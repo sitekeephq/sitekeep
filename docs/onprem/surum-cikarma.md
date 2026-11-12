@@ -41,6 +41,17 @@ satıştan sonra üretilen **lisans dosyası** belirler (lisanslama.md, baştaki
 3. Odoo sitesine yükleyin: Community paketi ve `.sha256`'sı herkese açık indirme sayfasına, Enterprise paketi
    müşteri portalına (yalnız lisanslı müşteriler). Sürüm notları `SURUM-NOTLARI.md`'de.
 4. Etiketi gönderin: `git push origin v1.0.0`.
+5. Açık depoyu güncelleyin ve Community sürümünü orada da yayımlayın:
+
+   ```bash
+   tools/public-sync.sh "SiteKeep 1.0.0" --push        # iç dışa aktarma + tarama, tek commit, github.com/sitekeephq/sitekeep
+   docker tag sitekeep:1.0.0 ghcr.io/sitekeephq/sitekeep:1.0.0 && docker push ghcr.io/sitekeephq/sitekeep:1.0.0
+   gh release create v1.0.0 -R sitekeephq/sitekeep --title "SiteKeep Community 1.0.0" -F ~/SiteKeep-surumler/sitekeep-1.0.0/SURUM-NOTLARI.md \
+     ~/SiteKeep-surumler/sitekeep-1.0.0/sitekeep-community-1.0.0-linux-amd64.tar.gz*
+   ```
+
+   Enterprise paketi açık depoya hiç konmaz. `tools/public-sync.sh` taramada iç bilgi izi bulursa durur
+   (`tools/public-export.markers`, izin verilenler `tools/public-export.allow`).
 
 **Nerede derlenir:** müşteri sunucuları amd64'tür. Apple silicon Mac amd64 imajını öykünerek (emulation) derler
 ve DWG aracının derlenmesi uzun sürer (saat mertebesi). Hızlı yol bir Linux amd64 makinedir, örneğin geçici

@@ -22,7 +22,7 @@ npm run dev        # API on http://127.0.0.1:8787, web app on http://localhost:5
 ```
 
 The repository layout, dependency rules and module boundary are described in
-docs/MIMARI.md and [docs/architecture/structure.md](docs/architecture/structure.md).
+[docs/architecture/structure.md](docs/architecture/structure.md) and [docs/modules/README.md](docs/modules/README.md).
 
 ## Make a change
 
