@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the on-prem installation bundle (docs/onprem/installation-bundle.md):
 #
-#   NODE_AUTH_TOKEN=… deploy/onprem/build-bundle.sh [--edition enterprise|community] [--version 1.0.0] [--platform linux/amd64] [--out dist-bundle]
+#   deploy/onprem/build-bundle.sh [--edition enterprise|community] [--version 1.0.0] [--platform linux/amd64] [--out dist-bundle]
 #
 # Output: <out>/sitekeep-<edition>-<version>-linux-<arch>.tar.gz with the application image (minified server,
 # no sources), PostgreSQL and Caddy images, install.sh, the sitekeep command and the README. The
@@ -27,7 +27,6 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -n "$VERSION" ] || VERSION="$(git -C "$ROOT" describe --tags --always --dirty 2>/dev/null || date +%Y%m%d)"
-[ -n "${NODE_AUTH_TOKEN:-}" ] || { echo "NODE_AUTH_TOKEN (read:packages) is required for the viewer package." >&2; exit 1; }
 case "$EDITION" in community|enterprise) ;; *) echo "--edition must be community or enterprise" >&2; exit 2 ;; esac
 ARCH="${PLATFORM#linux/}"
 if command -v sha256sum >/dev/null 2>&1; then SHA256=(sha256sum); else SHA256=(shasum -a 256); fi
@@ -40,7 +39,7 @@ rm -rf "$STAGE"
 mkdir -p "$STAGE/images"
 
 echo "==> application image $APP_IMAGE ($EDITION, $PLATFORM)"
-DOCKER_BUILDKIT=1 docker build --platform "$PLATFORM" --secret id=npm_token,env=NODE_AUTH_TOKEN \
+DOCKER_BUILDKIT=1 docker build --platform "$PLATFORM" \
   --build-arg EDITION="$EDITION" --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   -t "$APP_IMAGE" "$ROOT"
 

@@ -20,7 +20,6 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 
 - [Installation bundle and distribution (Linux)](onprem/installation-bundle.md)
 - [Installation with Docker Compose](onprem/docker-compose.md)
-- [Releasing (manual)](onprem/releasing.md)
 - [Backups](onprem/backups.md)
 - [Monitoring (Administration screen)](onprem/monitoring.md)
 - [Capacity and load testing (Administration screen)](onprem/capacity.md)

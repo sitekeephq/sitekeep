@@ -193,7 +193,7 @@ In order of priority. The Linux bundle (`v1.0.0-rc1`) is ready end to end; these
 
 ### 8.1 Cutting a release (today)
 
-Manually (without GitHub Actions): [releasing.md](releasing.md), `deploy/release.sh`. Automated:
+Manually (without GitHub Actions): releasing.md, `deploy/release.sh`. Automated:
 
 `.github/workflows/release.yml`. A release is tagged from `main` after green CI:
 
