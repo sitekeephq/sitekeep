@@ -1,0 +1,8 @@
+{
+  "entities": {
+    "template": "Template"
+  },
+  "errors": {
+    "adminRequired": "You must be a System Administrator to create a project."
+  }
+}

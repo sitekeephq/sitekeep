@@ -1,0 +1,30 @@
+{
+  "errors": {
+    "adminOnly": "This action requires System Administrator rights.",
+    "notForFile": "This preview cannot be made for this file.",
+    "notReady": "Preview not ready ({{status}}).",
+    "noFile": "Preview file missing.",
+    "pdfNotReady": "PDF preview not ready ({{status}}).",
+    "unsupportedType": "This file type cannot be shown in the browser."
+  },
+  "entities": {
+    "preview": "Preview",
+    "pdfPreview": "PDF preview"
+  },
+  "status": {
+    "none": "none"
+  },
+  "converter": {
+    "sofficeHint": "There is no local soffice on this server (optional, last-resort converter). Office files still open in the browser. For an exact PDF, an administrator can connect ONLYOFFICE, Collabora or Gotenberg under Administration → Office Integration (docs/features/OFIS_ENTEGRASYONU.md).",
+    "dwg2dxfHint": "LibreDWG (dwg2dxf) was not found on the server. Administrator: install LibreDWG or give its path with CDE_DWG2DXF_PATH (docs/features/GORUNTULEYICILER.md).",
+    "timeout": "The conversion timed out.",
+    "libreofficeFailed": "LibreOffice could not produce a PDF (code {{code}}). {{detail}}",
+    "dwgFailed": "The DWG could not be converted (code {{code}}). {{detail}}"
+  },
+  "jobs": {
+    "timeout": "Preparing the preview timed out.",
+    "workerExit": "The preview process ended with code {{code}}.",
+    "dxfFirst": "The DXF preview must be prepared first.",
+    "nothingToShow": "This drawing has no objects to show."
+  }
+}

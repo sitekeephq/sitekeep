@@ -1,0 +1,67 @@
+{
+  "errors": {
+    "aiOff": "AI has been switched off by the system administrator.",
+    "aiProjectOff": "AI is switched off in this project.",
+    "noProvider": "No AI provider is configured (Administration → AI and MCP).",
+    "promptCaptured": "Prompt captured (the model was not called).",
+    "noEmbeddingsHere": "No embeddings on this path.",
+    "candidateInvalid": "The answer did not pass the app's validation.",
+    "hostEmpty": "Empty entry.",
+    "hostInvalidRange": "Invalid IP range: {{entry}}",
+    "hostInvalidName": "Invalid host name: {{entry}}",
+    "clientLocalOnly": "Fully local mode: project content cannot be sent to a connected AI client (Claude, ChatGPT…). An administrator can turn on the \"Allow External AI Clients\" setting.",
+    "clientProjectNoExternal": "This project does not allow external AI; project content cannot be sent to a connected AI client (Claude, ChatGPT…).",
+    "adminOnly": "This action requires system administrator rights.",
+    "urlScheme": "The address must start with http:// or https://.",
+    "writeTokensDisabled": "The system administrator has switched off access tokens with write rights.",
+    "summaryFailed": "The summary could not be generated."
+  },
+  "messages": {
+    "invalidAddress": "invalid address",
+    "aiOffSystem": "AI is switched off system-wide.",
+    "aiOffProject": "AI is switched off in this project.",
+    "noProviderSelected": "No provider selected.",
+    "localOnlySelectedExternal": "Fully local mode: the selected provider is outside the network.",
+    "projectNoExternal": "The project does not allow external providers.",
+    "systemNoExternal": "The system mode does not allow external providers.",
+    "queueClient": "{{client}} (task queue)",
+    "aiClient": "AI client",
+    "noAnswer": "I could not answer this question within the step limit. Try narrowing the question (e.g. by naming a folder, discipline or status)."
+  },
+  "entities": {
+    "question": "Question",
+    "task": "Task",
+    "provider": "Provider"
+  },
+  "steps": {
+    "reading": "Reading the question…",
+    "tool": "Tool: {{tool}}…",
+    "fetching": "Fetching data…",
+    "writing": "Writing the answer…",
+    "evaluating": "Evaluating the results…",
+    "refusedTool": "Refused tool: {{tool}}"
+  },
+  "summary": {
+    "today": "Summary of the Today page"
+  },
+  "notifications": {
+    "taskDone": "AI task completed: {{label}}",
+    "taskDoneBy": "AI task completed ({{client}}): {{label}}"
+  },
+  "features": {
+    "reportGenerate": "Create Report Dashboard",
+    "reportRepair": "Repair Report Query",
+    "formFlow": "Form Approval Flow (from Description)",
+    "formFieldsNaming": "Name PDF Form Fields",
+    "formTemplateFromText": "Form Template from a Sentence",
+    "letterTranslate": "Letter Translation",
+    "docCompareSummary": "Document Comparison Summary",
+    "modelAsk": "Ask the Model",
+    "ask": "Ask",
+    "minutesActions": "Extract Actions from Minutes",
+    "rfiDraft": "RFI Draft",
+    "todaySummary": "Today Summary",
+    "recordFromFile": "Record Draft from File",
+    "paramChange": "Parameter Change (from a Sentence)"
+  }
+}

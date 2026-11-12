@@ -1,0 +1,451 @@
+{
+  "accessVia": {
+    "user": "personal permission",
+    "company": "company permission",
+    "role": "role permission",
+    "project_admin": "project admin",
+    "system_admin": "system admin"
+  },
+  "antetField": {
+    "projectNo": "Project No",
+    "projectName": "Project Name",
+    "drawingNo": "Drawing No",
+    "docNo": "Document No",
+    "sheetNo": "Sheet No",
+    "title": "Sheet Title",
+    "revision": "Revision",
+    "date": "Date",
+    "scale": "Scale",
+    "drawnBy": "Drawn By",
+    "checkedBy": "Checked By",
+    "approvedBy": "Approved By",
+    "discipline": "Discipline",
+    "status": "Status",
+    "company": "Company"
+  },
+  "approvalStatus": {
+    "approved": "Approved",
+    "approved_with_comments": "Approved with Comments",
+    "reviewed": "Reviewed",
+    "revise_resubmit": "Revise and Resubmit",
+    "rejected": "Rejected",
+    "in_review": "In Review"
+  },
+  "attributeType": {
+    "text": "Text",
+    "list": "Drop-down List",
+    "date": "Date",
+    "number": "Number"
+  },
+  "bcfImportState": {
+    "new": "New",
+    "update": "Will Update",
+    "unchanged": "No Change",
+    "conflict": "Conflict"
+  },
+  "clashGroupBy": {
+    "elementA": "By Element A",
+    "storey": "By Storey",
+    "classPair": "By Class Pair",
+    "system": "By System"
+  },
+  "deliveryStatus": {
+    "pending": "Preparing",
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "failed": "Not Delivered"
+  },
+  "diffRegion": {
+    "added": "Added",
+    "removed": "Removed",
+    "changed": "Changed"
+  },
+  "folderState": {
+    "wip": "Work in Progress",
+    "shared": "Shared",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "formItemType": {
+    "yes_no": "Yes / No / N/A",
+    "text": "Text",
+    "number": "Number (with unit)",
+    "km": "Km (chainage)",
+    "date": "Date",
+    "choice": "Single Choice",
+    "multi_choice": "Multiple Choice",
+    "signature": "Signature",
+    "photo": "Photo",
+    "location": "Location",
+    "file": "File Reference",
+    "table": "Table (repeating rows)",
+    "score": "Score (calculated)"
+  },
+  "formStatus": {
+    "draft": "Draft",
+    "submitted": "Submitted",
+    "in_review": "In Review",
+    "closed": "Closed"
+  },
+  "formTemplateOrigin": {
+    "pdf": "PDF Form",
+    "library": "Library Template",
+    "manual": "Built by Hand"
+  },
+  "ifcClass": {
+    "IfcWall": "Wall",
+    "IfcWallStandardCase": "Wall",
+    "IfcWallElementedCase": "Wall",
+    "IfcCurtainWall": "Curtain Wall",
+    "IfcDoor": "Door",
+    "IfcDoorStandardCase": "Door",
+    "IfcWindow": "Window",
+    "IfcWindowStandardCase": "Window",
+    "IfcSlab": "Slab",
+    "IfcSlabStandardCase": "Slab",
+    "IfcRoof": "Roof",
+    "IfcColumn": "Column",
+    "IfcColumnStandardCase": "Column",
+    "IfcBeam": "Beam",
+    "IfcBeamStandardCase": "Beam",
+    "IfcMember": "Member",
+    "IfcPlate": "Plate",
+    "IfcStair": "Stair",
+    "IfcStairFlight": "Stair Flight",
+    "IfcRamp": "Ramp",
+    "IfcRampFlight": "Ramp Flight",
+    "IfcRailing": "Railing",
+    "IfcCovering": "Covering",
+    "IfcFooting": "Footing",
+    "IfcPile": "Pile",
+    "IfcFurnishingElement": "Furniture",
+    "IfcFurniture": "Furniture",
+    "IfcBuildingElementProxy": "Generic Element",
+    "IfcPipeSegment": "Pipe",
+    "IfcPipeFitting": "Pipe Fitting",
+    "IfcDuctSegment": "Duct",
+    "IfcDuctFitting": "Duct Fitting",
+    "IfcFlowSegment": "Pipe / Duct",
+    "IfcFlowFitting": "Fitting",
+    "IfcFlowTerminal": "Terminal",
+    "IfcAirTerminal": "Air Terminal",
+    "IfcSanitaryTerminal": "Sanitary Fixture",
+    "IfcLightFixture": "Light Fixture",
+    "IfcCableCarrierSegment": "Cable Tray",
+    "IfcValve": "Valve",
+    "IfcPump": "Pump",
+    "IfcSpace": "Space",
+    "IfcOpeningElement": "Opening"
+  },
+  "issuePriority": {
+    "low": "Low",
+    "normal": "Normal",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "issueStatus": {
+    "open": "Open",
+    "in_progress": "In Progress",
+    "in_review": "In Review",
+    "closed": "Closed"
+  },
+  "letterLayout": {
+    "columns": "Side by Side (two columns)",
+    "stacked": "Stacked"
+  },
+  "level": {
+    "none": "No Access",
+    "view": "View",
+    "view_download": "View + Download",
+    "view_download_markup": "View + Download + Markup",
+    "upload_only": "Upload Only",
+    "edit": "Edit",
+    "manage": "Manage"
+  },
+  "locationLinkKind": {
+    "issue": "Issue",
+    "form": "Form",
+    "file": "File"
+  },
+  "modelAgg": {
+    "count": "Count",
+    "sum": "Sum",
+    "avg": "Average",
+    "min": "Minimum",
+    "max": "Maximum"
+  },
+  "modelChange": {
+    "added": "Added",
+    "changed": "Changed",
+    "removed": "Removed"
+  },
+  "modelOp": {
+    "=": "=",
+    "!=": "≠",
+    "contains": "contains",
+    ">": ">",
+    "<": "<",
+    ">=": "≥",
+    "<=": "≤",
+    "exists": "exists",
+    "missing": "missing"
+  },
+  "newRecordKind": {
+    "gelen-yazi": "Incoming Letter",
+    "giden-yazi": "Outgoing Letter",
+    "rfi": "RFI",
+    "submittal": "Submittal",
+    "meeting": "Meeting",
+    "action": "Action",
+    "transmittal": "Transmittal",
+    "issue": "Issue",
+    "form": "Form",
+    "review": "Start Review",
+    "param-change": "Parameter Change",
+    "upload": "Upload Document"
+  },
+  "oauthClientType": {
+    "public": "Public Client",
+    "confidential": "Confidential Client"
+  },
+  "oauthScope": {
+    "bcf": "BCF Issues",
+    "documents": "OpenCDE Documents",
+    "documents:read": "OpenCDE Documents (read)",
+    "read": "Read",
+    "write": "Write"
+  },
+  "outcomeKind": {
+    "approved": "Approval",
+    "approved_with_comments": "Conditional / Commented Approval",
+    "info": "Information (reviewed)",
+    "revise": "Revise (returned)",
+    "rejected": "Rejection"
+  },
+  "outcome": {
+    "approved": "Approved",
+    "approved_with_comments": "Approved with Comments",
+    "reviewed": "Reviewed",
+    "revise_resubmit": "Revise and Resubmit",
+    "rejected": "Rejected"
+  },
+  "paramChangeOwnership": {
+    "revit": "Also Applied in Revit",
+    "cde_only": "CDE Only"
+  },
+  "paramChangeSource": {
+    "selection": "From Selection",
+    "query": "From Query",
+    "ai": "From a Sentence"
+  },
+  "paramChangeStatus": {
+    "draft": "Draft",
+    "pending": "Awaiting Approval",
+    "approved": "Approved",
+    "applying": "Applying",
+    "applied": "Applied",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "authoring": "To Apply in Revit",
+    "values_lost": "Values Lost"
+  },
+  "paramItemResult": {
+    "pending": "Pending",
+    "ok": "OK",
+    "failed": "Failed",
+    "lost": "Lost",
+    "skipped": "Skipped"
+  },
+  "paramItemSource": {
+    "instance": "Instance",
+    "type": "Type",
+    "missing": "To Add"
+  },
+  "paramTypeMode": {
+    "instance": "Write to Instance",
+    "type": "Change on Type"
+  },
+  "paramValueType": {
+    "text": "Text",
+    "number": "Number",
+    "boolean": "Yes / No",
+    "enum": "Option"
+  },
+  "party": {
+    "client": "Client / Employer",
+    "consultant": "Consultant",
+    "contractor": "Contractor",
+    "designer": "Designer",
+    "subcontractor": "Subcontractor / Supplier",
+    "other": "Other"
+  },
+  "pdfDetection": {
+    "acroform": "Fillable PDF (AcroForm)",
+    "text": "PDF with Text Layer",
+    "scanned": "Scanned PDF"
+  },
+  "projectModule": {
+    "correspondence": "Correspondence",
+    "rfi": "RFI",
+    "submittals": "Submittals",
+    "meetings": "Meetings and Actions",
+    "transmittals": "Transmittals",
+    "issues": "Issues",
+    "reviews": "Reviews",
+    "forms": "Forms",
+    "coordination": "Coordination",
+    "schedule": "Schedule",
+    "spec": "Specification Analysis",
+    "reports": "Reports"
+  },
+  "reportModule": {
+    "documents": "Documents",
+    "issues": "Issues",
+    "works": "All Work",
+    "correspondence": "Correspondence",
+    "rfi": "RFIs",
+    "submittals": "Submittals",
+    "meetings": "Meetings and Actions",
+    "transmittals": "Transmittals",
+    "reviews": "Reviews",
+    "forms": "Forms",
+    "locations": "Locations",
+    "schedule": "Schedule",
+    "coordination": "Clashes",
+    "doccompare": "Document Comparisons",
+    "spec": "Specification Analysis",
+    "models": "Models",
+    "project": "Project and Activity"
+  },
+  "reportSharing": {
+    "private": "Only Me",
+    "project": "All Project Members",
+    "company": "My Company",
+    "admins": "Project Admins"
+  },
+  "reportValue": {
+    "status": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "in_review": "In Review",
+      "closed": "Closed"
+    },
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "derivativeStatus": {
+      "none": "None",
+      "pending": "Pending",
+      "processing": "Processing",
+      "ready": "Ready",
+      "failed": "Failed"
+    },
+    "folderState": {
+      "wip": "Work in Progress",
+      "shared": "Shared",
+      "published": "Published",
+      "archived": "Archived"
+    }
+  },
+  "reviewParty": {
+    "designer": "Designer",
+    "contractor": "Contractor",
+    "consultant": "Consultant",
+    "client": "Client",
+    "other": "Other"
+  },
+  "rolePackageAction": {
+    "create": "A new permission will be written",
+    "upgrade": "The current permission will be raised",
+    "unchanged": "The same permission already exists",
+    "kept_higher": "A higher permission is kept",
+    "covered_by_inherited": "Already inherited from the parent folder",
+    "rejected_lower_than_inherited": "Cannot be lower than the parent folder's permission",
+    "no_grant": "No access is given"
+  },
+  "ruleTarget": {
+    "code": "Activity Code",
+    "wbs": "Work Breakdown (WBS)"
+  },
+  "scheduleSource": {
+    "mspdi": "MS Project XML",
+    "xer": "Primavera P6 XER",
+    "csv": "CSV",
+    "xlsx": "Excel"
+  },
+  "simMode": {
+    "planned": "Planned",
+    "actual": "Actual"
+  },
+  "stageRevise": {
+    "stop": "A file marked revise/reject stops the chain and returns to the starter",
+    "continue": "Moves on to the next stage even when marked revise/reject"
+  },
+  "stepRule": {
+    "any": "Any One Is Enough",
+    "all": "Everyone Must Respond"
+  },
+  "todayMineGroup": {
+    "tasks": "Awaiting My Approval",
+    "works": "Work Assigned to Me",
+    "actions": "My Actions",
+    "replies": "Letters Awaiting Reply",
+    "receipts": "Awaiting Acknowledgement",
+    "forms": "Forms to Fill",
+    "issues": "Issues Assigned to Me"
+  },
+  "transmittalPurpose": {
+    "bilgi": "For Information",
+    "onay": "For Approval",
+    "uygulama": "For Construction"
+  },
+  "workflowKind": {
+    "review": "Document Review",
+    "rfi": "RFI",
+    "submittal": "Submittal",
+    "transmittal": "Transmittal",
+    "form": "Form Approval",
+    "progress_payment": "Progress Payment Approval"
+  },
+  "workflowRole": {
+    "project_admin": "Project Admins",
+    "starter": "Workflow Starter"
+  },
+  "workflowStatus": {
+    "running": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "workCategory": {
+    "correspondence": "Correspondence",
+    "transmittal": "Transmittal",
+    "generic": "General Work",
+    "rfi": "RFI",
+    "submittal": "Submittal Item",
+    "submittal_package": "Submittal Package",
+    "meeting": "Meeting",
+    "action": "Action"
+  },
+  "workFieldType": {
+    "text": "Text",
+    "textarea": "Long Text",
+    "date": "Date",
+    "number": "Number",
+    "list": "List",
+    "boolean": "Yes / No"
+  },
+  "workLinkRole": {
+    "ilgi": "Reference",
+    "ek": "Attachment",
+    "kaynak": "Source",
+    "kapak": "Cover"
+  },
+  "yesNo": {
+    "yes": "Yes",
+    "no": "No",
+    "na": "N/A"
+  }
+}

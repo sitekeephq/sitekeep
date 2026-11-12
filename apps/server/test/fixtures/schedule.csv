@@ -1,0 +1,5 @@
+Kod;Ad;WBS;Baþlangýç;Bitiþ;% Tamamlanma;Öncül;Kritik
+A10;Mobilizasyon;Hazýrlýk;05.01.2026;09.01.2026;100%;;
+A20;Þantiye binasý;Hazýrlýk;12.01.2026;23.01.2026;50;A10;evet
+A30;"Temel; radye";Kaba > Temel;26.01.2026;13.02.2026;0;A20BS+2;1
+A40;Temel bitti;Kaba > Temel;13.02.2026;13.02.2026;0;A30FF;

@@ -1,0 +1,67 @@
+{
+  "errors": {
+    "aiOff": "Yapay zekâ sistem yöneticisi tarafından kapatıldı.",
+    "aiProjectOff": "Bu projede yapay zekâ kapalı.",
+    "noProvider": "Yapay zekâ sağlayıcısı tanımlı değil (Yönetim → Yapay Zekâ ve MCP).",
+    "promptCaptured": "İstem yakalandı (model çağrılmadı).",
+    "noEmbeddingsHere": "Bu yolda embedding yok.",
+    "candidateInvalid": "Cevap uygulamanın doğrulamasından geçmedi.",
+    "hostEmpty": "Boş giriş.",
+    "hostInvalidRange": "Geçersiz IP aralığı: {{entry}}",
+    "hostInvalidName": "Geçersiz sunucu adı: {{entry}}",
+    "clientLocalOnly": "Tam yerel mod: proje içeriği bağlı bir yapay zekâ istemcisine (Claude, ChatGPT…) gönderilemez. Yönetici \"Dış Yapay Zekâ İstemcilerine İzin Ver\" ayarını açabilir.",
+    "clientProjectNoExternal": "Bu proje dış yapay zekâya izin vermiyor; proje içeriği bağlı bir yapay zekâ istemcisine (Claude, ChatGPT…) gönderilemez.",
+    "adminOnly": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
+    "urlScheme": "Adres http:// veya https:// ile başlamalı.",
+    "writeTokensDisabled": "Sistem yöneticisi yazma yetkili erişim anahtarlarını kapattı.",
+    "summaryFailed": "Özet üretilemedi."
+  },
+  "messages": {
+    "invalidAddress": "geçersiz adres",
+    "aiOffSystem": "Yapay zekâ sistem genelinde kapalı.",
+    "aiOffProject": "Yapay zekâ bu projede kapalı.",
+    "noProviderSelected": "Sağlayıcı seçilmemiş.",
+    "localOnlySelectedExternal": "Tam yerel mod: seçili sağlayıcı ağ dışında.",
+    "projectNoExternal": "Proje dış sağlayıcılara izin vermiyor.",
+    "systemNoExternal": "Sistem modu dış sağlayıcılara izin vermiyor.",
+    "queueClient": "{{client}} (görev kuyruğu)",
+    "aiClient": "Yapay zekâ istemcisi",
+    "noAnswer": "Bu soruyu verilen adım sınırında cevaplayamadım. Soruyu daraltmayı deneyin (ör. klasör, disiplin veya durum belirterek)."
+  },
+  "entities": {
+    "question": "Soru",
+    "task": "Görev",
+    "provider": "Sağlayıcı"
+  },
+  "steps": {
+    "reading": "Soru inceleniyor…",
+    "tool": "Araç: {{tool}}…",
+    "fetching": "Veriler alınıyor…",
+    "writing": "Cevap yazılıyor…",
+    "evaluating": "Sonuçlar değerlendiriliyor…",
+    "refusedTool": "Reddedilen araç: {{tool}}"
+  },
+  "summary": {
+    "today": "Bugün sayfasının özeti"
+  },
+  "notifications": {
+    "taskDone": "Yapay zekâ görevi tamamlandı: {{label}}",
+    "taskDoneBy": "Yapay zekâ görevi tamamlandı ({{client}}): {{label}}"
+  },
+  "features": {
+    "reportGenerate": "Rapor Paneli Oluşturma",
+    "reportRepair": "Rapor Sorgusu Onarma",
+    "formFlow": "Form Onay Akışı (Anlatımdan)",
+    "formFieldsNaming": "PDF Form Alanlarını Adlandırma",
+    "formTemplateFromText": "Cümleden Form Şablonu",
+    "letterTranslate": "Yazı Çevirisi",
+    "docCompareSummary": "Doküman Karşılaştırma Özeti",
+    "modelAsk": "Modele Sor",
+    "ask": "Sor",
+    "minutesActions": "Tutanaktan Eylem Çıkarma",
+    "rfiDraft": "Bilgi Talebi Taslağı",
+    "todaySummary": "Bugün Özeti",
+    "recordFromFile": "Dosyadan Kayıt Taslağı",
+    "paramChange": "Parametre Değişikliği (Cümleden)"
+  }
+}

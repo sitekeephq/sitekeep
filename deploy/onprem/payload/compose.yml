@@ -1,0 +1,50 @@
+# SiteKeep on-prem: PostgreSQL + SiteKeep + Caddy (HTTPS). Written by install.sh; values come from
+# .env next to this file (CDE_VERSION, CDE_DATA, ports, POSTGRES_PASSWORD) and config/app.env.
+# Every image ships in the bundle (pull_policy: never), so the server needs no internet access.
+name: sitekeep
+
+services:
+  db:
+    image: ${CDE_DB_IMAGE}
+    pull_policy: never
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cde
+      POSTGRES_USER: cde
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - ${CDE_DATA:?}/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cde -d cde"]
+      interval: 10s
+      retries: 12
+    networks: [internal]
+
+  app:
+    image: sitekeep:${CDE_VERSION:?}
+    pull_policy: never
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: ./config/app.env
+    volumes:
+      - ${CDE_DATA:?}/app:/data
+    networks: [internal]
+
+  proxy:
+    image: ${CDE_PROXY_IMAGE}
+    pull_policy: never
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "${CDE_HTTP_PORT:-80}:80"
+      - "${CDE_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./config/certs:/certs:ro
+      - ${CDE_DATA:?}/caddy:/data
+    networks: [internal]
+
+networks:
+  internal: {}

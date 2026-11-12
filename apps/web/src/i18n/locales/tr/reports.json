@@ -1,0 +1,231 @@
+{
+  "frame": {
+    "frameName": "Rapor paneli",
+    "errors": {
+      "escaped": "Panel kendi sayfasının dışına gitmeye çalıştı ve durduruldu. Panel kodunu (HTML) kontrol edin."
+    },
+    "actions": {
+      "reload": "Yeniden Yükle"
+    }
+  },
+  "list": {
+    "title": "Raporlar",
+    "actions": {
+      "createWithAi": "✨ Yapay Zekâ ile Oluştur",
+      "fromTemplate": "Şablondan",
+      "blank": "Boş Panel"
+    },
+    "defaultName": "Yeni panel",
+    "messages": {
+      "aiNotConfiguredShort": "Yapay zekâ yapılandırılmamış; şablon veya boş panel kullanın.",
+      "aiNotConfigured": "Yapay zekâ yapılandırılmamış. Hazır şablonlarla veya HTML düzenleyiciyle panel oluşturabilirsiniz.",
+      "localAiNotConfigured": "Yerel yapay zekâ yapılandırılmamış. İsteğinizi bağlı yapay zekâ istemcisine (Claude, ChatGPT…) gönderebilir veya hazır şablonları kullanabilirsiniz."
+    },
+    "mine": {
+      "title": "Panellerim",
+      "empty": "Henüz paneliniz yok. Yapay zekâya ne görmek istediğinizi yazın veya bir şablon seçin."
+    },
+    "shared": {
+      "title": "Benimle Paylaşılanlar",
+      "empty": "Sizinle paylaşılan panel yok."
+    },
+    "description": "Paneller her açılışta güncel veriyle hesaplanır ve açıkken veriler değiştikçe kendiliğinden yenilenir. Her modülün sayfasındaki Rapor düğmesi, o modülün verileriyle panel oluşturmayı başlatır."
+  },
+  "template": {
+    "title": "Şablondan Panel Oluştur",
+    "description": "Hazır şablonlar yapay zekâ gerektirmez. Oluşturulan panel sizin kopyanızdır; her açılışta güncel veriyle hesaplanır.",
+    "other": {
+      "title": "Diğer"
+    },
+    "actions": {
+      "use": "Bu Şablonla Oluştur"
+    }
+  },
+  "prompt": {
+    "messages": {
+      "busy": "Yerel model çalışıyor, bu biraz sürebilir…"
+    }
+  },
+  "aiCreate": {
+    "title": "Yapay Zekâ ile Panel",
+    "badges": {
+      "scope": "Kapsam: {{module}}"
+    },
+    "scopeHint": "Yalnızca bu modülün verileri yapay zekâya tanıtılır; istekte başka bir modül adı geçerse o da eklenir.",
+    "actions": {
+      "removeScope": "Kapsamı Kaldır"
+    },
+    "templatesHint": "Hazır şablon (yapay zekâsız):",
+    "ask": {
+      "title": "Ne Görmek İstiyorsunuz?"
+    },
+    "refine": {
+      "title": "Değiştirmek İster Misiniz?"
+    },
+    "nameLabel": "Panel adı",
+    "examples": {
+      "monthly": "Grafiği aylık yap",
+      "excludeClosed": "Kapalı kayıtları hariç tut",
+      "addTable": "Bir tablo da ekle"
+    },
+    "placeholder": "ör. Firmalara göre açık sorun sayısı ve termini geçenler",
+    "placeholderRefine": "ör. firmaları ayrı göster, grafiği aylık yap",
+    "placeholderScoped": "ör. {{example}}",
+    "defaultScopedExample": "Firmalara göre dağılım",
+    "description": "Panel yalnızca sizin görebildiğiniz verilerle çalışır. Paylaştığınız kişiler kendi yetkileri kadarını görür."
+  },
+  "spec": {
+    "title": "Şartname Analizi",
+    "actions": {
+      "backToDocuments": "← Dokümanlar",
+      "newAnalysis": "+ Şartname Analizi Başlat",
+      "report": "Rapor"
+    },
+    "picker": {
+      "title": "Şartname PDF'i Seç",
+      "placeholder": "PDF ara (dosya adı, klasör)…",
+      "empty": "Eşleşen PDF bulunamadı.",
+      "analysed": "Analiz Var",
+      "uploadPdf": "Yeni PDF Yükle",
+      "start": "Analiz Et",
+      "running": "Analiz Ediliyor…"
+    },
+    "intro": "Şartname PDF'lerinden çıkarılan taslak teknik onay listeleri. Yeni analiz için sağ üstteki <strong>+ Şartname Analizi Başlat</strong> düğmesinden bir PDF seçin veya Dokümanlar'da dosya panelinin Antet bölümündeki <strong>Şartnameden Teknik Onay Listesi Çıkar</strong> düğmesine basın.",
+    "empty": "Henüz analiz yok.",
+    "columns": {
+      "specification": "Şartname",
+      "version": "Versiyon",
+      "items": "Kalem",
+      "updated": "Güncelleme"
+    }
+  },
+  "specView": {
+    "actions": {
+      "back": "← Şartname Analizi",
+      "viewPdf": "PDF Görüntüle",
+      "import": "Teknik Onay Kalemi Olarak İçe Aktar",
+      "aiClassify": "Belirsizleri Yapay Zekâyla Sınıflandır",
+      "rebuild": "Yeniden Analiz Et"
+    },
+    "badges": {
+      "aiAssisted": "Yapay Zekâ Destekli",
+      "ai": "YZ"
+    },
+    "status": {
+      "aiRunning": "Yapay Zekâ Çalışıyor…",
+      "unclassified": "Belirsiz"
+    },
+    "options": {
+      "allTypes": "Tüm Tipler",
+      "allDisciplines": "Tüm Disiplinler",
+      "noDiscipline": "Disiplinsiz",
+      "showExcluded": "Çıkarılanları Göster"
+    },
+    "messages": {
+      "saveFirst": "Önce kaydedin",
+      "saveChangesFirst": "Önce değişiklikleri kaydedin"
+    },
+    "importHint": "Dışarıda bırakılmayan satırlardan teknik onay kalemleri oluşturur",
+    "jsonHint": "Teknik onay modülüne aktarım için",
+    "aiClassifyHint": "Belirsiz kalemler yerel modelle sınıflandırılır; kalem düzenlemeleri sıfırlanır.",
+    "rebuildHint": "Şartnameyi yeniden okur; kalem düzenlemeleri sıfırlanır.",
+    "pages_one": "{{count}} sayfa",
+    "pages_other": "{{count}} sayfa",
+    "sections_one": "{{count}} bölüm",
+    "sections_other": "{{count}} bölüm",
+    "items_one": "{{count}} kalem",
+    "items_other": "{{count}} kalem",
+    "summary": "{{pages}}, {{sections}}, {{items}} · Taslaktır: tip ve disiplini düzeltin, gereksiz kalemleri listeden çıkarın, sonra kaydedin. Dışa aktarımda çıkarılan kalemler yer almaz.",
+    "placeholder": "Ara (bölüm, metin)",
+    "columns": {
+      "no": "No",
+      "section": "Bölüm",
+      "page": "Sayfa",
+      "type": "Tip",
+      "discipline": "Disiplin",
+      "requirement": "Gereklilik",
+      "included": "Dahil"
+    },
+    "keywords": "Anahtar: {{list}}",
+    "empty": "Filtreye uyan kalem yok."
+  },
+  "view": {
+    "actions": {
+      "back": "← Raporlar",
+      "snapshot": "Anlık Görüntü Al (PDF)",
+      "versions": "Sürümler"
+    },
+    "liveHint": "Açık panel veriler değiştikçe kendiliğinden yenilenir (sekme görünürken).",
+    "lastUpdated": "Son güncelleme: {{time}}",
+    "status": {
+      "refreshed": "Yenilendi"
+    },
+    "snapshotHint": "Panelin şu anki hâlini PDF olarak kaydedin (yazdır → PDF olarak kaydet). Kayıtlı panel her açılışta güncel veriyi gösterir.",
+    "delete": {
+      "title": "Paneli Sil",
+      "confirm": "\"{{name}}\" paneli silinsin mi?"
+    },
+    "loadingData": "Veriler yükleniyor…",
+    "dataTime": "Veri zamanı: {{time}}. Veriler sizin yetkilerinizle ve her zaman güncel kayıtlarla (dosyaların, iş programlarının ve modellerin en yeni versiyonlarıyla) hesaplanır; panel açıkken veriler değişirse kendiliğinden yenilenir."
+  },
+  "broken": {
+    "actions": {
+      "aiRepair": "Yapay Zekâ ile Onar"
+    },
+    "messages": {
+      "aiWorking": "Yapay zekâ çalışıyor…"
+    },
+    "manualFix": "Düzenle → Gelişmiş bölümünden sorguyu düzeltin.",
+    "proposal": {
+      "title": "Önerilen Düzeltme",
+      "fields": {
+        "newQuery": "Yeni Sorgu ({{id}})"
+      },
+      "hint": "Uygulandığında panelin yeni bir sürümü kaydedilir; eski sürüme Sürümler düğmesinden dönebilirsiniz.",
+      "actions": {
+        "applyAndSave": "Uygula ve Kaydet"
+      }
+    }
+  },
+  "edit": {
+    "title": "Paneli Düzenle",
+    "promptHint": "Yapay zekâya değişikliği yazın",
+    "examples": {
+      "showHill": "Hill'i ayrı göster",
+      "addSummary": "Bir özet tablo ekle"
+    },
+    "placeholder": "ör. grafiği aylık yap, kapalı sorunları gösterme",
+    "noAi": "Yapay zekâ yapılandırılmamış; panel HTML ve sorgularını Gelişmiş bölümünden düzenleyebilirsiniz.",
+    "fields": {
+      "sharing": "Paylaşım",
+      "html": "Panel HTML'i (CDE.onData, CDE.bar, CDE.line, CDE.pie, CDE.kpi, CDE.table)",
+      "queries": "Sorgular (JSON)"
+    },
+    "ownerOnly": "Paylaşımı yalnızca panelin sahibi değiştirebilir.",
+    "advanced": {
+      "title": "Gelişmiş: HTML ve Sorgular"
+    },
+    "actions": {
+      "preview": "Önizle"
+    },
+    "errors": {
+      "queriesNotArray": "Sorgular bir JSON dizisi olmalı: [{\"id\": …, \"spec\": {…}}]",
+      "queries": "Sorgular: {{message}}"
+    }
+  },
+  "versions": {
+    "title": "Sürüm Geçmişi",
+    "columns": {
+      "version": "Sürüm",
+      "name": "Ad",
+      "savedBy": "Kaydeden",
+      "date": "Tarih"
+    },
+    "status": {
+      "current": "Güncel"
+    },
+    "actions": {
+      "restore": "Geri Yükle"
+    }
+  }
+}

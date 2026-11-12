@@ -1,0 +1,136 @@
+{
+  "list": {
+    "title": "Projects",
+    "description": "The project workspaces you can access. Reach documents, models and processes from here.",
+    "actions": {
+      "new": "New Project",
+      "refresh": "Refresh List",
+      "copyName": "Copy Project Name"
+    },
+    "searchPlaceholder": "Search projects: code, name or description",
+    "filterLabel": "Filter projects",
+    "count_one": "{{count}} project",
+    "count_other": "{{count}} projects",
+    "filteredCount_one": "{{shown}} / {{count}} project",
+    "filteredCount_other": "{{shown}} / {{count}} projects",
+    "columns": {
+      "project": "Project",
+      "description": "Description",
+      "myRole": "My Role",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "copyNameLabel": "Copy the project name {{name}}",
+    "status": {
+      "projectAdmin": "Project Administrator",
+      "member": "Member"
+    },
+    "emptyFiltered": "No projects match the filter.",
+    "empty": "No projects yet",
+    "emptyAdminHint": "Get started by creating your first project.",
+    "emptyMemberHint": "Contact your administrator to be added to a project."
+  },
+  "delete": {
+    "title": "Delete Project",
+    "label": "Delete the project {{name}}",
+    "confirm": "Are you sure you want to delete the project <b>{{name}}</b>?",
+    "hint": "The project and its records will be removed from users' project lists.",
+    "deleting": "Deleting…",
+    "actions": {
+      "confirm": "Yes, Delete the Project"
+    }
+  },
+  "wizard": {
+    "title": "New Project",
+    "steps": {
+      "template": "Template",
+      "details": "Project Details",
+      "companies": "Companies",
+      "preview": "Preview"
+    },
+    "template": {
+      "lead": "A template sets up folders, permissions, the naming standard, attributes and approval workflows together.",
+      "folders_one": "{{count}} folder",
+      "folders_other": "{{count}} folders",
+      "onDemand_one": "+{{count}} folder on first file",
+      "onDemand_other": "+{{count}} folders on first file",
+      "workflows_one": "{{count}} workflow",
+      "workflows_other": "{{count}} workflows",
+      "fromFile": {
+        "title": "From a JSON File",
+        "description": "A template exported from another project (.json)",
+        "actions": {
+          "change": "Change",
+          "choose": "Choose File"
+        }
+      },
+      "blank": {
+        "title": "Blank Project",
+        "description": "Only the “Proje Dosyaları” root folder; you set up the rest later."
+      }
+    },
+    "details": {
+      "fields": {
+        "code": "Project Code",
+        "name": "Project Name"
+      },
+      "codeHint": "Written into the project code field of the naming standard; it must not contain the separator (-).",
+      "namePlaceholder": "e.g. Zafer Shopping Centre"
+    },
+    "companies": {
+      "lead": "Choose the project company for each role in the template. Folder permissions and approval steps are given to these companies. Permissions of a role left empty are skipped and its steps go to the project administrators. The code is the company code in the naming standard.",
+      "empty": "This template has no roles.",
+      "columns": {
+        "role": "Role",
+        "company": "Company",
+        "code": "Code"
+      },
+      "options": {
+        "leaveEmpty": "— leave empty —",
+        "newCompany": "+ New Company…"
+      },
+      "companyNamePlaceholder": "Company name",
+      "companyCodeHint": "Company short code (2–8 letters/digits, optional)"
+    },
+    "preview": {
+      "dimensions": {
+        "heading": "Skeleton Dimensions",
+        "hint": "Each line is a folder. For example, edit the station and line lists for your project, then refresh the preview."
+      },
+      "actions": {
+        "refresh": "Refresh Preview"
+      },
+      "loading": "Preparing the preview…",
+      "stats": {
+        "foldersNow_one": "folder now",
+        "foldersNow_other": "folders now",
+        "foldersOnDemand_one": "folder on first file",
+        "foldersOnDemand_other": "folders on first file",
+        "grants_one": "company permission",
+        "grants_other": "company permissions",
+        "workflows_one": "approval workflow",
+        "workflows_other": "approval workflows",
+        "namingStandards_one": "naming standard",
+        "namingStandards_other": "naming standards",
+        "attributes_one": "attribute",
+        "attributes_other": "attributes"
+      },
+      "onDemandHint": "“On first file” folders appear faded in the list; they become real folders when someone uploads a file (or opens and creates the folder). This way unused empty folders do not pile up.",
+      "allRoles": "All Roles",
+      "namingStandard": "Naming standard",
+      "badges": {
+        "gate": "Approved Review Only"
+      },
+      "grant": "{{role}}: {{level}}"
+    },
+    "errors": {
+      "templateProblem": "The template has problems: {{errors}}",
+      "invalidJson": "The file is not valid JSON."
+    },
+    "progress": "Step {{current}} / {{total}}",
+    "creating": "Creating…",
+    "actions": {
+      "create": "Create Project"
+    }
+  }
+}

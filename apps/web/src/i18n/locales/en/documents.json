@@ -1,0 +1,796 @@
+{
+  "newFolder": {
+    "title": "New Folder",
+    "fields": {
+      "name": "Folder Name"
+    },
+    "hint": "The new folder inherits the permissions and attributes of its parent folder."
+  },
+  "more": {
+    "actions": {
+      "select": "Select",
+      "newFolder": "New Folder",
+      "permissions": "Permissions",
+      "settings": "Folder Settings",
+      "columnFilters": "Column Filters",
+      "filter": "Filter",
+      "inFolder": "Search This Folder Only",
+      "autodesk": "Autodesk Documents",
+      "report": "Report",
+      "spec": "Submittal Register from Specification"
+    },
+    "status": {
+      "offline": "Offline"
+    }
+  },
+  "compare": {
+    "ai": {
+      "goToPage": "Go to page",
+      "pageShort": "p.{{page}}",
+      "createIssue": "Create an issue from this item",
+      "heading": "✨ Change Summary",
+      "rewriteHint": "Rewrites the summary with AI",
+      "actions": {
+        "rewrite": "Rewrite"
+      },
+      "comparingText": "Comparing text…",
+      "errors": {
+        "failed": "Could not be compared: {{error}}",
+        "summaryFailed": "The AI summary could not be obtained: {{error}}"
+      },
+      "preparing": "Preparing the AI summary…",
+      "keepWorking": "You can keep using the page meanwhile.",
+      "disclaimer": "The AI ({{model}}) only saw the difference summary; check it before you decide.",
+      "ruleBasedUnavailable": "Rule-based summary. AI is not available: {{reason}}",
+      "off": "off",
+      "errorFallback": "error",
+      "ruleBasedQuick": "Quick rule-based summary; the AI summary follows shortly."
+    },
+    "regions": {
+      "badges": {
+        "newPage": "New Page",
+        "deletedPage": "Deleted Page"
+      },
+      "page": "Page {{page}}",
+      "item": "Page {{page}} · region {{n}}",
+      "createIssue": "Create an issue from this region",
+      "actions": {
+        "showAll": "Show All ({{count}})"
+      }
+    },
+    "text": {
+      "antetHeading": "Title Block Changes",
+      "headings": {
+        "pdf": "Text Difference",
+        "docx": "Paragraph Difference",
+        "text": "Line Difference",
+        "cells": "Cell Difference"
+      },
+      "totals": "{{changed}} changed, {{added}} added, {{removed}} deleted",
+      "identical": "The two versions are identical.",
+      "noDiff": "No text differences.",
+      "sheetTotals": "{{changed}} changed, {{added}} added, {{removed}} deleted rows",
+      "row": "Row {{row}}",
+      "moreRows_one": "… {{count}} more row",
+      "moreRows_other": "… {{count}} more rows",
+      "text": "Text",
+      "pageTotals": "{{changed}} changed · {{added}} added · {{removed}} deleted",
+      "antetTag": "(title block)",
+      "moreChanges_one": "… {{count}} more change",
+      "moreChanges_other": "… {{count}} more changes"
+    },
+    "errors": {
+      "noPrevious": "This version has no previous version to compare with.",
+      "pdf": "PDF could not be opened: {{error}}"
+    },
+    "header": {
+      "revisions": "Rev {{from}} → {{to}}",
+      "currentVersion": "V{{version}} (current)",
+      "backToFolder": "Back to the folder",
+      "old": "Old",
+      "oldVersion": "Old version",
+      "swap": "Swap",
+      "new": "New",
+      "newVersion": "New version",
+      "otherFileHint": "Choose another file from the same folder for the old side",
+      "actions": {
+        "otherFile": "With Another File…"
+      },
+      "otherFile": "Other file",
+      "chooseFile": "Choose File…"
+    },
+    "stage": {
+      "regionTitle": "{{kind}} region {{n}}",
+      "pageOnlyNew": "Page {{page}} exists only in the new version.",
+      "pageRemoved": "Page {{page}} is not in the new version (deleted).",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "modes": {
+        "overlay": "Overlay",
+        "side": "Side by Side",
+        "slider": "Slider"
+      },
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "actions": {
+        "fit": "⤢ Fit",
+        "regions": "▢ Regions"
+      },
+      "regionsHint": "Frames of changed regions",
+      "alignHint": "Align by shifting the old page (1 pt)",
+      "align": "Align",
+      "nudge": {
+        "left": "Left",
+        "up": "Up",
+        "down": "Down",
+        "right": "Right"
+      },
+      "resetAlign": "Reset alignment",
+      "same": "Unchanged",
+      "loadingPdfs": "Loading PDFs…",
+      "oldVersion": "Old · V{{version}}",
+      "newVersion": "New · V{{version}}"
+    }
+  },
+  "drawer": {
+    "actions": {
+      "download": "⬇ Download (V{{version}})",
+      "open": "👁 Open",
+      "compareRevision": "⇄ Compare with Previous Revision",
+      "openInModel": "🧊 Open in Model",
+      "compareVersion": "⇄ Compare with Previous Version",
+      "access": "↗ Sharing and Access",
+      "move": "↪ Move",
+      "rename": "✎ Rename",
+      "delete": "🗑 Delete",
+      "copy": "▣ Copy",
+      "saveAttributes": "Save Attributes"
+    },
+    "compareRevisionHint": "Compares the current version with the previous one: visual difference, text difference, AI summary",
+    "accessHint": "Project members who can see this file and why",
+    "rename": "Rename",
+    "deleteTitle": "Delete File",
+    "deleteConfirm": "Delete \"{{name}}\"? The file is moved to the recycle bin; a project administrator can restore it.",
+    "ifc": {
+      "heading": "IFC Summary",
+      "summary": "Schema: <b>{{schema}}</b> · Project: {{project}} · Elements: <b>{{elements}}</b>"
+    },
+    "otherAttributes": {
+      "heading": "Other Attributes"
+    },
+    "noAttributes": "No attributes.",
+    "freeAttributeName": "Free attribute name",
+    "attributeValue": "Value",
+    "history": {
+      "heading": "Version History",
+      "uploader": "Uploaded By",
+      "review": "Review #{{number}}",
+      "model": "Model",
+      "compareHint": "Compare with the previous version"
+    }
+  },
+  "approval": {
+    "title": "Review #{{number}} — {{name}}",
+    "titleCopy": "Review #{{number}} — {{name}} (approved copy)"
+  },
+  "whoCanSee": {
+    "via": {
+      "user": "Person",
+      "company": "Company",
+      "role": "Role",
+      "projectAdmin": "Project Administrator",
+      "systemAdmin": "System Administrator"
+    },
+    "titleFile": "Who Can See This File?",
+    "titleFolder": "Who Can See This Folder?",
+    "summary_one": "<b>{{count}} person</b> can see it. Permissions are inherited from parent folders; the person's company and roles count too. The highest permission applies.",
+    "summary_other": "<b>{{count}} people</b> can see it. Permissions are inherited from parent folders; the person's company and roles count too. The highest permission applies.",
+    "summaryWithHidden_one": "<b>{{count}} person</b> can see it, {{hidden}} project members cannot. Permissions are inherited from parent folders; the person's company and roles count too. The highest permission applies.",
+    "summaryWithHidden_other": "<b>{{count}} people</b> can see it, {{hidden}} project members cannot. Permissions are inherited from parent folders; the person's company and roles count too. The highest permission applies.",
+    "actions": {
+      "hideHidden": "Hide Those Who Cannot See",
+      "showHidden": "Show Those Who Cannot See ({{count}})"
+    },
+    "systemAdminsNote": "System administrators see every project even when they are not project members.",
+    "columns": {
+      "why": "Why?"
+    },
+    "inactive": "inactive",
+    "noCompany": "No company",
+    "canUpload": "+ can upload",
+    "inheritedFrom": "inherited: {{folder}}",
+    "decisive": "decisive"
+  },
+  "markupIssue": {
+    "defaultDescription": "{{file}} · V{{version}} · page {{page}}",
+    "titleMarkup": "Create Issue from Markup",
+    "titleVersion": "Create Issue on Version",
+    "createdMarkup": "Issue #{{number}} was created and linked to the markup.",
+    "createdVersion": "Issue #{{number}} was created and linked to the version.",
+    "types": {
+      "design": "Design",
+      "coordination": "Coordination",
+      "site": "Site",
+      "quality": "Quality",
+      "safety": "Health and Safety",
+      "other": "Other"
+    },
+    "willPublish": "The draft markup is published together with the issue."
+  },
+  "history": {
+    "label": "Version history",
+    "compareVersions": "Compare versions",
+    "showing_one": "Showing {{count}} version",
+    "showing_other": "Showing {{count}} versions",
+    "selected": "{{count}}/2 versions selected",
+    "selectVersion": "Select version V{{version}}",
+    "uploadedBy": "Uploaded by {{user}} on {{date}}",
+    "unknownUser": "Unknown user",
+    "versionActionsFor": "Actions for V{{version}}",
+    "versionActions": "Version actions",
+    "openInModel": "Open in model",
+    "downloadSource": "Download source file",
+    "comparePrevious": "Compare with previous version"
+  },
+  "reportShortcut": {
+    "hint": "Report for {{module}}: create it with AI or choose a ready-made template"
+  },
+  "cards": {
+    "folderContents": "Folder contents"
+  },
+  "startReview": {
+    "stageDays_one": "{{name}} ({{count}} day)",
+    "stageDays_other": "{{name}} ({{count}} days)",
+    "title": "Start Review",
+    "pinned_one": "{{count}} file is pinned at its current version: {{files}}",
+    "pinned_other": "{{count}} files are pinned at their current versions: {{files}}",
+    "fields": {
+      "template": "Approval Workflow Template",
+      "subject": "Subject (optional)",
+      "name": "Review Name",
+      "note": "Note (optional)",
+      "target": "Target Folder",
+      "pattern": "Subfolder Pattern (optional)"
+    },
+    "noTemplates": "The project has no review templates. Add them under Project Settings → Workflows.",
+    "namePlaceholder": "e.g. Architectural concept design set",
+    "number": "Review number: <b>{{code}}</b> <m>(final once started)</m>",
+    "options": {
+      "copy": "Copy Approved Files to a Folder (e.g. Work in Progress → Shared)",
+      "fallback": "Copy Files Missing a Field to the Target Folder Itself"
+    },
+    "notSelected": "Not selected",
+    "errors": {
+      "noUpload": "You do not have permission to upload to this folder; the review cannot be started."
+    },
+    "patternPlaceholder": "{Zone}/{Discipline}/{Type}",
+    "patternHelp": "Fields are read from the file attributes and the naming standard; missing folders are created and take the parent folder's permissions.",
+    "columns": {
+      "target": "Target"
+    },
+    "notCopied": "Will not be copied",
+    "missing": "missing: {{fields}}",
+    "actions": {
+      "start": "Start"
+    }
+  },
+  "deleted": {
+    "ago": {
+      "now": "just now",
+      "minutes_one": "{{count}} min ago",
+      "minutes_other": "{{count}} min ago",
+      "hours_one": "{{count}} hour ago",
+      "hours_other": "{{count}} hours ago",
+      "days_one": "{{count}} day ago",
+      "days_other": "{{count}} days ago"
+    },
+    "newName": "New Name",
+    "actions": {
+      "restore": "Restore",
+      "purge": "Delete Permanently"
+    },
+    "nameConflict": "name conflict",
+    "messages": {
+      "restorePartial_one": "{{count}} item restored. Could not restore: {{errors}}",
+      "restorePartial_other": "{{count}} items restored. Could not restore: {{errors}}",
+      "restoredOne": "\"{{name}}\" was restored to its original location.",
+      "restored_one": "{{count}} item was restored to its original location.",
+      "restored_other": "{{count}} items were restored to their original locations.",
+      "purgePartial_one": "{{count}} item deleted permanently. Could not delete: {{errors}}",
+      "purgePartial_other": "{{count}} items deleted permanently. Could not delete: {{errors}}",
+      "purgedOne": "\"{{name}}\" was deleted permanently.",
+      "purged_one": "{{count}} item was deleted permanently.",
+      "purged_other": "{{count}} items were deleted permanently."
+    },
+    "title": "Recycle Bin",
+    "description": "Deleted files and folders are kept here. A restored item returns to its original location; subfolders and files deleted with a folder return with it.",
+    "purgeNote": "Permanent deletion removes every version from the server and cannot be undone.",
+    "purgeAdminOnly": "Permanent deletion is only available to the system administrator.",
+    "tabs": {
+      "folders": "Folders",
+      "files": "Files"
+    },
+    "searchPlaceholder": "Search name, original location or who deleted it…",
+    "searchLabel": "Search the recycle bin",
+    "selected": "{{count}} selected",
+    "columns": {
+      "location": "Original Location",
+      "content": "Content",
+      "deletedBy": "Deleted By",
+      "deletedAt": "Deleted"
+    },
+    "noMatch": "No deleted items match the search.",
+    "empty": "No deleted files or folders.",
+    "projectFiles": "Project Files",
+    "parentDeleted": "parent folder deleted",
+    "folderDeleted": "its folder is deleted",
+    "restoreHint": "Restore to its original location",
+    "parentDeletedHint": "The parent folder is deleted too; restore it first.",
+    "folderDeletedHint": "Its folder is deleted too; restore the folder first.",
+    "purgeLabel": "Delete permanently",
+    "purgeItem": "Delete {{name}} permanently",
+    "purge": {
+      "confirmWord": "DELETE PERMANENTLY",
+      "title": "Delete Permanently",
+      "folder": "The \"{{name}}\" folder, its subfolders and all files in it (with all their versions) will be deleted from the server.",
+      "file": "The \"{{name}}\" file will be deleted from the server with all its versions.",
+      "many_one": "The selected {{count}} item (with the contents of folders and all versions) will be deleted from the server.",
+      "many_other": "The selected {{count}} items (with the contents of folders and all versions) will be deleted from the server.",
+      "irreversible": "This cannot be undone.",
+      "more_one": "+{{count}} more item",
+      "more_other": "+{{count}} more items",
+      "typeToConfirm": "Type to confirm: <b>{{text}}</b>"
+    },
+    "restoredSuffix": "(restored)"
+  },
+  "shapes": {
+    "pen": "Pen",
+    "rect": "Rectangle",
+    "cloud": "Revision Cloud",
+    "arrow": "Arrow",
+    "text": "Text"
+  },
+  "docCompare": {
+    "messages": {
+      "markupsSaved": "{{count}} changed regions on {{pages}} pages were saved as draft markups.",
+      "nothingToSave": "No changed regions to save.",
+      "noteAdded": "The summary was added as a note to the timeline of review #{{number}}."
+    },
+    "actions": {
+      "openInViewer": "Open in Viewer",
+      "openReview": "Open Review",
+      "saveMarkups": "☁ Save as Markup",
+      "addToReview": "Add Summary to Review"
+    },
+    "issueTitle": "Revision difference: page {{page}}, {{kind}} region",
+    "issueDescriptionPage": "{{file}} · V{{from}} → V{{to}} · page {{page}}",
+    "issueDescription": "{{file}} · V{{from}} → V{{to}}",
+    "findingPrevious": "Looking for the previous version…",
+    "chooseVersions": "Choose the versions to compare.",
+    "saveMarkupsHint": "Draws the changed regions on the new version as revision clouds (draft markup)",
+    "noMarkupPermission": "You do not have markup permission in this folder",
+    "rebuildHint": "Recalculates the comparison",
+    "preparing": "Preparing the comparison…",
+    "inReview": "This version is in review <a>{{code}}</a>.",
+    "checks": {
+      "heading": "Checks"
+    },
+    "regionsHeading": "Changed Regions ({{count}})",
+    "analysis": "Analysis {{done}}/{{total}}",
+    "visualRunning": "Visual comparison is running in the browser…",
+    "noVisualDiff": "No visual differences found.",
+    "analysedFirst": "Visual analysis covered the first {{count}} pages."
+  },
+  "viewer": {
+    "tools": {
+      "select": "Select"
+    },
+    "widths": {
+      "thin": "Thin",
+      "medium": "Medium",
+      "thick": "Thick"
+    },
+    "deleteTitle": "Delete Markup",
+    "deleteConfirm": "Delete the markup?",
+    "details": "Details",
+    "actions": {
+      "download": "⬇ Download",
+      "publish": "Publish",
+      "createIssue": "⚑ Create Issue",
+      "publishDrafts": "Publish Drafts ({{count}})",
+      "issueOnVersion": "+ Issue on Version",
+      "details": "☰ Details",
+      "fitWidth": "⤢ Fit Width",
+      "takeoff": "2D Take-off"
+    },
+    "compareHint": "Compares with the previous version: visual difference, text difference, AI summary",
+    "oldVersion": "This is an old version (V{{version}}). The current version is V{{current}}.",
+    "noMarkupPermission": "You do not have markup permission in this folder; you can only view.",
+    "selected": {
+      "heading": "Selected Markup"
+    },
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "markups": {
+      "heading": "Markups",
+      "empty": "No markups yet.",
+      "emptyCanDraw": "No markups yet. You can draw with the tools above."
+    },
+    "publishDraftsHint": "Makes your drafts visible to everyone",
+    "links": {
+      "heading": "Linked Issues",
+      "empty": "No issues are linked to this version.",
+      "markup": "markup",
+      "version": "version"
+    },
+    "page": "Page",
+    "colour": "Colour {{colour}}",
+    "width": "Thickness",
+    "textPlaceholder": "Type text, Enter: save, Esc: cancel",
+    "takeoffHint": "Take calibrated lengths, areas and counts on this drawing"
+  },
+  "upload": {
+    "suggestion": {
+      "rev": "Rev {{rev}}",
+      "error": "Title block: {{error}}",
+      "label": "Title block suggestion:",
+      "alreadyValid": "name already complies with the standard",
+      "noName": "no suitable name could be derived",
+      "noNameWithErrors": "no suitable name could be derived ({{errors}})",
+      "withAi": "With AI",
+      "aiRejected": "AI suggestion not used",
+      "actions": {
+        "undo": "Undo",
+        "details": "Details"
+      },
+      "fields": {
+        "name": "Name to Upload"
+      },
+      "alternatives": " · candidates: {{values}}",
+      "attributes": "Attributes (written to this file when the suggestion is applied)",
+      "freeForm": "(free text)"
+    },
+    "errors": {
+      "failed": "Could not be uploaded.",
+      "titleBlock": "Title block could not be read: {{error}}"
+    },
+    "title": "Upload → {{folder}}",
+    "standardRequired": "The <b>{{standard}}</b> naming standard is mandatory in this folder. Files that do not comply are not uploaded.",
+    "noStandard": "This folder has no naming standard.",
+    "readingTitleBlocks": "Reading PDF title blocks…",
+    "suggestionsFound_one": "Title block suggestion: a new standard-compliant name was found for {{count}} file.",
+    "suggestionsFound_other": "Title block suggestion: new standard-compliant names were found for {{count}} files.",
+    "aiHint": "Only unclear fields are sent to the local model; the answer is not used if it does not comply with the standard.",
+    "status": {
+      "aiThinking": "AI Is Thinking…"
+    },
+    "actions": {
+      "refineWithAi": "✨ Refine with AI ({{count}})",
+      "applyAll": "Apply to All",
+      "upload_one": "Upload {{count}} File",
+      "upload_other": "Upload {{count}} Files"
+    },
+    "columns": {
+      "check": "Check"
+    },
+    "uploadedVersion": "Uploaded · V{{version}}",
+    "checking": "checking…",
+    "newVersionHint": "A file with the same name exists in this folder; it is added as its new version, not as a new file.",
+    "newVersion": "New version · V{{version}}",
+    "newFile": "New file",
+    "attributes": {
+      "heading": "Attributes",
+      "help": "Values apply to all uploaded files and take precedence over title block suggestions. Fields marked * are mandatory.",
+      "choose": "Choose…",
+      "missingRequired": "Mandatory: {{names}} — cannot be left empty on new files (a new version of an existing file keeps the previous value; the value from an applied title block suggestion is also used)."
+    },
+    "fields": {
+      "comment": "Version Comment (optional)"
+    },
+    "commentPlaceholder": "e.g. P02 – comments addressed"
+  },
+  "grid": {
+    "sortBy": "Sort by {{column}}",
+    "actions": {
+      "sort": "Sort"
+    },
+    "columnWidth": "Column width",
+    "resizeHint": "Drag to widen; double-click to reset"
+  },
+  "selectItem": "Select {{name}}",
+  "columns": {
+    "version": "Version"
+  },
+  "autodesk": {
+    "externalSource": "EXTERNAL SOURCE",
+    "counts": "{{folders}} folders · {{files}} files",
+    "lastSync": "Last import: {{date}}",
+    "empty": "No Autodesk metadata source found",
+    "emptyHint": "It appears here once an Autodesk snapshot is imported into PostgreSQL.",
+    "columns": {
+      "typeVersion": "Type / Version",
+      "modified": "Modified",
+      "source": "Source"
+    },
+    "parentFolder": "Parent folder",
+    "folderEmpty": "This folder is empty.",
+    "cdeDocuments": "CDE Documents",
+    "openInAutodesk": "Open in Autodesk",
+    "readOnly": "Read Only"
+  },
+  "search": {
+    "titleInFolder": "Search results for \"{{query}}\" in this folder",
+    "titleInProject": "Search results for \"{{query}}\" in the project",
+    "count_one": "{{count}} file",
+    "count_other": "{{count}} files",
+    "countTruncated_one": "{{count}} file — showing the first results, narrow your search",
+    "countTruncated_other": "{{count}} files — showing the first results, narrow your search",
+    "actions": {
+      "close": "Close Search"
+    },
+    "searching": "Searching…",
+    "foundInContent": "Found in the file content",
+    "snippet": "<m>In content: </m>{{snippet}}"
+  },
+  "description": {
+    "placeholder": "Enter a description",
+    "errors": {
+      "saveFailedWith": "Could not be saved: {{error}}",
+      "saveFailed": "Could not be saved"
+    },
+    "edit": "Edit description"
+  },
+  "filters": {
+    "nameContains": "Name contains…",
+    "descriptionContains": "Description contains…",
+    "contains": "contains…"
+  },
+  "derivative": {
+    "openAs": "Open as {{kind}}",
+    "actions": {
+      "openModel": "Open Model"
+    },
+    "status": {
+      "failed": "Conversion Error",
+      "processing": "Processing…"
+    }
+  },
+  "page": {
+    "zipSearchName": "{{code}}-search",
+    "bulkDelete": {
+      "partial": "{{deleted}} files deleted, {{failed}} files could not be deleted:\n{{errors}}",
+      "dialogTitle": "Delete Files",
+      "body_one": "The selected <b>{{count}} file</b> will be moved to the recycle bin. A project administrator can restore it.",
+      "body_other": "The selected <b>{{count}} files</b> will be moved to the recycle bin. A project administrator can restore them.",
+      "more_one": "and {{count}} more file",
+      "more_other": "and {{count}} more files",
+      "foldersKept": "Selected folders are not deleted.",
+      "confirmButton_one": "Delete {{count}} file",
+      "confirmButton_other": "Delete {{count}} files"
+    },
+    "treeWidth": "Folder panel width",
+    "showTree": "Show folder panel",
+    "hideTree": "Hide folder panel",
+    "gatedHint": "Files only arrive in this folder through an approved review.",
+    "gatedHintBy": "Files only arrive in this folder through an approved review (setting: {{setting}}).",
+    "badges": {
+      "gated": "Approved Review Only"
+    },
+    "yourLevel": "Your permission in this folder",
+    "actions": {
+      "startReview": "Start Review ({{count}})",
+      "deleteCount": "Delete ({{count}})",
+      "chooseFiles": "Choose Files"
+    },
+    "zipHint": "Download the selected files and folders as a single zip",
+    "deleteHint": "Move the selected files to the recycle bin",
+    "search": {
+      "placeholderInFolder": "Search this folder…",
+      "placeholder": "Search files…",
+      "label": "Search files",
+      "hint": "Files in this folder are filtered as you type. Enter: search names, attributes and content.",
+      "goHint": "Search names, attributes and file content",
+      "goInFolder": "Search folder",
+      "goInProject": "Search project"
+    },
+    "hints": {
+      "upload": "Drag and drop files into this folder or press Upload. To upload to another folder, choose it on the left.",
+      "uploadNotAllowed": "You do not have permission to upload to this folder; choose a folder on the left that you can upload to.",
+      "review": "Tick the files to send for review, then press Start Review."
+    },
+    "empty": "This folder is empty.",
+    "emptyPhoneCanUpload": "This folder is empty. You can add files with Upload.",
+    "emptyCanUpload": "This folder is empty. You can upload files by dragging and dropping them.",
+    "noFilterMatch": "No files match the filter.",
+    "attributeInherited": "Attribute inherited from the parent folder",
+    "attributeOwn": "Attribute of this folder",
+    "columns": {
+      "lastUploader": "Last Uploaded By",
+      "approval": "Approval"
+    },
+    "virtual": {
+      "hintCanUpload": "This folder has not been created yet. Click to choose files or drop files here; the folder is created with the first file.",
+      "hint": "This folder has not been created yet; it is created when the first file is uploaded.",
+      "createdOnFirstFile": "Created with the first file",
+      "createdOnFirstFileWithSub_one": "Created with the first file (+{{count}} subfolder)",
+      "createdOnFirstFileWithSub_other": "Created with the first file (+{{count}} subfolders)",
+      "actions": {
+        "createNow": "Create Now"
+      },
+      "note": "created with the first file",
+      "noteWithSub_one": "created with the first file (+{{count}} subfolder)",
+      "noteWithSub_other": "created with the first file (+{{count}} subfolders)",
+      "errorTitle": "Folder Could Not Be Created"
+    },
+    "fileActions": "File actions",
+    "fileActionsFor": "File actions for {{name}}",
+    "openVersionHistory": "Open the version history of {{name}}"
+  },
+  "transfer": {
+    "moveTitle": "Move File",
+    "copyTitle": "Copy File",
+    "hint": "Choose the target folder for <b>{{name}}</b>.",
+    "target": "Target folder",
+    "copyName": "Name of the copy",
+    "alreadyHere": "The file is already in this folder.",
+    "actions": {
+      "move": "Move"
+    }
+  },
+  "pdfPages": {
+    "errors": {
+      "notFound": "PDF not found.",
+      "http": "PDF could not be opened (HTTP {{status}}).",
+      "offline": "The PDF is not on this device; it opens once you are back online."
+    },
+    "loading": "Loading PDF…"
+  },
+  "permissions": {
+    "errors": {
+      "lowerThanInherited": "Cannot be lower than the \"{{level}}\" permission inherited from the parent folder."
+    },
+    "status": {
+      "ok": "saved",
+      "skipped_existing": "already has permission"
+    },
+    "roleOption_one": "{{name}} ({{count}} person)",
+    "roleOption_other": "{{name}} ({{count}} people)",
+    "title": "Permissions — {{folder}}",
+    "help": "Permissions pass down to subfolders. A subfolder can raise a permission but not lower it. Project administrators manage every folder.",
+    "columns": {
+      "who": "Who",
+      "level": "Permission"
+    },
+    "inherited": "from parent folder",
+    "subjects": {
+      "user": "Person",
+      "role": "Role",
+      "roleTeam": "Role / Team"
+    },
+    "empty": "No permissions defined for this folder — only project administrators can see it.",
+    "addHeading": "Add Permission",
+    "choose": "Choose…",
+    "noRoles": "The project has no roles. Define teams under Project Settings → Roles.",
+    "actions": {
+      "whoCanSee": "Who Can See?"
+    }
+  },
+  "folderSettings": {
+    "actions": {
+      "delete": "Delete Folder"
+    },
+    "deleteConfirm": "Delete the \"{{name}}\" folder together with its subfolders and files? A project administrator can restore it from the recycle bin.",
+    "title": "Folder Settings",
+    "fields": {
+      "state": "ISO 19650 State",
+      "standard": "Naming Standard (mandatory in this folder and its subfolders)",
+      "attributes": "Attributes (shown as columns in this folder and its subfolders, requested on upload)"
+    },
+    "options": {
+      "inheritStandard": "None / Inherit from Parent Folder",
+      "gate": "Files Enter This Folder Only Through an Approved Review"
+    },
+    "noStandards": "No standards are defined in the project. Add them under Project Settings → Naming Standards.",
+    "gateHelp": "When on, direct uploads and moves are refused; files are only copied by review approval (ISO 19650 Shared / Published). Also applies to subfolders.",
+    "gateInherited": "Currently inherited from the \"{{folder}}\" folder.",
+    "noAttributes": "No attributes are defined in the project. Add them under Project Settings → Attributes.",
+    "badges": {
+      "inherited": "From Parent Folder"
+    }
+  },
+  "antet": {
+    "confidence": {
+      "ambiguousHint": "Ambiguous: there are several candidates",
+      "label": "Confidence",
+      "ambiguous": "ambiguous"
+    },
+    "sources": {
+      "antet": "title block",
+      "table": "revision table",
+      "filename": "file name",
+      "attribute": "attribute"
+    },
+    "heading": "Title Block",
+    "actions": {
+      "reread": "Read Again",
+      "revisionTable": "Revision Table ({{count}})",
+      "rename": "Rename as Suggested",
+      "refineWithAi": "✨ Refine with AI",
+      "fillAttributes": "Fill Attributes",
+      "specAnalysis": "📋 Specification Analysis",
+      "buildRegister": "📋 Build Submittal Register from Specification",
+      "analyseSpec": "Analyse as Specification"
+    },
+    "reading": "Reading title block…",
+    "errors": {
+      "readFailed": "Could not be read: {{error}}"
+    },
+    "badges": {
+      "warning": "Warning",
+      "info": "Info"
+    },
+    "fieldLabel": "Label: {{label}}",
+    "revision": "Revision: <b>{{value}}</b>",
+    "nameMatches": "Name matches the title block",
+    "suggestion": "Suggestion: <m>{{name}}</m>",
+    "noName": "No standard-compliant name could be derived from the title block.",
+    "aiResolved": "AI resolved the ambiguous fields.",
+    "attributesFromTitleBlock": "Attributes from the title block: {{values}}",
+    "status": {
+      "readingSpec": "Reading Specification…",
+      "reading": "Reading…"
+    }
+  },
+  "modelCompare": {
+    "heading": "⇄ Comparison",
+    "close": "Close the comparison",
+    "kinds": {
+      "added": "Added",
+      "changed": "Changed",
+      "removed": "Deleted",
+      "unchanged": "Unchanged"
+    },
+    "options": {
+      "fade": "Show Unchanged Faded",
+      "ghost": "Load the Old Version as a Ghost (deleted in red)"
+    },
+    "upgrading": "Preparing storey and property details (the model is being re-indexed)…",
+    "columns": {
+      "class": "Class"
+    },
+    "removedHint": "Load the old version to see deleted elements in the model.",
+    "unnamed": "(unnamed)",
+    "moreProps_one": "+{{count}} property",
+    "moreProps_other": "+{{count}} properties",
+    "moreElements_one": "… and {{count}} more element",
+    "moreElements_other": "… and {{count}} more elements",
+    "summary": {
+      "preparing": "Preparing the change summary…",
+      "heading": "Change Summary",
+      "aiModel": "AI · {{model}}",
+      "aiWriting": "AI is writing… {{seconds}} s",
+      "report": "Report (PDF)",
+      "aiError": "No AI summary: {{error}}",
+      "noChanges": "No changes.",
+      "showInModel": "Show in the model",
+      "createIssue": "Create an issue for this change",
+      "actions": {
+        "issue": "Issue"
+      },
+      "allGroups": "All Groups ({{count}})"
+    },
+    "dialog": {
+      "title": "Compare Versions",
+      "fields": {
+        "from": "Old Version",
+        "to": "New Version"
+      },
+      "help": "The new version is loaded: added elements in <added>green</added>, changed ones in <changed>orange</changed>. Deleted elements are listed; if you like, the old version is loaded as a ghost and deleted elements are shown in <removed>red</removed>. Elements are matched by IFC GlobalId; changes are detected from attributes and property sets.",
+      "actions": {
+        "compare": "Compare"
+      }
+    }
+  }
+}

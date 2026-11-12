@@ -1,0 +1,41 @@
+{
+  "errors": {
+    "apiRequestFailed": "The Autodesk API request could not be completed.",
+    "connectionNotFound": "Autodesk connection not found.",
+    "reauthorise": "The Autodesk connection needs to be authorised again.",
+    "invalidTokenResponse": "Autodesk OAuth returned an invalid token response.",
+    "oauthRequestFailed": "OAuth request failed",
+    "noProjectMember": "No project member found for the Autodesk synchronisation.",
+    "notConfigured": "AUTODESK_CLIENT_ID and AUTODESK_CALLBACK_URL are not configured.",
+    "oauthNotConfigured": "Autodesk OAuth is not configured.",
+    "callbackMissing": "The Autodesk OAuth callback details are missing.",
+    "oauthStateInvalid": "The Autodesk OAuth session is invalid.",
+    "oauthStateExpired": "The Autodesk OAuth session has expired.",
+    "invalidJobPayload": "The Autodesk sync job payload is invalid.",
+    "unavailableModules": "Unavailable modules: {{modules}}",
+    "mcpDisabled": "The MCP connection has been turned off by the System Administrator.",
+    "mcpTokenRequired": "An API access token is required: Authorization: Bearer <token> (CDE → My Account → API Access Tokens).",
+    "mcpPostOnly": "This MCP server is stateless; only POST is supported.",
+    "hubNotFound": "The hub of the connected Autodesk project was not found. Make sure the authorising account can access the project.",
+    "noStoredContent": "This Autodesk version has no downloadable content (e.g. a cloud worksharing model).",
+    "noDownloadUrl": "Autodesk did not return a download address.",
+    "downloadFailed": "The file could not be downloaded from Autodesk (HTTP {{status}})."
+  },
+  "entities": {
+    "connection": "Autodesk connection"
+  },
+  "files": {
+    "alreadyQueued": "This file is already queued for import.",
+    "requesterInactive": "The user who started the import is no longer active.",
+    "versionMismatch": "The Autodesk version does not belong to the selected file.",
+    "folderGone": "The target folder no longer exists.",
+    "versionComment": "Autodesk Docs: {{path}} (v{{version}})",
+    "browseFailed": "Autodesk Docs could not be read (HTTP {{status}}): {{detail}}"
+  },
+  "catalog": {
+    "failed": "ACC projects could not be listed (HTTP {{status}})."
+  },
+  "records": {
+    "syncing": "A record sync is running; try again when it ends."
+  }
+}

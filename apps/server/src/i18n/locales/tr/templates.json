@@ -1,0 +1,8 @@
+{
+  "entities": {
+    "template": "Şablon"
+  },
+  "errors": {
+    "adminRequired": "Proje oluşturmak için sistem yöneticisi olmalısınız."
+  }
+}

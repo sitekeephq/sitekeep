@@ -1,0 +1,115 @@
+{
+  "chain": {
+    "due": "Termin {{date}}"
+  },
+  "list": {
+    "options": {
+      "allStatuses": "Tüm Durumlar"
+    },
+    "actions": {
+      "newFromDocuments": "Dokümanlardan Yeni İnceleme",
+      "report": "Rapor"
+    },
+    "empty": "Henüz inceleme yok. Dokümanlar ekranında dosyaları seçip \"İnceleme başlat\" ile başlatın.",
+    "badges": {
+      "myTurn": "Sıra Sizde",
+      "overdue": "Gecikti"
+    },
+    "columns": {
+      "number": "No",
+      "step": "Adım",
+      "startedBy": "Başlatan"
+    }
+  },
+  "detail": {
+    "cancel": {
+      "title": "İncelemeyi İptal Et",
+      "message": "İsterseniz bir gerekçe yazın."
+    },
+    "actions": {
+      "cancel": "İptal Et",
+      "reassign": "Atananları Değiştir"
+    },
+    "approvedTo": "Onaylananlar →",
+    "marks": {
+      "title": "İnceleyen Görüşleri",
+      "empty": "Henüz görüş yok."
+    },
+    "timeline": {
+      "title": "Zaman Çizelgesi",
+      "system": "Sistem"
+    }
+  },
+  "behalf": {
+    "company": "{{name}} firması",
+    "projectAdmins": "Proje Yöneticileri",
+    "team": "{{name}} ekibi",
+    "deletedRole": "(silinmiş rol)",
+    "onBehalfOf": "{{names}} adına"
+  },
+  "actions": {
+    "stepN": "{{n}}. adım",
+    "start": "İnceleme başlatıldı",
+    "submit": "\"{{step}}\" yanıtlandı",
+    "submitWithOutcome": "\"{{step}}\" yanıtlandı — en kötü sonuç: {{outcome}}",
+    "stepCompleted": "\"{{step}}\" adımı tamamlandı",
+    "stepCompletedReturned_one": "\"{{step}}\" adımı tamamlandı — {{count}} dosya başlatana iade edildi",
+    "stepCompletedReturned_other": "\"{{step}}\" adımı tamamlandı — {{count}} dosya başlatana iade edildi",
+    "completed": "İnceleme tamamlandı",
+    "cancel": "İnceleme iptal edildi",
+    "reassign": "\"{{step}}\" atananları değişti",
+    "note": "Not eklendi"
+  },
+  "steps": {
+    "badges": {
+      "done": "Tamam",
+      "current": "Sırada"
+    },
+    "stageDays_one": "kademe {{count}} gün",
+    "stageDays_other": "kademe {{count}} gün",
+    "required": "Zorunlu: {{attributes}}",
+    "days_one": "{{count}} gün",
+    "days_other": "{{count}} gün",
+    "submittedBy": "Yanıtlayan: {{names}}"
+  },
+  "files": {
+    "columns": {
+      "version": "V",
+      "chain": "Zincir",
+      "copy": "Kopya"
+    },
+    "compareHint": "Önceki revizyonla karşılaştır",
+    "badges": {
+      "returned": "Başlatana İade Edildi",
+      "copied": "Kopyalandı"
+    },
+    "errors": {
+      "unresolved": "Çözülemeyen alan: {{fields}}"
+    }
+  },
+  "act": {
+    "title": "Sıra sizde: {{n}}. {{step}}",
+    "instructions": "Her dosya için sonuç seçin, sonra adımı gönderin.",
+    "instructionsWithAttributes": "Her dosya için sonuç seçin, zorunlu öznitelikleri ({{attributes}}) doldurun, sonra adımı gönderin.",
+    "behalfHint": "Yanıtınız kendi adınızla ve bu ekip / firma adına kaydedilir.",
+    "answeringFor": "{{who}} yanıtlıyorsunuz",
+    "options": {
+      "applyToAll": "Tümüne Uygula…",
+      "choose": "Seçin…"
+    },
+    "columns": {
+      "yourResult": "Sonucunuz",
+      "note": "Not"
+    },
+    "returned": "İade edildi: <badge></badge>",
+    "fileNotePlaceholder": "Dosya notu",
+    "commentPlaceholder": "Genel yorum (isteğe bağlı)",
+    "actions": {
+      "submit": "Adımı Gönder"
+    }
+  },
+  "reassign": {
+    "title": "Atananları Değiştir — {{step}}",
+    "description": "Yalnızca bu incelemenin mevcut adımı değişir; şablon aynı kalır. Verilmiş yanıtlar korunur."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "7d-cde": {
+      "type": "http",
+      "url": "${CDE_MCP_URL:-http://localhost:8787/mcp}",
+      "headers": {
+        "Authorization": "Bearer ${CDE_MCP_TOKEN}"
+      }
+    }
+  }
+}

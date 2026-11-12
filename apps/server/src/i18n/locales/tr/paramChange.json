@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "request": "Değişiklik talebi"
+  },
+  "errors": {
+    "changedMeanwhile": "Talep bu sırada değişti; sayfayı yenileyin."
+  },
+  "warnings": {
+    "noElements": "Seçime veya sorguya uyan eleman yok.",
+    "unknownSelected_one": "{{count}} seçili eleman bu versiyonda yok; atlandı ({{list}}).",
+    "unknownSelected_other": "{{count}} seçili eleman bu versiyonda yok; atlandı ({{list}}).",
+    "newProperty_one": "\"{{field}}\" modelde yok; {{count}} elemana yeni özellik olarak eklenecek.",
+    "newProperty_other": "\"{{field}}\" modelde yok; {{count}} elemana yeni özellik olarak eklenecek."
+  },
+  "guard": {
+    "classMissing": "\"{{name}}\" sınıfı modelde yok.",
+    "storeyMissing": "\"{{name}}\" katı modelde yok.",
+    "propertyMissing": "\"{{name}}\" özelliği modelde yok.",
+    "valueMissing": "\"{{value}}\" değeri cümlede ve modelde yok.",
+    "inventedProperty": "\"{{name}}\" özelliği modelde yok (uydurma özellik).",
+    "noBoolean": "\"{{name}}\" için evet/hayır değeri cümlede yok.",
+    "newValueMissing": "Yeni değer \"{{value}}\" cümlede yok.",
+    "noScope": "Hangi elemanların değişeceği belli değil (sınıf, kat veya koşul yok).",
+    "notJson": "Cevap JSON değil.",
+    "answer": "cevap"
+  },
+  "jobs": {
+    "timeout": "Parametre değişikliği süre sınırını aştı.",
+    "workerExit": "İşlem {{code}} koduyla bitti."
+  },
+  "notifications": {
+    "pending": "Onay bekleyen parametre değişikliği: {{code}} {{title}}",
+    "approved": "Parametre değişikliği onaylandı: {{code}} {{title}}",
+    "rejected": "Parametre değişikliği reddedildi: {{code}} {{title}}",
+    "authoring": "Parametre değişikliği Revit'te uygulanacak: {{code}} {{title}}",
+    "verified": "Parametre değişikliği V{{version}}'de doğrulandı: {{title}}"
+  }
+}

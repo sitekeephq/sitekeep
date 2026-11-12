@@ -1,0 +1,518 @@
+{
+  "aiPresets": {
+    "ollama": {
+      "dataLocation": "On this server or a GPU server on the network; data does not leave the network.",
+      "note": "The safest option for KVKK. DeepSeek and Qwen open-weight models run locally with Ollama."
+    },
+    "vllm": {
+      "dataLocation": "On a server on the network; data does not leave the network.",
+      "note": "For tool calls, start the server with --enable-auto-tool-choice and a suitable --tool-call-parser."
+    },
+    "lmstudio": {
+      "dataLocation": "On this computer; data does not leave the network."
+    },
+    "deepseek": {
+      "dataLocation": "On DeepSeek's servers in the People's Republic of China (according to its privacy policy).",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects. Use the DeepSeek cloud API only for demo or non-sensitive projects; for KVKK the safe option is to run DeepSeek / Qwen open-weight models locally with Ollama.",
+      "note": "The reasoning_content field never mixes into the answer or the JSON. The old deepseek-chat / deepseek-reasoner names were removed on 24.07.2026; the model ID can be edited. Ollama's deepseek-v4 \":cloud\" tags also run in the cloud."
+    },
+    "openai": {
+      "dataLocation": "On OpenAI's servers in the USA; projects with data residency can choose regions such as the EU (there is no Türkiye region).",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects."
+    },
+    "gemini": {
+      "dataLocation": "On Google's global infrastructure (the Gemini API has no region choice); on the free tier, prompts may be used for product development.",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects. Use the paid tier only.",
+      "note": "OpenAI-compatible endpoint (beta). Thinking cannot be turned off in Gemini 3."
+    },
+    "anthropic": {
+      "dataLocation": "On Anthropic's servers (global by default; optionally US only).",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects.",
+      "note": "There is no JSON mode; JSON is requested in the prompt and extracted by the application."
+    },
+    "mistral": {
+      "dataLocation": "In Mistral's data centres in the EU/EFTA (guaranteed with the api.eu.mistral.ai address).",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects."
+    },
+    "groq": {
+      "dataLocation": "On Groq's servers in the USA (Google Cloud); default retention 30 days.",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects."
+    },
+    "openrouter": {
+      "dataLocation": "Through OpenRouter (USA) to the provider of the selected model; the region depends on the model.",
+      "kvkk": "Project content is transferred to servers outside Türkiye (KVKK Art. 9): explicit consent or another valid transfer basis is required. Use a local model for sensitive projects.",
+      "note": "Many models with one key; the model ID is in provider/model format."
+    },
+    "azure-openai": {
+      "dataLocation": "In the Azure region you choose; Global deployments may process data in any region, a Data Zone (EU) deployment stays in the EU.",
+      "kvkk": "If the region is outside Türkiye, project content is transferred abroad (KVKK Art. 9).",
+      "note": "Replace the address with your resource name and the model field with your deployment name."
+    }
+  },
+  "attributes": {
+    "required": "\"{{name}}\" is required.",
+    "notAnOption": "\"{{value}}\" is not a valid option for \"{{name}}\". Allowed values: {{options}}.",
+    "date": "\"{{name}}\" must be a valid date (YYYY-MM-DD), not \"{{value}}\".",
+    "number": "\"{{name}}\" must be a number, not \"{{value}}\".",
+    "tooLong": "\"{{name}}\" can be at most {{max}} characters.",
+    "definition": {
+      "nameEmpty": "The attribute name cannot be empty.",
+      "noOptions": "A dropdown list must have at least one option.",
+      "emptyOption": "Options cannot be empty.",
+      "duplicateOption": "The same option is entered twice."
+    }
+  },
+  "capacity": {
+    "tiers": {
+      "trial": "Trial",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "enterprise": "Enterprise"
+    },
+    "tierDatabase": {
+      "trial": "Same machine",
+      "small": "Same machine",
+      "medium": "Same machine, separate disk recommended",
+      "large": "Separate disk; separate server recommended",
+      "enterprise": "Preliminary study: separate database server"
+    },
+    "requirements": {
+      "os64": "64-bit operating system",
+      "network": "Network: at least 100 Mbit/s; 1 Gbit/s for large IFC files",
+      "ssd": "SSD data disk (not a spinning disk)",
+      "backup": "Separate backup target (NAS / SFTP / S3); it does not count towards the data disk",
+      "fixedCores": "Dedicated cores on a virtual machine; not a shared “burst” processor"
+    },
+    "findings": {
+      "usersBelowSmallest_one": "{{count}} user · the server does not meet the smallest tier",
+      "usersBelowSmallest_other": "{{count}} users · the server does not meet the smallest tier",
+      "users_one": "{{count}} user · server sized for {{max}} users",
+      "users_other": "{{count}} users · server sized for {{max}} users",
+      "overLimit": "Limit exceeded. {{upgrade}}",
+      "nearLimit": "Approaching the limit; plan a hardware upgrade. {{upgrade}}",
+      "ok": "OK.",
+      "upgrade": "{{tier}} tier: at least {{vcpu}} vCPU, {{ram}} GB RAM.",
+      "upgradeEnterprise": "For an enterprise installation, carry out a preliminary study with 7D.",
+      "memory": "RAM {{ram}} GB · the {{tier}} tier needs {{need}} GB",
+      "memoryOk": "RAM {{ram}} GB",
+      "memoryAction": "Increase RAM to at least {{need}} GB.",
+      "cpu": "{{cpu}} vCPU · the {{tier}} tier needs {{need}} vCPU",
+      "cpuOk": "{{cpu}} vCPU",
+      "cpuAction": "Increase the processor to at least {{need}} vCPU.",
+      "disk": "Data disk {{used}}% full",
+      "diskAction": "Enlarge the data disk or clean up derivatives in Maintenance.",
+      "testMissing": "No capacity test has been run",
+      "testMissingAction": "Measure it with Run Live Test.",
+      "testOld_one": "Last test {{count}} day ago",
+      "testOld_other": "Last test {{count}} days ago",
+      "testOldAction": "Run the test again.",
+      "testRecent": "Last test is up to date",
+      "measured": "Measured ~{{measured}} registered users · {{active}} active",
+      "measuredAction": "The measured capacity is not enough for the active users; upgrade the hardware."
+    }
+  },
+  "chains": {
+    "pattern": {
+      "empty": "The pattern cannot be empty.",
+      "braces": "The { } in the pattern do not match.",
+      "counter": "The number pattern must contain exactly one counter, e.g. {0000}.",
+      "noCounter": "A folder pattern cannot contain a counter.",
+      "dotDot": "A folder pattern cannot contain \"..\"."
+    },
+    "partyOutcomeLabel": "{{party}} {{outcome}}",
+    "partyPrefix": {
+      "designer": "DESIGNER",
+      "contractor": "CONTRACTOR",
+      "consultant": "CONSULTANT",
+      "client": "CLIENT"
+    },
+    "partyOutcome": {
+      "approved": "APPROVED",
+      "approved_with_comments": "APPROVED WITH COMMENTS",
+      "info": "FOR INFORMATION",
+      "revise": "RETURNED",
+      "rejected": "REJECTED"
+    }
+  },
+  "companyCode": {
+    "invalid": "The company code must be 2–8 letters or digits (e.g. PAS)."
+  },
+  "documents": {
+    "submittalTypes": {
+      "MOS": "Material Approval Submittal",
+      "NUM": "Sample",
+      "UCZ": "Shop Drawing",
+      "YB": "Method Statement",
+      "IP": "Schedule",
+      "ISG": "Health and Safety",
+      "TR": "Technical Report / Calculation",
+      "PMR": "Periodic Inspection",
+      "KS": "Quality / Test",
+      "IKOF": "Works Inspection Approval Form",
+      "BAS": "Submittal for Information",
+      "MKF": "Site Material Acceptance"
+    },
+    "submittalDisciplines": {
+      "MIM": "Architecture",
+      "INS": "Civil / Structural",
+      "GEO": "Geotechnical",
+      "MEK": "Mechanical",
+      "ELK": "Electrical",
+      "ALT": "Infrastructure",
+      "PEY": "Landscape",
+      "GNL": "General"
+    },
+    "suitability": {
+      "S0": "S0 · Work in Progress (WIP)",
+      "S1": "S1 · For Coordination",
+      "S2": "S2 · For Information",
+      "S3": "S3 · For Review and Comment",
+      "S4": "S4 · For Approval",
+      "A": "A · Approved (Published)",
+      "B": "B · Partially Approved"
+    }
+  },
+  "forms": {
+    "template": {
+      "noSections": "At least one section is required.",
+      "duplicateSectionId": "Section ID used twice: {{id}}.",
+      "emptySectionTitle": "The section title cannot be empty.",
+      "duplicateItemId": "Item ID used twice: {{id}}.",
+      "emptyItemLabel": "{{id}}: the item text cannot be empty.",
+      "emptyOptions": "\"{{item}}\": the option list is empty.",
+      "duplicateOption": "\"{{item}}\": the same option is written twice.",
+      "failOptionMissing": "\"{{item}}\": a \"non-compliant\" option is not in the list.",
+      "minAboveMax": "\"{{item}}\": the minimum is greater than the maximum.",
+      "noColumns": "\"{{item}}\": the table needs at least one column.",
+      "duplicateColumnId": "\"{{item}}\": column IDs must be unique.",
+      "emptyColumnLabel": "\"{{item}}\": the column name cannot be empty.",
+      "columnNoOptions": "\"{{item}}\": the \"{{column}}\" column has no options.",
+      "scoreSource": "\"{{item}}\": a score is calculated only from Yes/No items ({{ref}})."
+    },
+    "values": {
+      "cell": "{{item}} / row {{row}} / {{column}}",
+      "notNumber": "\"{{label}}\" must be a number.",
+      "belowMin": "\"{{label}}\" must be at least {{min}}{{unit}} (entered {{value}}).",
+      "aboveMax": "\"{{label}}\" can be at most {{max}}{{unit}} (entered {{value}}).",
+      "required": "\"{{label}}\" is required.",
+      "yesNo": "Select Yes, No or N/A for \"{{label}}\".",
+      "naNotAllowed": "\"Not Applicable\" cannot be selected for \"{{label}}\".",
+      "notText": "\"{{label}}\" must be text.",
+      "textTooLong_one": "\"{{label}}\" can be at most {{count}} character.",
+      "textTooLong_other": "\"{{label}}\" can be at most {{count}} characters.",
+      "dateFormat": "\"{{label}}\" must be a valid date (YYYY-MM-DD).",
+      "date": "\"{{label}}\" must be a valid date.",
+      "choice": "Select a valid option for \"{{label}}\".",
+      "multiChoice": "Options for \"{{label}}\" must be chosen from the list.",
+      "invalid": "\"{{label}}\" is invalid.",
+      "tooManyPhotos_one": "At most {{count}} photo can be added to \"{{label}}\".",
+      "tooManyPhotos_other": "At most {{count}} photos can be added to \"{{label}}\".",
+      "tableRows": "The table rows of \"{{label}}\" are invalid.",
+      "tooManyRows_one": "\"{{label}}\" can have at most {{count}} row.",
+      "tooManyRows_other": "\"{{label}}\" can have at most {{count}} rows."
+    },
+    "numberPattern": {
+      "unknownToken": "Unknown field: {{token}}. Available: {PROJE} {KOD} {YYYY} {YY} {MM} {KONUM} {000}.",
+      "noSequence": "The number format needs exactly one sequence field, e.g. {0000}.",
+      "tooLong_one": "The number format can be at most {{count}} character.",
+      "tooLong_other": "The number format can be at most {{count}} characters."
+    },
+    "print": {
+      "km": "km {{value}}",
+      "score": "{{value}}%"
+    },
+    "flow": {
+      "opener": "The person who opens the form",
+      "filler": "1. {{who}} fills in",
+      "byAttribute": "by the {{attribute}} field",
+      "toStep": "step {{step}}",
+      "closes": "closes",
+      "returnsTo": "returns to step {{step}}",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "fills": "Fills in: {{fields}}",
+      "notifyApproved": "Notified on approval: {{who}}",
+      "notifyReturned": "Notified on return: {{who}}",
+      "statusNote": "Status: Closed when approved; Draft if returned or rejected to the filler",
+      "outcome": {
+        "approved": "Approve",
+        "approved_with_comments": "Approve with Comments",
+        "info": "Noted",
+        "revise": "Return",
+        "rejected": "Reject"
+      }
+    }
+  },
+  "intake": {
+    "noText": "There is no text layer; fill in the fields by hand or add OCR / a vision model."
+  },
+  "letters": {
+    "translationMissing": "{{number}}: The letter will be printed in {{language}}; enter the subject and content for this language under Translations."
+  },
+  "locations": {
+    "invalidKm": "Invalid km value.",
+    "invalidKmValue": "Invalid km value: \"{{value}}\". Example: 12+345.6 or 12.3456"
+  },
+  "modelQuery": {
+    "fields": {
+      "class": "Class",
+      "storey": "Storey",
+      "type": "Type",
+      "name": "Name",
+      "material": "Material",
+      "globalId": "GlobalId",
+      "change": "Change"
+    },
+    "chips": {
+      "class": "Class: {{value}}",
+      "storey": "Storey: {{value}}",
+      "filter": "{{field}} {{op}} {{value}}",
+      "filterNoValue": "{{field}} {{op}}",
+      "groupBy": "by {{field}}",
+      "aggregate": "{{op}} {{field}}"
+    }
+  },
+  "modules": {
+    "offMessage": "The {{module}} module is turned off in this project; new records cannot be created. Existing records can still be opened. A project administrator can turn the module on in Project Settings → Modules.",
+    "help": {
+      "correspondence": "Incoming and outgoing official letters, reply chains, registered e-mail (KEP) and e-mail.",
+      "rfi": "RFIs and the RFI register.",
+      "submittals": "Submittal items, packages and the submittal register.",
+      "meetings": "Meetings, minutes and actions.",
+      "transmittals": "Transmittals and cover sheets.",
+      "issues": "Issues raised on site and in the model.",
+      "reviews": "Document reviews and approval chains.",
+      "forms": "Site forms, checklists and form templates.",
+      "coordination": "Model sets, clash tests and information requirement checks (IDS).",
+      "schedule": "Schedule, Gantt chart and 4D.",
+      "spec": "A draft submittal register from a specification PDF.",
+      "reports": "Report dashboards and ready-made report templates."
+    }
+  },
+  "naming": {
+    "partCount_one": "The name must have {{expected}} fields; it has {{count}} (delimiter \"{{delimiter}}\").",
+    "partCount_other": "The name must have {{expected}} fields; it has {{count}} (delimiter \"{{delimiter}}\").",
+    "fieldProblem": "{{field}}: {{problem}}",
+    "noMatch": "The name does not follow the standard.",
+    "field": {
+      "missing": "missing",
+      "notAllowed": "\"{{value}}\" is not one of the allowed values",
+      "digits": "must be a {{digits}}-digit number",
+      "minLength_one": "at least {{count}} character",
+      "minLength_other": "at least {{count}} characters",
+      "maxLength_one": "at most {{count}} character",
+      "maxLength_other": "at most {{count}} characters"
+    },
+    "standard": {
+      "nameEmpty": "The standard name is empty.",
+      "delimiter": "The delimiter must be a single character.",
+      "noFields": "At least one field is required.",
+      "noNameField": "The name must contain at least one field.",
+      "fieldNameEmpty": "A field name is empty.",
+      "duplicateField": "The field \"{{field}}\" is defined twice.",
+      "emptyList": "The value list of \"{{field}}\" is empty.",
+      "codeHasDelimiter": "The code \"{{code}}\" in the field \"{{field}}\" contains the delimiter.",
+      "codeDelimiterEdge": "The code \"{{code}}\" in the field \"{{field}}\" cannot start or end with the delimiter.",
+      "digits": "The number of digits of \"{{field}}\" must be 1–12.",
+      "digitRange": "The minimum/maximum digits of \"{{field}}\" must be between 1 and 12 (minimum ≤ maximum)."
+    }
+  },
+  "oauth": {
+    "scopeHints": {
+      "bcf": "Can read and write issues, comments and viewpoints through the BCF API with your permissions.",
+      "documents": "Can upload files and new versions to a folder you choose through the OpenCDE Documents API; can view and download documents you select.",
+      "documentsRead": "Can only view and download documents you select through the OpenCDE Documents API; cannot upload.",
+      "read": "Can view your projects, folders, files and records with your permissions.",
+      "write": "Can create and change records and upload files with your permissions."
+    },
+    "clientTypeHints": {
+      "public": "Desktop and browser applications. No secret; PKCE (S256) required.",
+      "confidential": "Applications that run on their own server or can keep a secret. PKCE optional."
+    }
+  },
+  "office": {
+    "editors": {
+      "none": "Off",
+      "onlyoffice": "ONLYOFFICE Docs",
+      "collabora": "Collabora Online"
+    },
+    "converters": {
+      "auto": "Automatic",
+      "none": "Off",
+      "onlyoffice": "ONLYOFFICE (ConvertService)",
+      "collabora": "Collabora (convert-to)",
+      "gotenberg": "Gotenberg",
+      "local": "LibreOffice on the server (soffice)"
+    }
+  },
+  "paramChange": {
+    "lost_one": "The earlier parameter change is missing from this version: {{title}} ({{count}} element)",
+    "lost_other": "The earlier parameter change is missing from this version: {{title}} ({{count}} elements)"
+  },
+  "privacy": {
+    "statement": "This server does not send data out on its own; there is no telemetry."
+  },
+  "register": {
+    "typeEmpty": "Type is empty.",
+    "typeUnknown": "Type not recognised: \"{{value}}\".",
+    "disciplineEmpty": "Discipline is empty.",
+    "disciplineUnknown": "Discipline not recognised: \"{{value}}\".",
+    "descriptionEmpty": "Description is empty."
+  },
+  "reports": {
+    "warnings": {
+      "network": "Network calls (fetch/XHR/WebSocket) are blocked in the dashboard; data comes only through CDE.data.",
+      "inlineHandlers": "Inline event attributes (such as onclick=…) do not work in the dashboard; use addEventListener.",
+      "externalResources": "External resources (CDN, image, font links) cannot be loaded; everything must be inline.",
+      "navigation": "The dashboard tries to navigate away or open a connection; this code is stopped for security reasons."
+    },
+    "frame": {
+      "blank": "(empty)",
+      "noData": "No data to show.",
+      "noRecords": "No records.",
+      "more_one": "+{{count}} more row",
+      "more_other": "+{{count}} more rows",
+      "cannotShow": "This section cannot be shown",
+      "panelError": "Dashboard error: {{message}}",
+      "targetNotFound": "CDE: target not found: {{target}}"
+    }
+  },
+  "roles": {
+    "packages": {
+      "idare": {
+        "label": "Client",
+        "description": "Sees and marks up everything shared and published; manages published content through approval steps."
+      },
+      "musavir": {
+        "label": "Consultant",
+        "description": "Sees and marks up shared content, approves in review steps; downloads published and archived content."
+      },
+      "tasarimci": {
+        "label": "Designer",
+        "description": "Manages its own work area, sends to shared through a review; downloads published content."
+      },
+      "yuklenici": {
+        "label": "Contractor",
+        "description": "Manages its own area, sends to shared (raises RFIs and submittals); downloads published content."
+      }
+    },
+    "access": {
+      "reason": {
+        "projectAdmin": "manages every folder as a project administrator",
+        "systemAdmin": "manages every folder as a system administrator",
+        "grant": "{{who}}{{where}}: {{level}}"
+      },
+      "via": {
+        "user": "personal permission",
+        "namedCompany": "via company \"{{name}}\"",
+        "company": "via their company",
+        "namedRole": "via role \"{{name}}\"",
+        "role": "via a role"
+      },
+      "inheritedFrom": " (inherited from folder \"{{folder}}\")",
+      "inherited": " (inherited from a parent folder)",
+      "noAccess": "{{name}} cannot see this folder: no personal, company or role permission.",
+      "head": {
+        "fileUploadOnly": "{{name}} cannot see this file: can only upload and sees only the files they uploaded",
+        "uploadOnly": "{{name}} can only upload and sees only the files they uploaded",
+        "canSee": "{{name}} can see ({{level}})"
+      },
+      "sentence": "{{head}} — {{reasons}}.",
+      "sentenceWithLower_one": "{{head}} — {{reasons}}; plus {{count}} lower permission.",
+      "sentenceWithLower_other": "{{head}} — {{reasons}}; plus {{count}} lower permissions."
+    }
+  },
+  "sim": {
+    "rule": {
+      "storeys": "Storey: {{value}}",
+      "classes": "Class: {{value}}",
+      "nameContains": "Name contains \"{{value}}\"",
+      "equalsCostCode": "{{key}} = item code",
+      "equalsActivityWbs": "{{key}} = activity WBS",
+      "equalsActivityCode": "{{key}} = activity code",
+      "propertyContains": "{{key}} contains \"{{value}}\"",
+      "propertyEquals": "{{key}} = \"{{value}}\"",
+      "propertyExists": "{{key}} exists",
+      "allElements": "All elements"
+    }
+  },
+  "template": {
+    "unknownDimension": "The template has no dimension named \"{{name}}\".",
+    "tooManyFolders": "The template produces more than {{max}} folders.",
+    "skeletonTooDeep": "{{where}}: the skeleton is deeper than {{max}} levels (dimensions may be inserting each other).",
+    "dimensionNotDefined": "{{where}}: no dimension named \"{{name}}\" is defined.",
+    "badOnDemand": "{{path}}: onDemand \"{{onDemand}}\" is neither \"leaves\"/\"none\" nor a dimension name.",
+    "duplicateSubfolder": "{{path}}: subfolder \"{{name}}\" is defined twice.",
+    "duplicateTopFolder": "Top-level folder \"{{name}}\" is defined twice.",
+    "nameEmpty": "The template name is empty.",
+    "slotKeyEmpty": "A role (slot) key is empty.",
+    "slotKeyStar": "\"*\" cannot be used as a role key (it means all roles).",
+    "duplicateSlot": "Role \"{{key}}\" is defined twice.",
+    "duplicateStandard": "Naming standard \"{{name}}\" is defined twice.",
+    "duplicateAttribute": "Attribute \"{{name}}\" is defined twice.",
+    "grantSlotUnknown": "{{where}}: role \"{{slot}}\" in a permission is not defined.",
+    "standardUnknown": "{{where}}: naming standard \"{{name}}\" is not defined.",
+    "attributeUnknown": "{{where}}: attribute \"{{name}}\" is not defined.",
+    "projectRoot": "Project root",
+    "folderNameEmpty": "{{path}}: the folder name is empty.",
+    "folderNameSpaces": "{{path}}: a folder name cannot start or end with a space.",
+    "folderNameTooLong": "{{path}}: the folder name is longer than {{max}} characters.",
+    "folderNameForbidden": "{{path}}: a folder name cannot contain \\ / : * ? \" < > |.",
+    "duplicateWorkflow": "Workflow \"{{name}}\" is defined twice.",
+    "workflowNoSteps": "\"{{name}}\": at least one step is required.",
+    "stepNoAssignee": "\"{{name}}\" step {{step}}: at least one assignee is required.",
+    "stepSlotUnknown": "\"{{name}}\" step {{step}}: role \"{{slot}}\" is not defined.",
+    "copyTargetInvalid": "\"{{name}}\": the copy target folder path is invalid (\"{{folder}}\")."
+  },
+  "viewers": {
+    "kinds": {
+      "pdf": "PDF",
+      "ifc": "IFC model",
+      "document": "Document",
+      "slides": "Presentation",
+      "sheet": "Spreadsheet",
+      "cad": "Drawing",
+      "image": "Image",
+      "text": "Text",
+      "markdown": "Markdown",
+      "video": "Video",
+      "audio": "Audio",
+      "email": "Email",
+      "none": "No preview"
+    }
+  },
+  "workFields": {
+    "unknown": "Unknown field: {{key}}",
+    "required": "\"{{label}}\" is required.",
+    "number": "\"{{label}}\" must be a number.",
+    "boolean": "\"{{label}}\" must be yes/no.",
+    "date": "\"{{label}}\" must be a YYYY-MM-DD date.",
+    "list": "\"{{label}}\" must be a value from the list.",
+    "text": "\"{{label}}\" must be text.",
+    "tooLong": "\"{{label}}\" is too long.",
+    "def": {
+      "key": "Field {{n}}: the key must use lower-case letters, digits, - or _.",
+      "duplicateKey": "Field {{n}}: the key \"{{key}}\" is used twice.",
+      "labelEmpty": "Field {{n}}: the label cannot be empty.",
+      "noOptions": "Field {{n}}: list options are required."
+    }
+  },
+  "workNumbering": {
+    "empty": "The numbering pattern cannot be empty.",
+    "counter": "The pattern must contain exactly one sequence number field, e.g. {0000}.",
+    "unknownToken": "Unknown field: {{token}}",
+    "tokens": {
+      "project": "project code",
+      "type": "work type key",
+      "sender": "sender company code (project code if no company)",
+      "recipient": "company code of the first action recipient",
+      "year": "year",
+      "year2": "last two digits of the year",
+      "month": "month",
+      "sequence": "sequence number (number of zeros = digits)",
+      "fields": "the type's fields (label or key); list value \"M - Mekanik\" → M",
+      "subject": "title (not part of the counter scope)"
+    }
+  }
+}

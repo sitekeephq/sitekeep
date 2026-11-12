@@ -1,0 +1,70 @@
+{
+  "errors": {
+    "adminOnly": "This action requires system administrator permission.",
+    "invalidDate": "The date must be in YYYY-MM-DD format.",
+    "oauthManagedElsewhere": "OAuth applications are enabled and disabled on the Administration → OAuth Applications page.",
+    "unknownConnection": "Unknown connection."
+  },
+  "outbound": {
+    "killSwitch": "All external connections are off (Administration → Privacy Centre): no connection was made to {{host}}.",
+    "connectionDisabled": "This connection was turned off in the Privacy Centre ({{purpose}}, {{host}}). It can be turned on under Administration → Privacy Centre → External Connections."
+  },
+  "data": {
+    "localDisk": "Local disk: {{root}}",
+    "configuredStorage": "Configured storage",
+    "pglite": "PGlite (embedded database)"
+  },
+  "connections": {
+    "default": "Default",
+    "apiKeyStored": "API key stored",
+    "reportModel": "Report Builder Model (AI_BASE_URL)",
+    "fromEnvironment": "Defined by an environment variable",
+    "smtp": "E-mail Server (SMTP)",
+    "smtpSends": "Sends official letters",
+    "smtpNotConfigured": "Not configured (CDE_SMTP_URL)",
+    "officeEditor": "Office Editor",
+    "officeEditorWith": "Office Editor ({{name}})",
+    "browserAddress": "Browser address: {{host}}",
+    "notConfigured": "Not configured",
+    "officeConverter": "Office → PDF Converter",
+    "officeConverterWith": "Office → PDF Converter ({{name}})",
+    "localLibreOffice": "LibreOffice on this server",
+    "mcp": "MCP Server (AI Clients)",
+    "writeTokensOn": "Write tokens allowed",
+    "readOnly": "Read only",
+    "accessTokens_one": "{{count}} access token",
+    "accessTokens_other": "{{count}} access tokens",
+    "aiQueue": "AI Task Queue (External Clients)",
+    "externalClientsAllowed": "External clients allowed even in fully local mode",
+    "stoppedByKillSwitch": "Stopped because all external connections are off",
+    "oauth": "OAuth Applications (OpenCDE)",
+    "oauthApps_one": "{{count}} application, {{enabled}} enabled",
+    "oauthApps_other": "{{count}} applications, {{enabled}} enabled",
+    "oauthManaged": "Managed under Administration → OAuth Applications",
+    "comingSoon": "Coming soon"
+  },
+  "csv": {
+    "fileName": "outbound-connection-log.csv",
+    "columns": {
+      "time": "Time",
+      "purpose": "Purpose",
+      "connection": "Connection",
+      "host": "Server",
+      "method": "Method",
+      "location": "Location",
+      "blocked": "Blocked",
+      "bytesOut": "Bytes Out",
+      "bytesIn": "Bytes In",
+      "status": "Status",
+      "error": "Error",
+      "duration": "Duration (ms)",
+      "user": "User",
+      "project": "Project",
+      "details": "Details"
+    },
+    "local": "Local",
+    "external": "External",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

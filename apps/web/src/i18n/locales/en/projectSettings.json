@@ -1,0 +1,657 @@
+{
+  "activity": {
+    "events": {
+      "project": {
+        "created": "Project created",
+        "updated": "Project updated",
+        "ai_updated": "AI setting changed",
+        "created_from_template": "Project created from template"
+      },
+      "member": {
+        "added": "Member added",
+        "updated": "Member updated",
+        "removed": "Member removed",
+        "roles_set": "Member's roles changed"
+      },
+      "folder": {
+        "created": "Folder created",
+        "updated": "Folder updated",
+        "deleted": "Folder deleted",
+        "permissions_set": "Folder permissions changed",
+        "restored": "Folder restored",
+        "purged": "Folder permanently deleted",
+        "attributes_bound": "Folder attributes changed",
+        "attribute_bound": "Attribute linked to folder",
+        "attribute_unbound": "Attribute removed from folder",
+        "settings_updated": "Folder setting changed",
+        "materialized": "Folder created (first file)"
+      },
+      "naming": {
+        "created": "Naming standard added",
+        "updated": "Naming standard updated"
+      },
+      "file": {
+        "uploaded": "File uploaded",
+        "version_added": "New version uploaded",
+        "updated": "File updated",
+        "deleted": "File deleted",
+        "downloaded": "File downloaded",
+        "zip_downloaded": "Bulk download (zip)",
+        "restored": "File restored",
+        "purged": "File permanently deleted",
+        "attributes_updated": "File attributes changed"
+      },
+      "attribute": {
+        "created": "Attribute added",
+        "updated": "Attribute updated",
+        "deleted": "Attribute deleted"
+      },
+      "issue": {
+        "created": "Issue created",
+        "updated": "Issue updated",
+        "commented": "Comment added to issue",
+        "linked": "Issue link added",
+        "unlinked": "Issue link removed"
+      },
+      "workflow_template": {
+        "created": "Workflow template added",
+        "updated": "Workflow template updated",
+        "deleted": "Workflow template deleted"
+      },
+      "review": {
+        "started": "Review started",
+        "submitted": "Review step answered",
+        "step_completed": "Review step completed",
+        "completed": "Review completed",
+        "cancelled": "Review cancelled",
+        "reassigned": "Review assignees changed",
+        "file_copied": "Approved file copied",
+        "files_returned": "Review files returned"
+      },
+      "role": {
+        "created": "Role added",
+        "updated": "Role updated",
+        "deleted": "Role deleted",
+        "member_added": "Role given to member",
+        "member_removed": "Role taken from member"
+      },
+      "role_package": {
+        "applied": "Role package applied to company"
+      },
+      "mcp": {
+        "tool": "MCP tool called"
+      },
+      "markup": {
+        "created": "Markup added",
+        "updated": "Markup updated",
+        "deleted": "Markup deleted",
+        "published": "Markup published"
+      },
+      "report": {
+        "created": "Report dashboard created",
+        "updated": "Report dashboard updated",
+        "deleted": "Report dashboard deleted",
+        "restored": "Report dashboard version restored",
+        "generated": "Report dashboard generated with AI"
+      },
+      "work": {
+        "created": "Work item created",
+        "updated": "Work item updated",
+        "sent": "Work item sent",
+        "received": "Work item received",
+        "submitted": "Work item submitted for approval",
+        "responded": "Work item answered",
+        "cancelled": "Work item cancelled",
+        "minutes_saved": "Meeting minutes saved"
+      },
+      "work_type": {
+        "created": "Work type added",
+        "updated": "Work type updated",
+        "archived": "Work type archived",
+        "numbering_preset": "Numbering preset applied"
+      },
+      "work_automation": {
+        "updated": "Work automation changed"
+      },
+      "submittal": {
+        "register_imported": "Submittal register imported"
+      },
+      "schedule": {
+        "imported": "Schedule imported",
+        "updated": "Schedule updated",
+        "deleted": "Schedule deleted",
+        "link_added": "Link added to activity",
+        "link_removed": "Link removed from activity",
+        "summary": "Schedule summary generated"
+      },
+      "model_set": {
+        "created": "Model set added",
+        "updated": "Model set updated",
+        "deleted": "Model set deleted"
+      },
+      "clash_test": {
+        "created": "Clash test added",
+        "updated": "Clash test updated",
+        "deleted": "Clash test deleted",
+        "run": "Clash test run"
+      },
+      "clash_group": {
+        "updated": "Clash group updated"
+      },
+      "clash": {
+        "status": "Clash status changed"
+      },
+      "ids": {
+        "check": "Information requirements check (IDS) run"
+      },
+      "form": {
+        "created": "Form created",
+        "saved": "Form saved",
+        "submitted": "Form submitted",
+        "reviewed": "Form reviewed",
+        "returned": "Form returned",
+        "closed": "Form closed",
+        "deleted": "Form deleted",
+        "pdf": "Form PDF generated",
+        "attachment_added": "Attachment added to form"
+      },
+      "form_template": {
+        "created": "Form template added",
+        "updated": "Form template updated",
+        "archived": "Form template archived",
+        "merged": "Form templates merged"
+      },
+      "location": {
+        "created": "Location added",
+        "updated": "Location updated",
+        "deleted": "Location deleted",
+        "imported_csv": "Locations imported from CSV",
+        "import_ifc_queued": "Locations being imported from IFC",
+        "linked": "Location link changed"
+      },
+      "docintel": {
+        "spec_register": "Specification analysed",
+        "spec_register_updated": "Specification register updated",
+        "ai_suggest": "Title block suggestion (AI)"
+      },
+      "ai": {
+        "ask": "Ask assistant used",
+        "clash_summary": "Clash summary (AI)",
+        "form_template_generated": "Form template generated with AI"
+      }
+    },
+    "columns": {
+      "time": "Time",
+      "person": "Person",
+      "action": "Action",
+      "details": "Details"
+    }
+  },
+  "modules": {
+    "help": {
+      "correspondence": "Incoming and outgoing official letters, reply chains, registered e-mail (KEP) and e-mail.",
+      "rfi": "RFIs and the RFI register.",
+      "submittals": "Submittal items, packages and the submittal register.",
+      "meetings": "Meetings, minutes and actions.",
+      "transmittals": "Transmittals and cover sheets.",
+      "issues": "Issues raised on site and in the model.",
+      "reviews": "Document reviews and approval chains.",
+      "forms": "Site forms, checklists and form templates.",
+      "coordination": "Model sets, clash tests and information requirements checks (IDS).",
+      "schedule": "Schedule, Gantt chart and 4D.",
+      "spec": "Draft submittal register from a specification PDF.",
+      "reports": "Report dashboards and ready-made report templates."
+    },
+    "messages": {
+      "saved": "Saved."
+    },
+    "description": "A module that is turned off does not appear in the menu, the Work views, the \"+ New\" window, the Model tabs, the Ask assistant or reports. Its data is not deleted: existing records still open, only new records cannot be created. Documents are always on."
+  },
+  "title": "Project Settings",
+  "members": {
+    "columns": {
+      "name": "Name",
+      "email": "E-mail",
+      "company": "Company (in this project)",
+      "roles": "Roles",
+      "projectAdmin": "Project Administrator"
+    },
+    "projectAdminLabel": "{{name}} project administrator",
+    "remove": {
+      "title": "Remove Member",
+      "confirm": "Remove {{name}} from the project?"
+    },
+    "actions": {
+      "remove": "Remove"
+    },
+    "add": {
+      "heading": "Add Member",
+      "options": {
+        "chooseUser": "Choose a User…"
+      },
+      "roleLabel": "Role",
+      "hint": "People not in the list are created by the system administrator in Administration."
+    }
+  },
+  "naming": {
+    "description": "Link a standard to a folder in Documents → Folder settings. File names are checked on upload in the linked folder and its subfolders.",
+    "actions": {
+      "add": "+ Standard"
+    },
+    "badges": {
+      "delimiter": "Delimiter \"{{delimiter}}\""
+    },
+    "example": "Example: {{example}}",
+    "empty": "No standards defined.",
+    "exampleText": "Text",
+    "editor": {
+      "editTitle": "Edit Standard",
+      "newTitle": "New Naming Standard",
+      "fields": {
+        "delimiter": "Delimiter",
+        "fields": "Fields — one field per line: \"Name | list | CODE=Description, CODE2\" · \"Name | number | 4\" (or \"2-3\") · \"Name | text\" · add \"| meta\" at the end for a field that is not part of the name"
+      },
+      "exampleName": "Example name: {{example}}",
+      "defaultFields": "Project | list | PRJ\nCompany | list | ABC, XYZ\nDiscipline | list | A, S, M, E\nType | list | M3, DR\nNumber | number | 4"
+    }
+  },
+  "templateExport": {
+    "heading": "Export as Template",
+    "description": "This project's structure is written to a single JSON file: folders (with their states and sub-states, including “on first file” folders not created yet), folder permissions by company role, naming standards, attributes and approval workflows. Files, records and people are not included. Use it with the “From a JSON File” option when creating a new project.",
+    "preparing": "Preparing…",
+    "actions": {
+      "export": "Export as Template (.json)"
+    }
+  },
+  "roles": {
+    "remove": {
+      "title": "Delete Role",
+      "confirm": "Delete the role \"{{name}}\"? The role's folder permissions are removed too."
+    },
+    "messages": {
+      "grantsRemoved_one": "{{count}} folder permission removed.",
+      "grantsRemoved_other": "{{count}} folder permissions removed."
+    },
+    "description": "Every project has Viewer, Editor and Administrator ready (permission on all folders from the root). Choose one when adding a member; extra teams (+ Role) are also used in folder permissions and approval steps.",
+    "actions": {
+      "applyPackage": "Apply Role Package to Company",
+      "add": "+ Role"
+    },
+    "columns": {
+      "role": "Role",
+      "description": "Description",
+      "members": "Members"
+    },
+    "empty": "No roles defined.",
+    "matrix": {
+      "heading": "Member – Role Mapping",
+      "columns": {
+        "member": "Member"
+      },
+      "noCompany": "No company",
+      "cellLabel": "{{member}} — {{role}}"
+    },
+    "editor": {
+      "editTitle": "Edit Role",
+      "newTitle": "New Role",
+      "namePlaceholder": "e.g. Consultant Architecture Team",
+      "descriptionPlaceholder": "e.g. Checks the architectural sheets",
+      "actions": {
+        "defaultColour": "Default"
+      },
+      "previewName": "Preview"
+    }
+  },
+  "rolePackage": {
+    "title": "Apply Role Package to Company",
+    "description": "The package writes company permissions to folders with an ISO 19650 state (Work in Progress / Shared / Published / Archived). Existing permissions are not lowered or deleted; a subfolder never gets a permission lower than the one inherited from above. Preview first, then apply.",
+    "fields": {
+      "package": "Package",
+      "ownArea": "Own Area"
+    },
+    "options": {
+      "choose": "Choose…",
+      "hasOwnArea": "Company Has Its Own Area (e.g. 01-WIP / 99-Tasarımcı Ortak Alan)"
+    },
+    "stateLevel": "{{state}}: {{level}}",
+    "noAccess": "no access",
+    "ownAreaLevel": "Own area: {{level}}",
+    "notSelected": "Not selected",
+    "resultHeading": "{{status}} — {{company}}",
+    "status": {
+      "applied": "Applied",
+      "preview": "Preview"
+    },
+    "written_one": "{{count}} permission written.",
+    "written_other": "{{count}} permissions written.",
+    "toWrite_one": "{{count}} permission will be written.",
+    "toWrite_other": "{{count}} permissions will be written.",
+    "noMembers": "This company has no members in the project; the permissions reach no one for now.",
+    "columns": {
+      "folder": "Folder",
+      "state": "State",
+      "packageLevel": "Package Permission",
+      "current": "Now (direct)",
+      "result": "Result"
+    },
+    "badges": {
+      "ownArea": "own area"
+    },
+    "inherited": "from above: {{level}}",
+    "empty": "The project has no folders with an ISO 19650 state. Assign states in folder settings.",
+    "actions": {
+      "preview": "Preview",
+      "apply": "Apply"
+    }
+  },
+  "attributes": {
+    "remove": {
+      "title": "Delete Attribute",
+      "confirm": "Delete the attribute \"{{name}}\"? Values on files remain as free attributes."
+    },
+    "description": "Link attributes to a folder in Documents → Folder settings. In the linked folder and its subfolders they appear as table columns and are asked for on upload; required ones cannot be left empty.",
+    "actions": {
+      "add": "+ Attribute"
+    },
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "options": "Options",
+      "required": "Required"
+    },
+    "badges": {
+      "required": "Required"
+    },
+    "notRequired": "No",
+    "empty": "No attributes defined.",
+    "editor": {
+      "editTitle": "Edit Attribute",
+      "newTitle": "New Attribute",
+      "namePlaceholder": "e.g. Status, Revision, Delivery date",
+      "fields": {
+        "options": "Options — one value per line"
+      },
+      "options": {
+        "required": "Required (cannot be left empty when uploading to linked folders)"
+      },
+      "renameNotice": "When the name changes, this attribute's key on the project's files is updated to the new name too."
+    }
+  },
+  "ai": {
+    "personal": {
+      "heading": "My Own API Keys",
+      "description": "Keys are encrypted on the server with AES-256-GCM; they are never shown in clear text in the interface or in API responses. Hashing is not used, because a key that must be sent to the provider again cannot be recovered from a hash.",
+      "notAllowed": "You can save your key and test the connection. To use it with project data: {{reason}}",
+      "badges": {
+        "hasKey": "Key Saved",
+        "noKey": "No Key"
+      },
+      "createKey": "Create an API key ↗",
+      "fields": {
+        "apiKey": "API Key",
+        "model": "Model",
+        "workspaceId": "Workspace ID (optional)"
+      },
+      "replacePlaceholder": "{{masked}} · type a new one to replace it",
+      "pastePlaceholder": "Paste the API key",
+      "actions": {
+        "test": "Test",
+        "deleteKey": "Delete Key",
+        "loadModels": "Load Models"
+      },
+      "verifying": "Verifying…",
+      "workspaceHelp": "Needed when your key can act on more than one Workspace; sent as anthropic-workspace-id with every request. Find it in Anthropic Console → Workspaces.",
+      "workspacePlaceholder": "wrkspc_…",
+      "loadingModels": "Loading models…",
+      "modelsHelp": "The list is loaded from Anthropic: the models your key can use."
+    }
+  },
+  "workTypes": {
+    "heading": "Work Types",
+    "actions": {
+      "add": "+ New Type",
+      "restore": "Restore",
+      "archive": "Archive"
+    },
+    "columns": {
+      "name": "Name",
+      "category": "Kind",
+      "pattern": "Number Pattern",
+      "fields": "Fields"
+    },
+    "badges": {
+      "builtIn": "built-in",
+      "archived": "archived"
+    },
+    "tokensHint": "Pattern fields: {{tokens}}. The sequence number increases among records whose pattern is otherwise identical (e.g. separately for each sender/recipient/year).",
+    "editor": {
+      "editTitle": "Edit Type {{name}}",
+      "newTitle": "New Work Type",
+      "fields": {
+        "key": "Key",
+        "category": "Kind",
+        "icon": "Icon",
+        "pattern": "Number Pattern",
+        "counterGroup": "Shared Counter Group",
+        "workflow": "Default Workflow",
+        "dueDays": "Response Time (days)"
+      },
+      "counterGroupPlaceholder": "(none)",
+      "dueDaysHint": "When submitted for approval, the due date becomes today + this many days. Without a workflow, the action company answers in a single step.",
+      "options": {
+        "incoming": "Incoming Record (not sent, recorded as received)"
+      },
+      "fieldsHeading": "Fields",
+      "columns": {
+        "key": "Key",
+        "label": "Label",
+        "type": "Type",
+        "options": "Options (comma-separated)",
+        "required": "Required"
+      },
+      "actions": {
+        "addField": "+ Field"
+      },
+      "removeField": "Remove field"
+    }
+  },
+  "automation": {
+    "heading": "Automatic Transmittal When a Review Completes",
+    "description": "When a review started with the selected review template finishes, the approved files (their approved copies, if any) are added to a transmittal, a cover sheet is generated and it is sent to the recipient companies within the CDE. If no recipient is selected, it goes to the company that started the review.",
+    "columns": {
+      "template": "Review Template",
+      "on": "On",
+      "recipients": "Recipient Companies",
+      "purpose": "Purpose",
+      "files": "Files",
+      "sendNow": "Send Immediately"
+    },
+    "options": {
+      "approved": "Approved Only",
+      "all": "All"
+    },
+    "empty": "No review templates. Add one in the \"Workflows\" tab."
+  },
+  "numbering": {
+    "applied": "{{preset}} applied. New numbers are given with this pattern.",
+    "heading": "RFI and Submittal Numbers",
+    "presets": {
+      "standart": "Standard"
+    },
+    "hint": "Standard: <code>{{standard}}</code> · ZAVM: <code>{{zavm}}</code>. The counter runs separately per discipline; {Konu} is not part of the counter."
+  },
+  "locations": {
+    "remove": {
+      "title": "Delete Location",
+      "confirm": "Delete \"{{name}}\" and the locations under it?"
+    },
+    "unlink": {
+      "title": "Remove Links",
+      "confirm": "{{message}} Remove the links and delete?"
+    },
+    "title": "Locations",
+    "actions": {
+      "add": "+ Location",
+      "report": "Report",
+      "importCsv": "Import CSV",
+      "fromIfc": "Create from IFC"
+    },
+    "description": "Stations, zones, levels, rooms or line / tunnel sections with km ranges. Issues, forms and files are linked to a location; filters include sub-locations too.",
+    "columns": {
+      "name": "Name",
+      "code": "Code",
+      "type": "Type",
+      "km": "Km",
+      "ifc": "IFC"
+    },
+    "empty": "No locations yet. Add them by hand, import a CSV or create them from an IFC model's spatial structure.",
+    "new": {
+      "title": "New Location"
+    },
+    "form": {
+      "namePlaceholder": "e.g. Pendik Central Station",
+      "codePlaceholder": "e.g. SG1",
+      "fields": {
+        "type": "Type",
+        "kmStart": "Km Start",
+        "kmEnd": "Km End",
+        "parent": "Parent Location"
+      },
+      "options": {
+        "topLevel": "— Top level —"
+      }
+    },
+    "detail": {
+      "messages": {
+        "saved": "Saved."
+      },
+      "actions": {
+        "addChild": "+ Sub-location"
+      },
+      "linksHeading": "Linked Records (including sub-locations)",
+      "noLinks": "No linked issues, forms or files."
+    },
+    "csv": {
+      "title": "Import Locations from CSV",
+      "description": "A header row is required. Columns: <code>Kod</code>, <code>Ad</code>, <code>Tip</code>, <code>Üst kod</code>, <code>Km başlangıç</code>, <code>Km bitiş</code>, <code>Sıra</code> (delimiter ; , or tab). Locations with the same code are updated. If any row has an error, no record changes.",
+      "fields": {
+        "parent": "Rows with an empty parent code are added under"
+      },
+      "lineError": "Line {{line}}: {{message}}",
+      "result": "{{created}} locations added, {{updated}} updated.",
+      "actions": {
+        "import": "Import"
+      }
+    },
+    "ifc": {
+      "done": "Done: {{created}} locations added, {{updated}} updated.",
+      "failed": "The operation failed.",
+      "reading": "Reading IFC…",
+      "queued": "Queued…",
+      "title": "Create Locations from IFC",
+      "description": "The model's spatial structure (Site → Building → Storey → Space, facilities and parts in IFC 4.3) is transferred to the location tree. Importing the same model again updates the names and does not create duplicates.",
+      "fields": {
+        "model": "IFC Model",
+        "parent": "Add Under"
+      },
+      "options": {
+        "choose": "— Choose —"
+      }
+    }
+  },
+  "workflows": {
+    "remove": {
+      "title": "Delete Template",
+      "confirm": "Delete the template \"{{name}}\"? Reviews in progress are not affected."
+    },
+    "byAttribute": "by {{attribute}} value",
+    "description": "Approval workflow templates are chosen when a review is started. A started review runs with the template as it was at that moment; later changes apply only to new reviews.",
+    "actions": {
+      "add": "+ Template"
+    },
+    "originBadge": "{{party}} (initiator)",
+    "days_one": " · {{count}} day",
+    "days_other": " · {{count}} days",
+    "stopBadge": " · return",
+    "stepSummary": "{{name}} ({{assignees}})",
+    "stepBadge": "{{n}}. {{name}}",
+    "stepRule": "{{assignees}} · {{rule}}",
+    "copySubfolder": "Copy subfolder: <code>{{pattern}}</code>",
+    "empty": "No templates defined.",
+    "editor": {
+      "editTitle": "Edit Template",
+      "newTitle": "New Approval Workflow Template",
+      "namePlaceholder": "e.g. PAS → CNS → HLL → ZRT",
+      "fields": {
+        "kind": "Use",
+        "originParty": "Initiating Party",
+        "party": "Party",
+        "displayName": "Display Name",
+        "days": "Time (days)",
+        "onRevise": "Revise / Reject",
+        "namePattern": "Review Number Pattern (optional)",
+        "copyFolder": "Folder to Copy Approved Files To",
+        "subfolderPattern": "Subfolder Pattern"
+      },
+      "stagesHeading": "Stages (parties)",
+      "stagesHint": "Optional. Steps are tied to party stages (Designer → Contractor → Consultant → Client). A stage's time runs from its first step; in a \"return\" stage, a file that gets revise/reject leaves the chain and goes back to the initiator.",
+      "stageN": "Stage {{n}}",
+      "actions": {
+        "remove": "Remove",
+        "addStage": "+ Stage",
+        "addStep": "+ Add Step",
+        "choose": "Choose"
+      },
+      "stepsHeading": "Steps",
+      "numberHeading": "Number and Copy Target",
+      "namePatternHint": "{Proje}, {Yıl}, {Ay} and file fields (attribute or naming field) can be used; {0000} is the counter. The counter is unique per project and prefix.",
+      "copyFolderNotSet": "Not selected (chosen when the review is started)",
+      "options": {
+        "copyToBase": "Copy a File with Missing Fields to the Target Folder Itself (otherwise it is not copied and is reported)"
+      },
+      "finalHeading": "Last Step's Outcome → File's Approval Status",
+      "finalHint": "Default: the same code. Files with \"Approved\" and \"Approved with Comments\" status are copied to the target folder.",
+      "finalMap": "{{outcome}} →"
+    },
+    "step": {
+      "heading": "Step {{n}}",
+      "actions": {
+        "up": "Up",
+        "down": "Down",
+        "removeOutcome": "Remove outcome",
+        "addOutcome": "+ Outcome",
+        "fillParty": "Fill with {{party}} Labels"
+      },
+      "fields": {
+        "name": "Step Name",
+        "stage": "Stage",
+        "rule": "Rule",
+        "assignees": "Assignees (person, company or role / team)",
+        "outcomes": "Allowed Outcomes",
+        "requiredAttributes": "Required Attributes in This Step (comma-separated; written to the file)"
+      },
+      "namePlaceholder": "e.g. CNS review",
+      "stageOption": "{{n}}. {{name}}",
+      "assigneesHint": "When a company or team is assigned, one of its members answers with their own account; the record shows the person and \"on behalf of …\" together. No shared account is needed.",
+      "options": {
+        "byAttribute": "Also Assign by File Field (one template for all disciplines)",
+        "customOutcomes": "Custom Outcome Labels (e.g. \"İDARE ŞARTLI ONAYLANDI\")"
+      },
+      "codePlaceholder": "Code",
+      "labelPlaceholder": "Label",
+      "requiredAttributesPlaceholder": "e.g. Letter No, Revision"
+    },
+    "rule": {
+      "fields": {
+        "attribute": "Field",
+        "fallback": "For Unmatched Values (optional)"
+      },
+      "attributeHint": "Attribute or naming field name. The files in one review must fall to the same assignees.",
+      "actions": {
+        "removeValue": "Remove value",
+        "addValue": "+ Value"
+      },
+      "valuePlaceholder": "Value, e.g. S"
+    }
+  }
+}

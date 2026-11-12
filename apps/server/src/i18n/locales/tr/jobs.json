@@ -1,0 +1,62 @@
+{
+  "queue": {
+    "indexNotCreated": "İndeks oluşturulmadı.",
+    "indexFailed": "İndeks oluşturulamadı.",
+    "ifcTimeout": "IFC dönüşümü zaman aşımına uğradı.",
+    "ifcExit": "IFC dönüşüm işlemi {{code}} koduyla bitti."
+  },
+  "spatial": {
+    "versionNotFound": "IFC versiyonu bulunamadı.",
+    "timeout": "IFC konum okuma zaman aşımına uğradı.",
+    "exit": "IFC konum işlemi {{code}} koduyla bitti."
+  },
+  "clash": {
+    "timeLimit": "Çakışma testi {{minutes}} dakikalık süre sınırını aştı. Seçimleri daraltın (dosya, sınıf veya özellik filtresi).",
+    "tooManyElements": "Seçimde çok fazla eleman var ({{count}}; sınır {{limit}} / taraf). Sınıf veya dosya filtresiyle daraltın.",
+    "tooManyElementsAB": "Seçimde çok fazla eleman var (A: {{a}}, B: {{b}}; sınır {{limit}} / taraf). Sınıf veya dosya filtresiyle daraltın.",
+    "geometryTooLarge": "Seçili elemanların geometrisi çok büyük ({{limit}} üçgen sınırı aşıldı). Seçimleri daraltın.",
+    "tooManyPairs": "Ön elemede çok fazla aday çift çıktı (>{{limit}}). Seçimleri daraltın veya toleransı düşürün.",
+    "tooManyClashes": "Çok fazla çakışma bulundu (>{{limit}}). Seçimleri daraltın; sonuçlar kaydedilmedi.",
+    "failed": "Çakışma testi başarısız: {{reason}}"
+  },
+  "ids": {
+    "restriction": "kısıt",
+    "empty": "boş",
+    "entityExpected": "Sınıf {{expected}} bekleniyordu, {{found}} bulundu",
+    "predefinedTypeExpected": "Önceden tanımlı tip {{expected}} bekleniyordu, {{found}} bulundu",
+    "attributeProhibited": "{{name}} özniteliği bulunmamalı",
+    "attributeMissing": "{{name}} özniteliği boş veya yok",
+    "valueExpected": "{{name}} = \"{{value}}\"; beklenen {{expected}}",
+    "propertyProhibited": "{{name}} bulunmamalı",
+    "propertyMissing": "{{name}} özelliği yok veya boş",
+    "dataTypeExpected": "{{name}} veri tipi {{type}}; beklenen {{expected}}",
+    "schemaSkipped": "Model şeması {{schema}}; spesifikasyon {{versions}} için.",
+    "applicabilityUnsupported": "Uygulanabilirlik desteklenmeyen bir faset içeriyor.",
+    "prohibited": "Bu spesifikasyona uyan eleman bulunmamalı",
+    "noApplicable": "Uygulanabilir eleman yok; spesifikasyon en az bir eleman bekliyor.",
+    "unsupportedFacets": "Değerlendirilmeyen fasetler: {{facets}}",
+    "failed": "Bilgi gereksinimi kontrolü (IDS) başarısız: {{reason}}"
+  },
+  "paramChange": {
+    "notBoolean": "\"{{value}}\" evet/hayır değeri değil.",
+    "notNumberTyped": "\"{{value}}\" sayı değil; özellik sayısal ({{type}}).",
+    "notInteger": "\"{{value}}\" tam sayı değil ({{type}}).",
+    "notNumber": "\"{{value}}\" sayı değil.",
+    "kindNotEditable": "Bu özellik türü ({{kind}}) değiştirilemez; yalnız tek değerli ve seçenekli özellikler.",
+    "elementNotFound": "Eleman modelde bulunamadı.",
+    "duplicate": "Aynı elemanın aynı özelliği talepte iki kez var.",
+    "quantity": "Miktarlar (Qto) geometriden türetilir; değiştirilemez.",
+    "valueUpdated": "Değer güncellendi.",
+    "typeOverridden": "Tip değeri elemanda geçersiz kılındı.",
+    "typeOverriddenNewSet": "Tip değeri elemanda yeni özellik setiyle geçersiz kılındı.",
+    "typeChanged": "Tipte değiştirildi ({{count}} eleman etkilenir).",
+    "typePropertyAdded": "Tipe özellik eklendi ({{count}} eleman etkilenir).",
+    "typeSetAdded": "Tipe özellik seti eklendi ({{count}} eleman etkilenir).",
+    "propertyAdded": "Özellik eklendi.",
+    "setAndPropertyAdded": "Özellik seti ve özellik eklendi.",
+    "sharedSetSplit": "{{note}} Paylaşılan özellik seti bu eleman için ayrıldı.",
+    "typeConflict": "Aynı tipteki elemanlara farklı değer istendi; tipte değiştirilemez. Elemana yaz seçeneğini kullanın.",
+    "notApplied": "Uygulanamadı.",
+    "ifcOpenFailed": "IFC dosyası açılamadı."
+  }
+}

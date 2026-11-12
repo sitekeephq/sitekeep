@@ -1,0 +1,95 @@
+{
+  "errors": {
+    "indexUpgrading": "Model indeksi güncelleniyor (kat ve özellik bilgisi ekleniyor). Biraz sonra tekrar deneyin.",
+    "indexUpgradeFailed": "Model indeksi yeni biçime çevrilemedi; dosyayı yeniden yüklemeyi deneyin.",
+    "indexPreparing": "Model indeksi hazırlanıyor. Biraz sonra tekrar deneyin.",
+    "indexFailed": "Model indeksi oluşturulamadı: {{detail}}",
+    "unknownError": "bilinmeyen hata",
+    "notIfc": "{{name}} bir IFC dosyası değil; yalnızca IFC versiyonları kullanılabilir.",
+    "compareNotReport": "Karşılaştırma sorguları rapor olarak kaydedilemez; karşılaştırma raporunu kullanın.",
+    "aiQueryInvalid": "Model geçerli bir sorgu döndürmedi.",
+    "aiQueryRejected": "Model geçersiz bir sorgu döndürdü: {{detail}}",
+    "aiSummaryInvalid": "Model geçerli bir özet döndürmedi.",
+    "aiInventedNumbers": "Model verilmeyen sayılar yazdı; kural tabanlı özet gösteriliyor.",
+    "valueRequired": "'{{op}}' için değer gerekli.",
+    "fieldRequired": "'{{op}}' için alan gerekli.",
+    "datasetUnavailable": "Model veri kümesi hazır değil.",
+    "datasetNeedsFile": "model_elements: fileId (ya da versionId) için bir eq filtresi gerekli.",
+    "modelNotFound": "Model bulunamadı.",
+    "indexNotReady": "Modelin indeksi henüz hazır değil.",
+    "modelQueryNotJson": "modelQuery geçerli JSON değil.",
+    "modelQueryInvalid": "modelQuery geçersiz: {{detail}}"
+  },
+  "warnings": {
+    "propertyMissing": "\"{{field}}\" özelliği bu modelde bulunamadı.",
+    "propertyApprox": "\"{{field}}\" tam bulunamadı; benzer adlı özellikler kullanıldı: {{keys}}.",
+    "storeyMissing": "\"{{storey}}\" adlı kat modelde yok (katlar: {{storeys}}).",
+    "oldIndex": "Model indeksi eski biçimde; kat ve özellik bilgisi yok. Yeniden indekslemeyi bekleyin.",
+    "changeFilterIgnored": "Değişiklik filtresi yalnızca karşılaştırmada kullanılır; yok sayıldı.",
+    "tableTruncated": "Tabloda ilk {{max}} grup gösteriliyor ({{count}} grup).",
+    "noNumericValue": "\"{{field}}\" için sayısal değer bulunamadı."
+  },
+  "answer": {
+    "element": "eleman",
+    "inChanges": "Değişikliklerde",
+    "inChangesKinds": "Değişikliklerde ({{kinds}})",
+    "noneFound": "{{prefix}}aranan koşullara uyan {{what}} bulunamadı{{cond}}.",
+    "found": "{{prefix}}{{n}} {{what}} bulundu{{cond}}.",
+    "distribution": "Dağılım: {{top}}."
+  },
+  "diff": {
+    "noStorey": "Katsız",
+    "added": "{{where}}: {{count}} eklendi",
+    "removed": "{{where}}: {{count}} silindi",
+    "changed_one": "{{where}}: {{count}} elemanda değişiklik var",
+    "changed_other": "{{where}}: {{count}} elemanda değişiklik var",
+    "moved_one": "{{where}}: {{count}} elemanın konumu değişti",
+    "moved_other": "{{where}}: {{count}} elemanın konumu değişti",
+    "otherChanged_one": "{{where}}: {{count}} elemanda geometri / öznitelik değişti",
+    "otherChanged_other": "{{where}}: {{count}} elemanda geometri / öznitelik değişti",
+    "propChanged_one": "{{where}}: {{count}} elemanda {{label}} {{from}} → {{to}}",
+    "propChanged_other": "{{where}}: {{count}} elemanda {{label}} {{from}} → {{to}}",
+    "propMixed_one": "{{where}}: {{count}} elemanda {{label}} değişti ({{values}} farklı değer)",
+    "propMixed_other": "{{where}}: {{count}} elemanda {{label}} değişti ({{values}} farklı değer)"
+  },
+  "datasets": {
+    "modelElements": {
+      "label": "Model Elemanları (Modele Sor)",
+      "description": "Bir IFC modelinin 'Modele sor' sorgusuna uyan elemanları; her zaman dosyanın en yeni versiyonu. fileId (ya da versionId) ve modelQuery (sorgu JSON'u) için eq filtresi gerekir. Özellikler 'p.' ön ekiyle (p.FireRating).",
+      "fields": {
+        "fileId": "Dosya Kimliği",
+        "versionId": "Versiyon Kimliği",
+        "modelQuery": "Sorgu (JSON)",
+        "fileName": "Dosya",
+        "version": "Versiyon",
+        "globalId": "GlobalId",
+        "expressId": "Express ID",
+        "class": "IFC Sınıfı",
+        "classLabel": "Sınıf",
+        "storey": "Kat",
+        "type": "Tip",
+        "name": "Ad",
+        "material": "Malzeme",
+        "value": "Miktar"
+      },
+      "hints": {
+        "value": "Sorgunun toplam alanı (ör. NetArea) değeri",
+        "dynamic": "Eleman özelliği (ör. p.FireRating, p.Pset_DoorCommon.FireRating)"
+      }
+    }
+  },
+  "draft": {
+    "defaultTitle": "Model sorgusu",
+    "newestVersion": "en yeni versiyon",
+    "question": "Soru: {{question}}",
+    "elements": "Elemanlar",
+    "element": "Eleman",
+    "total": "Toplam {{unit}}",
+    "by": "{{fields}} bazında",
+    "name": "Ad",
+    "class": "Sınıf",
+    "storey": "Kat",
+    "type": "Tip",
+    "description": "Modele sor: {{query}}"
+  }
+}

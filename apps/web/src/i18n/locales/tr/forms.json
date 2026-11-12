@@ -1,0 +1,178 @@
+{
+  "page": {
+    "title": "Formlar",
+    "tabs": {
+      "forms": "Formlar",
+      "templates": "Şablonlar"
+    },
+    "actions": {
+      "report": "Rapor"
+    }
+  },
+  "list": {
+    "messages": {
+      "draftsSent_one": "{{count}} taslak gönderildi.",
+      "draftsSent_other": "{{count}} taslak gönderildi."
+    },
+    "actions": {
+      "syncNow": "Şimdi Eşitle",
+      "newForm": "+ Yeni Form"
+    },
+    "options": {
+      "allStatuses": "Tüm Durumlar",
+      "openOnly": "Açık Kalanlar (kapanmamış)"
+    },
+    "fields": {
+      "from": "Başlangıç",
+      "to": "Bitiş"
+    },
+    "empty": "Form yok. \"+ Yeni Form\" ile başlayın; şablonu yoksa \"Şablonlar\" sekmesinden hazır şablon ekleyin.",
+    "columns": {
+      "number": "No"
+    }
+  },
+  "newForm": {
+    "title": "Yeni Form"
+  },
+  "templates": {
+    "messages": {
+      "draftReady": "{{provider}} ({{model}}) taslak üretti. Kontrol edip kaydedin.",
+      "draftReadyRepaired": "{{provider}} ({{model}}) taslak üretti (bir kez düzeltildi). Kontrol edip kaydedin."
+    },
+    "fromPdf": {
+      "heading": "PDF'ten Şablon Oluştur",
+      "description": "Kullandığınız resmî formun PDF'ini yükleyin; alanlar bulunur, akışı anlatırsınız, doldurulan form aynı PDF düzeninde çıkar.",
+      "actions": {
+        "create": "PDF'ten Şablon Oluştur"
+      }
+    },
+    "fromText": {
+      "heading": "Cümleden Şablon Oluştur",
+      "description": "Formu bir iki cümleyle anlatın; yerel yapay zekâ taslak üretir, siz düzenleyip kaydedersiniz. Örnek: \"Şap dökümü öncesi kontrol: kot, nem, yüzey temizliği, derzler; fotoğraf ve imza.\"",
+      "placeholder": "Formu anlatın…",
+      "generating": "Üretiliyor…",
+      "actions": {
+        "generate": "Taslak Üret"
+      }
+    },
+    "actions": {
+      "library": "Hazır Şablonlar",
+      "blank": "+ Boş Şablon",
+      "workflow": "Onay Akışı",
+      "archive": "Arşivle"
+    },
+    "similar": {
+      "heading": "Benzer Şablonlar",
+      "description": "Dönem / \"GÜNCEL\" / \"ESKİ\" kopyaları yerine tek şablon ve sürümler kullanın. Birleştirince eski şablon arşivlenir; doldurulmuş formlar kendi sürümleriyle kalır.",
+      "mergeTitle": "Şablonları Birleştir",
+      "confirm": "\"{{from}}\" arşivlenip \"{{into}}\" ile birleştirilsin mi?",
+      "actions": {
+        "merge": "Birleştir"
+      },
+      "differences": "Farklar: {{list}}"
+    },
+    "itemCount_one": "{{count}} madde",
+    "itemCount_other": "{{count}} madde",
+    "formCount_one": "{{count}} form",
+    "formCount_other": "{{count}} form",
+    "withWorkflow": "onay akışlı",
+    "archiveTitle": "Şablonu Arşivle",
+    "archiveConfirm": "\"{{name}}\" arşivlensin mi? Doldurulmuş formlar kalır.",
+    "empty": "Henüz şablon yok.",
+    "emptyAdmin": "Henüz şablon yok. Hazır şablonlardan ekleyin veya cümleden üretin.",
+    "workflowTitle": "Onay Akışı · {{name}}"
+  },
+  "library": {
+    "title": "Hazır Şablonlar",
+    "itemCount_one": "{{count}} madde.",
+    "itemCount_other": "{{count}} madde.",
+    "actions": {
+      "add": "Projeye Ekle"
+    }
+  },
+  "editor": {
+    "defaultSection": "Genel",
+    "newSection": "Yeni bölüm",
+    "messages": {
+      "savedNewVersion": "Kaydedildi: kullanılmış sürüm korunarak v{{version}} oluşturuldu.",
+      "saved": "Kaydedildi (v{{version}}).",
+      "created": "\"{{name}}\" oluşturuldu."
+    },
+    "editTitle": "Şablonu Düzenle",
+    "newTitle": "Yeni Form Şablonu",
+    "hint": "Doldurulmuş formlarda kullanılan sürüm değişmez: kaydettiğinizde yeni sürüm açılır, eski formlar kendi sürümüyle kalır.",
+    "categoryPlaceholder": "Kalite, İSG…",
+    "fields": {
+      "numberPattern": "Numara Biçimi ({{tokens}})",
+      "workflow": "Gönderilince Onay Akışı"
+    },
+    "options": {
+      "noWorkflow": "— Yok (yönetici kapatır) —"
+    },
+    "sectionUp": "Bölümü yukarı",
+    "sectionDown": "Bölümü aşağı",
+    "actions": {
+      "deleteSection": "Bölümü Sil",
+      "addItem": "+ Madde",
+      "addSection": "+ Bölüm"
+    }
+  },
+  "item": {
+    "dragHint": "Sürükleyerek taşıyın",
+    "labelPlaceholder": "Madde metni",
+    "moveUp": "Yukarı",
+    "moveDown": "Aşağı",
+    "options": {
+      "allowNa": "\"Uygulanmaz\" Seçilebilir",
+      "multiline": "Çok Satırlı"
+    },
+    "unitPlaceholder": "Birim",
+    "minPlaceholder": "En az",
+    "maxPlaceholder": "En çok",
+    "optionsPlaceholder": "Her satıra bir seçenek",
+    "failOptions": "Uygunsuz sayılanlar:",
+    "maxPhotosBefore": "En fazla",
+    "maxPhotosAfter": "fotoğraf",
+    "scoreHelp": "Evet / Hayır maddelerindeki \"Evet\" oranı (U.D. hariç) otomatik hesaplanır."
+  },
+  "media": {
+    "actions": {
+      "addPhoto": "Fotoğraf Ekle",
+      "resign": "Yeniden İmzala",
+      "saveSignature": "İmzayı Kaydet"
+    },
+    "signature": "İmza",
+    "pendingHint": "Bağlantı gelince yüklenecek",
+    "pending": "bekliyor"
+  },
+  "workflow": {
+    "issue": "Sorun #{{number}}",
+    "issueOnRow": "Sorun #{{number}} ({{row}}. satır)",
+    "actions": {
+      "createIssue": "Sorun Oluştur",
+      "createIssueOnRow": "Sorun Oluştur ({{row}}. satır)"
+    },
+    "step": "{{index}}/{{total}}. onay adımı: {{name}}",
+    "stepWithDue": "{{index}}/{{total}}. onay adımı: {{name}} · termin {{due}}",
+    "notePlaceholder": "Not (isteğe bağlı)"
+  },
+  "inputs": {
+    "outOfRange": "Aralık dışında ({{min}} – {{max}})",
+    "deleteRow": "Satırı sil",
+    "actions": {
+      "addRow": "+ Satır"
+    }
+  },
+  "filePicker": {
+    "placeholder": "Dosya adı ara…"
+  },
+  "flow": {
+    "steps": {
+      "heading": "Adımlar",
+      "badges": {
+        "saved": "Kayıtlı",
+        "unsaved": "Kaydedilmedi"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": false,
+    "declarationMap": false,
+    "rootDir": "../..",
+    "outDir": "types",
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "paths": { "@sitekeep/shared": ["../shared/src/index.ts"], "@sitekeep/cde-tools": ["../cde-tools/src/index.ts"] }
+  },
+  "files": ["../../apps/server/src/sdk/index.ts"],
+  "include": ["../../apps/server/src/**/*.d.ts"]
+}

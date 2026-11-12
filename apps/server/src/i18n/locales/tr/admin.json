@@ -1,0 +1,131 @@
+{
+  "errors": {
+    "adminOnly": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
+    "invalidDomain": "Geçerli bir alan adı girin: {{domain}}",
+    "codeInUse": "\"{{code}}\" kodu \"{{company}}\" firmasında kullanılıyor.",
+    "companyExists": "\"{{name}}\" adlı bir firma zaten var.",
+    "invalidEmail": "Geçerli bir e-posta adresi girin.",
+    "selfLockout": "Kendi yönetici yetkinizi kaldıramaz veya hesabınızı kapatamazsınız.",
+    "loadTestOff": "Tam yük testi bu kurulumda kapalı (CAPACITY_LOAD_TEST=0).",
+    "reportWhileRunning": "Test bitmeden rapor alınamaz.",
+    "runActive": "Bir kapasite testi zaten çalışıyor."
+  },
+  "entities": {
+    "user": "Kullanıcı",
+    "capacityRun": "Kapasite testi",
+    "company": "Firma"
+  },
+  "capacity": {
+    "stage": {
+      "starting": "Başlıyor",
+      "done": "Bitti",
+      "stopped": "Durduruldu",
+      "error": "Hata: {{message}}",
+      "hardware": "Donanım okunuyor",
+      "cpu": "İşlemci ölçülüyor",
+      "disk": "Disk hızı ölçülüyor",
+      "database": "Veritabanı ölçülüyor",
+      "ifc": "Örnek IFC dönüştürülüyor",
+      "memory": "Bellek payı hesaplanıyor",
+      "users_one": "{{count}} sanal kullanıcı",
+      "users_other": "{{count}} sanal kullanıcı",
+      "limitReached": "Sınıra ulaşıldı"
+    },
+    "check": {
+      "hardware": "Donanım",
+      "cpu": "İşlemci",
+      "disk": "Disk",
+      "database": "Veritabanı",
+      "ifc": "IFC dönüşümü",
+      "memory": "Bellek payı"
+    },
+    "value": {
+      "hardware": "{{cpus}} vCPU · {{ram}} GB RAM",
+      "hardwareDisk": "{{cpus}} vCPU · {{ram}} GB RAM · {{disk}} GB disk",
+      "cpu": "tek çekirdek 1,0× · {{cores}} çekirdek {{factor, number(minimumFractionDigits: 1; maximumFractionDigits: 1)}}×",
+      "disk": "yazma 412 MB/sn · okuma 1,1 GB/sn · fsync 0,9 ms",
+      "database": "p50 0,6 ms · p95 2,1 ms",
+      "ifc": "örnek model {{seconds}} sn",
+      "memory": "{{gb}} GB boş kalır (IFC ve ofis için)"
+    },
+    "stop": {
+      "p95": "Yanıt süresi p95 > {{ms}} ms",
+      "p99": "Yanıt süresi p99 > {{ms}} ms",
+      "errorRate": "Hata oranı > %{{pct}}",
+      "cpu": "İşlemci > %{{pct}}",
+      "freeMemory": "Boş RAM < %{{pct}}"
+    },
+    "report": {
+      "percent": "%{{value}}",
+      "level": {
+        "ok": "Uygun",
+        "warn": "Dikkat",
+        "danger": "Eksik"
+      },
+      "status": {
+        "running": "Sürüyor",
+        "passed": "Tamamlandı",
+        "limited": "Sınıra ulaşıldı",
+        "cancelled": "Durduruldu",
+        "failed": "Hata"
+      },
+      "chartLabel": "Basamak başına yanıt süresi",
+      "chartLimit": "sınır {{ms}} ms",
+      "chartUsers": "sanal kullanıcı",
+      "modeQuick": "Hızlı Kontrol",
+      "modeLoad": "Tam Yük Testi",
+      "pageTitle": "SiteKeep Kapasite Raporu",
+      "heading": "Kapasite Raporu · {{mode}}",
+      "demoTitle": "Örnek veri.",
+      "demoText": "Bu rapor örnek test motoruyla üretildi; sunucuya yük bindirilmedi, ölçüm yapılmadı.",
+      "result": "Sonuç",
+      "resultBig": "~{{concurrent}} eşzamanlı · ~{{registered}} kayıtlı kullanıcı",
+      "resultNoteStopped": "Kayıtlı = eşzamanlı / {{ratio}} (yoğun saatte kayıtlıların {{pct}}'i aynı anda). Durma nedeni: {{reason}}.",
+      "resultNoteNoLimit": "Kayıtlı = eşzamanlı / {{ratio}} (yoğun saatte kayıtlıların {{pct}}'i aynı anda). Üst basamağa kadar sınır aşılmadı.",
+      "server": "Sunucu",
+      "cpu": "İşlemci",
+      "memory": "Bellek",
+      "dataDisk": "Veri diski",
+      "diskValue": "{{total}} GB · {{free}} GB boş",
+      "diskUnreadable": "okunamadı",
+      "os": "İşletim sistemi",
+      "users": "Kullanıcı",
+      "usersValue": "{{registered}} kayıtlı · {{active}} aktif (30 gün)",
+      "findings": "Eksikler ve öneriler",
+      "colStatus": "Durum",
+      "colTopic": "Konu",
+      "colAction": "Ne yapılmalı",
+      "measurements": "Ölçümler",
+      "steps": "Yük basamakları",
+      "colUsers": "Kullanıcı",
+      "colRps": "İstek/sn",
+      "colError": "Hata",
+      "colCpu": "İşlemci",
+      "colRam": "RAM",
+      "stepPassed": "geçti",
+      "stepLimit": "sınır",
+      "limits": "Sınırlar: p95 {{p95}} ms, p99 {{p99}} ms, hata {{error}}, işlemci {{cpu}}, boş RAM {{ram}}.",
+      "tiers": "Kapasite tablosu",
+      "colTier": "Kademe",
+      "colRegistered": "Kayıtlı",
+      "colConcurrent": "Eşzamanlı",
+      "colDisk": "Veri diski",
+      "measuredAt": "Tablo {{date}} tarihinde ölçüldü.",
+      "estimated": "Tablodaki sayılar tahminidir; referans ölçüm bekleniyor.",
+      "concurrencyRatio": "Eşzamanlılık oranı {{pct}}."
+    }
+  },
+  "license": {
+    "adminOnly": "Lisansı yalnız sistem yöneticileri yönetir.",
+    "fileRequired": "Bir lisans dosyası seçin.",
+    "problems": {
+      "format": "Bu bir SiteKeep lisans dosyası değil.",
+      "unknown_key": "Lisans bu sürümün tanımadığı bir anahtarla imzalanmış. SiteKeep'i güncelleyin veya yeni lisans isteyin.",
+      "dev_key_in_production": "Bu bir geliştirme lisansı; canlı kurulumda çalışmaz.",
+      "signature": "Lisans imzası tutmuyor: dosya değiştirilmiş ya da bozulmuş.",
+      "payload": "Lisansın içeriği okunamıyor.",
+      "other_installation": "Bu lisans başka bir kuruluma ait. Lisans isterken bu kurulumun kimliğini gönderin.",
+      "build_after_support": "Bu SiteKeep sürümü destek süreniz bittikten sonra çıktı. Önceki sürüme dönün veya desteği yenileyin."
+    }
+  }
+}

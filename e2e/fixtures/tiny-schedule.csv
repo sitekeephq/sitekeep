@@ -1,0 +1,3 @@
+Code,Name,Start,Finish,Percent Complete,Predecessors
+E2E-100,Site setup,2026-10-19,2026-10-20,100,
+E2E-200,Foundation check,2026-10-21,2026-10-22,0,E2E-100

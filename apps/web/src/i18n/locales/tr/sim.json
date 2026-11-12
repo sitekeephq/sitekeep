@@ -1,0 +1,210 @@
+{
+  "rule": {
+    "fields": {
+      "storey": "Kat",
+      "class": "Sınıf",
+      "nameContains": "Ad İçerir",
+      "property": "Özellik"
+    },
+    "noStoreys": "Modelde kat bilgisi yok.",
+    "classSearch": "Sınıf ara",
+    "namePlaceholder": "ör. perde",
+    "propertyCondition": "Özellik koşulu",
+    "options": {
+      "noProperty": "Özellik Koşulu Yok",
+      "propertyValue": "Özellik = Değer",
+      "propertyItemCode": "Özellik = Poz No",
+      "propertyActivity": "Özellik = Faaliyet Kodu / WBS",
+      "contains": "İçerir"
+    },
+    "propertyPlaceholder": "Özellik adı (ör. WBS)",
+    "comparison": "Karşılaştırma",
+    "valuePlaceholder": "Değer",
+    "matchedField": "Eşleşen alan"
+  },
+  "linkRules": {
+    "errors": {
+      "failed": "{{action}}: {{message}}",
+      "apply": "Uygulanamadı",
+      "suggest": "Öneri alınamadı",
+      "add": "Eklenemedi",
+      "remove": "Silinemedi"
+    },
+    "messages": {
+      "applied": "{{activities}} faaliyete {{elements}} eleman bağlandı ({{links}} bağlantı).",
+      "suggested_one": "{{count}} kural önerildi.",
+      "suggested_other": "{{count}} kural önerildi.",
+      "noSuggestions": "Faaliyet adlarından kural çıkarılamadı.",
+      "added_one": "{{count}} kural eklendi. Bağlantıları yazmak için \"Uygula\"ya basın.",
+      "added_other": "{{count}} kural eklendi. Bağlantıları yazmak için \"Uygula\"ya basın.",
+      "removed": "Kural ve yazdığı bağlantılar silindi.",
+      "ruleAdded": "Kural eklendi."
+    },
+    "title": "Bağlantı Kuralları",
+    "description": "Faaliyetleri model elemanlarına kat, sınıf, özellik veya ada göre bağlar. Kurallar sunucudaki eleman indeksinde çalışır; yeni model versiyonu geldiğinde kendiliğinden yeniden uygulanır. Elle bağlanan elemanlar korunur.",
+    "fields": {
+      "model": "Model",
+      "activity": "Faaliyet"
+    },
+    "options": {
+      "noModel": "IFC Modeli Yok",
+      "chooseActivity": "Faaliyet Seçin"
+    },
+    "previewStats": "{{matched}} / {{total}} eleman · {{activities}} faaliyet",
+    "multiTarget_one": "{{count}} eleman birden çok faaliyette",
+    "multiTarget_other": "{{count}} eleman birden çok faaliyette",
+    "stale": "Modelin yeni versiyonu var; kuralları yeniden uygulayın.",
+    "empty": "Bu model için kural yok. \"Kural Öner\" ile başlayabilirsiniz.",
+    "byProperty": "Özellik Değerine Göre",
+    "unknownValues": "Eşleşmeyen değerler: {{list}}",
+    "matchedHint": "Kurala uyan eleman",
+    "elements_one": "{{count}} eleman",
+    "elements_other": "{{count}} eleman",
+    "removeRule": "Kuralı sil",
+    "suggestedHeading": "Önerilen Kurallar",
+    "skipped_one": "{{count}} faaliyet için modelde uygun eleman yok.",
+    "skipped_other": "{{count}} faaliyet için modelde uygun eleman yok.",
+    "actions": {
+      "addSelected": "Seçilenleri Ekle ({{count}})",
+      "suggest": "Kural Öner",
+      "add": "+ Kural Ekle"
+    },
+    "newRule": "Yeni Kural",
+    "activitySearch": "Faaliyet ara",
+    "chooseCondition": "En az bir koşul seçin."
+  },
+  "cost": {
+    "title": "Maliyet (5D)",
+    "tabs": {
+      "summary": "Özet",
+      "items": "Birim Fiyatlar",
+      "rules": "Maliyet Kuralları",
+      "learned": "Öğrenilen Eşlemeler"
+    },
+    "summary": {
+      "calculating": "Hesaplanıyor…",
+      "kpis": {
+        "total": "Toplam Maliyet",
+        "elements": "Eleman",
+        "lines": "Maliyet Satırı",
+        "missing": "Miktarı Eksik"
+      },
+      "models": "Modeller: {{list}}",
+      "groups": {
+        "category": "Kategoriye Göre",
+        "storey": "Kata Göre",
+        "class": "Sınıfa Göre",
+        "activity": "Faaliyete Göre"
+      },
+      "missingElements": "Miktarı Eksik Elemanlar ({{count}})"
+    },
+    "columns": {
+      "quantity": "Miktar",
+      "amount": "Tutar",
+      "element": "Eleman",
+      "rule": "Kural"
+    },
+    "chart": {
+      "title": "Nakit akışı",
+      "forecast": "Öngörülen",
+      "unscheduled": "faaliyete bağlı olmayan {{amount}} eğride yok"
+    },
+    "items": {
+      "deleteTitle": "Birim Fiyatı Sil",
+      "deleteConfirm": "\"{{code}}\" silinsin mi? Bu birim fiyatı kullanan maliyet kuralları da silinir.",
+      "searchPlaceholder": "Poz no veya tanım ara",
+      "count_one": "{{count}} kalem",
+      "count_other": "{{count}} kalem",
+      "empty": "Birim fiyat yok. Excel listesini içe aktarın ya da aşağıdan ekleyin.",
+      "codePlaceholder": "Poz no",
+      "pricePlaceholder": "Birim fiyat (₺)",
+      "actions": {
+        "add": "+ Ekle"
+      }
+    },
+    "rules": {
+      "total": "Toplam: {{amount}}",
+      "noItems": "Önce birim fiyatları ekleyin ya da içe aktarın.",
+      "empty": "Bu model için maliyet kuralı yok.",
+      "codeFromProperty": "Poz No Özellikten",
+      "activity": "faaliyet {{code}}",
+      "missing_one": "{{count}} miktarsız",
+      "missing_other": "{{count}} miktarsız",
+      "added": "Maliyet kuralı eklendi.",
+      "actions": {
+        "add": "+ Maliyet Kuralı Ekle"
+      }
+    },
+    "newRule": {
+      "title": "Yeni Maliyet Kuralı",
+      "missing_one": "{{count}} elemanda miktar yok",
+      "missing_other": "{{count}} elemanda miktar yok",
+      "options": {
+        "chooseItem": "Poz Seçin",
+        "otherProperty": "Diğer Özellik",
+        "from4d": "4D Bağlantısından"
+      },
+      "quantitySource": "Miktar kaynağı",
+      "propertyName": "Özellik adı",
+      "multiplier": "Çarpan",
+      "multiplierHint": "Çarpan (ör. donatı için 100 kg/m³)"
+    }
+  },
+  "poz": {
+    "title": "Poz Öner",
+    "intro": "{{model}} modelindeki eleman grupları için birim fiyat önerileri. Onayladığınız satırlar maliyet kuralına dönüşür ve sonraki projelerde ilk sırada önerilir.",
+    "useAi": "Yapay Zekâ ile",
+    "aiUsed": "Yapay zekâ: {{model}}",
+    "aiNotUsed": "Yapay zekâ kullanılmadı.",
+    "aiError": "Yapay zekâ kullanılamadı ({{error}}). Öğrenilen ve anahtar sözcük önerileri gösteriliyor.",
+    "loading": "Öneriler hazırlanıyor…",
+    "covered_one": "{{count}} grup zaten bir maliyet kuralıyla fiyatlanıyor.",
+    "covered_other": "{{count}} grup zaten bir maliyet kuralıyla fiyatlanıyor.",
+    "empty": "Önerilecek grup kalmadı.",
+    "elements_one": "{{count}} eleman",
+    "elements_other": "{{count}} eleman",
+    "badge": "Öneri",
+    "changed": "Poz değiştirildi; onaylarsanız bu seçim öğrenilir.",
+    "confidence": "Güven %{{value}}",
+    "selectedTotal": "Seçilenlerin tutarı: {{amount}}",
+    "selectRow": "{{group}} Seç",
+    "itemFor": "{{group}} Pozu",
+    "rejectRow": "{{group}} Önerisini Reddet",
+    "rejected": "{{code}} bu grup için bir daha önerilmeyecek.",
+    "accepted_one": "{{count}} maliyet kuralı eklendi.",
+    "accepted_other": "{{count}} maliyet kuralı eklendi.",
+    "unmatched": "Önerisiz Gruplar ({{count}})",
+    "columns": {
+      "select": "Seç",
+      "group": "Eleman Grubu",
+      "item": "Önerilen Poz",
+      "source": "Kaynak"
+    },
+    "source": {
+      "memory": "Öğrenilmiş",
+      "ai": "Yapay Zekâ",
+      "keywords": "Anahtar Sözcük"
+    },
+    "actions": {
+      "open": "Poz Öner",
+      "refresh": "Yeniden Öner",
+      "reject": "Reddet",
+      "accept_one": "Seçilenleri Kurala Çevir ({{count}})",
+      "accept_other": "Seçilenleri Kurala Çevir ({{count}})"
+    },
+    "learned": {
+      "intro": "Onaylanan ve reddedilen eleman grubu ↔ poz eşlemeleri. Tüm projelerde ortaktır; yanlış bir eşlemeyi silebilirsiniz.",
+      "empty": "Henüz öğrenilen eşleme yok. Poz Öner ekranında onayladığınız satırlar burada görünür.",
+      "decision": "Karar",
+      "uses": "Onay Sayısı",
+      "decisions": {
+        "accepted": "Onaylandı",
+        "rejected": "Reddedildi"
+      },
+      "remove": "{{code}} Eşlemesini Sil",
+      "deleteTitle": "Eşlemeyi Sil",
+      "deleteConfirm": "{{group}} ↔ {{code}} eşlemesi silinsin mi? Mevcut maliyet kuralları değişmez."
+    },
+    "noItems": "Bu projede birim fiyat yok. Önce İş Programı → Maliyet (5D) → Birim Fiyatlar bölümünden ekleyin ya da Excel listesini içe aktarın."
+  }
+}

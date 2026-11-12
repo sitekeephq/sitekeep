@@ -1,0 +1,95 @@
+{
+  "errors": {
+    "indexUpgrading": "The model index is being updated (storey and property information is being added). Please try again shortly.",
+    "indexUpgradeFailed": "The model index could not be converted to the new format; try uploading the file again.",
+    "indexPreparing": "The model index is being prepared. Please try again shortly.",
+    "indexFailed": "The model index could not be created: {{detail}}",
+    "unknownError": "unknown error",
+    "notIfc": "{{name}} is not an IFC file; only IFC versions can be used.",
+    "compareNotReport": "Comparison queries cannot be saved as a report; use the comparison report.",
+    "aiQueryInvalid": "The model did not return a valid query.",
+    "aiQueryRejected": "The model returned an invalid query: {{detail}}",
+    "aiSummaryInvalid": "The model did not return a valid summary.",
+    "aiInventedNumbers": "The model wrote numbers it was not given; the rule-based summary is shown.",
+    "valueRequired": "A value is required for '{{op}}'.",
+    "fieldRequired": "A field is required for '{{op}}'.",
+    "datasetUnavailable": "The model dataset is not ready.",
+    "datasetNeedsFile": "model_elements: an eq filter for fileId (or versionId) is required.",
+    "modelNotFound": "Model not found.",
+    "indexNotReady": "The model's index is not ready yet.",
+    "modelQueryNotJson": "modelQuery is not valid JSON.",
+    "modelQueryInvalid": "modelQuery is invalid: {{detail}}"
+  },
+  "warnings": {
+    "propertyMissing": "The property \"{{field}}\" was not found in this model.",
+    "propertyApprox": "\"{{field}}\" was not found exactly; properties with similar names were used: {{keys}}.",
+    "storeyMissing": "There is no storey named \"{{storey}}\" in the model (storeys: {{storeys}}).",
+    "oldIndex": "The model index is in the old format; there is no storey or property information. Wait for re-indexing.",
+    "changeFilterIgnored": "The change filter is only used in comparisons; it was ignored.",
+    "tableTruncated": "The table shows the first {{max}} groups ({{count}} groups).",
+    "noNumericValue": "No numeric value was found for \"{{field}}\"."
+  },
+  "answer": {
+    "element": "element",
+    "inChanges": "In changes",
+    "inChangesKinds": "In changes ({{kinds}})",
+    "noneFound": "{{prefix}}no {{what}} matching the conditions was found{{cond}}.",
+    "found": "{{prefix}}{{n}} {{what}} found{{cond}}.",
+    "distribution": "Distribution: {{top}}."
+  },
+  "diff": {
+    "noStorey": "No storey",
+    "added": "{{where}}: {{count}} added",
+    "removed": "{{where}}: {{count}} removed",
+    "changed_one": "{{where}}: {{count}} element has changes",
+    "changed_other": "{{where}}: {{count}} elements have changes",
+    "moved_one": "{{where}}: the position of {{count}} element changed",
+    "moved_other": "{{where}}: the position of {{count}} elements changed",
+    "otherChanged_one": "{{where}}: geometry / attributes changed in {{count}} element",
+    "otherChanged_other": "{{where}}: geometry / attributes changed in {{count}} elements",
+    "propChanged_one": "{{where}}: {{label}} {{from}} → {{to}} in {{count}} element",
+    "propChanged_other": "{{where}}: {{label}} {{from}} → {{to}} in {{count}} elements",
+    "propMixed_one": "{{where}}: {{label}} changed in {{count}} element ({{values}} different values)",
+    "propMixed_other": "{{where}}: {{label}} changed in {{count}} elements ({{values}} different values)"
+  },
+  "datasets": {
+    "modelElements": {
+      "label": "Model Elements (Ask the Model)",
+      "description": "Elements of an IFC model that match an 'Ask the Model' query; always the file's newest version. An eq filter is required for fileId (or versionId) and modelQuery (the query JSON). Properties with the 'p.' prefix (p.FireRating).",
+      "fields": {
+        "fileId": "File ID",
+        "versionId": "Version ID",
+        "modelQuery": "Query (JSON)",
+        "fileName": "File",
+        "version": "Version",
+        "globalId": "GlobalId",
+        "expressId": "Express ID",
+        "class": "IFC Class",
+        "classLabel": "Class",
+        "storey": "Storey",
+        "type": "Type",
+        "name": "Name",
+        "material": "Material",
+        "value": "Quantity"
+      },
+      "hints": {
+        "value": "The value of the query's total quantity (e.g. NetArea)",
+        "dynamic": "Element property (e.g. p.FireRating, p.Pset_DoorCommon.FireRating)"
+      }
+    }
+  },
+  "draft": {
+    "defaultTitle": "Model query",
+    "newestVersion": "newest version",
+    "question": "Question: {{question}}",
+    "elements": "Elements",
+    "element": "Element",
+    "total": "Total {{unit}}",
+    "by": "By {{fields}}",
+    "name": "Name",
+    "class": "Class",
+    "storey": "Storey",
+    "type": "Type",
+    "description": "Ask the Model: {{query}}"
+  }
+}

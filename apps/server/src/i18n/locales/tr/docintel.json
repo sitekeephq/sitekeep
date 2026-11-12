@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "register": "Kayıt"
+  },
+  "errors": {
+    "pdfTimeout": "PDF okuma zaman aşımına uğradı.",
+    "pdfPassword": "PDF parola korumalı.",
+    "pdfInvalid": "Geçerli bir PDF değil.",
+    "pdfWorkerExit": "PDF okuma işlemi {{code}} koduyla bitti.",
+    "folderIdRequired": "folderId gerekli.",
+    "multipartExpected": "multipart/form-data bekleniyor.",
+    "tooManyFiles_one": "En fazla {{count}} dosya.",
+    "tooManyFiles_other": "En fazla {{count}} dosya.",
+    "invalidFileName": "Geçersiz dosya adı.",
+    "tooBigForAntet": "Antet okunmadı: dosya {{mb}} MB sınırından büyük.",
+    "noFile": "Dosya gönderilmedi.",
+    "antetPdfOnly": "Antet yalnız PDF dosyalarından okunur.",
+    "antetNotRead": "Bu versiyon için antet henüz okunmadı.",
+    "aiUnavailable": "Bu projede yapay zekâ kullanılamıyor.",
+    "specPdfOnly": "Şartname analizi yalnız PDF dosyalarında yapılır.",
+    "registerEditDenied": "Kaydı yalnız oluşturan, klasörde düzenleme yetkisi olan veya proje yöneticisi değiştirebilir.",
+    "duplicateItemIds": "Kalem numaraları tekrar ediyor.",
+    "badFormat": "format csv, xlsx veya json olmalı."
+  },
+  "antet": {
+    "noPages": "PDF'de sayfa yok.",
+    "noText": "Metin katmanı yok; taranmış PDF olabilir (OCR henüz yok).",
+    "notFound": "Antet bulunamadı; sayfa düz metin gibi görünüyor."
+  },
+  "revision": {
+    "sameContent": "V{{version}} içeriği V{{previous}} ile birebir aynı; aynı dosya yeniden yüklenmiş.",
+    "sameRevisionChanged": "İçerik değişmiş ama revizyon aynı ({{revision}}); V{{previous}} de {{previousRevision}} idi.",
+    "backwards": "Revizyon geri gitmiş: V{{previous}} {{previousRevision}}, V{{version}} {{revision}}.",
+    "tableMismatch": "Antetteki revizyon ({{antet}}) revizyon tablosunun son satırıyla ({{table}}) uyuşmuyor.",
+    "nameMismatch": "Dosya adındaki revizyon ({{name}}) antetteki revizyonla ({{revision}}) uyuşmuyor.",
+    "attributeMismatch": "Revizyon özniteliği {{attribute}} ama dokümanda {{revision}} okundu."
+  },
+  "columns": {
+    "no": "No",
+    "sectionCode": "Bölüm Kodu",
+    "sectionTitle": "Bölüm Adı",
+    "page": "Sayfa",
+    "type": "Tip",
+    "typeName": "Tip Adı",
+    "discipline": "Disiplin",
+    "description": "Açıklama",
+    "excerpt": "Şartname Metni",
+    "confidence": "Güven",
+    "keywords": "Anahtar Kelimeler",
+    "untyped": "Belirsiz"
+  },
+  "export": {
+    "fileSuffix": "teknik-onay",
+    "sheet": "Teknik Onay"
+  },
+  "register": {
+    "types": {
+      "mos": "Malzeme onayı (teknik föy / katalog)",
+      "num": "Numune",
+      "ucz": "Atölye / uygulama çizimi",
+      "yb": "Yöntem beyanı",
+      "ip": "İş programı",
+      "isg": "İSG dokümanı",
+      "tr": "Teknik rapor / hesap",
+      "pmr": "Periyodik muayene",
+      "ks": "Test raporu / sertifika",
+      "ikof": "İmalat kontrol onayı",
+      "bas": "Bilgi amaçlı sunum",
+      "mkf": "Saha malzeme kabulü",
+      "untyped": "Onaya sunulacak doküman"
+    },
+    "noAmbiguousItems": "Belirsiz kalem yok."
+  },
+  "suggest": {
+    "fromAntetLabel": "Antetteki '{{label}}: {{text}}' → {{field}} {{value}}",
+    "fromAntetDocCode": "Antetteki doküman kodu '{{code}}' → {{field}} {{value}}",
+    "fromAntet": "Antetteki '{{text}}' → {{field}} {{value}}",
+    "fromAntetCode": "Antetteki kod '{{code}}' → {{field}} {{value}}",
+    "fromFileName": "Dosya adı '{{text}}' → {{field}} {{value}}",
+    "fromFolder": "Klasör '{{folder}}' → {{field}} {{value}}",
+    "fromCurrentName": "Mevcut dosya adından → {{field}} {{value}}",
+    "labelsTurkish": "Antet etiketleri Türkçe → {{field}} {{value}}",
+    "labelsEnglish": "Antet etiketleri İngilizce → {{field}} {{value}}",
+    "singleValue": "Tek izinli değer → {{field}} {{value}}",
+    "fromAntetText": "Antetteki '{{label}}: {{text}}' → {{field}}",
+    "noEvidence": "{{field}}: antette, dosya adında veya klasörde karşılık bulunamadı.",
+    "otherCandidate": "{{text}} (başka aday: {{value}})",
+    "undetermined": "Belirlenemeyen alanlar: {{fields}}.",
+    "fromRevisionTableRow": "Revizyon tablosu {{rev}} satırı → {{name}} {{value}}",
+    "freeForm": "{{text}} (serbest öznitelik)",
+    "revisionFromAntet": "Antetteki '{{raw}}' → {{name}} {{value}}",
+    "revisionFromTable": "Revizyon tablosundaki '{{raw}}' → {{name}} {{value}}",
+    "revisionFromFileName": "Dosya adındaki '{{raw}}' → {{name}} {{value}}",
+    "revisionFromAttribute": "Öznitelikteki '{{raw}}' → {{name}} {{value}}"
+  },
+  "ai": {
+    "noAmbiguousFields": "Belirsiz alan yok.",
+    "unreadable": "Yapay zekâ cevabı okunamadı: {{error}}",
+    "notAllowed": "Yapay zekâ izinli olmayan bir değer önerdi ({{field}}: {{value}}); öneri reddedildi.",
+    "noChoice": "Yapay zekâ belirsiz alanlara değer seçmedi.",
+    "chosen": "Yapay zekâ seçti → {{field}} {{value}}",
+    "chosenWithCandidates": "Yapay zekâ seçti → {{field}} {{value}} (adaylar: {{candidates}})",
+    "nameInvalid": "Yapay zekâ önerisiyle ad standarda uymadı: {{errors}}"
+  }
+}

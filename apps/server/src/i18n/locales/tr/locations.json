@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "location": "Konum",
+    "job": "İş",
+    "issue": "Sorun",
+    "form": "Form",
+    "file": "Dosya"
+  },
+  "errors": {
+    "kmStartAfterEnd": "Km başlangıcı bitişten büyük olamaz.",
+    "moveUnderItself": "Konum kendi altına taşınamaz.",
+    "linkedRecords_one": "Bu konuma (veya altındakilere) bağlı {{count}} kayıt var. Yine de silmek için onaylayın.",
+    "linkedRecords_other": "Bu konuma (veya altındakilere) bağlı {{count}} kayıt var. Yine de silmek için onaylayın.",
+    "csvErrors_one": "CSV'de {{count}} hata var; hiçbir kayıt değiştirilmedi.",
+    "csvErrors_other": "CSV'de {{count}} hata var; hiçbir kayıt değiştirilmedi.",
+    "parentCodesUnresolved": "Üst kodlar çözülemedi (döngü).",
+    "ifcOnly": "Yalnızca IFC dosyalarından konum oluşturulabilir.",
+    "locationOrTargetRequired": "locationId veya targetId gerekli.",
+    "issueLinkForbidden": "Sorunun konumunu yalnızca oluşturan, atanan kişi veya proje yöneticisi değiştirebilir.",
+    "formLinkForbidden": "Formun konumunu yalnızca taslağı hazırlayan veya proje yöneticisi değiştirebilir."
+  },
+  "csv": {
+    "parentNotFound": "Üst kod \"{{code}}\" bulunamadı.",
+    "ownParent": "Konum kendisinin üstü olamaz.",
+    "parentCycle": "\"{{code}}\" için döngüsel üst kod.",
+    "empty": "CSV boş.",
+    "noNameColumn": "Başlık satırında \"Ad\" sütunu yok (ör. Kod;Ad;Tip;Üst kod;Km başlangıç;Km bitiş).",
+    "nameEmpty": "Ad boş.",
+    "nameTooLong": "Ad en fazla 200 karakter olabilir.",
+    "codeTooLong": "Kod en fazla 40 karakter olabilir.",
+    "duplicateCode": "\"{{code}}\" kodu dosyada iki kez geçiyor.",
+    "kmStartAfterEnd": "Km başlangıcı bitişten büyük.",
+    "orderNotInteger": "Sıra tam sayı olmalı: \"{{value}}\".",
+    "noDataRows": "CSV'de veri satırı yok."
+  }
+}

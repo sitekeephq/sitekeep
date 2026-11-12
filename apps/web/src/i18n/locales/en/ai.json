@@ -1,0 +1,147 @@
+{
+  "actions": {
+    "cancel": "Cancel"
+  },
+  "mode": {
+    "options": {
+      "off": "Off",
+      "localOnly": "Fully Local",
+      "allowExternal": "Allow External Providers"
+    },
+    "badges": {
+      "off": "AI Off",
+      "localOnly": "Fully Local Mode",
+      "allowExternal": "External Providers Allowed"
+    },
+    "localOnlyHint": "AI calls do not leave the network",
+    "allowExternalHint": "In projects that allow it, data may go to the cloud provider"
+  },
+  "presets": {
+    "localName": "{{label}} (local)",
+    "custom": {
+      "label": "Custom (OpenAI Compatible)",
+      "dataLocation": "On the server at the address you enter."
+    },
+    "cost": {
+      "low": "low",
+      "medium": "medium",
+      "high": "high"
+    }
+  },
+  "tasks": {
+    "defaultClient": "The AI client",
+    "messages": {
+      "working": "{{client}} is working on it…",
+      "waiting": "Waiting in the AI client — tell your connected client (Claude, ChatGPT…) “do the pending SiteKeep tasks”."
+    }
+  },
+  "provider": {
+    "aria": {
+      "provider": "AI provider",
+      "model": "Answer model"
+    },
+    "project": "Project Provider",
+    "projectWith": "Project Provider · {{name}}",
+    "keyNeeded": "{{name}} · key required",
+    "notAllowed": "{{name}} · not allowed",
+    "useOwnKey": "Use your own API key"
+  },
+  "ask": {
+    "actions": {
+      "ask": "Ask"
+    }
+  },
+  "modelAsk": {
+    "title": "Ask the Model",
+    "compareTitle": "Ask About the Changes",
+    "aria": {
+      "model": "Model",
+      "question": "Question",
+      "display": "Display",
+      "remove": "Remove {{text}}"
+    },
+    "placeholder": "E.g. fire doors on the 2nd floor",
+    "placeholderCompare": "E.g. which doors changed?",
+    "examples": {
+      "notEi60": "Doors that are not EI60",
+      "slabArea": "How many m² of slab are there?",
+      "wallsByStorey": "Walls by storey",
+      "fireDoors": "Fire doors on the 1st floor"
+    },
+    "compareExamples": {
+      "changedDoors": "Which doors changed?",
+      "deletedWalls": "Deleted walls",
+      "addedByStorey": "Additions by storey"
+    },
+    "messages": {
+      "searching": "Searching…",
+      "aiWorking": "AI is analysing the query… {{seconds}} s",
+      "keywordAnswer": "Answered with keywords; you can correct the filters.",
+      "aiFailed": "(AI could not be used: {{error}})",
+      "reportSaved": "Report dashboard saved (visible only to you).",
+      "more_one": "… and {{count}} more element (all highlighted in the model)",
+      "more_other": "… and {{count}} more elements (all highlighted in the model)"
+    },
+    "errors": {
+      "waitCurrent": "Wait for the current query to finish.",
+      "tooShort": "First type a question of at least two characters."
+    },
+    "badges": {
+      "ai": "AI",
+      "quick": "Quick Result",
+      "filter": "Filter"
+    },
+    "cached": "cache",
+    "allModels": "All Open Models ({{count}})",
+    "matchCount": "{{n}} / {{total}} elements",
+    "empty": "No filter: all elements.",
+    "unnamed": "(unnamed)",
+    "firstElementsHint": "The first 5000 elements are selected",
+    "defaultIssueTitle": "Model query",
+    "actions": {
+      "addFilter": "+ Filter",
+      "closeBuilder": "Close Builder",
+      "buildWithoutAi": "Build a Filter Without AI",
+      "saveReport": "Save as Report",
+      "createIssue": "Create Issue"
+    },
+    "display": {
+      "options": {
+        "color": "Colour",
+        "isolate": "Isolate",
+        "none": "Hide"
+      }
+    },
+    "fields": {
+      "type": "Type",
+      "name": "Name",
+      "material": "Material",
+      "storey": "Storey",
+      "class": "Class"
+    }
+  },
+  "filterBuilder": {
+    "loading": "Loading the model vocabulary…",
+    "aria": {
+      "addClass": "Add class",
+      "addStorey": "Add storey",
+      "changeKind": "Change type",
+      "field": "Field",
+      "condition": "Condition",
+      "value": "Value",
+      "groupBy": "Group by",
+      "total": "Total"
+    },
+    "options": {
+      "addClass": "+ Class",
+      "addStorey": "+ Storey",
+      "addChange": "+ Change",
+      "property": "Property…",
+      "noGrouping": "No Grouping",
+      "groupByField": "By {{field}}",
+      "countOnly": "Count Only",
+      "aggregate": "{{op}} {{field}}"
+    },
+    "placeholder": "Value"
+  }
+}

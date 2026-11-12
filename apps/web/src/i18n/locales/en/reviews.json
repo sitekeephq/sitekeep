@@ -1,0 +1,115 @@
+{
+  "chain": {
+    "due": "Due {{date}}"
+  },
+  "list": {
+    "options": {
+      "allStatuses": "All Statuses"
+    },
+    "actions": {
+      "newFromDocuments": "New Review from Documents",
+      "report": "Report"
+    },
+    "empty": "No reviews yet. Select files on the Documents screen and start one with \"Start Review\".",
+    "badges": {
+      "myTurn": "Your Turn",
+      "overdue": "Overdue"
+    },
+    "columns": {
+      "number": "No.",
+      "step": "Step",
+      "startedBy": "Started By"
+    }
+  },
+  "detail": {
+    "cancel": {
+      "title": "Cancel Review",
+      "message": "You may give a reason."
+    },
+    "actions": {
+      "cancel": "Cancel Review",
+      "reassign": "Change Assignees"
+    },
+    "approvedTo": "Approved →",
+    "marks": {
+      "title": "Reviewer Comments",
+      "empty": "No comments yet."
+    },
+    "timeline": {
+      "title": "Timeline",
+      "system": "System"
+    }
+  },
+  "behalf": {
+    "company": "{{name}} company",
+    "projectAdmins": "Project Administrators",
+    "team": "{{name}} team",
+    "deletedRole": "(deleted role)",
+    "onBehalfOf": "on behalf of {{names}}"
+  },
+  "actions": {
+    "stepN": "step {{n}}",
+    "start": "Review started",
+    "submit": "\"{{step}}\" answered",
+    "submitWithOutcome": "\"{{step}}\" answered — worst result: {{outcome}}",
+    "stepCompleted": "Step \"{{step}}\" completed",
+    "stepCompletedReturned_one": "Step \"{{step}}\" completed — {{count}} file returned to the initiator",
+    "stepCompletedReturned_other": "Step \"{{step}}\" completed — {{count}} files returned to the initiator",
+    "completed": "Review completed",
+    "cancel": "Review cancelled",
+    "reassign": "Assignees of \"{{step}}\" changed",
+    "note": "Note added"
+  },
+  "steps": {
+    "badges": {
+      "done": "Done",
+      "current": "Current"
+    },
+    "stageDays_one": "stage {{count}} day",
+    "stageDays_other": "stage {{count}} days",
+    "required": "Required: {{attributes}}",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "submittedBy": "Answered by: {{names}}"
+  },
+  "files": {
+    "columns": {
+      "version": "V",
+      "chain": "Chain",
+      "copy": "Copy"
+    },
+    "compareHint": "Compare with the previous revision",
+    "badges": {
+      "returned": "Returned to Initiator",
+      "copied": "Copied"
+    },
+    "errors": {
+      "unresolved": "Unresolved field: {{fields}}"
+    }
+  },
+  "act": {
+    "title": "Your turn: {{n}}. {{step}}",
+    "instructions": "Choose a result for each file, then submit the step.",
+    "instructionsWithAttributes": "Choose a result for each file, fill in the required attributes ({{attributes}}), then submit the step.",
+    "behalfHint": "Your answer is recorded under your own name and on behalf of this team / company.",
+    "answeringFor": "You are answering {{who}}",
+    "options": {
+      "applyToAll": "Apply to All…",
+      "choose": "Choose…"
+    },
+    "columns": {
+      "yourResult": "Your Result",
+      "note": "Note"
+    },
+    "returned": "Returned: <badge></badge>",
+    "fileNotePlaceholder": "File note",
+    "commentPlaceholder": "General comment (optional)",
+    "actions": {
+      "submit": "Submit Step"
+    }
+  },
+  "reassign": {
+    "title": "Change Assignees — {{step}}",
+    "description": "Only the current step of this review changes; the template stays the same. Answers already given are kept."
+  }
+}

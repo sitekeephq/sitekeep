@@ -1,0 +1,572 @@
+{
+  "today": {
+    "title": "Today",
+    "mine": {
+      "title": "Assigned to Me",
+      "empty": "Nothing is waiting for you."
+    },
+    "overdue": {
+      "title": "Overdue",
+      "empty": "No overdue records."
+    },
+    "upcoming": {
+      "title": "Upcoming Due Dates",
+      "description_one": "Next {{count}} day.",
+      "description_other": "Next {{count}} days.",
+      "empty": "No upcoming due dates."
+    },
+    "changes": {
+      "title": "Recent Changes",
+      "description_one": "Last {{count}} day; only records you can see.",
+      "description_other": "Last {{count}} days; only records you can see.",
+      "empty": "No changes in recent days.",
+      "system": "System",
+      "more_one": "and {{count}} more record",
+      "more_other": "and {{count}} more records"
+    },
+    "days": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "showMore": "Show More",
+    "showLess": "Show Less"
+  },
+  "summary": {
+    "title": "Today's Summary",
+    "modelTitle": "Model: {{model}}",
+    "badges": {
+      "ai": "AI Summary · {{time}}",
+      "auto": "Automatic Summary"
+    },
+    "messages": {
+      "writing": "Writing the AI summary…",
+      "waitingClient": "Waiting for the AI client…"
+    },
+    "stale": "Recent changes are not yet reflected in this summary."
+  },
+  "myTasks": {
+    "title": "My Tasks",
+    "description": "Records across all projects awaiting your approval, reply or action.",
+    "groups": {
+      "overdue": "Overdue",
+      "dueSoon": "Due Soon (2 Days)",
+      "awaitingReply": "Letters Awaiting Reply",
+      "toReceive": "Awaiting Acknowledgement",
+      "assigned": "Work Assigned to Me"
+    },
+    "metrics": {
+      "tasks": "Approval tasks"
+    },
+    "tasks": {
+      "title": "My Approval Tasks",
+      "empty": "You have no pending approval tasks."
+    },
+    "columns": {
+      "record": "Record",
+      "step": "Step"
+    },
+    "empty": "Nothing is waiting for today.",
+    "followedNote": "New versions in followed folders will appear here once folder following is added."
+  },
+  "list": {
+    "columns": {
+      "type": "Type",
+      "party": "From → To"
+    },
+    "badges": {
+      "replyAwaited": "Awaiting Reply"
+    },
+    "options": {
+      "groupBy": {
+        "none": "No Grouping",
+        "type": "By Type",
+        "status": "By Status",
+        "company": "By Counterparty",
+        "month": "By Month"
+      },
+      "due": {
+        "overdue": "Overdue",
+        "soon": "Due Soon"
+      },
+      "openOnly": "Open Work Only",
+      "allStatuses": "All Statuses",
+      "allDueDates": "All Due Dates",
+      "list": "List"
+    },
+    "fields": {
+      "quickFilter": "Quick Filter",
+      "groupBy": "Grouping",
+      "display": "Display"
+    },
+    "groups": {
+      "expand": "Open {{name}}",
+      "collapse": "Close {{name}}",
+      "expandAll": "Open All",
+      "collapseAll": "Close All"
+    },
+    "noCompany": "No Company",
+    "chips": {
+      "search": "Search: \"{{query}}\"",
+      "type": "Type: {{type}}",
+      "status": "Status: {{status}}"
+    },
+    "empty": {
+      "filtered": "No records match the filters.",
+      "all": "No work yet. Use \"+ New\" to create a letter, transmittal, RFI or any other defined work item.",
+      "sections": {
+        "correspondence": "No letters yet. Start with \"+ New\".",
+        "rfi": "No RFIs yet. Start with \"+ New\".",
+        "submittal": "No submittals yet. Start with \"+ New\".",
+        "meeting": "No meetings yet. Start with \"+ New\".",
+        "transmittal": "No transmittals yet. Start with \"+ New\"."
+      }
+    },
+    "placeholder": "Search: number, subject, field…",
+    "specRegisterHint": "Extract a draft submittal register from the specification PDF",
+    "actions": {
+      "specRegister": "Submittal Register from Specification"
+    }
+  },
+  "hub": {
+    "sharedBy": "{{owner}} · shared with the project",
+    "badges": {
+      "shared": "Shared"
+    },
+    "saveViewHint": "Save this view with its filters, grouping and search",
+    "moduleOff": "This module is turned off in the project. Existing records can be opened; new records cannot be created.",
+    "saveDialog": {
+      "description": "The view is kept under \"Saved Views\" with its filters, grouping and search.",
+      "shareHint": "all project members see it"
+    },
+    "manage": {
+      "fields": {
+        "viewName": "View Name"
+      },
+      "private": "Only you",
+      "sharedBy": "{{owner}} · shared",
+      "actions": {
+        "moveUp": "Move Up",
+        "up": "Up",
+        "moveDown": "Move Down",
+        "down": "Down",
+        "unshare": "Stop Sharing",
+        "share": "Share with Project"
+      },
+      "delete": {
+        "title": "Delete View",
+        "confirm": "Delete the view \"{{name}}\"?"
+      }
+    }
+  },
+  "newRecord": {
+    "title": "What Would You Like to Do?",
+    "placeholder": "E.g. open an RFI to Prota about the B3 excavation",
+    "inputLabel": "What would you like to do?",
+    "suggestion": "Suggestion: <b>{{kind}}</b>{{details}}. Press Enter to continue or click another type.",
+    "suggestionFrom": "sender {{company}}",
+    "suggestionTo": "recipient {{company}}",
+    "suggestionTitle": "title \"{{title}}\"",
+    "notUnderstood": "The type could not be recognised; choose one below. Your sentence becomes the title.",
+    "hint": "Type a sentence or choose a record type directly.",
+    "loadingTypes": "Loading record types…",
+    "actions": {
+      "continue": "Continue"
+    },
+    "kindHelp": {
+      "incomingLetter": "Register an incoming official letter",
+      "outgoingLetter": "Prepare and send an official letter",
+      "rfi": "Ask the designer or consultant a question",
+      "submittal": "Request approval of a material, sample or drawing",
+      "meeting": "Meeting, agenda and minutes",
+      "action": "Give someone a task with a due date",
+      "transmittal": "Send files with a cover sheet",
+      "issue": "Raise an issue you saw on site or in the model",
+      "form": "Fill in a site form from a template",
+      "review": "Send files through an approval chain",
+      "paramChange": "Change element data in the IFC model (new version)",
+      "upload": "Upload a file to Documents"
+    }
+  },
+  "newIssue": {
+    "title": "New Issue",
+    "fields": {
+      "title": "Title *"
+    },
+    "pinHint": "For an issue tied to a point in the model, use \"📍 Issue from Pin\" in Model → Viewer."
+  },
+  "newForm": {
+    "title": "New Form",
+    "noTemplates": "This project has no form templates. Add a ready-made template under Forms → Templates."
+  },
+  "createWork": {
+    "title": "New Work Item",
+    "titleOfType": "New {{type}}",
+    "fields": {
+      "title": "Title / Subject *",
+      "fromCompany": "Sender Company",
+      "toIncoming": "Addressed Companies (for action)",
+      "to": "For Action (recipient companies)",
+      "cc": "For Information (distribution)"
+    },
+    "options": {
+      "replyRequired": "Reply Required"
+    },
+    "numberHint": "The number is given on saving: <mono>{{pattern}}</mono>",
+    "attachmentsHint": "Attachments are added on the detail screen after saving.",
+    "noCompanies": "No companies defined."
+  },
+  "send": {
+    "title": "Send {{number}}",
+    "fields": {
+      "reference": "Dispatch No. / Reference",
+      "note": "Note"
+    },
+    "referencePlaceholder": "e.g. registered e-mail (KEP) dispatch no.",
+    "signedRequired": "For this channel at least one PDF attachment must be marked as \"Signed PDF\".",
+    "transmittalHint": "On sending, a cover sheet (PDF) is generated and saved in the \"Transmittals\" folder.",
+    "letterHint": "On sending, the official letter (PDF) is generated and saved in the Letters folder. Letters to be printed in a foreign language require a translation."
+  },
+  "filePicker": {
+    "title": "Add File Version",
+    "placeholder": "Search file name or attribute…",
+    "columns": {
+      "version": "Version"
+    },
+    "selected_one": "{{count}} selected · the selected version is pinned",
+    "selected_other": "{{count}} selected · the selected versions are pinned"
+  },
+  "linkPicker": {
+    "title": "Add Reference / Link",
+    "options": {
+      "work": "Work / Letter",
+      "issue": "Issue",
+      "review": "Review"
+    },
+    "placeholder": "Search…",
+    "empty": "No records."
+  },
+  "editWork": {
+    "title": "Edit {{number}}",
+    "fields": {
+      "title": "Title / Subject",
+      "to": "For Action",
+      "cc": "For Information"
+    },
+    "sentRecipientsLocked": "The recipients of a sent work item cannot be changed."
+  },
+  "detail": {
+    "badges": {
+      "due": "Due {{date}}"
+    },
+    "actions": {
+      "send": "Send…",
+      "receive": "Received",
+      "reply": "Write Reply",
+      "refreshCover": "Regenerate Cover PDF",
+      "addFileVersion": "+ File Version",
+      "link": "+ Link"
+    },
+    "fields": {
+      "from": "From"
+    },
+    "receipts": {
+      "title": "Acknowledgements of Receipt"
+    },
+    "attachments": {
+      "empty": "No attachments."
+    },
+    "links": {
+      "title": "References and Links",
+      "backlinksHeading": "Records Referencing This Letter",
+      "replyToThis": "Reply to this letter",
+      "refersToThis": "Refers to this work item",
+      "empty": "No links.",
+      "officialLetterPdf": "Official Letter (PDF)",
+      "reply": "reply",
+      "signedPdf": "signed PDF"
+    },
+    "options": {
+      "signedPdf": "Signed PDF (E-signature)"
+    },
+    "timeline": {
+      "title": "Timeline"
+    },
+    "commentPlaceholder": "Write a note / comment…",
+    "delivery": {
+      "heading": "Dispatch:",
+      "referencePlaceholder": "Dispatch no. (KEP etc.)",
+      "reference": "Dispatch no.: {{reference}}"
+    },
+    "thread": {
+      "title_one": "Correspondence Thread ({{count}})",
+      "title_other": "Correspondence Thread ({{count}})"
+    },
+    "events": {
+      "created": "created",
+      "createdWithNote": "created ({{note}})",
+      "updated": "updated",
+      "status": "changed the status: {{from}} → {{to}}",
+      "linked": "added a link",
+      "unlinked": "removed a link",
+      "sent": "sent ({{channel}})",
+      "sentWithReference": "sent ({{channel}} · {{reference}})",
+      "delivery": "updated the delivery details",
+      "deliveryWithStatus": "updated the delivery details: {{status}}",
+      "received": "marked as received ({{company}})",
+      "replied": "wrote a reply",
+      "answered": "was answered",
+      "coverPdf": "cover PDF generated: {{file}}",
+      "comment": "added a note:",
+      "minutes": "saved the minutes",
+      "minutesWithNote": "saved the minutes ({{note}})",
+      "submitted": "submitted for approval",
+      "submittedWithNote": "submitted for approval: {{note}}",
+      "responded": "responded",
+      "respondedWithResult": "responded: {{result}}",
+      "respondedWithNote": "responded ({{note}})",
+      "respondedWithResultAndNote": "responded: {{result}} ({{note}})",
+      "decided": "decided: {{result}}",
+      "revised": "started a revision",
+      "cancelled": "cancelled",
+      "cancelledWithNote": "cancelled: {{note}}",
+      "archived": "archived",
+      "reopened": "returned to draft",
+      "letter": "updated the letter text",
+      "letterPdf": "official letter PDF generated: {{file}}",
+      "mail": "sent an e-mail"
+    }
+  },
+  "letter": {
+    "title": "Letter",
+    "dialogTitle": "{{number}} · Letter",
+    "actions": {
+      "edit": "Edit Letter",
+      "previewPdf": "Preview PDF",
+      "prepareEml": "Prepare E-mail (.eml)",
+      "sendMail": "Send E-mail",
+      "markMailed": "Mark as Sent",
+      "archive": "Archive",
+      "cancel": "Cancel Letter",
+      "reopen": "Return to Draft",
+      "fillFromCompany": "Fill from Company",
+      "translateWithAi": "Translate with AI"
+    },
+    "fields": {
+      "language": "Language",
+      "recipient": "Recipient",
+      "signature": "Signature",
+      "letterLanguage": "Letter Language",
+      "secondLanguage": "Second Language",
+      "layout": "Bilingual Layout",
+      "recipientName": "Office / Person",
+      "address": "Address",
+      "ccEmails": "CC E-mails (comma-separated)",
+      "signerName": "Full Name",
+      "signerTitleTr": "Job Title (Turkish)",
+      "signerTitle": "Job Title",
+      "referenceTextLong": "Reference Text (free text; reference links are printed separately as a), b)…)",
+      "referenceText": "Reference Text",
+      "body": "Content",
+      "bodyRequired": "Content *",
+      "body2Long": "Content 2 (printed on a separate page)",
+      "body2": "Content 2",
+      "subjectRequired": "Subject *"
+    },
+    "badges": {
+      "mailSent": "Sent · {{date}}",
+      "mailNotSent": "Not Sent"
+    },
+    "mailPreparedOnSend": "Prepared once the letter is sent",
+    "emlHint": "E-mail draft (.eml) with the letter PDF attached; opens in your e-mail program.",
+    "emlNeedsEmail": "Enter the recipient's e-mail address first.",
+    "errors": {
+      "noRecipientEmail": "Enter the recipient's e-mail address for the e-mail (Edit Letter)."
+    },
+    "cancel": {
+      "title": "Cancel Letter",
+      "confirm": "Cancel {{number}}?"
+    },
+    "delete": {
+      "title": "Delete Letter",
+      "confirm": "Delete {{number}} permanently?"
+    },
+    "messages": {
+      "suggestionApplied": "The suggestion was written into the form; check it and save."
+    },
+    "tabs": {
+      "general": "General",
+      "text": "Text",
+      "translations": "Translations",
+      "translationsCount": "Translations ({{count}})"
+    },
+    "options": {
+      "singleLanguage": "— (single language)"
+    },
+    "languageHint": "The Turkish text is the main text; the title is the Turkish subject. Other languages are entered under \"Translations\"; where a field is left empty, the Turkish text is printed.",
+    "fillFromCompanyHint": "Fill in with the details of {{company}}",
+    "noCounterpart": "No counterparty company selected",
+    "ccPlaceholder": "project@company.com, archive@company.com",
+    "formattingHint": "A blank line starts a new paragraph, a line starting with \"- \" becomes a bullet, **bold** becomes bold text.",
+    "turkishOnly": "The letter is in Turkish only. To translate it, choose the letter language or a second language under \"General\".",
+    "status": {
+      "translating": "Translating…"
+    },
+    "translationHint": "Where a field is left empty, the Turkish text is printed. Before sending, the subject (and the content, if there is Turkish content) must be translated."
+  },
+  "build": {
+    "badges": {
+      "rev": "Rev {{rev}}",
+      "ballInCourt": "Ball in court: {{names}}"
+    },
+    "parent": "Parent work item: <link>{{number}}</link>",
+    "submitNotePlaceholder": "Submission note (optional)",
+    "actions": {
+      "submitItems": "Submit Items for Approval",
+      "submit": "Submit for Approval",
+      "revise": "New Revision (Rev {{rev}})"
+    },
+    "cancel": {
+      "title": "Cancel Work Item",
+      "confirm": "Cancel the work item? The running approval workflow stops too."
+    },
+    "rfi": {
+      "question": "Question",
+      "proposedSolution": "Proposed Solution",
+      "officialResponse": "Official Response",
+      "notAnswered": "Not answered yet."
+    },
+    "revisions": {
+      "title": "Revision History",
+      "inReview": "In Review",
+      "cancelled": "Cancelled"
+    },
+    "columns": {
+      "rev": "Rev",
+      "submission": "Submission"
+    },
+    "flow": {
+      "title": "Approval Workflow · Rev {{rev}}",
+      "due": "due {{date}}",
+      "onBehalfOf": "on behalf of {{names}}",
+      "fields": {
+        "officialResponseRequired": "Official Response *"
+      },
+      "actions": {
+        "respond": "Respond"
+      }
+    }
+  },
+  "meeting": {
+    "title": "Meeting",
+    "actions": {
+      "minutesPdf": "Minutes PDF",
+      "createNext": "Create Next Meeting",
+      "openNext": "Next Meeting →"
+    },
+    "attendees": {
+      "title": "Attendees",
+      "namePlaceholder": "Full name",
+      "options": {
+        "present": "Attended",
+        "addMember": "+ Add Member"
+      },
+      "actions": {
+        "addExternal": "+ External Attendee"
+      }
+    },
+    "agenda": {
+      "title": "Agenda",
+      "actions": {
+        "add": "+ Agenda Item"
+      }
+    },
+    "messages": {
+      "saved": "Attendees and agenda saved.",
+      "minutesSaved": "Minutes saved: {{created}} new, {{updated}} updated actions."
+    },
+    "minutes": {
+      "title": "Minutes",
+      "hint": "An item with an owner or a due date becomes an \"Action\" work item and is assigned to the owner.",
+      "subjectPlaceholder": "Subject",
+      "decisionPlaceholder": "Decision",
+      "options": {
+        "ownerPerson": "Responsible Person —",
+        "ownerCompany": "Responsible Company —"
+      },
+      "fields": {
+        "notes": "Notes"
+      },
+      "actions": {
+        "addItem": "+ Item",
+        "save": "Save Minutes"
+      }
+    },
+    "ai": {
+      "title": "Extract Actions from Minutes (AI)",
+      "placeholder": "Paste the free-text minutes",
+      "actions": {
+        "addToMinutes": "Add to Minutes"
+      },
+      "empty": "No suggestions."
+    },
+    "actionsList": {
+      "title": "Actions",
+      "empty": "No actions from this meeting."
+    },
+    "carried": {
+      "title": "Carried Over from Previous Meetings"
+    }
+  },
+  "register": {
+    "rfi": {
+      "title": "RFI Log",
+      "summary_one": "{{count}} RFI · {{open}} open · {{overdue}} overdue",
+      "summary_other": "{{count}} RFIs · {{open}} open · {{overdue}} overdue",
+      "empty": "No RFIs yet."
+    },
+    "submittal": {
+      "title": "Submittal Register",
+      "count_one": "{{count}} item",
+      "count_other": "{{count}} items",
+      "empty": "No submittal items yet. You can import the register extracted from the specification or open an item with \"+ New Submittal\"."
+    },
+    "actions": {
+      "excel": "Excel",
+      "import": "Import Specification Register"
+    },
+    "columns": {
+      "subject": "Subject",
+      "discipline": "Discipline",
+      "ballInCourt": "Ball in Court",
+      "daysOpen": "Days Open",
+      "package": "Package"
+    },
+    "options": {
+      "groupBy": {
+        "section": "By Specification Section",
+        "kind": "By Type",
+        "discipline": "By Discipline"
+      }
+    }
+  },
+  "import": {
+    "messages": {
+      "created": "{{items}} items and {{packages}} packages created."
+    },
+    "description": "CSV, XLSX or JSON. Columns: section code, section title, type (MOS, UCZ…), discipline, description, page, quote. A preview is shown first.",
+    "options": {
+      "bySection": "Package by Specification Section",
+      "byKind": "Package by Type",
+      "none": "Do Not Create Packages"
+    },
+    "preview": "{{valid}} valid · {{invalid}} invalid rows · {{packages}} packages ({{existing}} existing)",
+    "columns": {
+      "section": "Section",
+      "problem": "Problem"
+    },
+    "actions": {
+      "create_one": "Create {{count}} Item",
+      "create_other": "Create {{count}} Items"
+    }
+  }
+}

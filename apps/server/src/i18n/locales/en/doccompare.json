@@ -1,0 +1,149 @@
+{
+  "entities": {
+    "comparison": "Comparison"
+  },
+  "errors": {
+    "versionIdsRequired": "from and to version IDs are required.",
+    "sameVersion": "A version cannot be compared with itself.",
+    "textNotReady": "The text comparison has not finished yet.",
+    "notReady": "The comparison has not finished yet.",
+    "aiUnavailable": "AI is not available in this project.",
+    "notInReview": "This version is not in this review, or the review is not running.",
+    "ifcInViewer": "IFC models are compared in the model viewer (Open in Model → Compare).",
+    "unsupportedType": "This file type cannot be compared (.{{extension}}). Supported: PDF, XLSX, CSV, DOCX, TXT.",
+    "mixedTypes": "Both files must be of the same type (e.g. PDF and PDF).",
+    "fileTooLarge": "The file is too large ({{mb}} MB); the limit is {{limit}} MB.",
+    "preparing": "Preparing the comparison; the model index is being built. Try again shortly.",
+    "xlsxNoSheets": "The XLSX file has no worksheets.",
+    "docxInvalid": "Not a valid DOCX file (word/document.xml is missing)."
+  },
+  "notes": {
+    "noText": "No text layer; visual comparison only.",
+    "pagesLimited": "Text was compared on the first {{pages}} pages only."
+  },
+  "antet": {
+    "revisionTableRow": "Revision Table (last row)"
+  },
+  "flags": {
+    "identical": "The two versions are identical (same file).",
+    "noText": "No text layer; only a visual comparison was made.",
+    "pageCountChanged": "The page count changed: {{from}} → {{to}}.",
+    "revisionUnknown": "No revision could be read in the title block; the revision check was not possible.",
+    "revisionNotUpdated": "The content changed but the revision did not ({{revision}}). The revision cloud/table may not have been updated.",
+    "revisionBackwards": "The revision went backwards: {{from}} → {{to}}.",
+    "revisionWithoutChange": "The revision changed ({{from}} → {{to}}) but no content change was found outside the title block.",
+    "revisionTableNotUpdated": "The revision is now {{revision}} but the last row of the revision table is \"{{row}}\"; the table may not have been updated.",
+    "revisionTableEmpty": "The revision is now {{revision}} but the last row of the revision table is empty; the table may not have been updated."
+  },
+  "changes": {
+    "added": "added: {{text}}",
+    "removed": "removed: {{text}}",
+    "rowChanged": "row {{row}}: {{cells}}",
+    "rowAdded": "row {{row}} added: {{text}}",
+    "rowRemoved": "row {{row}} removed: {{text}}"
+  },
+  "counts": {
+    "changed": "{{count}} changed",
+    "added": "{{count}} added",
+    "removed": "{{count}} removed",
+    "of": {
+      "row": "rows: {{parts}}",
+      "text": "text: {{parts}}",
+      "paragraph": "paragraphs: {{parts}}"
+    },
+    "noDiff": {
+      "row": "no row differences",
+      "text": "no text differences",
+      "paragraph": "no paragraph differences"
+    }
+  },
+  "summary": {
+    "antet": "Title block: {{changes}}.",
+    "sheetAdded": "Sheet \"{{name}}\" added.",
+    "sheetRemoved": "Sheet \"{{name}}\" removed.",
+    "sheetChanged": "\"{{name}}\": {{counts}}.",
+    "sheetChangedExamples": "\"{{name}}\": {{counts}} ({{examples}}).",
+    "visualRegions_one": "{{count}} visual region",
+    "visualRegions_other": "{{count}} visual regions",
+    "page": "Page {{page}}: {{parts}}.",
+    "pageExamples": "Page {{page}}: {{parts}}. Example: {{examples}}.",
+    "text": "Text: {{parts}}.",
+    "textExamples": "Text: {{parts}}. Example: {{examples}}.",
+    "noTextDiffVisualPending": "No text differences found; the visual comparison runs in the browser.",
+    "noDiff": "No differences found."
+  },
+  "ai": {
+    "interrupted": "The summary was interrupted (the server may have restarted); start it again.",
+    "externalProvider": "External provider: {{name}}. Only the difference summary is sent.",
+    "writing": "The model is writing… ({{chars}} characters, {{seconds}} s)",
+    "thinking": "The model is thinking… ({{seconds}} s)",
+    "emptySummary": "The model returned an empty summary."
+  },
+  "reviewNote": {
+    "title": "Revision comparison: {{file}} V{{from}} → V{{to}}",
+    "titleAi": "Revision comparison: {{file}} V{{from}} → V{{to}} (AI summary)"
+  },
+  "report": {
+    "fileSuffix": "comparison",
+    "docTitle": "Revision comparison: {{file}}",
+    "title": "Revision Comparison Report",
+    "file": "File: {{file}}",
+    "oldFile": "Old: {{file}}",
+    "versions": "Version: V{{versionA}} → V{{versionB}}",
+    "versionsWithRevision": "Version: V{{versionA}} → V{{versionB}} · Revision: {{revisionA}} → {{revisionB}}",
+    "newFile": "New: {{file}} (V{{versionB}}) · Old version V{{versionA}}",
+    "preparedBy": "Prepared by: {{name}} · {{date}}",
+    "summary": "Change Summary",
+    "aiSummary": "AI summary ({{model}}); do not decide without checking it.",
+    "ruleSummary": "Rule-based summary.",
+    "ruleSummaryWithNote": "Rule-based summary. {{note}}",
+    "checks": "Checks",
+    "antetChanges": "Title Block Changes",
+    "columns": {
+      "field": "Field",
+      "old": "Old",
+      "new": "New"
+    },
+    "sheetChanges": "Spreadsheet Changes",
+    "sheetCounts": "{{name}}: {{changed}} changed, {{added}} added, {{removed}} removed rows",
+    "rowChanged": "Row {{row}}: {{cells}}",
+    "rowAdded": "Row {{row}} added: {{text}}",
+    "rowRemoved": "Row {{row}} removed: {{text}}",
+    "textChanges": "Text Changes",
+    "pageCounts": "Page {{page}}: {{changed}} changed, {{added}} added, {{removed}} removed",
+    "textCounts": "Text: {{changed}} changed, {{added}} added, {{removed}} removed",
+    "inAntet": "{{text}} (title block)",
+    "more_one": "… {{count}} more change",
+    "more_other": "… {{count}} more changes",
+    "visual": "Visual Comparison",
+    "legend": "Red: in the old version but not in the new one; blue: newly added; grey: unchanged.",
+    "page": "Page {{page}}",
+    "pageOnlyNew": "Page {{page}} · only in the new version",
+    "pageNotInNew": "Page {{page}} · not in the new version",
+    "pageRegions_one": "Page {{page}} · {{count}} changed region",
+    "pageRegions_other": "Page {{page}} · {{count}} changed regions",
+    "footer": "SiteKeep · Revision Comparison"
+  },
+  "modelReport": {
+    "title": "Model comparison: {{file}} V{{from}} → V{{to}}",
+    "print": "Print / PDF",
+    "added": "Added",
+    "changed": "Changed",
+    "removed": "Removed",
+    "unchanged": "Unchanged",
+    "summary": "Change summary",
+    "aiModel": "(AI: {{model}})",
+    "noChanges": "No changes.",
+    "oldIndex": "The model index is in the old format; no storey or property details.",
+    "byClass": "By class",
+    "groups": "Change groups",
+    "columns": {
+      "class": "Class",
+      "kind": "Type",
+      "storey": "Storey",
+      "property": "Property",
+      "count": "Count",
+      "elements": "Elements"
+    }
+  }
+}

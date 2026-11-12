@@ -1,0 +1,41 @@
+{
+  "errors": {
+    "apiRequestFailed": "Autodesk API isteği tamamlanamadı.",
+    "connectionNotFound": "Autodesk bağlantısı bulunamadı.",
+    "reauthorise": "Autodesk bağlantısının yeniden yetkilendirilmesi gerekiyor.",
+    "invalidTokenResponse": "Autodesk OAuth geçersiz token yanıtı döndürdü.",
+    "oauthRequestFailed": "OAuth isteği başarısız",
+    "noProjectMember": "Autodesk senkronizasyonu için proje üyesi bulunamadı.",
+    "notConfigured": "AUTODESK_CLIENT_ID ve AUTODESK_CALLBACK_URL yapılandırılmamış.",
+    "oauthNotConfigured": "Autodesk OAuth yapılandırılmamış.",
+    "callbackMissing": "Autodesk OAuth dönüş bilgisi eksik.",
+    "oauthStateInvalid": "Autodesk OAuth oturumu geçersiz.",
+    "oauthStateExpired": "Autodesk OAuth oturumu süresi dolmuş.",
+    "invalidJobPayload": "Autodesk sync job payload geçersiz.",
+    "unavailableModules": "Erişilemeyen modüller: {{modules}}",
+    "mcpDisabled": "MCP bağlantısı sistem yöneticisi tarafından kapatıldı.",
+    "mcpTokenRequired": "API erişim anahtarı gerekli: Authorization: Bearer <anahtar> (CDE → Hesabım → API Erişim Anahtarları).",
+    "mcpPostOnly": "Bu MCP sunucusu oturumsuz çalışır; yalnız POST desteklenir.",
+    "hubNotFound": "Bağlı Autodesk projesinin hub'ı bulunamadı. Yetkilendiren hesabın projeye erişimi olduğundan emin olun.",
+    "noStoredContent": "Bu Autodesk sürümünün indirilebilir içeriği yok (ör. bulut paylaşımlı model).",
+    "noDownloadUrl": "Autodesk indirme adresi vermedi.",
+    "downloadFailed": "Autodesk'ten dosya indirilemedi (HTTP {{status}})."
+  },
+  "entities": {
+    "connection": "Autodesk bağlantısı"
+  },
+  "files": {
+    "alreadyQueued": "Bu dosya zaten aktarım sırasında.",
+    "requesterInactive": "Aktarımı başlatan kullanıcı artık etkin değil.",
+    "versionMismatch": "Autodesk sürümü seçilen dosyaya ait değil.",
+    "folderGone": "Hedef klasör artık yok.",
+    "versionComment": "Autodesk Docs: {{path}} (v{{version}})",
+    "browseFailed": "Autodesk Docs okunamadı (HTTP {{status}}): {{detail}}"
+  },
+  "catalog": {
+    "failed": "ACC projeleri listelenemedi (HTTP {{status}})."
+  },
+  "records": {
+    "syncing": "Kayıt eşitlemesi sürüyor; bittiğinde tekrar deneyin."
+  }
+}

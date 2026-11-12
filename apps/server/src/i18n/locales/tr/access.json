@@ -1,0 +1,18 @@
+{
+  "entities": {
+    "member": "Üye",
+    "folder": "Klasör",
+    "areaFolder": "Alan klasörü",
+    "role": "Rol",
+    "file": "Dosya",
+    "company": "Firma"
+  },
+  "errors": {
+    "roleInUseTemplates": "\"{{name}}\" rolü kullanımda: şablonlar: {{templates}}. Önce bu adımlardan rolü kaldırın.",
+    "roleInUseRunning_one": "\"{{name}}\" rolü kullanımda: {{count}} devam eden akış. Önce bu adımlardan rolü kaldırın.",
+    "roleInUseRunning_other": "\"{{name}}\" rolü kullanımda: {{count}} devam eden akış. Önce bu adımlardan rolü kaldırın.",
+    "roleInUseBoth_one": "\"{{name}}\" rolü kullanımda: şablonlar: {{templates}}; {{count}} devam eden akış. Önce bu adımlardan rolü kaldırın.",
+    "roleInUseBoth_other": "\"{{name}}\" rolü kullanımda: şablonlar: {{templates}}; {{count}} devam eden akış. Önce bu adımlardan rolü kaldırın.",
+    "areaFolderIsRoot": "Firmanın kendi alanı kök klasör olamaz; bir alt klasör seçin."
+  }
+}

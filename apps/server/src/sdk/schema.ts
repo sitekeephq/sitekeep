@@ -1,0 +1,35 @@
+/**
+ * Core tables a module may read and reference (foreign keys). Modules define their own tables in
+ * their package; they never write core tables directly except through SDK services.
+ */
+export {
+  companies,
+  dashboards,
+  fileVersions,
+  files,
+  folders,
+  issues,
+  jobs,
+  locationLinks,
+  locations,
+  memberRoles,
+  modelSets,
+  issueLinks,
+  projectMembers,
+  projectRoles,
+  projectAiSettings,
+  projects,
+  reviews,
+  systemSettings,
+  tokens,
+  users,
+  workflowActions,
+  workflowInstances,
+  workflowReminders,
+  workflowTemplates,
+  wopiLocks,
+  wopiTokens,
+  workRevisions,
+  workTypes,
+  works,
+} from "../db/schema.js";

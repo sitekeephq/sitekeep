@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "schedule": "Schedule",
+    "link": "Link",
+    "file": "File",
+    "folder": "Folder",
+    "issue": "Issue",
+    "modelVersion": "Model version"
+  },
+  "errors": {
+    "plannerOnly": "Only a project administrator (planning permission) can change the Schedule.",
+    "multipartExpected": "multipart/form-data expected.",
+    "noFile": "No file was sent.",
+    "mappingFormat": "The mapping field must be in the form {\"code\": 0, \"name\": 1, …}."
+  },
+  "parse": {
+    "notZip": "Not a valid ZIP/XLSX file.",
+    "zipDirectoryCorrupt": "The ZIP directory is corrupt.",
+    "zipEntryCorrupt": "A ZIP entry is corrupt.",
+    "zipCompression": "Unsupported ZIP compression ({{method}})."
+  },
+  "warnings": {
+    "duplicateKey": "Duplicate activity key skipped: {{key}}",
+    "duplicateCode": "Code \"{{code}}\" is used by more than one activity; record {{n}} was imported as \"{{newCode}}\".",
+    "finishBeforeStart": "{{code}}: finish is before start; finish set to start.",
+    "danglingDependency": "Dependency on a missing activity skipped ({{pred}} → {{succ}}).",
+    "xerProjects": "The XER contains {{count}} projects; only the first ({{name}}) was imported.",
+    "dateUnreadable": "Date could not be read: \"{{value}}\"",
+    "predecessorNotFound": "Predecessor not found: \"{{token}}\"",
+    "formulasFailed_one": "{{count}} formula could not be calculated ({{cells}}); open and save the file in Excel or replace the formulas with values.",
+    "formulasFailed_other": "{{count}} formulas could not be calculated ({{cells}}); open and save the file in Excel or replace the formulas with values."
+  },
+  "columns": {
+    "fallback": "Column {{n}}"
+  },
+  "links": {
+    "elements_one": "V{{version}} · {{count}} element",
+    "elements_other": "V{{version}} · {{count}} elements",
+    "work": "Work"
+  },
+  "summary": {
+    "aiNotRequested": "AI summary was not requested.",
+    "aiFailed": "The AI summary could not be obtained.",
+    "overview": "{{programme}} (v{{version}}), data date {{dataDate}}: {{activities}} activities — {{complete}} complete, {{inProgress}} in progress, {{notStarted}} not started; {{late}} late.",
+    "finishVariance_one": "Project finish {{finish}}; {{days}} day against the baseline.",
+    "finishVariance_other": "Project finish {{finish}}; {{days}} days against the baseline.",
+    "finishSameAsBaseline": "Project finish {{finish}}; same as the baseline.",
+    "finish": "Project finish {{finish}}.",
+    "criticalOpen_one": "{{n}} incomplete activity on the critical path.",
+    "criticalOpen_other": "{{n}} incomplete activities on the critical path.",
+    "finishSlip_one": "Project finish changed by {{days}} day compared with v{{version}}.",
+    "finishSlip_other": "Project finish changed by {{days}} days compared with v{{version}}.",
+    "slipped_one": "{{n}} activity slipped compared with v{{version}}.",
+    "slipped_other": "{{n}} activities slipped compared with v{{version}}.",
+    "slippedTop_one": "{{n}} activity slipped compared with v{{version}}; largest slip {{code}} {{name}} ({{days}} days).",
+    "slippedTop_other": "{{n}} activities slipped compared with v{{version}}; largest slip {{code}} {{name}} ({{days}} days).",
+    "noSlips": "No activities slipped compared with v{{version}}.",
+    "improved_one": "{{n}} activity was brought forward.",
+    "improved_other": "{{n}} activities were brought forward.",
+    "becameCritical": "Became critical: {{list}}.",
+    "noLongerCritical": "No longer critical: {{list}}.",
+    "addedRemoved": "Activities added: {{added}}, removed: {{removed}}.",
+    "topLate": "Most delayed: {{list}}.",
+    "lateItem": "{{code}} {{name}} ({{days}} days)",
+    "lookahead_one": "{{n}} activity starts or continues in the next 3 weeks.",
+    "lookahead_other": "{{n}} activities start or continue in the next 3 weeks."
+  }
+}

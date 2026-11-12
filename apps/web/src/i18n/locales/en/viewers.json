@@ -1,0 +1,402 @@
+{
+  "actions": {
+    "fit": "Fit",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "messages": {
+    "notFound": "Not found"
+  },
+  "open": {
+    "loading": "Loading viewer…",
+    "bar": {
+      "backHint": "Back to folder",
+      "actions": {
+        "folder": "Folder"
+      }
+    },
+    "badges": {
+      "oldVersion": "Old Version"
+    },
+    "fields": {
+      "version": "Version",
+      "uploaded": "Uploaded"
+    },
+    "currentVersion": "(current: V{{version}})",
+    "preview": {
+      "messages": {
+        "queued": "Preview queued…",
+        "processing": "Preparing preview…",
+        "unavailable": "No preview tool is installed on this server.",
+        "askAdmin": "Tell your system administrator."
+      },
+      "errors": {
+        "failed": "The preview could not be made.",
+        "failedWith": "The preview could not be made: {{error}}"
+      }
+    },
+    "converter": {
+      "title": "Converter Needed for Preview",
+      "description": ".{{extension}} is an old binary format and cannot be shown in the browser directly. You can download the file and open it.",
+      "hintDocx": "The new format (.docx) opens in the browser.",
+      "hintPptx": "The new format (.pptx) opens in the browser.",
+      "adminHint": "Administrator: connect a converter (ONLYOFFICE, Collabora or Gotenberg) under Administration → Office Integration and these files will open too.",
+      "userHint": "If you want these files to open here, tell your system administrator.",
+      "errors": {
+        "failed": "The conversion could not be done.",
+        "failedWith": "The conversion could not be done: {{error}}"
+      }
+    },
+    "noPreview": {
+      "title": "No Preview — Download",
+      "description": ".{{extension}} files cannot be shown in the browser. Download the file and open it with a suitable program."
+    },
+    "messages": {
+      "noDownload": "You do not have permission to download this file."
+    }
+  },
+  "office": {
+    "pdfLayout": {
+      "hint": "The converter's PDF: exact page layout, markup possible",
+      "actions": {
+        "open": "Open in Page Layout (PDF)",
+        "retry": "Retry PDF"
+      },
+      "status": {
+        "preparing": "Preparing PDF…"
+      }
+    },
+    "print": {
+      "hint": "Print or save as PDF",
+      "title": "Print / Save as PDF",
+      "actions": {
+        "menu": "Print / PDF",
+        "print": "Print"
+      },
+      "help": "In the print dialog choose “Save as PDF”. The page layout is approximate.",
+      "noExactPdf": "For an exact PDF an administrator can enable a converter on the server.",
+      "exactPdf": "<link>Open the exact PDF</link> (made by the converter)."
+    },
+    "zoom": {
+      "fields": {
+        "zoom": "Zoom"
+      },
+      "fitHint": "Fit the page to the window width"
+    },
+    "find": {
+      "placeholder": "Search in document"
+    },
+    "largeFile": {
+      "title": "Large File",
+      "description": "{{size}} MB. Opening it in the browser may be slow and uses a lot of memory.",
+      "actions": {
+        "openAnyway": "Open Anyway"
+      }
+    }
+  },
+  "document": {
+    "pagesHint": "Based on the page breaks Word saved; approximate",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "simpleViewHint": "Simple view: text, headings, lists, tables and pictures. Not the page layout.",
+    "badges": {
+      "simpleView": "Simple View"
+    },
+    "messages": {
+      "preparing": "Preparing the document…"
+    },
+    "errors": {
+      "noContent": "content.xml is missing; the file is not OpenDocument.",
+      "openFailed": "The document could not be opened."
+    },
+    "failed": {
+      "title": "Document Could Not Be Opened in the Browser",
+      "description": "The file may be damaged or contain an unsupported feature. You can download and open it."
+    },
+    "empty": "Empty document.",
+    "pageBreak": "Page break"
+  },
+  "sheet": {
+    "messages": {
+      "loading": "Loading spreadsheet…"
+    },
+    "empty": "Empty file.",
+    "hiddenSheet": "Hidden sheet",
+    "find": {
+      "placeholder": "Search in sheet"
+    },
+    "freezeHint": "Keep the first row in place while scrolling",
+    "actions": {
+      "freeze": "Freeze First Row"
+    },
+    "size": "{{rows}} rows × {{cols}} columns",
+    "truncated": "(cut off at the limit)",
+    "print": {
+      "options": {
+        "thisSheet": "This Sheet ({{name}})",
+        "allSheets": "All Sheets ({{count}})"
+      },
+      "help": "A4; wide tables print in landscape and are shrunk to the page width.",
+      "rowLimit": "Only the first {{rows}} rows of each sheet are printed.",
+      "moreRows": "… {{rows}} more rows (not printed)."
+    }
+  },
+  "slides": {
+    "errors": {
+      "openFailed": "The presentation could not be opened: {{message}}",
+      "browserFailed": "The presentation could not be opened in the browser: {{message}}",
+      "slideFailed": "This slide could not be drawn."
+    },
+    "messages": {
+      "loading": "Loading presentation…",
+      "preparingBrowser": "Preparing the presentation in the browser…"
+    },
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "slideLabel": "Slide {{n}}",
+    "presentHint": "Full screen (F)",
+    "browserViewHint": "Drawn in the browser: text, pictures, shapes, tables and charts. No animation; fonts may differ.",
+    "browserViewButtonHint": "Draw the slides in the browser (view without a converter)",
+    "markupHint": "Open in the PDF viewer (markup)",
+    "exactPdfTab": "The exact PDF opens in a new tab; print or save it from there.",
+    "presentExit": "{{slide}} / {{total}} · Esc to exit",
+    "actions": {
+      "present": "Presentation Mode",
+      "notes": "Notes",
+      "browserView": "Browser View",
+      "markup": "Mark Up"
+    },
+    "badges": {
+      "browserView": "Browser View"
+    }
+  },
+  "simple": {
+    "image": {
+      "error": "The image could not be shown (the browser may not support this format)."
+    },
+    "text": {
+      "actions": {
+        "source": "Source",
+        "wrap": "Wrap Lines"
+      },
+      "summary": "{{lines}} lines · {{size}}",
+      "truncated": "Showing the start of the file; download it for the rest."
+    },
+    "media": {
+      "videoError": "This video format cannot be played in the browser. Download the file and open it.",
+      "audioError": "This audio format cannot be played in the browser. Download the file and open it."
+    },
+    "email": {
+      "noSubject": "(no subject)",
+      "noBody": "(no body)",
+      "attachmentName": "attachment",
+      "attachmentsHint": "To see the attachments, download the file and open it in an e-mail program.",
+      "fields": {
+        "from": "From",
+        "to": "To",
+        "cc": "Cc"
+      }
+    }
+  },
+  "modelMore": {
+    "actions": {
+      "pinIssue": "Issue from Pin",
+      "viewIssue": "Issue from View",
+      "fourD": "Calendar"
+    }
+  },
+  "cad": {
+    "messages": {
+      "loading": "Loading drawing…",
+      "missingGlyphs": "Some characters are missing from the font and may show as boxes."
+    },
+    "errors": {
+      "webgl": "WebGL could not be started: {{message}}",
+      "openFailed": "The drawing could not be opened: {{message}}",
+      "sceneUnknown": "Scene file not recognised.",
+      "sceneFormat": "Scene format not supported ({{version}}).",
+      "sceneDownload": "The scene could not be downloaded (HTTP {{status}})."
+    },
+    "phases": {
+      "font": "Font",
+      "fetch": "Downloading",
+      "parse": "Reading",
+      "prepare": "Preparing"
+    },
+    "progress": "{{phase}}…",
+    "progressPercent": "{{phase}} {{percent}}…",
+    "notices": {
+      "civil3dPartial": "Civil 3D objects (alignments, corridors, surfaces) cannot be shown; only AutoCAD objects are visible.",
+      "converterPartial_one": "The converter could not read some objects in this drawing ({{count}} error); the drawing may look incomplete.",
+      "converterPartial_other": "The converter could not read some objects in this drawing ({{count}} errors); the drawing may look incomplete."
+    },
+    "toolbar": {
+      "fitHint": "Show the main body of the drawing",
+      "fitAllHint": "The whole drawing, far-away objects included",
+      "snapHint": "Snap to endpoints, midpoints, centres and onto lines",
+      "backgroundHint": "Background",
+      "modelOnlyHint": "Hide paper space (layout) objects",
+      "actions": {
+        "fitAll": "Show All",
+        "snap": "Snap",
+        "lightBackground": "Light Background",
+        "darkBackground": "Dark Background",
+        "modelSpaceOnly": "Model Space Only",
+        "layers": "Layers ({{count}})"
+      }
+    },
+    "layers": {
+      "placeholder": "Search layers",
+      "actions": {
+        "allOn": "Turn All On",
+        "allOff": "Turn All Off"
+      },
+      "empty": "No layers.",
+      "noMatch": "No matching layers."
+    },
+    "tools": {
+      "length": "Length",
+      "chain": "Chain Length",
+      "area": "Area",
+      "angle": "Angle",
+      "coord": "Coordinate",
+      "info": "Info"
+    },
+    "hints": {
+      "lengthFirst": "Click the first point.",
+      "lengthSecond": "Click the second point.",
+      "chainStart": "Click the start point.",
+      "chainNext": "Click the next point.",
+      "chainNextOrFinish": "Click the next point; double-click or press Enter to finish.",
+      "areaCorners": "Click the corners of the area in turn.",
+      "areaNextOrClose": "Click the next corner; double-click or press Enter to close.",
+      "angleFirstArm": "Click the end of the first arm.",
+      "angleVertex": "Click the vertex.",
+      "angleSecondArm": "Click the end of the second arm.",
+      "coord": "Click the point.",
+      "info": "Click a line: its layer and type are shown."
+    },
+    "snapKinds": {
+      "end": "Endpoint",
+      "mid": "Midpoint",
+      "center": "Centre",
+      "near": "Nearest"
+    },
+    "shapes": {
+      "line": "Line",
+      "polyline": "Polyline",
+      "arc": "Arc",
+      "circle": "Circle",
+      "point": "Point"
+    },
+    "units": {
+      "unknown": "Unknown",
+      "unitShort": "unit",
+      "names": {
+        "unitless": "Unitless",
+        "inch": "Inch",
+        "foot": "Foot",
+        "mile": "Mile",
+        "millimetre": "Millimetre",
+        "centimetre": "Centimetre",
+        "metre": "Metre",
+        "kilometre": "Kilometre",
+        "microinch": "Microinch",
+        "mil": "Mil",
+        "yard": "Yard",
+        "angstrom": "Angstrom",
+        "nanometre": "Nanometre",
+        "micron": "Micron",
+        "decimetre": "Decimetre",
+        "decametre": "Decametre",
+        "hectometre": "Hectometre",
+        "gigametre": "Gigametre",
+        "astronomicalUnit": "Astronomical Unit",
+        "lightYear": "Light Year",
+        "parsec": "Parsec",
+        "usSurveyFoot": "US Survey Foot",
+        "usSurveyInch": "US Survey Inch",
+        "usSurveyYard": "US Survey Yard",
+        "usSurveyMile": "US Survey Mile"
+      }
+    },
+    "measure": {
+      "title": "Measurements",
+      "segments_one": "{{count}} Segment",
+      "segments_other": "{{count}} Segments",
+      "perimeter": "Perimeter {{length}}",
+      "unitManual": "{{unit}} (chosen by hand)",
+      "unitAssumed": "{{unit}} (m assumed)",
+      "clipboardHeading": "Measurements — {{file}} (Drawing Unit: {{unitNote}}; shown in: {{unit}})",
+      "unitSummary": "Drawing Unit: {{unit}}",
+      "infoHit": "Layer: <b>{{layer}}</b> · Type: {{shape}}",
+      "deleteLabel": "Delete measurement {{n}}",
+      "empty": "No measurements yet.",
+      "fields": {
+        "drawingUnit": "Drawing Unit",
+        "displayUnit": "Display Unit"
+      },
+      "options": {
+        "fromFile": "From File ({{unit}})"
+      },
+      "messages": {
+        "copied": "Copied to the clipboard.",
+        "preparingSnap": "Preparing snapping…",
+        "noLineNearby": "No line found nearby."
+      },
+      "errors": {
+        "copyFailed": "Could not copy; the browser did not allow it."
+      },
+      "actions": {
+        "finish": "Finish",
+        "undo": "Undo",
+        "copy": "Copy to Clipboard",
+        "clearAll": "Clear Measurements"
+      },
+      "takeoff": {
+        "add": "Add To Take-off",
+        "addLabel": "Add measurement {{n}} to the take-off",
+        "saved": "In take-off",
+        "open": "Open 2D Take-off"
+      }
+    },
+    "gate": {
+      "phases": {
+        "parse": "Reading the drawing",
+        "build": "Building the scene",
+        "compress": "Packing"
+      },
+      "civil3d": {
+        "title": "Civil 3D Drawing",
+        "description": "This drawing contains Civil 3D objects (alignments, corridors, surfaces). The open-source converter cannot read these objects. Save it in Civil 3D with 'Export to AutoCAD' (EXPORTTOAUTOCAD) and upload it again; for a 3D model, export it as IFC 4.3."
+      },
+      "empty": {
+        "title": "Drawing Could Not Be Read",
+        "description": "No objects to show were found in the drawing. The converter may not have been able to read this file. Save it in AutoCAD as DXF or a current DWG and upload it again."
+      },
+      "tooBig": "This drawing is too large to open on a phone ({{size}} DXF). The quick view (2D scene) opens here once it is ready; you can open it on a computer.",
+      "preparingLarge": "Large drawing ({{size}} DXF): the server is preparing the quick view (2D scene) once; it opens here when it is ready.",
+      "openRawDxfHint": "Read in the browser; takes long for large drawings",
+      "actions": {
+        "openRawDxf": "Open Raw DXF"
+      },
+      "errors": {
+        "sceneFailed": "The quick view could not be prepared.",
+        "sceneFailedWith": "The quick view could not be prepared: {{error}}",
+        "sceneUnavailable": "The quick view cannot be prepared on this server."
+      },
+      "messages": {
+        "preparing": "Preparing…",
+        "preparingQueued": "Preparing (queued)…",
+        "preparingPhase": "Preparing: {{phase}}…"
+      },
+      "fields": {
+        "objects": "Objects",
+        "civil3dClasses": "Civil 3D Classes",
+        "converterErrors": "Converter Errors"
+      }
+    }
+  }
+}

@@ -1,0 +1,518 @@
+{
+  "aiPresets": {
+    "ollama": {
+      "dataLocation": "Bu sunucuda veya ağdaki ekran kartlı sunucuda; veri ağ dışına çıkmaz.",
+      "note": "KVKK açısından en güvenli seçenek. DeepSeek ve Qwen açık ağırlıklı modelleri Ollama ile yerelde çalışır."
+    },
+    "vllm": {
+      "dataLocation": "Ağdaki sunucuda; veri ağ dışına çıkmaz.",
+      "note": "Araç çağrısı için sunucu --enable-auto-tool-choice ve uygun --tool-call-parser ile başlatılmalı."
+    },
+    "lmstudio": {
+      "dataLocation": "Bu bilgisayarda; veri ağ dışına çıkmaz."
+    },
+    "deepseek": {
+      "dataLocation": "DeepSeek'in Çin Halk Cumhuriyeti'ndeki sunucularında (gizlilik politikasına göre).",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın. DeepSeek bulut API'sini yalnız demo veya hassas olmayan projelerde kullanın; KVKK açısından güvenli seçenek DeepSeek / Qwen açık ağırlıklı modellerini Ollama ile yerelde çalıştırmaktır.",
+      "note": "reasoning_content alanı cevaba ve JSON'a hiç karışmaz. Eski deepseek-chat / deepseek-reasoner adları 24.07.2026'da kaldırıldı; model kimliği düzenlenebilir. Ollama'daki deepseek-v4 \":cloud\" etiketleri de bulutta çalışır."
+    },
+    "openai": {
+      "dataLocation": "OpenAI'nin ABD'deki sunucularında; veri yerleşimi açık projelerde AB vb. bölgeler seçilebilir (Türkiye bölgesi yok).",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın."
+    },
+    "gemini": {
+      "dataLocation": "Google'ın küresel altyapısında (Gemini API'de bölge seçimi yok); ücretsiz kotada istemler ürün geliştirmede kullanılabilir.",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın. Yalnız ücretli kota kullanın.",
+      "note": "OpenAI uyumlu uç (beta). Gemini 3'te düşünme kapatılamaz."
+    },
+    "anthropic": {
+      "dataLocation": "Anthropic'in sunucularında (varsayılan küresel; isteğe bağlı yalnız ABD).",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın.",
+      "note": "JSON modu yoktur; JSON istemle istenir ve uygulama ayıklar."
+    },
+    "mistral": {
+      "dataLocation": "Mistral'in AB/EFTA'daki veri merkezlerinde (api.eu.mistral.ai adresiyle garanti).",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın."
+    },
+    "groq": {
+      "dataLocation": "Groq'un ABD'deki (Google Cloud) sunucularında; varsayılan saklama 30 gün.",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın."
+    },
+    "openrouter": {
+      "dataLocation": "OpenRouter (ABD) üzerinden seçilen modelin sağlayıcısına; bölge modele göre değişir.",
+      "kvkk": "Proje içeriği Türkiye dışındaki sunuculara aktarılır (KVKK m.9): açık rıza veya uygun aktarım dayanağı gerekir. Hassas projelerde yerel model kullanın.",
+      "note": "Tek anahtarla birçok model; model kimliği sağlayıcı/model biçimindedir."
+    },
+    "azure-openai": {
+      "dataLocation": "Seçtiğiniz Azure bölgesinde; Global dağıtımlar herhangi bir bölgede işleyebilir, Data Zone (AB) dağıtımı AB'de kalır.",
+      "kvkk": "Bölge Türkiye dışındaysa proje içeriği yurt dışına aktarılır (KVKK m.9).",
+      "note": "Adres kaynak adınızla, model alanı dağıtım (deployment) adınızla değiştirilir."
+    }
+  },
+  "attributes": {
+    "required": "\"{{name}}\" zorunlu.",
+    "notAnOption": "\"{{name}}\" için \"{{value}}\" geçerli bir seçenek değil. İzinli değerler: {{options}}.",
+    "date": "\"{{name}}\" geçerli bir tarih olmalı (YYYY-AA-GG), \"{{value}}\" değil.",
+    "number": "\"{{name}}\" sayı olmalı, \"{{value}}\" değil.",
+    "tooLong": "\"{{name}}\" en fazla {{max}} karakter olabilir.",
+    "definition": {
+      "nameEmpty": "Öznitelik adı boş olamaz.",
+      "noOptions": "Açılır liste en az bir seçenek içermeli.",
+      "emptyOption": "Boş seçenek olamaz.",
+      "duplicateOption": "Aynı seçenek iki kez yazılmış."
+    }
+  },
+  "capacity": {
+    "tiers": {
+      "trial": "Deneme",
+      "small": "Küçük",
+      "medium": "Orta",
+      "large": "Büyük",
+      "enterprise": "Kurumsal"
+    },
+    "tierDatabase": {
+      "trial": "Aynı makine",
+      "small": "Aynı makine",
+      "medium": "Aynı makine, ayrı disk önerilir",
+      "large": "Ayrı disk; ayrı sunucu önerilir",
+      "enterprise": "Ön çalışma: ayrı veritabanı sunucusu"
+    },
+    "requirements": {
+      "os64": "64 bit işletim sistemi",
+      "network": "Ağ: en az 100 Mbit/sn; büyük IFC için 1 Gbit/sn",
+      "ssd": "Veri diski SSD (dönen disk değil)",
+      "backup": "Yedek hedefi ayrı (NAS / SFTP / S3); veri diskine sayılmaz",
+      "fixedCores": "Sanal makinede sabit çekirdek; paylaşımlı “burst” işlemci değil"
+    },
+    "findings": {
+      "usersBelowSmallest_one": "{{count}} kullanıcı · sunucu en küçük kademeyi karşılamıyor",
+      "usersBelowSmallest_other": "{{count}} kullanıcı · sunucu en küçük kademeyi karşılamıyor",
+      "users_one": "{{count}} kullanıcı · sunucu {{max}} kullanıcıya göre",
+      "users_other": "{{count}} kullanıcı · sunucu {{max}} kullanıcıya göre",
+      "overLimit": "Sınır aşıldı. {{upgrade}}",
+      "nearLimit": "Sınıra yaklaşıldı; donanım büyütmeyi planlayın. {{upgrade}}",
+      "ok": "Uygun.",
+      "upgrade": "{{tier}} kademesi: en az {{vcpu}} vCPU, {{ram}} GB RAM.",
+      "upgradeEnterprise": "Kurumsal kurulum için 7D ile ön çalışma yapın.",
+      "memory": "RAM {{ram}} GB · {{tier}} kademesi {{need}} GB ister",
+      "memoryOk": "RAM {{ram}} GB",
+      "memoryAction": "RAM'i en az {{need}} GB yapın.",
+      "cpu": "{{cpu}} vCPU · {{tier}} kademesi {{need}} vCPU ister",
+      "cpuOk": "{{cpu}} vCPU",
+      "cpuAction": "İşlemciyi en az {{need}} vCPU yapın.",
+      "disk": "Veri diski %{{used}} dolu",
+      "diskAction": "Veri diskini büyütün veya Bakım'dan türevleri temizleyin.",
+      "testMissing": "Kapasite testi yapılmadı",
+      "testMissingAction": "Canlı Test Et ile ölçün.",
+      "testOld_one": "Son test {{count}} gün önce",
+      "testOld_other": "Son test {{count}} gün önce",
+      "testOldAction": "Testi yeniden çalıştırın.",
+      "testRecent": "Son test güncel",
+      "measured": "Ölçümde ~{{measured}} kayıtlı kullanıcı · aktif {{active}}",
+      "measuredAction": "Ölçülen kapasite aktif kullanıcıya yetmiyor; donanımı büyütün."
+    }
+  },
+  "chains": {
+    "pattern": {
+      "empty": "Desen boş olamaz.",
+      "braces": "Desende { } eşleşmiyor.",
+      "counter": "Numara deseninde tam bir sayaç olmalı, ör. {0000}.",
+      "noCounter": "Klasör deseninde sayaç kullanılamaz.",
+      "dotDot": "Klasör deseninde .. kullanılamaz."
+    },
+    "partyOutcomeLabel": "{{party}} {{outcome}}",
+    "partyPrefix": {
+      "designer": "TASARIMCI",
+      "contractor": "YÜKLENİCİ",
+      "consultant": "MÜŞAVİR",
+      "client": "İDARE"
+    },
+    "partyOutcome": {
+      "approved": "ONAYLANDI",
+      "approved_with_comments": "ŞARTLI ONAYLANDI",
+      "info": "BİLGİ",
+      "revise": "İADE EDİLDİ",
+      "rejected": "REDDEDİLDİ"
+    }
+  },
+  "companyCode": {
+    "invalid": "Firma kodu 2–8 harf veya rakam olmalı (ör. PAS)."
+  },
+  "documents": {
+    "submittalTypes": {
+      "MOS": "Malzeme Onay Sunumu",
+      "NUM": "Numune",
+      "UCZ": "Uygulama / Atölye Çizimi",
+      "YB": "Yöntem Beyanı",
+      "IP": "İş Programı",
+      "ISG": "İSG",
+      "TR": "Teknik Rapor / Hesap",
+      "PMR": "Periyodik Muayene",
+      "KS": "Kalite / Test",
+      "IKOF": "İmalat Kontrol Onay Formu",
+      "BAS": "Bilgi Amaçlı Sunum",
+      "MKF": "Saha Malzeme Kabul"
+    },
+    "submittalDisciplines": {
+      "MIM": "Mimari",
+      "INS": "İnşaat / Yapısal",
+      "GEO": "Geoteknik",
+      "MEK": "Mekanik",
+      "ELK": "Elektrik",
+      "ALT": "Altyapı",
+      "PEY": "Peyzaj",
+      "GNL": "Genel"
+    },
+    "suitability": {
+      "S0": "S0 · Çalışma (WIP)",
+      "S1": "S1 · Koordinasyon İçin",
+      "S2": "S2 · Bilgi İçin",
+      "S3": "S3 · İnceleme ve Yorum İçin",
+      "S4": "S4 · Onay İçin",
+      "A": "A · Onaylı (Yayınlanan)",
+      "B": "B · Kısmen Onaylı"
+    }
+  },
+  "forms": {
+    "template": {
+      "noSections": "En az bir bölüm gerekli.",
+      "duplicateSectionId": "Bölüm kimliği iki kez kullanılmış: {{id}}.",
+      "emptySectionTitle": "Bölüm başlığı boş olamaz.",
+      "duplicateItemId": "Madde kimliği iki kez kullanılmış: {{id}}.",
+      "emptyItemLabel": "{{id}}: madde metni boş olamaz.",
+      "emptyOptions": "\"{{item}}\": seçenek listesi boş.",
+      "duplicateOption": "\"{{item}}\": aynı seçenek iki kez yazılmış.",
+      "failOptionMissing": "\"{{item}}\": \"uygunsuz\" seçenek listede yok.",
+      "minAboveMax": "\"{{item}}\": en küçük değer en büyükten büyük.",
+      "noColumns": "\"{{item}}\": tabloda en az bir sütun olmalı.",
+      "duplicateColumnId": "\"{{item}}\": sütun kimlikleri benzersiz olmalı.",
+      "emptyColumnLabel": "\"{{item}}\": sütun adı boş olamaz.",
+      "columnNoOptions": "\"{{item}}\": \"{{column}}\" sütununda seçenek yok.",
+      "scoreSource": "\"{{item}}\": puan yalnızca Evet/Hayır maddelerinden hesaplanır ({{ref}})."
+    },
+    "values": {
+      "cell": "{{item}} / {{row}}. satır / {{column}}",
+      "notNumber": "\"{{label}}\" sayı olmalı.",
+      "belowMin": "\"{{label}}\" en az {{min}}{{unit}} olmalı (girilen {{value}}).",
+      "aboveMax": "\"{{label}}\" en fazla {{max}}{{unit}} olabilir (girilen {{value}}).",
+      "required": "\"{{label}}\" zorunlu.",
+      "yesNo": "\"{{label}}\" için Evet, Hayır veya U.D. seçilmeli.",
+      "naNotAllowed": "\"{{label}}\" için \"Uygulanmaz\" seçilemez.",
+      "notText": "\"{{label}}\" metin olmalı.",
+      "textTooLong_one": "\"{{label}}\" en fazla {{count}} karakter olabilir.",
+      "textTooLong_other": "\"{{label}}\" en fazla {{count}} karakter olabilir.",
+      "dateFormat": "\"{{label}}\" geçerli bir tarih olmalı (YYYY-AA-GG).",
+      "date": "\"{{label}}\" geçerli bir tarih olmalı.",
+      "choice": "\"{{label}}\" için geçerli bir seçenek seçilmeli.",
+      "multiChoice": "\"{{label}}\" için seçenekler listeden seçilmeli.",
+      "invalid": "\"{{label}}\" geçersiz.",
+      "tooManyPhotos_one": "\"{{label}}\" için en fazla {{count}} fotoğraf eklenebilir.",
+      "tooManyPhotos_other": "\"{{label}}\" için en fazla {{count}} fotoğraf eklenebilir.",
+      "tableRows": "\"{{label}}\" tablo satırları geçersiz.",
+      "tooManyRows_one": "\"{{label}}\" en fazla {{count}} satır olabilir.",
+      "tooManyRows_other": "\"{{label}}\" en fazla {{count}} satır olabilir."
+    },
+    "numberPattern": {
+      "unknownToken": "Bilinmeyen alan: {{token}}. Kullanılabilir: {PROJE} {KOD} {YYYY} {YY} {MM} {KONUM} {000}.",
+      "noSequence": "Numara biçiminde tam bir sıra alanı olmalı, ör. {0000}.",
+      "tooLong_one": "Numara biçimi en fazla {{count}} karakter olabilir.",
+      "tooLong_other": "Numara biçimi en fazla {{count}} karakter olabilir."
+    },
+    "print": {
+      "km": "Km {{value}}",
+      "score": "%{{value}}"
+    },
+    "flow": {
+      "opener": "Formu açan kişi",
+      "filler": "1. {{who}} doldurur",
+      "byAttribute": "{{attribute}} alanına göre",
+      "toStep": "{{step}}. adım",
+      "closes": "kapanır",
+      "returnsTo": "{{step}}. adıma döner",
+      "days_one": "{{count}} gün",
+      "days_other": "{{count}} gün",
+      "fills": "Doldurur: {{fields}}",
+      "notifyApproved": "Onaylanınca bilgi: {{who}}",
+      "notifyReturned": "Geri dönünce bilgi: {{who}}",
+      "statusNote": "Durum: onaylanınca Kapalı; iade veya retle doldurana dönerse Taslak",
+      "outcome": {
+        "approved": "Onay",
+        "approved_with_comments": "Notlu Onay",
+        "info": "Görüldü",
+        "revise": "İade",
+        "rejected": "Ret"
+      }
+    }
+  },
+  "intake": {
+    "noText": "Metin katmanı yok; alanları elle doldurun veya OCR/görsel model ekleyin."
+  },
+  "letters": {
+    "translationMissing": "{{number}}: Yazı {{language}} dilinde basılacak; Çeviriler bölümünde bu dil için konu ve içerik girin."
+  },
+  "locations": {
+    "invalidKm": "Geçersiz km değeri.",
+    "invalidKmValue": "Geçersiz km değeri: \"{{value}}\". Örnek: 12+345.6 veya 12.3456"
+  },
+  "modelQuery": {
+    "fields": {
+      "class": "Sınıf",
+      "storey": "Kat",
+      "type": "Tip",
+      "name": "Ad",
+      "material": "Malzeme",
+      "globalId": "GlobalId",
+      "change": "Değişiklik"
+    },
+    "chips": {
+      "class": "Sınıf: {{value}}",
+      "storey": "Kat: {{value}}",
+      "filter": "{{field}} {{op}} {{value}}",
+      "filterNoValue": "{{field}} {{op}}",
+      "groupBy": "{{field}} bazında",
+      "aggregate": "{{op}} {{field}}"
+    }
+  },
+  "modules": {
+    "offMessage": "{{module}} modülü bu projede kapalı; yeni kayıt oluşturulamaz. Mevcut kayıtlar açılabilir. Proje yöneticisi modülü Proje Ayarları → Modüller'den açabilir.",
+    "help": {
+      "correspondence": "Gelen ve giden resmi yazılar, cevap zinciri, KEP ve e-posta.",
+      "rfi": "Bilgi talepleri ve bilgi talebi listesi.",
+      "submittals": "Teknik onay kalemleri, paketler ve teknik onay listesi.",
+      "meetings": "Toplantılar, tutanaklar ve eylemler.",
+      "transmittals": "Gönderim formları ve kapak sayfaları.",
+      "issues": "Sahada ve modelde açılan sorunlar.",
+      "reviews": "Doküman incelemeleri ve onay zincirleri.",
+      "forms": "Saha formları, kontrol listeleri ve form şablonları.",
+      "coordination": "Model setleri, çakışma testleri ve bilgi gereksinimi kontrolleri (IDS).",
+      "schedule": "İş programı, Gantt şeması ve 4D.",
+      "spec": "Şartname PDF'inden taslak teknik onay listesi.",
+      "reports": "Rapor panelleri ve hazır rapor şablonları."
+    }
+  },
+  "naming": {
+    "partCount_one": "Ad {{expected}} alandan oluşmalı, {{count}} alan var (ayraç \"{{delimiter}}\").",
+    "partCount_other": "Ad {{expected}} alandan oluşmalı, {{count}} alan var (ayraç \"{{delimiter}}\").",
+    "fieldProblem": "{{field}}: {{problem}}",
+    "noMatch": "Ad standarda uymuyor.",
+    "field": {
+      "missing": "eksik",
+      "notAllowed": "\"{{value}}\" izinli değerlerden biri değil",
+      "digits": "{{digits}} haneli sayı olmalı",
+      "minLength_one": "en az {{count}} karakter",
+      "minLength_other": "en az {{count}} karakter",
+      "maxLength_one": "en fazla {{count}} karakter",
+      "maxLength_other": "en fazla {{count}} karakter"
+    },
+    "standard": {
+      "nameEmpty": "Standart adı boş.",
+      "delimiter": "Ayraç tek karakter olmalı.",
+      "noFields": "En az bir alan gerekli.",
+      "noNameField": "Adda en az bir alan olmalı.",
+      "fieldNameEmpty": "Alan adı boş.",
+      "duplicateField": "\"{{field}}\" alanı iki kez tanımlı.",
+      "emptyList": "\"{{field}}\" için değer listesi boş.",
+      "codeHasDelimiter": "\"{{field}}\" alanındaki \"{{code}}\" kodu ayraç içeriyor.",
+      "codeDelimiterEdge": "\"{{field}}\" alanındaki \"{{code}}\" kodu ayraçla başlayamaz veya bitemez.",
+      "digits": "\"{{field}}\" için hane sayısı 1–12 olmalı.",
+      "digitRange": "\"{{field}}\" için en az/en çok hane 1–12 arasında olmalı (en az ≤ en çok)."
+    }
+  },
+  "oauth": {
+    "scopeHints": {
+      "bcf": "BCF API ile sorunları, yorumları ve bakış açılarını sizin yetkilerinizle okuyup yazabilir.",
+      "documents": "OpenCDE Documents API ile sizin seçtiğiniz klasöre dosya ve yeni versiyon yükleyebilir; seçtiğiniz dokümanları görüp indirebilir.",
+      "documentsRead": "OpenCDE Documents API ile yalnız sizin seçtiğiniz dokümanları görüp indirebilir; yükleme yapamaz.",
+      "read": "Projelerinizi, klasörlerinizi, dosyalarınızı ve kayıtlarınızı sizin yetkilerinizle görebilir.",
+      "write": "Sizin yetkilerinizle kayıt oluşturabilir, değiştirebilir ve dosya yükleyebilir."
+    },
+    "clientTypeHints": {
+      "public": "Masaüstü ve tarayıcı uygulamaları. Gizli anahtar yok; PKCE (S256) zorunlu.",
+      "confidential": "Kendi sunucusunda çalışan ya da gizli anahtar saklayabilen uygulamalar. PKCE isteğe bağlı."
+    }
+  },
+  "office": {
+    "editors": {
+      "none": "Kapalı",
+      "onlyoffice": "ONLYOFFICE Docs",
+      "collabora": "Collabora Online"
+    },
+    "converters": {
+      "auto": "Otomatik",
+      "none": "Kapalı",
+      "onlyoffice": "ONLYOFFICE (ConvertService)",
+      "collabora": "Collabora (convert-to)",
+      "gotenberg": "Gotenberg",
+      "local": "Sunucudaki LibreOffice (soffice)"
+    }
+  },
+  "paramChange": {
+    "lost_one": "Önceki parametre değişikliği bu versiyonda yok: {{title}} ({{count}} eleman)",
+    "lost_other": "Önceki parametre değişikliği bu versiyonda yok: {{title}} ({{count}} eleman)"
+  },
+  "privacy": {
+    "statement": "Bu sunucu dışarıya kendiliğinden veri göndermez; telemetri yoktur."
+  },
+  "register": {
+    "typeEmpty": "Tür boş.",
+    "typeUnknown": "Tür tanınmadı: \"{{value}}\".",
+    "disciplineEmpty": "Disiplin boş.",
+    "disciplineUnknown": "Disiplin tanınmadı: \"{{value}}\".",
+    "descriptionEmpty": "Açıklama boş."
+  },
+  "reports": {
+    "warnings": {
+      "network": "Ağ çağrısı (fetch/XHR/WebSocket) panelde engellidir; veri yalnızca CDE.data üzerinden gelir.",
+      "inlineHandlers": "Satır içi olay öznitelikleri (onclick=… gibi) panelde çalışmaz; addEventListener kullanın.",
+      "externalResources": "Dış kaynak (CDN, resim, font bağlantısı) yüklenemez; her şey satır içi olmalı.",
+      "navigation": "Panel sayfa dışına yönlendirme veya bağlantı kurmaya çalışıyor; bu kod güvenlik nedeniyle durdurulur."
+    },
+    "frame": {
+      "blank": "(boş)",
+      "noData": "Gösterilecek veri yok.",
+      "noRecords": "Kayıt yok.",
+      "more_one": "+{{count}} satır daha",
+      "more_other": "+{{count}} satır daha",
+      "cannotShow": "Bu bölüm gösterilemiyor",
+      "panelError": "Panel hatası: {{message}}",
+      "targetNotFound": "CDE: hedef bulunamadı: {{target}}"
+    }
+  },
+  "roles": {
+    "packages": {
+      "idare": {
+        "label": "İdare",
+        "description": "Paylaşılan ve yayınlanan her şeyi görür, işaretler; yayınlananı onay adımlarıyla yönetir."
+      },
+      "musavir": {
+        "label": "Müşavir",
+        "description": "Paylaşılanı görür ve işaretler, inceleme adımlarında onaylar; yayınlananı ve arşivi indirir."
+      },
+      "tasarimci": {
+        "label": "Tasarımcı",
+        "description": "Kendi çalışma alanını yönetir, paylaşılana inceleme ile gönderir; yayınlananı indirir."
+      },
+      "yuklenici": {
+        "label": "Yüklenici",
+        "description": "Kendi alanını yönetir, paylaşılana gönderir (bilgi talebi ve teknik onay açar); yayınlananı indirir."
+      }
+    },
+    "access": {
+      "reason": {
+        "projectAdmin": "proje yöneticisi olduğu için her klasörü yönetir",
+        "systemAdmin": "sistem yöneticisi olduğu için her klasörü yönetir",
+        "grant": "{{who}}{{where}}: {{level}}"
+      },
+      "via": {
+        "user": "kişisel yetkisi",
+        "namedCompany": "\"{{name}}\" firması üzerinden",
+        "company": "firması üzerinden",
+        "namedRole": "\"{{name}}\" rolü üzerinden",
+        "role": "rolü üzerinden"
+      },
+      "inheritedFrom": " (\"{{folder}}\" klasöründen miras)",
+      "inherited": " (üst klasörden miras)",
+      "noAccess": "{{name}} bu klasörü göremez: kişi, firma veya rol yetkisi yok.",
+      "head": {
+        "fileUploadOnly": "{{name}} bu dosyayı göremez: yalnız yükleyebilir ve kendi yüklediği dosyaları görür",
+        "uploadOnly": "{{name}} yalnız yükleyebilir ve kendi yüklediği dosyaları görür",
+        "canSee": "{{name}} görebilir ({{level}})"
+      },
+      "sentence": "{{head}} — {{reasons}}.",
+      "sentenceWithLower_one": "{{head}} — {{reasons}}; ayrıca {{count}} daha düşük yetki.",
+      "sentenceWithLower_other": "{{head}} — {{reasons}}; ayrıca {{count}} daha düşük yetki."
+    }
+  },
+  "sim": {
+    "rule": {
+      "storeys": "Kat: {{value}}",
+      "classes": "Sınıf: {{value}}",
+      "nameContains": "Ad içerir \"{{value}}\"",
+      "equalsCostCode": "{{key}} = poz no",
+      "equalsActivityWbs": "{{key}} = faaliyet WBS'i",
+      "equalsActivityCode": "{{key}} = faaliyet kodu",
+      "propertyContains": "{{key}} içerir \"{{value}}\"",
+      "propertyEquals": "{{key}} = \"{{value}}\"",
+      "propertyExists": "{{key}} var",
+      "allElements": "Tüm elemanlar"
+    }
+  },
+  "template": {
+    "unknownDimension": "\"{{name}}\" adlı bir boyut şablonda yok.",
+    "tooManyFolders": "Şablon {{max}} klasörden fazlasını üretiyor.",
+    "skeletonTooDeep": "{{where}}: iskelet {{max}} seviyeden derin (boyutlar birbirini ekliyor olabilir).",
+    "dimensionNotDefined": "{{where}}: \"{{name}}\" adlı boyut tanımlı değil.",
+    "badOnDemand": "{{path}}: onDemand \"{{onDemand}}\" ne \"leaves\"/\"none\" ne de bir boyut adı.",
+    "duplicateSubfolder": "{{path}}: \"{{name}}\" alt klasörü iki kez tanımlı.",
+    "duplicateTopFolder": "\"{{name}}\" üst klasörü iki kez tanımlı.",
+    "nameEmpty": "Şablon adı boş.",
+    "slotKeyEmpty": "Rol (slot) anahtarı boş.",
+    "slotKeyStar": "\"*\" rol anahtarı olarak kullanılamaz (tüm roller anlamına gelir).",
+    "duplicateSlot": "\"{{key}}\" rolü iki kez tanımlı.",
+    "duplicateStandard": "\"{{name}}\" isimlendirme standardı iki kez tanımlı.",
+    "duplicateAttribute": "\"{{name}}\" özniteliği iki kez tanımlı.",
+    "grantSlotUnknown": "{{where}}: yetkideki \"{{slot}}\" rolü tanımlı değil.",
+    "standardUnknown": "{{where}}: \"{{name}}\" isimlendirme standardı tanımlı değil.",
+    "attributeUnknown": "{{where}}: \"{{name}}\" özniteliği tanımlı değil.",
+    "projectRoot": "Proje kökü",
+    "folderNameEmpty": "{{path}}: klasör adı boş.",
+    "folderNameSpaces": "{{path}}: klasör adı boşlukla başlayamaz veya bitemez.",
+    "folderNameTooLong": "{{path}}: klasör adı {{max}} karakterden uzun.",
+    "folderNameForbidden": "{{path}}: klasör adında \\ / : * ? \" < > | kullanılamaz.",
+    "duplicateWorkflow": "\"{{name}}\" iş akışı iki kez tanımlı.",
+    "workflowNoSteps": "\"{{name}}\": en az bir adım gerekli.",
+    "stepNoAssignee": "\"{{name}}\" {{step}}. adım: en az bir atanan gerekli.",
+    "stepSlotUnknown": "\"{{name}}\" {{step}}. adım: \"{{slot}}\" rolü tanımlı değil.",
+    "copyTargetInvalid": "\"{{name}}\": kopya hedef klasör yolu geçersiz (\"{{folder}}\")."
+  },
+  "viewers": {
+    "kinds": {
+      "pdf": "PDF",
+      "ifc": "IFC model",
+      "document": "Belge",
+      "slides": "Sunum",
+      "sheet": "Tablo",
+      "cad": "Çizim",
+      "image": "Görsel",
+      "text": "Metin",
+      "markdown": "Markdown",
+      "video": "Video",
+      "audio": "Ses",
+      "email": "E-posta",
+      "none": "Önizleme yok"
+    }
+  },
+  "workFields": {
+    "unknown": "Bilinmeyen alan: {{key}}",
+    "required": "\"{{label}}\" zorunlu.",
+    "number": "\"{{label}}\" sayı olmalı.",
+    "boolean": "\"{{label}}\" evet/hayır olmalı.",
+    "date": "\"{{label}}\" YYYY-AA-GG tarihi olmalı.",
+    "list": "\"{{label}}\" listedeki bir değer olmalı.",
+    "text": "\"{{label}}\" metin olmalı.",
+    "tooLong": "\"{{label}}\" çok uzun.",
+    "def": {
+      "key": "{{n}}. alan: anahtar küçük harf, rakam, - veya _ olmalı.",
+      "duplicateKey": "{{n}}. alan: \"{{key}}\" anahtarı iki kez kullanılmış.",
+      "labelEmpty": "{{n}}. alan: etiket boş olamaz.",
+      "noOptions": "{{n}}. alan: liste seçenekleri gerekli."
+    }
+  },
+  "workNumbering": {
+    "empty": "Numara deseni boş olamaz.",
+    "counter": "Desende tam bir sıra no alanı olmalı, ör. {0000}.",
+    "unknownToken": "Bilinmeyen alan: {{token}}",
+    "tokens": {
+      "project": "proje kodu",
+      "type": "iş tipi anahtarı",
+      "sender": "gönderen firmanın kodu (firma yoksa proje kodu)",
+      "recipient": "ilk gereği alıcısının firma kodu",
+      "year": "yıl",
+      "year2": "yılın son iki hanesi",
+      "month": "ay",
+      "sequence": "sıra no (sıfır sayısı = hane)",
+      "fields": "tipin alanları (etiket ya da anahtar); liste değeri \"M - Mekanik\" → M",
+      "subject": "başlık (sayaç kapsamına girmez)"
+    }
+  }
+}

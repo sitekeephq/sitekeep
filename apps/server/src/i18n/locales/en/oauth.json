@@ -1,0 +1,34 @@
+{
+  "errors": {
+    "sessionRequired": "This operation requires a browser session.",
+    "adminRequired": "This operation requires System Administrator permission.",
+    "redirectUriRequired": "Enter at least one redirect address.",
+    "scopeRequired": "Select at least one permission.",
+    "invalidClientRequest": "The application's request is invalid.",
+    "publicClientNoSecret": "Public clients have no secret.",
+    "clientIdMissing": "The application ID (client_id) is missing.",
+    "clientNotRegistered": "This application is not registered in SiteKeep. Contact your System Administrator.",
+    "clientDisabled": "The application \"{{name}}\" has been disabled by the System Administrator.",
+    "redirectRepeated": "The redirect address was sent more than once.",
+    "redirectMismatch": "redirect_uri and redirect_url point to different addresses.",
+    "redirectMissing": "The redirect address (redirect_uri) is missing.",
+    "redirectNotRegistered": "The redirect address is not registered for this application. It must be exactly the same as the address registered on the OAuth Applications page.",
+    "bearerRequired": "A valid access token (Bearer) is required.",
+    "resourceNotFound": "This OpenCDE resource or version does not exist.",
+    "redirectTooLong": "The redirect address is too long.",
+    "redirectInvalid": "\"{{uri}}\" is not a valid address.",
+    "redirectFragment": "\"{{uri}}\": a redirect address cannot contain a # fragment.",
+    "redirectUserInfo": "\"{{uri}}\": the address cannot contain a user name or password.",
+    "redirectHttpLoopback": "\"{{uri}}\": http can only be used for local addresses (127.0.0.1, localhost); other addresses must use https.",
+    "redirectScheme": "\"{{uri}}\": only https, local http or an application address in reverse domain form (e.g. com.company.app:/callback) can be used.",
+    "tooManyAttempts": "Too many failed attempts. Try again later."
+  },
+  "entities": {
+    "connectedApp": "Connected application",
+    "client": "OAuth application"
+  },
+  "errorPage": {
+    "title": "Authorisation Error · SiteKeep",
+    "heading": "The Application Could Not Connect"
+  }
+}

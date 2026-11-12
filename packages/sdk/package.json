@@ -1,0 +1,44 @@
+{
+  "name": "@7dimensions-project/sitekeep-sdk",
+  "version": "0.12.0",
+  "license": "MIT",
+  "description": "The SiteKeep core's surface for modules: the core provides the implementation at run time (apps/*/src/sdk/bind.ts); this package forwards it and carries the core's type declarations.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sitekeephq/sitekeep.git",
+    "directory": "packages/sdk"
+  },
+  "type": "module",
+  "exports": {
+    "./server": {
+      "types": "./server.d.ts",
+      "import": "./server.js"
+    },
+    "./web": {
+      "types": "./web.d.ts",
+      "import": "./web.js"
+    },
+    "./shared": {
+      "types": "./shared.d.ts",
+      "import": "./shared.js"
+    }
+  },
+  "files": [
+    "server.js",
+    "server.d.ts",
+    "web.js",
+    "web.d.ts",
+    "shared.js",
+    "shared.d.ts",
+    "types"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "node scripts/gen-shims.mjs",
+    "build:types": "node scripts/build-types.mjs",
+    "check": "node scripts/gen-shims.mjs --check",
+    "prepack": "node scripts/build-types.mjs && node scripts/gen-shims.mjs --check"
+  }
+}

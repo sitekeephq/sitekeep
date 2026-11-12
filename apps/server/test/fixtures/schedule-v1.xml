@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Project xmlns="http://schemas.microsoft.com/project">
+  <Name>ZAVM.xml</Name>
+  <Title>ZAVM Ana Program</Title>
+  <StatusDate>2026-03-02T08:00:00</StatusDate>
+  <MinutesPerDay>480</MinutesPerDay>
+  <Tasks>
+    <Task><UID>0</UID><ID>0</ID><Name>ZAVM</Name><OutlineLevel>0</OutlineLevel><Summary>1</Summary></Task>
+    <Task><UID>1</UID><ID>1</ID><Name>Kaba inşaat</Name><WBS>1</WBS><OutlineLevel>1</OutlineLevel><Summary>1</Summary>
+      <Start>2026-02-02T08:00:00</Start><Finish>2026-03-27T17:00:00</Finish><PercentComplete>45</PercentComplete><Critical>1</Critical></Task>
+    <Task><UID>2</UID><ID>2</ID><Name>Temel kazısı</Name><WBS>1.1</WBS><OutlineLevel>2</OutlineLevel>
+      <Start>2026-02-02T08:00:00</Start><Finish>2026-02-13T17:00:00</Finish><Duration>PT80H0M0S</Duration>
+      <PercentComplete>100</PercentComplete><Critical>1</Critical>
+      <ActualStart>2026-02-02T08:00:00</ActualStart><ActualFinish>2026-02-13T17:00:00</ActualFinish>
+      <Baseline><Number>0</Number><Start>2026-02-02T08:00:00</Start><Finish>2026-02-13T17:00:00</Finish></Baseline></Task>
+    <Task><UID>3</UID><ID>3</ID><Name>Temel betonu &amp; yalıtım</Name><WBS>1.2</WBS><OutlineLevel>2</OutlineLevel>
+      <Start>2026-02-16T08:00:00</Start><Finish>2026-03-06T17:00:00</Finish><Duration>PT120H0M0S</Duration>
+      <PercentComplete>40</PercentComplete><Critical>1</Critical><ActualStart>2026-02-16T08:00:00</ActualStart>
+      <PredecessorLink><PredecessorUID>2</PredecessorUID><Type>1</Type><LinkLag>0</LinkLag><LagFormat>7</LagFormat></PredecessorLink></Task>
+    <Task><UID>4</UID><ID>4</ID><Name>Kolonlar</Name><WBS>1.3</WBS><OutlineLevel>2</OutlineLevel>
+      <Start>2026-03-09T08:00:00</Start><Finish>2026-03-27T17:00:00</Finish><Duration>PT120H0M0S</Duration>
+      <PercentComplete>0</PercentComplete><Critical>1</Critical>
+      <PredecessorLink><PredecessorUID>3</PredecessorUID><Type>1</Type><LinkLag>4800</LinkLag><LagFormat>7</LagFormat></PredecessorLink></Task>
+    <Task><UID>5</UID><ID>5</ID><Name>İnce işler</Name><WBS>2</WBS><OutlineLevel>1</OutlineLevel><Summary>1</Summary>
+      <Start>2026-03-30T08:00:00</Start><Finish>2026-04-17T17:00:00</Finish><PercentComplete>0</PercentComplete></Task>
+    <Task><UID>6</UID><ID>6</ID><Name>Duvarlar</Name><WBS>2.1</WBS><OutlineLevel>2</OutlineLevel>
+      <Start>2026-03-30T08:00:00</Start><Finish>2026-04-17T17:00:00</Finish><Duration>PT120H0M0S</Duration>
+      <PercentComplete>0</PercentComplete><Critical>0</Critical>
+      <PredecessorLink><PredecessorUID>4</PredecessorUID><Type>3</Type><LinkLag>0</LinkLag></PredecessorLink></Task>
+    <Task><UID>7</UID><ID>7</ID><Name>Kaba inşaat bitti</Name><WBS>3</WBS><OutlineLevel>1</OutlineLevel>
+      <Start>2026-03-27T17:00:00</Start><Finish>2026-03-27T17:00:00</Finish><Duration>PT0H0M0S</Duration><Milestone>1</Milestone>
+      <PercentComplete>0</PercentComplete><Critical>1</Critical>
+      <PredecessorLink><PredecessorUID>4</PredecessorUID><Type>0</Type><LinkLag>0</LinkLag></PredecessorLink></Task>
+  </Tasks>
+  <Resources>
+    <Resource><UID>1</UID><Name>Poyraz İnşaat</Name></Resource>
+  </Resources>
+  <Assignments>
+    <Assignment><TaskUID>2</TaskUID><ResourceUID>1</ResourceUID></Assignment>
+    <Assignment><TaskUID>3</TaskUID><ResourceUID>1</ResourceUID></Assignment>
+  </Assignments>
+</Project>

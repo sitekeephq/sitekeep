@@ -1,0 +1,34 @@
+{
+  "errors": {
+    "sessionRequired": "Bu işlem tarayıcı oturumu gerektirir.",
+    "adminRequired": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
+    "redirectUriRequired": "En az bir yönlendirme adresi girin.",
+    "scopeRequired": "En az bir izin seçin.",
+    "invalidClientRequest": "Uygulamanın isteği geçersiz.",
+    "publicClientNoSecret": "Açık istemcilerin gizli anahtarı yok.",
+    "clientIdMissing": "Uygulama kimliği (client_id) eksik.",
+    "clientNotRegistered": "Bu uygulama SiteKeep'te kayıtlı değil. Sistem yöneticinize başvurun.",
+    "clientDisabled": "\"{{name}}\" uygulaması sistem yöneticisi tarafından devre dışı bırakıldı.",
+    "redirectRepeated": "Yönlendirme adresi birden çok kez gönderildi.",
+    "redirectMismatch": "redirect_uri ve redirect_url farklı adresler gösteriyor.",
+    "redirectMissing": "Yönlendirme adresi (redirect_uri) eksik.",
+    "redirectNotRegistered": "Yönlendirme adresi bu uygulama için kayıtlı değil. Adres, OAuth Uygulamaları sayfasında kayıtlı adresle birebir aynı olmalı.",
+    "bearerRequired": "Geçerli bir erişim anahtarı (Bearer) gerekiyor.",
+    "resourceNotFound": "Bu OpenCDE kaynağı ya da sürümü yok.",
+    "redirectTooLong": "Yönlendirme adresi çok uzun.",
+    "redirectInvalid": "\"{{uri}}\" geçerli bir adres değil.",
+    "redirectFragment": "\"{{uri}}\": yönlendirme adresinde # bölümü olamaz.",
+    "redirectUserInfo": "\"{{uri}}\": adreste kullanıcı adı veya şifre olamaz.",
+    "redirectHttpLoopback": "\"{{uri}}\": http yalnız yerel adreslerde (127.0.0.1, localhost) kullanılabilir; diğer adresler https olmalı.",
+    "redirectScheme": "\"{{uri}}\": yalnız https, yerel http ya da ters alan adı biçiminde uygulama adresi (ör. com.firma.uygulama:/geri) kullanılabilir.",
+    "tooManyAttempts": "Çok fazla hatalı deneme. Daha sonra yeniden deneyin."
+  },
+  "entities": {
+    "connectedApp": "Bağlı uygulama",
+    "client": "OAuth uygulaması"
+  },
+  "errorPage": {
+    "title": "Yetkilendirme Hatası · SiteKeep",
+    "heading": "Uygulama Bağlanamadı"
+  }
+}

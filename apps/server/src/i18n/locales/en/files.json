@@ -1,0 +1,9 @@
+{
+  "errors": {
+    "noNewVersionPermission": "You do not have permission to upload a new version of this file.",
+    "noUploadPermission": "You do not have permission to upload to this folder.",
+    "editLocked": "The file is currently being edited in the browser by {{name}}. Upload the new version after the editing session has closed.",
+    "editLockedUnknown": "The file is currently being edited in the browser by a user. Upload the new version after the editing session has closed.",
+    "nameNotStandard": "The file name does not follow the folder's naming standard: {{errors}}"
+  }
+}

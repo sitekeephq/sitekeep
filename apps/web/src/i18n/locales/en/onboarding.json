@@ -1,0 +1,76 @@
+{
+  "tour": {
+    "label": "Product Tour",
+    "progress": "{{current}} / {{total}}",
+    "actions": {
+      "skip": "Skip",
+      "finish": "Finish"
+    },
+    "steps": {
+      "navToday": {
+        "title": "Today",
+        "body": "The project's home screen. Work assigned to you, overdue items and upcoming due dates are gathered here."
+      },
+      "todayGrid": {
+        "title": "Daily Summary",
+        "body": "Cards: assigned to me, overdue, upcoming due dates and recent changes. New records are created from the top right."
+      },
+      "navFiles": {
+        "title": "Documents",
+        "body": "Project files live in this menu. IFC, PDF, CAD and office files are uploaded into folders."
+      },
+      "filesTree": {
+        "title": "Folders",
+        "body": "Pick a folder on the left (at the bottom on a phone). Next we will go down to the station folder."
+      },
+      "filesUpload": {
+        "title": "Upload",
+        "body": "Choose a file here or drag it onto the list. Once an IFC is uploaded it is prepared for the Model Viewer automatically."
+      },
+      "folderTasarim": {
+        "title": "Design Work",
+        "body": "01-TASARIM ÇALIŞMALARI under Proje Dosyaları. Next opens this folder."
+      },
+      "folderOnaya": {
+        "title": "Shared for Approval",
+        "body": "02-Onaya Sunulan (Shared for Approval) — the shared design folder."
+      },
+      "folderIstasyonlar": {
+        "title": "Stations",
+        "body": "002-İstasyonlar. Each station has its own folder here."
+      },
+      "folderS16": {
+        "title": "S16",
+        "body": "Station S16. The discipline models are inside this folder."
+      },
+      "disciplineFolders": {
+        "title": "Five Disciplines",
+        "body": "Five folders on the right: 00-Koordinasyon Modeli, 01-Mimari, 02-Yapısal, 04-Mekanik, 05-Elektrik."
+      },
+      "folderMimari": {
+        "title": "Architecture",
+        "body": "Open the 01-Mimari folder. The model file and its approval status are here."
+      },
+      "docsMeta": {
+        "title": "Date and Approval",
+        "body": "Scroll the table to the right. The date and approval columns are to the right of the name; when the model is ready, Open Model appears."
+      },
+      "openModel": {
+        "title": "Open Model",
+        "body": "Open Model goes to the IFC viewer. This badge does not appear until conversion has finished."
+      },
+      "navViewer": {
+        "title": "Model Viewer",
+        "body": "Uploaded IFC models open here in 3D. Coordination and issues are linked to this scene too."
+      },
+      "viewerModels": {
+        "title": "Models",
+        "body": "Tick one or more models in the list. On a phone, the Models button opens the list."
+      },
+      "viewerHud": {
+        "title": "Scene Tools",
+        "body": "Fit, create issue, schedule (4D) and Ask the Model are on this bar. The tour is over; you can also close it with Skip."
+      }
+    }
+  }
+}

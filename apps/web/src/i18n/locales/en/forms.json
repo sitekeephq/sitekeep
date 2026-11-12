@@ -1,0 +1,178 @@
+{
+  "page": {
+    "title": "Forms",
+    "tabs": {
+      "forms": "Forms",
+      "templates": "Templates"
+    },
+    "actions": {
+      "report": "Report"
+    }
+  },
+  "list": {
+    "messages": {
+      "draftsSent_one": "{{count}} draft sent.",
+      "draftsSent_other": "{{count}} drafts sent."
+    },
+    "actions": {
+      "syncNow": "Sync Now",
+      "newForm": "+ New Form"
+    },
+    "options": {
+      "allStatuses": "All Statuses",
+      "openOnly": "Open (not closed)"
+    },
+    "fields": {
+      "from": "From",
+      "to": "To"
+    },
+    "empty": "No forms. Start with \"+ New Form\"; if there is no template, add a ready-made one from the \"Templates\" tab.",
+    "columns": {
+      "number": "No."
+    }
+  },
+  "newForm": {
+    "title": "New Form"
+  },
+  "templates": {
+    "messages": {
+      "draftReady": "{{provider}} ({{model}}) produced a draft. Check it and save.",
+      "draftReadyRepaired": "{{provider}} ({{model}}) produced a draft (corrected once). Check it and save."
+    },
+    "fromPdf": {
+      "heading": "Create Template from PDF",
+      "description": "Upload the PDF of the official form you use; the fields are detected, you describe the flow, and the filled form comes out in the same PDF layout.",
+      "actions": {
+        "create": "Create Template from PDF"
+      }
+    },
+    "fromText": {
+      "heading": "Create Template from a Sentence",
+      "description": "Describe the form in a sentence or two; the local AI produces a draft that you edit and save. Example: \"Check before screed pouring: level, moisture, surface cleanliness, joints; photo and signature.\"",
+      "placeholder": "Describe the form…",
+      "generating": "Generating…",
+      "actions": {
+        "generate": "Generate Draft"
+      }
+    },
+    "actions": {
+      "library": "Ready-Made Templates",
+      "blank": "+ Blank Template",
+      "workflow": "Approval Workflow",
+      "archive": "Archive"
+    },
+    "similar": {
+      "heading": "Similar Templates",
+      "description": "Use a single template with versions instead of period / \"CURRENT\" / \"OLD\" copies. When merged, the old template is archived; filled forms stay with their own versions.",
+      "mergeTitle": "Merge Templates",
+      "confirm": "Archive \"{{from}}\" and merge it into \"{{into}}\"?",
+      "actions": {
+        "merge": "Merge"
+      },
+      "differences": "Differences: {{list}}"
+    },
+    "itemCount_one": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "formCount_one": "{{count}} form",
+    "formCount_other": "{{count}} forms",
+    "withWorkflow": "with approval workflow",
+    "archiveTitle": "Archive Template",
+    "archiveConfirm": "Archive \"{{name}}\"? Filled forms are kept.",
+    "empty": "No templates yet.",
+    "emptyAdmin": "No templates yet. Add one from the ready-made templates or generate one from a sentence.",
+    "workflowTitle": "Approval Workflow · {{name}}"
+  },
+  "library": {
+    "title": "Ready-Made Templates",
+    "itemCount_one": "{{count}} item.",
+    "itemCount_other": "{{count}} items.",
+    "actions": {
+      "add": "Add to Project"
+    }
+  },
+  "editor": {
+    "defaultSection": "General",
+    "newSection": "New section",
+    "messages": {
+      "savedNewVersion": "Saved: the used version was kept and v{{version}} was created.",
+      "saved": "Saved (v{{version}}).",
+      "created": "\"{{name}}\" created."
+    },
+    "editTitle": "Edit Template",
+    "newTitle": "New Form Template",
+    "hint": "The version used in filled forms does not change: saving opens a new version, and old forms keep their own version.",
+    "categoryPlaceholder": "Quality, H&S…",
+    "fields": {
+      "numberPattern": "Number Format ({{tokens}})",
+      "workflow": "Approval Workflow on Submission"
+    },
+    "options": {
+      "noWorkflow": "— None (an administrator closes it) —"
+    },
+    "sectionUp": "Move section up",
+    "sectionDown": "Move section down",
+    "actions": {
+      "deleteSection": "Delete Section",
+      "addItem": "+ Item",
+      "addSection": "+ Section"
+    }
+  },
+  "item": {
+    "dragHint": "Drag to move",
+    "labelPlaceholder": "Item text",
+    "moveUp": "Up",
+    "moveDown": "Down",
+    "options": {
+      "allowNa": "\"Not Applicable\" Allowed",
+      "multiline": "Multi-Line"
+    },
+    "unitPlaceholder": "Unit",
+    "minPlaceholder": "Min",
+    "maxPlaceholder": "Max",
+    "optionsPlaceholder": "One option per line",
+    "failOptions": "Counted as non-conforming:",
+    "maxPhotosBefore": "Up to",
+    "maxPhotosAfter": "photos",
+    "scoreHelp": "The share of \"Yes\" answers in Yes / No items (excluding N/A) is calculated automatically."
+  },
+  "media": {
+    "actions": {
+      "addPhoto": "Add Photo",
+      "resign": "Sign Again",
+      "saveSignature": "Save Signature"
+    },
+    "signature": "Signature",
+    "pendingHint": "Will be uploaded once online",
+    "pending": "waiting"
+  },
+  "workflow": {
+    "issue": "Issue #{{number}}",
+    "issueOnRow": "Issue #{{number}} (row {{row}})",
+    "actions": {
+      "createIssue": "Create Issue",
+      "createIssueOnRow": "Create Issue (Row {{row}})"
+    },
+    "step": "Approval step {{index}}/{{total}}: {{name}}",
+    "stepWithDue": "Approval step {{index}}/{{total}}: {{name}} · due {{due}}",
+    "notePlaceholder": "Note (optional)"
+  },
+  "inputs": {
+    "outOfRange": "Out of range ({{min}} – {{max}})",
+    "deleteRow": "Delete row",
+    "actions": {
+      "addRow": "+ Row"
+    }
+  },
+  "filePicker": {
+    "placeholder": "Search by file name…"
+  },
+  "flow": {
+    "steps": {
+      "heading": "Steps",
+      "badges": {
+        "saved": "Saved",
+        "unsaved": "Not Saved"
+      }
+    }
+  }
+}

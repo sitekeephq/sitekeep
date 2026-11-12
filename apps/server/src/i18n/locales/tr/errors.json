@@ -1,0 +1,27 @@
+{
+  "notFound": "{{what}} bulunamadı.",
+  "forbidden": "Bu işlem için yetkiniz yok.",
+  "validation": "Geçersiz istek.",
+  "generic": "Hata",
+  "duplicate": "Aynı adla bir kayıt zaten var.",
+  "internal": "Sunucu hatası.",
+  "entities": {
+    "record": "Kayıt",
+    "folder": "Klasör",
+    "project": "Proje"
+  },
+  "unauthorized": "Oturum açmanız gerekiyor.",
+  "routeNotFound": "Bulunamadı.",
+  "projectAdminRequired": "Bu işlem proje yöneticisi yetkisi gerektirir.",
+  "passwordTooShort": "Şifre en az 10 karakter olmalı.",
+  "tokenScope": {
+    "consentSessionOnly": "Uygulama onayı yalnız tarayıcı oturumundan verilir.",
+    "sessionRequired": "Bu işlem tarayıcı oturumu gerektirir; API erişim anahtarıyla yapılamaz.",
+    "tokensSessionOnly": "API erişim anahtarları yalnız tarayıcı oturumundan yönetilir.",
+    "openCdeOnly": "Bu erişim anahtarı yalnız OpenCDE API'leri (BCF, Documents) için verildi; okuma ya da yazma izni yok.",
+    "projectLimited": "Bu erişim anahtarı belirli projelerle sınırlı; proje dışı değişiklik yapamaz.",
+    "readOnly": "Bu erişim anahtarı salt okuma yetkisine sahip."
+  },
+  "moduleOff": "Bu modül bu kurulumda açık değil.",
+  "licenseReadOnly": "Bu modülün lisans süresi doldu: lisans yenilenene kadar salt okunur."
+}

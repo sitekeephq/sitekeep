@@ -1,0 +1,201 @@
+{
+  "language": {
+    "title": "Dil",
+    "choose": "Dil: {{language}}",
+    "beta": "beta"
+  },
+  "nav": {
+    "items": {
+      "bugun": "Bugün",
+      "isler": "İşler",
+      "dokumanlar": "Dokümanlar",
+      "model": "Model",
+      "raporlar": "Raporlar",
+      "ayarlar": "Proje Ayarları"
+    },
+    "workSections": {
+      "yazismalar": "Yazışmalar",
+      "yazismalarNew": "Yeni Yazı",
+      "bilgiTalepleri": "Bilgi Talepleri",
+      "bilgiTalepleriNew": "Yeni Bilgi Talebi",
+      "teknikOnaylar": "Teknik Onaylar",
+      "teknikOnaylarNew": "Yeni Teknik Onay",
+      "toplantilar": "Toplantılar",
+      "toplantilarNew": "Yeni Toplantı",
+      "gonderimler": "Gönderim Formları",
+      "gonderimlerNew": "Yeni Gönderim Formu"
+    },
+    "quickFilters": {
+      "rfi": "Bilgi Talebi",
+      "submittal": "Teknik Onay",
+      "meeting": "Toplantı",
+      "action": "Eylem",
+      "rfiLog": "Bilgi Talebi Listesi",
+      "register": "Teknik Onay Listesi",
+      "awaiting": "Cevap Bekleyen",
+      "unmailed": "E-posta Gönderilmemiş",
+      "archived": "Arşiv",
+      "cancelled": "İptal"
+    },
+    "hubViews": {
+      "bana": "Bana Düşenler",
+      "tum": "Tüm İşler",
+      "yazismalar": "Yazışmalar",
+      "bilgiTalepleri": "Bilgi Talepleri",
+      "teknikOnaylar": "Teknik Onaylar",
+      "toplantilar": "Toplantılar",
+      "gonderimler": "Gönderim Formları",
+      "sorunlar": "Sorunlar",
+      "incelemeler": "İncelemeler",
+      "formlar": "Formlar"
+    },
+    "modelTabs": {
+      "viewer": "Görüntüleyici",
+      "coordination": "Koordinasyon",
+      "schedule": "İş Programı",
+      "params": "Parametre Değişiklikleri"
+    },
+    "settingsTabs": {
+      "uyeler": "Üyeler",
+      "roller": "Roller",
+      "moduller": "Modüller",
+      "konumlar": "Konumlar",
+      "sablon": "Şablon",
+      "yapayZeka": "Yapay Zekâ",
+      "isimlendirme": "İsimlendirme Standartları",
+      "isAkislari": "İş Akışları",
+      "isTipleri": "İş Tipleri",
+      "oznitelikler": "Öznitelikler",
+      "aktivite": "Aktivite Kaydı",
+      "sistemDurumu": "Sistem Durumu"
+    },
+    "hub": {
+      "views": "Görünümler",
+      "savedViews": "Kayıtlı Görünümler",
+      "saveView": "Görünümü Kaydet",
+      "manageViews": "Görünümleri Düzenle",
+      "newRecord": "+ Yeni",
+      "filters": "Filtreler",
+      "clearFilters": "Filtreleri Temizle",
+      "shareWithProject": "Proje için Paylaş"
+    },
+    "ask": "Sor…",
+    "showAdvanced": "Gelişmiş Ayarları Göster"
+  },
+  "projectNav": {
+    "groups": {
+      "work": "Çalışma",
+      "model": "Model ve Koordinasyon",
+      "planning": "Planlama ve Analiz",
+      "admin": "Yönetim"
+    },
+    "items": {
+      "today": "Bugün",
+      "works": "İşler",
+      "files": "Dokümanlar",
+      "reviews": "İncelemeler",
+      "forms": "Formlar",
+      "viewer": "Model Görüntüleyici",
+      "coordination": "Koordinasyon",
+      "issues": "Sorunlar",
+      "paramChanges": "Parametre Değişiklikleri",
+      "schedule": "İş Programı",
+      "contracts": "Sözleşme ve Hakediş",
+      "quantities": "Metraj",
+      "locations": "Konumlar",
+      "reports": "Raporlar",
+      "spec": "Şartname Analizi",
+      "deleted": "Silinenler",
+      "settings": "Proje Ayarları",
+      "sistemDurumu": "Sistem Durumu",
+      "formaEsitleme": "Forma Eşitleme"
+    }
+  },
+  "topbar": {
+    "homeLabel": "SiteKeep ana sayfa",
+    "tour": "Sanal tur",
+    "myTasks": "Görevlerim",
+    "project": "Proje",
+    "chooseProject": "Proje seçin",
+    "projects": "Projeler",
+    "noProjects": "Erişiminiz olan proje yok.",
+    "allProjects": "Tüm projeleri görüntüle",
+    "searchPages": "Sayfa veya proje ara",
+    "searchProjects": "Proje ara",
+    "search": "Ara",
+    "noResults": "Sonuç bulunamadı.",
+    "accountSettings": "Hesap ayarları",
+    "systemAdmin": "Sistem yönetimi",
+    "signOut": "Oturumu kapat"
+  },
+  "projectShell": {
+    "navLabel": "Proje navigasyonu",
+    "closeMenu": "Proje menüsünü kapat",
+    "openMenu": "Proje menüsü",
+    "ask": "Projeye sor",
+    "askTitle": "Projeye soru sor (Ctrl+K)",
+    "askBlocked": "Modele Sor açıkken Projeye Sor kullanılamaz.",
+    "dismissMenu": "Menüyü kapat",
+    "projectAdmin": "Proje yöneticisi",
+    "projectMember": "Proje üyesi",
+    "expand": "Menüyü genişlet",
+    "collapse": "Menüyü daralt",
+    "expandShort": "Genişlet",
+    "breadcrumbs": "Konum",
+    "projects": "Projeler"
+  },
+  "app": {
+    "loading": "SiteKeep yükleniyor…"
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "unreadLabel": "Bildirimler ({{count}} okunmamış)",
+    "actions": {
+      "readAll": "Tümünü Okundu Say"
+    },
+    "empty": "Bildirim yok."
+  },
+  "privacyBanner": {
+    "message": "Tüm dış bağlantılar kapalı: sunucu ağ dışına bağlanmıyor, yapay zekâ tam yerel çalışıyor.",
+    "link": "Gizlilik Merkezi"
+  },
+  "assignee": {
+    "types": {
+      "user": "Kişi",
+      "company": "Firma",
+      "role": "Rol / Ekip"
+    },
+    "deletedRole": "(silinmiş rol)",
+    "roleMembers_one": "{{name}} ({{count}} kişi)",
+    "roleMembers_other": "{{name}} ({{count}} kişi)",
+    "none": "Atanan yok",
+    "remove": "Kaldır",
+    "choose": "Seçin…"
+  },
+  "filterBar": {
+    "placeholder": "Ara…",
+    "search": "Ara",
+    "removeFilter": "{{filter}} filtresini kaldır",
+    "remove": "Kaldır"
+  },
+  "location": {
+    "field": "Konum",
+    "none": "— Konum yok —"
+  },
+  "moreMenu": {
+    "label": "Diğer"
+  },
+  "attribute": {
+    "invalid": "{{value}} (geçersiz)"
+  },
+  "about": {
+    "viewer": "Görüntüleyici That Open Company açık kaynak bileşenleriyle (MIT) çalışır."
+  },
+  "apiErrors": {
+    "sheet": "Tablo okunamadı (HTTP {{status}}).",
+    "file": "Dosya okunamadı (HTTP {{status}})."
+  },
+  "recordCard": {
+    "due": "Termin {{date}}"
+  }
+}

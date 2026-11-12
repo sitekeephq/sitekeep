@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "location": "Location",
+    "job": "Job",
+    "issue": "Issue",
+    "form": "Form",
+    "file": "File"
+  },
+  "errors": {
+    "kmStartAfterEnd": "The start chainage cannot be greater than the end chainage.",
+    "moveUnderItself": "A Location cannot be moved under itself.",
+    "linkedRecords_one": "{{count}} record is linked to this Location (or the ones below it). Confirm to delete it anyway.",
+    "linkedRecords_other": "{{count}} records are linked to this Location (or the ones below it). Confirm to delete it anyway.",
+    "csvErrors_one": "The CSV has {{count}} error; no records were changed.",
+    "csvErrors_other": "The CSV has {{count}} errors; no records were changed.",
+    "parentCodesUnresolved": "Parent codes could not be resolved (cycle).",
+    "ifcOnly": "Locations can only be created from IFC files.",
+    "locationOrTargetRequired": "locationId or targetId is required.",
+    "issueLinkForbidden": "Only the creator, the assignee or a project administrator can change the Location of an issue.",
+    "formLinkForbidden": "Only the person who drafted the form or a project administrator can change the Location of a form."
+  },
+  "csv": {
+    "parentNotFound": "Parent code \"{{code}}\" not found.",
+    "ownParent": "A Location cannot be its own parent.",
+    "parentCycle": "Circular parent code for \"{{code}}\".",
+    "empty": "The CSV is empty.",
+    "noNameColumn": "The header row has no \"Name\" column (e.g. Code;Name;Type;Parent code;Km start;Km end).",
+    "nameEmpty": "Name is empty.",
+    "nameTooLong": "Name can be at most 200 characters.",
+    "codeTooLong": "Code can be at most 40 characters.",
+    "duplicateCode": "Code \"{{code}}\" appears twice in the file.",
+    "kmStartAfterEnd": "The start chainage is greater than the end chainage.",
+    "orderNotInteger": "Order must be a whole number: \"{{value}}\".",
+    "noDataRows": "The CSV has no data rows."
+  }
+}

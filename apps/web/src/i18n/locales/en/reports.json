@@ -1,0 +1,231 @@
+{
+  "frame": {
+    "frameName": "Report dashboard",
+    "errors": {
+      "escaped": "The dashboard tried to leave its own page and was stopped. Check the dashboard code (HTML)."
+    },
+    "actions": {
+      "reload": "Reload"
+    }
+  },
+  "list": {
+    "title": "Reports",
+    "actions": {
+      "createWithAi": "✨ Create with AI",
+      "fromTemplate": "From Template",
+      "blank": "Blank Dashboard"
+    },
+    "defaultName": "New dashboard",
+    "messages": {
+      "aiNotConfiguredShort": "AI is not configured; use a template or a blank dashboard.",
+      "aiNotConfigured": "AI is not configured. You can create dashboards from ready-made templates or with the HTML editor.",
+      "localAiNotConfigured": "Local AI is not configured. You can send your request to the connected AI client (Claude, ChatGPT…) or use the ready-made templates."
+    },
+    "mine": {
+      "title": "My Dashboards",
+      "empty": "You have no dashboards yet. Tell the AI what you want to see or pick a template."
+    },
+    "shared": {
+      "title": "Shared with Me",
+      "empty": "No dashboards have been shared with you."
+    },
+    "description": "Dashboards are calculated with current data each time they are opened and refresh themselves while open as the data changes. The Report button on each module's page starts a dashboard with that module's data."
+  },
+  "template": {
+    "title": "Create Dashboard from Template",
+    "description": "Ready-made templates do not need AI. The dashboard created is your own copy; it is calculated with current data each time it is opened.",
+    "other": {
+      "title": "Other"
+    },
+    "actions": {
+      "use": "Create with This Template"
+    }
+  },
+  "prompt": {
+    "messages": {
+      "busy": "The local model is working, this may take a while…"
+    }
+  },
+  "aiCreate": {
+    "title": "Dashboard with AI",
+    "badges": {
+      "scope": "Scope: {{module}}"
+    },
+    "scopeHint": "Only this module's data is described to the AI; if the request names another module, that one is added too.",
+    "actions": {
+      "removeScope": "Remove Scope"
+    },
+    "templatesHint": "Ready-made template (no AI):",
+    "ask": {
+      "title": "What Would You Like to See?"
+    },
+    "refine": {
+      "title": "Would You Like to Change It?"
+    },
+    "nameLabel": "Dashboard name",
+    "examples": {
+      "monthly": "Make the chart monthly",
+      "excludeClosed": "Exclude closed records",
+      "addTable": "Add a table as well"
+    },
+    "placeholder": "e.g. Number of open issues by company and those past their due date",
+    "placeholderRefine": "e.g. show companies separately, make the chart monthly",
+    "placeholderScoped": "e.g. {{example}}",
+    "defaultScopedExample": "Breakdown by company",
+    "description": "The dashboard only works with data you can see. People you share it with see as much as their own permissions allow."
+  },
+  "spec": {
+    "title": "Specification Analysis",
+    "actions": {
+      "backToDocuments": "← Documents",
+      "newAnalysis": "+ Start Specification Analysis",
+      "report": "Report"
+    },
+    "picker": {
+      "title": "Select Specification PDF",
+      "placeholder": "Search PDF (file name, folder)…",
+      "empty": "No matching PDF found.",
+      "analysed": "Analysed",
+      "uploadPdf": "Upload New PDF",
+      "start": "Analyse",
+      "running": "Analysing…"
+    },
+    "intro": "Draft submittal registers extracted from specification PDFs. For a new analysis, pick a PDF from <strong>+ Start Specification Analysis</strong> above or press <strong>Extract Submittal Register from Specification</strong> in the Title Block section of the file panel in Documents.",
+    "empty": "No analyses yet.",
+    "columns": {
+      "specification": "Specification",
+      "version": "Version",
+      "items": "Items",
+      "updated": "Updated"
+    }
+  },
+  "specView": {
+    "actions": {
+      "back": "← Specification Analysis",
+      "viewPdf": "View PDF",
+      "import": "Import as Submittal Items",
+      "aiClassify": "Classify Unclassified Items with AI",
+      "rebuild": "Analyse Again"
+    },
+    "badges": {
+      "aiAssisted": "AI Assisted",
+      "ai": "AI"
+    },
+    "status": {
+      "aiRunning": "AI Working…",
+      "unclassified": "Unclassified"
+    },
+    "options": {
+      "allTypes": "All Types",
+      "allDisciplines": "All Disciplines",
+      "noDiscipline": "No Discipline",
+      "showExcluded": "Show Excluded"
+    },
+    "messages": {
+      "saveFirst": "Save first",
+      "saveChangesFirst": "Save your changes first"
+    },
+    "importHint": "Creates submittal items from the rows that are not excluded",
+    "jsonHint": "For transfer to the submittals module",
+    "aiClassifyHint": "Unclassified items are classified with the local model; item edits are reset.",
+    "rebuildHint": "Reads the specification again; item edits are reset.",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "sections_one": "{{count}} section",
+    "sections_other": "{{count}} sections",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "summary": "{{pages}}, {{sections}}, {{items}} · This is a draft: correct the type and discipline, remove unnecessary items from the list, then save. Excluded items are left out of exports.",
+    "placeholder": "Search (section, text)",
+    "columns": {
+      "no": "No.",
+      "section": "Section",
+      "page": "Page",
+      "type": "Type",
+      "discipline": "Discipline",
+      "requirement": "Requirement",
+      "included": "Included"
+    },
+    "keywords": "Keywords: {{list}}",
+    "empty": "No items match the filter."
+  },
+  "view": {
+    "actions": {
+      "back": "← Reports",
+      "snapshot": "Take Snapshot (PDF)",
+      "versions": "Versions"
+    },
+    "liveHint": "An open dashboard refreshes itself as the data changes (while the tab is visible).",
+    "lastUpdated": "Last updated: {{time}}",
+    "status": {
+      "refreshed": "Refreshed"
+    },
+    "snapshotHint": "Save the dashboard as it is now as a PDF (print → save as PDF). The saved dashboard shows current data each time it is opened.",
+    "delete": {
+      "title": "Delete Dashboard",
+      "confirm": "Delete the dashboard \"{{name}}\"?"
+    },
+    "loadingData": "Loading data…",
+    "dataTime": "Data as of {{time}}. Data is calculated with your permissions and always with current records (the latest versions of files, schedules and models); if the data changes while the dashboard is open, it refreshes itself."
+  },
+  "broken": {
+    "actions": {
+      "aiRepair": "Repair with AI"
+    },
+    "messages": {
+      "aiWorking": "AI is working…"
+    },
+    "manualFix": "Fix the query under Edit → Advanced.",
+    "proposal": {
+      "title": "Suggested Fix",
+      "fields": {
+        "newQuery": "New Query ({{id}})"
+      },
+      "hint": "Applying it saves a new version of the dashboard; you can go back to the old version with the Versions button.",
+      "actions": {
+        "applyAndSave": "Apply and Save"
+      }
+    }
+  },
+  "edit": {
+    "title": "Edit Dashboard",
+    "promptHint": "Describe the change for the AI",
+    "examples": {
+      "showHill": "Show Hill separately",
+      "addSummary": "Add a summary table"
+    },
+    "placeholder": "e.g. make the chart monthly, do not show closed issues",
+    "noAi": "AI is not configured; you can edit the dashboard HTML and queries under Advanced.",
+    "fields": {
+      "sharing": "Sharing",
+      "html": "Dashboard HTML (CDE.onData, CDE.bar, CDE.line, CDE.pie, CDE.kpi, CDE.table)",
+      "queries": "Queries (JSON)"
+    },
+    "ownerOnly": "Only the dashboard's owner can change sharing.",
+    "advanced": {
+      "title": "Advanced: HTML and Queries"
+    },
+    "actions": {
+      "preview": "Preview"
+    },
+    "errors": {
+      "queriesNotArray": "Queries must be a JSON array: [{\"id\": …, \"spec\": {…}}]",
+      "queries": "Queries: {{message}}"
+    }
+  },
+  "versions": {
+    "title": "Version History",
+    "columns": {
+      "version": "Version",
+      "name": "Name",
+      "savedBy": "Saved By",
+      "date": "Date"
+    },
+    "status": {
+      "current": "Current"
+    },
+    "actions": {
+      "restore": "Restore"
+    }
+  }
+}

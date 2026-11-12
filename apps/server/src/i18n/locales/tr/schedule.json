@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "schedule": "İş programı",
+    "link": "Bağlantı",
+    "file": "Dosya",
+    "folder": "Klasör",
+    "issue": "Sorun",
+    "modelVersion": "Model versiyonu"
+  },
+  "errors": {
+    "plannerOnly": "İş programını yalnızca proje yöneticisi (planlama yetkisi) değiştirebilir.",
+    "multipartExpected": "multipart/form-data bekleniyor.",
+    "noFile": "Dosya gönderilmedi.",
+    "mappingFormat": "mapping alanı {\"code\": 0, \"name\": 1, …} biçiminde olmalı."
+  },
+  "parse": {
+    "notZip": "Geçerli bir ZIP/XLSX dosyası değil.",
+    "zipDirectoryCorrupt": "ZIP dizini bozuk.",
+    "zipEntryCorrupt": "ZIP girdisi bozuk.",
+    "zipCompression": "Desteklenmeyen ZIP sıkıştırması ({{method}})."
+  },
+  "warnings": {
+    "duplicateKey": "Tekrarlanan faaliyet anahtarı atlandı: {{key}}",
+    "duplicateCode": "\"{{code}}\" kodu birden fazla faaliyette var; {{n}}. kayıt \"{{newCode}}\" olarak alındı.",
+    "finishBeforeStart": "{{code}}: bitiş başlangıçtan önce; bitiş başlangıca eşitlendi.",
+    "danglingDependency": "Bulunamayan faaliyete bağımlılık atlandı ({{pred}} → {{succ}}).",
+    "xerProjects": "XER {{count}} proje içeriyor; yalnız ilki ({{name}}) alındı.",
+    "dateUnreadable": "Tarih okunamadı: \"{{value}}\"",
+    "predecessorNotFound": "Öncül bulunamadı: \"{{token}}\"",
+    "formulasFailed_one": "{{count}} formül hesaplanamadı ({{cells}}); dosyayı Excel'de açıp kaydedin veya değerleri sabitleyin.",
+    "formulasFailed_other": "{{count}} formül hesaplanamadı ({{cells}}); dosyayı Excel'de açıp kaydedin veya değerleri sabitleyin."
+  },
+  "columns": {
+    "fallback": "Sütun {{n}}"
+  },
+  "links": {
+    "elements_one": "V{{version}} · {{count}} eleman",
+    "elements_other": "V{{version}} · {{count}} eleman",
+    "work": "İş"
+  },
+  "summary": {
+    "aiNotRequested": "Yapay zekâ özeti istenmedi.",
+    "aiFailed": "Yapay zekâ özeti alınamadı.",
+    "overview": "{{programme}} (v{{version}}), veri tarihi {{dataDate}}: {{activities}} faaliyet — {{complete}} tamamlandı, {{inProgress}} devam ediyor, {{notStarted}} başlamadı; {{late}} gecikmede.",
+    "finishVariance_one": "Proje bitişi {{finish}}; temel plana göre {{days}} gün.",
+    "finishVariance_other": "Proje bitişi {{finish}}; temel plana göre {{days}} gün.",
+    "finishSameAsBaseline": "Proje bitişi {{finish}}; temel planla aynı.",
+    "finish": "Proje bitişi {{finish}}.",
+    "criticalOpen_one": "Kritik yolda tamamlanmamış {{n}} faaliyet var.",
+    "criticalOpen_other": "Kritik yolda tamamlanmamış {{n}} faaliyet var.",
+    "finishSlip_one": "v{{version}}'e göre proje bitişi {{days}} gün değişti.",
+    "finishSlip_other": "v{{version}}'e göre proje bitişi {{days}} gün değişti.",
+    "slipped_one": "v{{version}}'e göre {{n}} faaliyet ötelendi.",
+    "slipped_other": "v{{version}}'e göre {{n}} faaliyet ötelendi.",
+    "slippedTop_one": "v{{version}}'e göre {{n}} faaliyet ötelendi; en büyük öteleme {{code}} {{name}} ({{days}} gün).",
+    "slippedTop_other": "v{{version}}'e göre {{n}} faaliyet ötelendi; en büyük öteleme {{code}} {{name}} ({{days}} gün).",
+    "noSlips": "v{{version}}'e göre ötelenen faaliyet yok.",
+    "improved_one": "{{n}} faaliyet öne çekildi.",
+    "improved_other": "{{n}} faaliyet öne çekildi.",
+    "becameCritical": "Kritik yola giren: {{list}}.",
+    "noLongerCritical": "Kritik yoldan çıkan: {{list}}.",
+    "addedRemoved": "Eklenen faaliyet: {{added}}, kaldırılan: {{removed}}.",
+    "topLate": "En çok geciken: {{list}}.",
+    "lateItem": "{{code}} {{name}} ({{days}} gün)",
+    "lookahead_one": "Önümüzdeki 3 haftada {{n}} faaliyet başlıyor veya devam ediyor.",
+    "lookahead_other": "Önümüzdeki 3 haftada {{n}} faaliyet başlıyor veya devam ediyor."
+  }
+}

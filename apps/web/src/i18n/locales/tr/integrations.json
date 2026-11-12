@@ -1,0 +1,86 @@
+{
+  "framed": "Bu sayfa güvenlik nedeniyle başka bir sayfanın içinde açılamaz.",
+  "consent": {
+    "failed": {
+      "title": "Uygulama Bağlanamadı"
+    },
+    "request": "<b>{{name}}</b> hesabınıza erişmek istiyor",
+    "intro": "Onaylarsanız uygulama <b>{{name}}</b> ({{email}}) olarak, sizin yetkilerinizle şunları yapabilir:",
+    "after": "Onaydan sonra tarayıcı <b>{{target}}</b> adresine döner. Erişimi istediğiniz zaman Hesabım → Bağlı Uygulamalar bölümünden kaldırabilirsiniz.",
+    "actions": {
+      "deny": "Reddet",
+      "approve": "Onayla",
+      "switchAccount": "Başka Hesapla Giriş Yap"
+    },
+    "notYou": "Siz değil misiniz?",
+    "redirecting": "Yönlendiriliyor…"
+  },
+  "opencde": {
+    "errors": {
+      "missingKey": "Bağlantı eksik. İşlemi uygulamadan yeniden başlatın."
+    },
+    "returning": {
+      "title": "Uygulamaya Dönülüyor",
+      "description": "{{client}} işlemi sürdürecek. Bu sekmeyi kapatabilirsiniz."
+    },
+    "failed": {
+      "title": "Sayfa Açılamadı"
+    },
+    "done": {
+      "title": "Bu İşlem Tamamlandı",
+      "description": "Yeniden yüklemek ya da seçmek için işlemi uygulamadan tekrar başlatın."
+    },
+    "options": {
+      "selectFolder": "Klasör Seçin…",
+      "selectProject": "Proje Seçin…",
+      "notSelected": "Seçilmedi"
+    },
+    "actions": {
+      "cancel": "İptal",
+      "startUpload": "Yüklemeyi Başlat",
+      "sendSelection": "Seçimi Gönder",
+      "sendSelectionCount": "Seçimi Gönder ({{n}})"
+    },
+    "upload": {
+      "frameTitle": "Dış Uygulamadan Yükleme",
+      "request_one": "<b>{{client}}</b> {{count}} dosyayı CDE'ye yüklemek istiyor",
+      "request_other": "<b>{{client}}</b> {{count}} dosyayı CDE'ye yüklemek istiyor",
+      "intro": "{{name}} olarak, sizin klasör yetkilerinizle yüklenir. Bitince tarayıcı <b>{{target}}</b> adresine döner.",
+      "fields": {
+        "targetFolder": "Hedef Klasör",
+        "revision": "Revizyon",
+        "suitability": "Durum / Uygunluk"
+      },
+      "noWritable": "Bu projede yükleme yetkiniz olan klasör yok.",
+      "standard": "İsimlendirme Standardı: {{name}}",
+      "noStandard": "Bu klasörde isimlendirme standardı yok.",
+      "columns": {
+        "incoming": "Gelen Dosya",
+        "cdeName": "CDE'deki Adı"
+      },
+      "newVersion": "Yeni Versiyon (V{{version}})",
+      "matches": "Standarda Uygun",
+      "placeholder": {
+        "revision": "ör. C01",
+        "comment": "Bu versiyonda ne değişti?"
+      },
+      "errors": {
+        "emptyName": "Ad boş olamaz.",
+        "keepExtension": "Uzantı .{{ext}} kalmalı."
+      },
+      "footnote": "Dosyalar uygulamadan doğrudan bu sunucuya gönderilir; dışarıya veri çıkmaz. Yükleme normal yüklemeyle aynı kurallardan geçer (isimlendirme, öznitelikler, IFC modeli hazırlama, bildirimler, denetim kaydı)."
+    },
+    "select": {
+      "frameTitle": "Dış Uygulama İçin Belge Seç",
+      "request": "<b>{{client}}</b> CDE'den belge seçmenizi istiyor",
+      "description": "Seçtiğiniz dokümanların bilgileri ve indirme bağlantıları uygulamaya verilir. Yetkiniz olmayan dosyalar listelenmez.",
+      "placeholder": "Dosya Adında Ara",
+      "options": {
+        "onlyExts": "Yalnız {{exts}} Dosyaları"
+      },
+      "empty": "Doküman yok.",
+      "pickFolder": "Bir klasör seçin ya da arayın.",
+      "noDownload": "İndirme yetkiniz yok; yalnız bilgileri verilir."
+    }
+  }
+}

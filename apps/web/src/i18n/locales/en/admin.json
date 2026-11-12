@@ -1,0 +1,830 @@
+{
+  "title": "Administration",
+  "adminOnly": "This page is for system administrators.",
+  "messages": {
+    "saved": "Saved."
+  },
+  "shared": {
+    "actions": {
+      "testConnection": "Test Connection",
+      "removeKey": "Delete Saved Key"
+    },
+    "placeholder": {
+      "keyStored": "A key is saved — type to change it"
+    }
+  },
+  "tabs": {
+    "users": "Users and Companies",
+    "ai": "AI and MCP",
+    "office": "Office Integration",
+    "oauth": "OAuth Applications",
+    "privacy": "Privacy Centre",
+    "status": "System Status",
+    "forma": "Forma Sync",
+    "license": "Licence"
+  },
+  "users": {
+    "title": "Users",
+    "actions": {
+      "add": "+ User",
+      "setPassword": "Set Password",
+      "revokeAdmin": "Remove Administrator Rights",
+      "makeAdmin": "Make Administrator"
+    },
+    "columns": {
+      "systemAdmin": "System Administrator"
+    },
+    "passwordPrompt": "New password for {{name}} (at least 10 characters)."
+  },
+  "companies": {
+    "title": "Companies",
+    "help": "The short code (2–8 letters/digits) is used in work item numbers ({Gönderen}, {Alıcı}) and as the company code in the new project wizard. If it is empty, the code in the number is derived from the company name. The address and e-mail are suggested as recipient details in formal letters.",
+    "columns": {
+      "shortCode": "Short Code",
+      "address": "Address",
+      "people": "People"
+    },
+    "fields": {
+      "addressOf": "{{name}} Address",
+      "emailOf": "{{name}} E-mail"
+    },
+    "aria": {
+      "shortCode": "{{name}} short code"
+    },
+    "placeholder": {
+      "name": "Company name",
+      "code": "Code (e.g. PAS)"
+    }
+  },
+  "googleDomain": {
+    "title": "Allowed Domain",
+    "description": "When this is on, a person signing in with Google whose domain is in the list and who has no CDE account yet gets a normal user account. They do not become an administrator. A disabled account still cannot sign in.",
+    "options": {
+      "autoCreate": "Create New Users Automatically"
+    },
+    "empty": "No domains yet. Example: 7dimensions.eu",
+    "placeholder": "e.g. 7dimensions.eu",
+    "inputLabel": "Allowed domain",
+    "actions": {
+      "addDomain": "Add Domain"
+    }
+  },
+  "newUser": {
+    "title": "New User",
+    "capacityWarning": "With this addition: {{finding}}. {{action}} Details: System Status → Capacity.",
+    "fields": {
+      "fullName": "Full Name",
+      "initialPassword": "Initial Password (at least 10 characters — the user changes it under My Account)",
+      "systemAdmin": "System Administrator"
+    }
+  },
+  "capacity": {
+    "title": "Capacity",
+    "badges": {
+      "ok": "Suitable",
+      "warn": "Attention",
+      "danger": "Insufficient",
+      "sampleData": "Sample Data",
+      "estimatedTable": "Estimated Table",
+      "thisServer": "This Server",
+      "needed": "Required",
+      "sample": "Sample"
+    },
+    "findingNames": {
+      "users": "Users",
+      "memory": "Memory",
+      "cpu": "Processor",
+      "disk": "Data disk",
+      "test": "Capacity test",
+      "measured": "Measured capacity"
+    },
+    "findingAction": "What to do",
+    "modes": {
+      "quick": "Quick Check",
+      "load": "Full Load Test"
+    },
+    "status": {
+      "running": "Running",
+      "passed": "Completed",
+      "limited": "Limit Reached",
+      "cancelled": "Stopped",
+      "failed": "Error",
+      "stepPassed": "Passed",
+      "stepLimit": "Limit"
+    },
+    "tierWithMax": "{{tier}} (≤ {{max}})",
+    "tierUnbounded": "{{tier}} (500+)",
+    "tierBelow": "below the smallest tier",
+    "summary": "Server: {{tier}} · {{registered}} registered, {{active}} active users (30 days).",
+    "lastTest": "Last test {{date}} · {{mode}}.",
+    "lastTestWithResult": "Last test {{date}} · {{mode}} · ~{{concurrent}} concurrent / ~{{registered}} registered.",
+    "noTest": "No capacity test has been run yet.",
+    "actions": {
+      "watchTest": "Watch Test",
+      "runTest": "Run Live Test",
+      "guide": "Capacity Guide",
+      "reports": "Reports",
+      "startTest": "Start Test",
+      "stop": "Stop",
+      "downloadReport": "Download Report",
+      "downloadPackage": "Download 7D Package",
+      "newTest": "New Test",
+      "report": "Report"
+    },
+    "test": {
+      "title": "Run Live Test",
+      "description": "The server measures itself; the result shows how many people it can carry and what is missing. Project files are not touched.",
+      "demoNotice": "Sample data: the test engine is still a sample. No load is put on the server; the charts replay a sample run.",
+      "quickMeta": "1–2 min · always safe",
+      "quickText": "Hardware, processor, disk and database speed, a sample IFC conversion, memory headroom.",
+      "loadMeta": "10–20 min · outside working hours",
+      "loadText": "Virtual users increase step by step; the test stops when the p95 response time exceeds {{p95}} ms, errors exceed {{errorRate}} or the processor exceeds {{cpu}}.",
+      "loadWarning": "Users working during the test may notice slowness. If real user traffic starts, the test stops itself.",
+      "options": {
+        "afterHours": "I Am Outside Working Hours"
+      },
+      "disabledHere": "Disabled in this installation"
+    },
+    "run": {
+      "progressLabel": "Test progress",
+      "result": "~{{concurrent}} concurrent · ~{{registered}} registered users",
+      "stopReason": "Stop reason: {{reason}}.",
+      "noLimit": "No limit was exceeded up to the top step.",
+      "firstStepOver": "Even the first step was over the limit: {{reason}}.",
+      "findings": {
+        "title": "Gaps and Recommendations"
+      },
+      "waiting": "waiting…"
+    },
+    "charts": {
+      "responseTime": "Response time (p95)",
+      "virtualUsers": "Virtual users",
+      "requestsPerSecond": "Requests / s",
+      "cpu": "Processor",
+      "chartLabel": "{{title}} chart",
+      "limitCaption": "Dashed line: limit {{limit}}",
+      "columns": {
+        "users": "Users",
+        "p95": "p95",
+        "rps": "Req/s",
+        "errors": "Errors",
+        "cpu": "Processor"
+      }
+    },
+    "guide": {
+      "title": "Capacity Guide",
+      "intro": "Which server is needed for how many users.",
+      "measuredOn": "The figures were measured on {{date}}.",
+      "estimated": "The figures are estimates; they will be updated with a reference measurement.",
+      "concurrency": "At peak time, {{percent}} of registered users are assumed to work at the same time.",
+      "tiers": {
+        "title": "Tiers"
+      },
+      "columns": {
+        "tier": "Tier",
+        "registered": "Registered",
+        "concurrent": "Concurrent",
+        "vcpu": "vCPU",
+        "ram": "RAM",
+        "disk": "Data Disk (SSD)",
+        "database": "Database"
+      },
+      "perProject": "depends on the project",
+      "serverSummary": "This server: {{cpu}} vCPU · {{ram}} GB RAM · {{os}}.",
+      "serverSummaryDisk": "This server: {{cpu}} vCPU · {{ram}} GB RAM · {{total}} data disk ({{free}} free) · {{os}}.",
+      "everyTier": {
+        "title": "In Every Tier"
+      },
+      "disk": {
+        "title": "How Disk Is Calculated",
+        "description": "Disk grows with model volume, not with users: uploaded files × 1.6 (Fragments and previews) + database + 30% free space. Backups are kept on a separate target."
+      },
+      "operations": {
+        "title": "How to Run It",
+        "whenToTest": "Run the capacity test at first installation, when the hardware changes and after a major version upgrade.",
+        "oldTest": "A test older than {{days}} days shows yellow.",
+        "plan": "Plan hardware when the number of users reaches 90% of the tier limit; once the limit is exceeded the warning turns red.",
+        "afterHours": "Run the full load test outside working hours; the Quick Check is always safe.",
+        "disk": "Extend the disk before it passes 80%.",
+        "office": "Large IFC conversions and the office server need extra memory; a separate machine is recommended for the office server."
+      },
+      "meaning": {
+        "title": "What the Warnings Mean",
+        "ok": "The server can handle this number of users.",
+        "warn": "The limit is close, the test is old or the disk is filling up. Plan ahead.",
+        "danger": "The server cannot handle the number of users. Apply the action shown on screen (RAM, processor, disk)."
+      }
+    },
+    "runs": {
+      "title": "Capacity Reports",
+      "empty": "No tests yet. Start with Run Live Test.",
+      "columns": {
+        "test": "Test"
+      },
+      "result": "~{{concurrent}} concurrent / ~{{registered}} registered",
+      "footnote": "Tests are deleted when the server restarts; a permanent report history will come in a later step."
+    }
+  },
+  "systemStatus": {
+    "title": "System Status",
+    "badges": {
+      "ok": "Green",
+      "warn": "Yellow",
+      "danger": "Red",
+      "up": "Up",
+      "down": "Down",
+      "valid": "Valid",
+      "latest": "Latest",
+      "allExternalOff": "All External Connections Off",
+      "externalOn": "External Connections On",
+      "queued": "Waiting {{n}}",
+      "running": "Running {{n}}",
+      "failed": "Failed {{n}}",
+      "done": "Done {{n}}"
+    },
+    "time": {
+      "ago": "{{time}} ago",
+      "in": "in {{time}}",
+      "seconds": "{{n}} s",
+      "minutes": "{{n}} min",
+      "hours": "{{n}} h",
+      "hoursMinutes": "{{h}} h {{m}} min"
+    },
+    "checked": "Last check {{time}}. Automatic backup is running; no Grafana or SSH needed.",
+    "health": {
+      "title": "Health",
+      "app": "Application",
+      "appDetail": "version {{version}} · {{node}} · up {{uptime}}",
+      "database": "Database",
+      "databaseDetail": "{{kind}} · {{size}}",
+      "databaseDown": "cannot connect",
+      "licence": "Licence",
+      "monthsLeft_one": "{{count}} month left",
+      "monthsLeft_other": "{{count}} months left"
+    },
+    "resources": {
+      "title": "Resources",
+      "cpu": "Processor",
+      "cpuUsage": "{{percent}} in use",
+      "memory": "Memory",
+      "disk": "Disk",
+      "usage": "{{percent}} used · {{free}} free / {{total}}",
+      "process": "Process {{size}}",
+      "unreadable": "could not be read",
+      "last24": "Last 24 hours. The machine, not project content."
+    },
+    "queue": {
+      "title": "Job Queue",
+      "description": "Conversion, preview and the nightly backup run in this queue.",
+      "actions": {
+        "view": "View Jobs"
+      },
+      "spark": "Waiting, last 24 hours — the queue is draining",
+      "dialogDescription": "Conversion, preview, clash and backup. A failed job can be queued again.",
+      "columns": {
+        "job": "Job",
+        "target": "Target"
+      },
+      "status": {
+        "queued": "Waiting",
+        "running": "Running",
+        "done": "Done",
+        "failed": "Failed"
+      }
+    },
+    "demo": {
+      "kinds": {
+        "preview": "Preview",
+        "clash": "Clash",
+        "backup": "Nightly Backup"
+      },
+      "targets": {
+        "estimate": "Estimate.pdf",
+        "facade": "Facade.dwg",
+        "clash": "Architecture ∩ Mechanical",
+        "localDisk": "Local disk",
+        "meetingNote": "Meeting note.pdf",
+        "now": "Now"
+      },
+      "sources": {
+        "queue": "Queue",
+        "backup": "Backup",
+        "preview": "Preview"
+      },
+      "logs": {
+        "ifcStarted": "IFC → Fragments started: {{file}}",
+        "backupDone": "Nightly backup finished · {{size}} · {{minutes}} min",
+        "ifcTimeout": "IFC → Fragments timed out: {{file}}",
+        "noDwg": "No DWG converter; {{file}} is waiting in the queue"
+      }
+    },
+    "backup": {
+      "title": "Automatic Backup",
+      "nightly": "Every night at 02:00.",
+      "lastSuccess": "Last successful backup {{time}}.",
+      "next": "Next {{time}}.",
+      "copies_one": "{{count}} copy kept.",
+      "copies_other": "{{count}} copies kept.",
+      "notScheduled": "Scheduling is not on yet. Once the target and the night-time hour are set, the backup job enters the queue.",
+      "queued": "Backup queued; it finishes in a few minutes.",
+      "actions": {
+        "viewCopies": "View Copies",
+        "backupNow": "Back Up Now",
+        "delete": "Delete Backup"
+      },
+      "copiesTitle": "Backup Copies",
+      "copiesDescription": "Each copy holds the database, the files and the Recovery Package. The latest copy cannot be deleted. Only a system administrator deletes an old copy.",
+      "columns": {
+        "taken": "Taken"
+      },
+      "minutes": "{{n}} min",
+      "deleteConfirm": "Delete the backup of {{date}}? This cannot be undone."
+    },
+    "maintenance": {
+      "title": "Maintenance",
+      "cleaned": "Derivatives deleted; the files remain. Previews and Fragments are regenerated when first opened.",
+      "description": "Previews and Fragments can be regenerated. Project files and the database are not deleted from here.",
+      "actions": {
+        "clean": "Clean Up Derivatives"
+      },
+      "confirm": "Previews and Fragments will be deleted (about {{size}}). Uploaded files and the database stay."
+    },
+    "recentErrors": {
+      "title": "Recent Errors",
+      "description": "Secrets are masked. Not the raw server log; queue and backup lines.",
+      "actions": {
+        "view": "View Errors"
+      },
+      "dialogDescription": "Keys, sessions and access tokens do not appear in the lines. Project files are not opened.",
+      "columns": {
+        "level": "Level",
+        "source": "Source",
+        "message": "Message"
+      },
+      "levels": {
+        "info": "Info",
+        "warn": "Warning",
+        "error": "Error"
+      }
+    },
+    "external": {
+      "title": "External Connections"
+    }
+  },
+  "privacy": {
+    "tabs": {
+      "summary": "Summary",
+      "connections": "External Connections",
+      "log": "Outbound Connection Log"
+    },
+    "kill": {
+      "title": "Turn Off All External Connections",
+      "reopenTitle": "Reopen External Connections",
+      "actions": {
+        "turnOffAll": "Turn Off All External Connections",
+        "reopenAll": "Reopen External Connections",
+        "turnOff": "Turn Off",
+        "reopen": "Reopen"
+      },
+      "confirmOff": "The server's connections to every address outside the network will be cut: cloud AI, external e-mail and office servers. AI switches to fully local mode and the external client queue stops.",
+      "confirmOn": "External connections will be reopened; each connection returns to its own setting.",
+      "on": "On. The server connects only to addresses on the local network; AI runs fully locally and the external client queue has stopped.",
+      "onSince": "On ({{date}}). The server connects only to addresses on the local network; AI runs fully locally and the external client queue has stopped.",
+      "onSinceBy": "On ({{date}}, {{name}}). The server connects only to addresses on the local network; AI runs fully locally and the external client queue has stopped.",
+      "off": "Off. When turned on, the server connects to no address outside the network; the local network and the internal network list keep working."
+    },
+    "summary": {
+      "fields": {
+        "aiMode": "AI Mode",
+        "externalProjects": "Projects Allowing External AI",
+        "database": "Database",
+        "files": "Files"
+      },
+      "selectedMode": "Selected mode: {{mode}}; running fully locally because external connections are off.",
+      "noExternal": "No project allows external AI.",
+      "permissionsInvalid": "The permissions do not apply right now: the system mode does not allow external providers."
+    },
+    "aiModes": {
+      "off": "Off",
+      "localOnly": "Fully Local",
+      "allowExternal": "External Providers Allowed"
+    },
+    "settings": {
+      "title": "Settings",
+      "options": {
+        "redactLocal": "Mask for the Local Model Too",
+        "redactNames": "Mask Project Members' Names"
+      },
+      "redactLocalHint": "(personal data goes to the local model with placeholders too)",
+      "redactNamesHint": "(role and company are sent instead of the name, e.g. \"Project Manager (Poyraz)\")",
+      "always": "In every prompt to AI outside the network, e-mail addresses, phone numbers, Turkish ID numbers and IBANs are always replaced with placeholders. The originals are put back when the answer is shown to you; the mapping is kept in memory only for that call.",
+      "fields": {
+        "retention": "Log Retention Period (days)",
+        "lanHosts": "Internal Network Servers"
+      },
+      "lanPlaceholder": "ai.company.com\n*.company.local\n100.64.0.0/10",
+      "lanHelp": "Servers that are on your network even though their names look public (one name per line, \"*.domain\" or an IPv4 range). Private IP ranges and single-label names are already local. The entries in this list count as local: they keep working while all external connections are off, and AI prompts to them are not masked."
+    },
+    "location": {
+      "local": "Local Network",
+      "external": "External",
+      "inbound": "Inbound",
+      "cloud": "Cloud",
+      "localShort": "Local",
+      "localHint": "Inside your network (private IP range or internal network list)",
+      "externalHint": "Outside your network (cloud)",
+      "inboundHint": "External clients connect to the CDE; the server does not connect out"
+    },
+    "connections": {
+      "columns": {
+        "connection": "Connection",
+        "server": "Server",
+        "lastUsed": "Last Used"
+      },
+      "options": {
+        "on": "On"
+      },
+      "badges": {
+        "on": "On",
+        "off": "Off"
+      },
+      "stoppedHint": "Does not work while external connections are off."
+    },
+    "log": {
+      "chars_one": "{{formatted}} character",
+      "chars_other": "{{formatted}} characters",
+      "redacted": "masked: {{list}}",
+      "redactions": {
+        "eposta": "E-mail",
+        "telefon": "Phone",
+        "tckn": "Turkish ID No",
+        "iban": "IBAN",
+        "kisi": "Person Name"
+      },
+      "fields": {
+        "purpose": "Purpose",
+        "server": "Server"
+      },
+      "options": {
+        "aiAll": "AI (all)",
+        "onlyBlocked": "Blocked Only"
+      },
+      "actions": {
+        "downloadCsv": "Download CSV"
+      },
+      "description": "The time, purpose, server, size and result of every external call are kept; the content never is. Entries are deleted every day once the retention period has passed.",
+      "columns": {
+        "purpose": "Purpose",
+        "server": "Server",
+        "outIn": "Out / In",
+        "user": "User",
+        "details": "Details"
+      },
+      "badges": {
+        "local": "Local",
+        "external": "External",
+        "blocked": "Blocked",
+        "ok": "OK"
+      },
+      "empty": "No entries. The server made no external connection matching this filter.",
+      "count": "{{shown}} / {{total}} entries"
+    }
+  },
+  "ai": {
+    "mode": {
+      "title": "AI Mode",
+      "killSwitch": "All external connections are off (Privacy Centre): AI runs fully locally and the external client queue has stopped. The mode you choose applies once connections are reopened.",
+      "projectsLimit": "Projects cannot go beyond this limit: the project administrator can turn AI off under Project Settings → AI, or choose only providers the system mode allows. External models work only in projects that allow them.",
+      "current": "Currently Used: {{option}}",
+      "order": "Order: local model → cloud model → \"Run with My Own AI\" (fallback). The options can be combined."
+    },
+    "queue": {
+      "options": {
+        "allowWrite": "Allow Read + Write Access Tokens (needed for the task queue and the saving tools)",
+        "everyone": "All Users",
+        "projectAdmins": "Project Administrators and System Administrators",
+        "admins": "System Administrators Only",
+        "unlimited": "Unlimited"
+      },
+      "fields": {
+        "tokenCreators": "Who Can Create Access Tokens",
+        "maxTokenDays": "Maximum Access Token Lifetime"
+      },
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days"
+    },
+    "provider": {
+      "embedding": "search model: {{model}}",
+      "actions": {
+        "makeDefault": "Make Default"
+      }
+    }
+  },
+  "office": {
+    "editorNames": {
+      "none": "Off",
+      "onlyoffice": "ONLYOFFICE Docs",
+      "collabora": "Collabora Online"
+    },
+    "editorTexts": {
+      "none": "Office files open only in the browser viewers; to edit, they are downloaded and uploaded again.",
+      "onlyoffice": "AGPL-3.0. The editor most faithful to Microsoft formats (docx/xlsx/pptx). The free edition allows at most 20 concurrent connections. Needs WOPI_ENABLED=true and JWT.",
+      "collabora": "MPL-2.0, based on LibreOffice. Strong with ODF and older formats (doc/xls/ppt). The CODE edition has no connection limit but shows a warning as load grows."
+    },
+    "converterNames": {
+      "auto": "Automatic",
+      "none": "Off",
+      "onlyoffice": "ONLYOFFICE (ConvertService)",
+      "collabora": "Collabora (convert-to)",
+      "gotenberg": "Gotenberg",
+      "local": "LibreOffice on the Server (soffice)"
+    },
+    "converterTexts": {
+      "auto": "The editor's server if an editor is set up; otherwise LibreOffice on this server if present; otherwise no PDF is made (files still open in the browser).",
+      "onlyoffice": "ConvertService API (JWT). ONLYOFFICE downloads the file from the CDE through a single-use address.",
+      "collabora": "/cool/convert-to/pdf. Collabora must allow the CDE server (net.post_allow).",
+      "gotenberg": "MIT-licensed lightweight conversion service with LibreOffice (/forms/libreoffice/convert). It only converts; it does not edit.",
+      "local": "soffice installed on this server. A last resort; no longer in the Docker image.",
+      "none": "Conversion is off. Office files get no PDF view, markup or visual comparison."
+    },
+    "overview": {
+      "title": "Status",
+      "testHint": "Tries the editor and the converter with the saved settings",
+      "testing": "Testing…",
+      "fields": {
+        "browserEditing": "Browser Editing",
+        "officeToPdf": "Office → PDF"
+      },
+      "editableWithProof_one": "{{count}} format editable · proof key present",
+      "editableWithProof_other": "{{count}} formats editable · proof key present",
+      "editableNoProof_one": "{{count}} format editable · no proof key",
+      "editableNoProof_other": "{{count}} formats editable · no proof key",
+      "off": "Off",
+      "converterAuto": "{{label}} (automatic)",
+      "fromEnv": "Defaults from environment variables: <code>{{vars}}</code>. A value saved here takes precedence."
+    },
+    "wopi": {
+      "title": "Browser Editing (WOPI)",
+      "fields": {
+        "editorUrl": "Editor Address (as reached by the CDE server)",
+        "publicUrl": "Address Used by the Browser (if different)",
+        "wopiBase": "The CDE Address as Seen by the Editor",
+        "jwt": "ONLYOFFICE JWT Secret (same as JWT_SECRET)",
+        "sessionTtl": "Editor Session Duration"
+      },
+      "placeholder": {
+        "publicUrl": "e.g. https://office.company.com — if empty, the address the editor reports",
+        "wopiBase": "if empty, the browser address ({{origin}})"
+      },
+      "options": {
+        "verifyProof": "Verify the Signature of WOPI Requests (X-WOPI-Proof, with the editor's discovery key). Do not turn this off except while troubleshooting."
+      },
+      "actions": {
+        "useThis": "Use This Address"
+      },
+      "help": "The editor reads the file from here and saves it here (e.g. <code>http://app:8080</code> on a Docker network). ONLYOFFICE conversion uses this address too.",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes"
+    },
+    "converter": {
+      "title": "Office → PDF Converter",
+      "description": "For the PDF view of office files, markup, visual revision comparison and batch PDF. Files are sent only to the address set here.",
+      "fields": {
+        "url": "Converter Address",
+        "gotenbergAuth": "Gotenberg Basic Authentication (optional, user:password)",
+        "timeout": "Time Limit (s)",
+        "maxFile": "Largest File (MB)",
+        "concurrency": "Concurrent Jobs",
+        "retries": "Retries"
+      },
+      "placeholder": {
+        "sameAsEditor": "if empty, the editor address",
+        "stored": "Saved — type to change it"
+      },
+      "actions": {
+        "removeStored": "Delete Saved Credentials"
+      }
+    },
+    "actions": {
+      "revert": "Revert"
+    }
+  },
+  "oauth": {
+    "values": {
+      "baseUrl": "Server Address (Foundation URL)",
+      "versions": "Version List",
+      "auth": "Authorisation Address (auth URL)",
+      "token": "Access Token Address (token URL)",
+      "clientId": "Client ID (client_id)",
+      "redirect": "Redirect Address"
+    },
+    "connection": {
+      "title": "Connection Details",
+      "description": "OpenCDE clients (Solibri, IfcOpenShell, BCF tools) first ask for the server address; they find the other addresses themselves through /foundation/versions and /foundation/1.1/auth. Some forms ask for each one separately.",
+      "notConfigured": "These addresses were derived from the address of the request. On the server, set the CDE_PUBLIC_URL variable to the HTTPS address the customer uses (e.g. https://cde.company.local)."
+    },
+    "secretNotice": "Copy the secret for \"{{name}}\" now; it will not be shown again:",
+    "apps": {
+      "title": "OAuth Applications",
+      "aecPilotHint": "Ready-made entry for the Revit / Civil 3D add-in: public client, local redirect, OpenCDE Documents permission",
+      "description": "Applications connect with the user's consent and with the user's own project and folder permissions. The user can remove access under My Account → Connected Applications.",
+      "actions": {
+        "addAecPilot": "Add AEC Pilot",
+        "add": "+ Application",
+        "connectionDetails": "Connection Details",
+        "disable": "Disable",
+        "enable": "Enable",
+        "rotate": "Regenerate Secret",
+        "regenerate": "Regenerate"
+      },
+      "columns": {
+        "app": "Application",
+        "clientId": "Client ID",
+        "scopes": "Permissions",
+        "usage": "Usage"
+      },
+      "badges": {
+        "disabled": "Disabled"
+      },
+      "users_one": "{{count}} user",
+      "users_other": "{{count}} users",
+      "lastUsed": "Last used {{date}}",
+      "neverUsed": "Not used",
+      "rotateTitle": "Regenerate Secret",
+      "rotateConfirm": "Generate a new secret for \"{{name}}\"? The old secret stops working immediately.",
+      "deleteTitle": "Delete Application",
+      "deleteConfirm": "Delete \"{{name}}\"? All users' consents and access tokens are deleted too.",
+      "empty": "No registered applications."
+    },
+    "info": {
+      "title": "{{name}}: Connection Details",
+      "description": "The Solibri private connection form and other OpenCDE clients ask for these values.",
+      "secretHint": "The secret is shown only when it is created; if it is lost, regenerate it.",
+      "copyAll": {
+        "title": "Copy All"
+      }
+    },
+    "dialog": {
+      "editTitle": "Edit Application",
+      "newTitle": "New OAuth Application",
+      "placeholder": {
+        "name": "e.g. Solibri Office",
+        "description": "Shown on the consent page",
+        "redirects": "http://127.0.0.1/callback\nhttps://app.company.local/oauth/callback"
+      },
+      "fields": {
+        "redirects": "Redirect Addresses (one address per line)",
+        "scopes": "Permissions"
+      },
+      "redirectHelp": "Addresses must match exactly. For desktop applications, http://127.0.0.1 and http://localhost match any port. Other addresses must use https.",
+      "scopesHelp": "Read and Write open the existing SiteKeep API. The BCF and Documents permissions are for the OpenCDE APIs."
+    },
+    "tokens": {
+      "title": "API access tokens"
+    }
+  },
+  "forma": {
+    "title": "Forma Sync",
+    "description": "Autodesk ACC / Forma folders and files. Records (issues, reviews) sync separately; the file engine does not exist yet — this screen is a sample.",
+    "status": {
+      "ok": "OK",
+      "warn": "Warning",
+      "paused": "Paused"
+    },
+    "fileActions": {
+      "new": "New",
+      "version": "Version",
+      "skipped": "Skipped",
+      "error": "Error"
+    },
+    "syncNow": {
+      "title": "Sync Now",
+      "confirm": "The file sync will look as if it was queued. The engine does not exist yet; no files come down from ACC.",
+      "queued": "File sync queued (sample)."
+    },
+    "actions": {
+      "queue": "Queue",
+      "syncNow": "Sync Now",
+      "addMapping": "+ Add Mapping",
+      "openList": "Open List"
+    },
+    "badges": {
+      "sample": "Sample",
+      "live": "Live",
+      "apsConfigured": "APS Configured",
+      "apsMissing": "APS Settings Missing",
+      "issues": "Issues: {{n}}",
+      "reviews": "Reviews: {{n}}",
+      "rfis": "RFIs: {{n}}",
+      "forms": "Forms: {{n}}",
+      "pending": "Pending Files: {{n}}",
+      "lastCopied": "Copied in Last Run: {{n}}"
+    },
+    "connection": {
+      "none": "No Connection",
+      "meta": "{{project}} · records every {{minutes}} min",
+      "hint": "Connect an ACC project under Project Settings → Autodesk."
+    },
+    "metrics": {
+      "lastRecordSync": "Last Record Sync",
+      "nextScan": "Next Scan",
+      "lastFileRun": "Last File Run"
+    },
+    "mappings": {
+      "title": "File Mappings",
+      "columns": {
+        "forma": "Forma",
+        "cde": "CDE",
+        "direction": "Direction",
+        "lastRun": "Last Run"
+      },
+      "added": "Mapping added (sample; not saved)."
+    },
+    "recent": {
+      "title": "Recently Transferred",
+      "description": "Names that do not match are skipped; files deleted at the source stay in the CDE. Once the engine is connected this list becomes `integration_sync_runs`.",
+      "columns": {
+        "action": "Action"
+      }
+    },
+    "addDialog": {
+      "title": "Add Mapping",
+      "fields": {
+        "formaFolder": "Forma Folder",
+        "cdeFolder": "CDE Folder",
+        "direction": "Direction",
+        "kinds": "File Types"
+      },
+      "sampleFolder": "04-Specification",
+      "hint": "Not saved. Once Data Management is connected, it is chosen from the folder tree."
+    }
+  },
+  "license": {
+    "title": "Licence",
+    "status": {
+      "none": "No Licence",
+      "not_yet": "Not Yet Valid",
+      "active": "Active",
+      "expiring": "Expiring Soon",
+      "grace": "Expired (Grace Period)",
+      "read_only": "Read-Only",
+      "invalid": "Invalid"
+    },
+    "statusText": {
+      "none": "SiteKeep Community: the core is free and not limited. Install a licence to turn on Enterprise modules.",
+      "not_yet": "The licence starts on its validity date; until then Enterprise modules stay off.",
+      "active": "The licence is valid.",
+      "expiring": "The licence ends in {{days}} days. Renew it to keep the Enterprise modules.",
+      "grace": "The licence has ended. Enterprise modules become read-only on {{date}} unless it is renewed.",
+      "read_only": "The licence has ended: Enterprise modules are read-only until it is renewed. The core is not affected.",
+      "invalid": "The licence file cannot be used."
+    },
+    "notEnforced": "Licence checks are off on this installation (SITEKEEP_LICENSE_ENFORCE): modules follow the installed packages.",
+    "clockBehind": "The server clock is behind the latest time seen; the licence is judged by that time.",
+    "installationTitle": "Installation Id",
+    "installationText": "Send this id when you ask for a licence; the licence is made for this installation.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "detailsTitle": "Licence Details",
+    "fields": {
+      "customer": "Customer",
+      "lid": "Licence Number",
+      "modules": "Modules",
+      "seats": "Users",
+      "validUntil": "Valid Until",
+      "supportUntil": "Updates Until"
+    },
+    "seatsOf": "{{used}} / {{seats}} active users",
+    "seatsUnlimited": "{{used}} active users (unlimited)",
+    "perpetual": "Perpetual",
+    "moduleNames": {
+      "field": "Field",
+      "coordinate": "Coordinate",
+      "planning": "Planning",
+      "cost": "Cost",
+      "ai": "AI",
+      "manage": "Manage",
+      "connect": "Connect"
+    },
+    "uploadTitle": "Install a Licence",
+    "replaceTitle": "Replace the Licence",
+    "uploadText": "Choose the licence file (license.json) you received.",
+    "fileLabel": "Licence file",
+    "installed": "Licence installed.",
+    "remove": "Remove Licence",
+    "removeTitle": "Remove the licence?",
+    "removeText": "Enterprise modules turn off; their data stays and comes back with a licence.",
+    "problems": {
+      "format": "This is not a SiteKeep licence file.",
+      "unknown_key": "The licence was signed with a key this version does not know.",
+      "dev_key_in_production": "This is a development licence; it does not work on a production installation.",
+      "signature": "The licence signature does not match: the file was changed or damaged.",
+      "payload": "The licence content cannot be read.",
+      "other_installation": "This licence belongs to another installation.",
+      "build_after_support": "This SiteKeep version was released after the support period ended."
+    },
+    "seatsOver": "{{count}} more active users than the licence allows: Enterprise modules are read-only until accounts are disabled or seats are added."
+  }
+}

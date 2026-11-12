@@ -1,0 +1,796 @@
+{
+  "newFolder": {
+    "title": "Yeni Klasör",
+    "fields": {
+      "name": "Klasör Adı"
+    },
+    "hint": "Yeni klasör, üst klasörün yetkilerini ve özniteliklerini devralır."
+  },
+  "more": {
+    "actions": {
+      "select": "Seç",
+      "newFolder": "Yeni Klasör",
+      "permissions": "Yetkiler",
+      "settings": "Klasör Ayarları",
+      "columnFilters": "Sütun Filtreleri",
+      "filter": "Filtre",
+      "inFolder": "Yalnız Bu Klasörde Ara",
+      "autodesk": "Autodesk Dokümanları",
+      "report": "Rapor",
+      "spec": "Şartnameden Teknik Onay Listesi"
+    },
+    "status": {
+      "offline": "Çevrimdışı"
+    }
+  },
+  "compare": {
+    "ai": {
+      "goToPage": "Sayfaya git",
+      "pageShort": "s.{{page}}",
+      "createIssue": "Bu maddeden sorun oluştur",
+      "heading": "✨ Değişiklik Özeti",
+      "rewriteHint": "Özeti yapay zekâ ile yeniden yazar",
+      "actions": {
+        "rewrite": "Yeniden Yaz"
+      },
+      "comparingText": "Metin karşılaştırılıyor…",
+      "errors": {
+        "failed": "Karşılaştırılamadı: {{error}}",
+        "summaryFailed": "Yapay zekâ özeti alınamadı: {{error}}"
+      },
+      "preparing": "Yapay zekâ özeti hazırlanıyor…",
+      "keepWorking": "Bu sırada sayfayı kullanabilirsiniz.",
+      "disclaimer": "Yapay zekâ ({{model}}) yalnızca fark özetini gördü; kararı kontrol ederek verin.",
+      "ruleBasedUnavailable": "Kural tabanlı özet. Yapay zekâ kullanılamıyor: {{reason}}",
+      "off": "kapalı",
+      "errorFallback": "hata",
+      "ruleBasedQuick": "Kural tabanlı hızlı özet; yapay zekâ özeti birazdan."
+    },
+    "regions": {
+      "badges": {
+        "newPage": "Yeni Sayfa",
+        "deletedPage": "Silinen Sayfa"
+      },
+      "page": "Sayfa {{page}}",
+      "item": "Sayfa {{page}} · bölge {{n}}",
+      "createIssue": "Bu bölgeden sorun oluştur",
+      "actions": {
+        "showAll": "Tümünü Göster ({{count}})"
+      }
+    },
+    "text": {
+      "antetHeading": "Antet Değişiklikleri",
+      "headings": {
+        "pdf": "Metin Farkı",
+        "docx": "Paragraf Farkı",
+        "text": "Satır Farkı",
+        "cells": "Hücre Farkı"
+      },
+      "totals": "{{changed}} değişen, {{added}} eklenen, {{removed}} silinen",
+      "identical": "İki versiyon birebir aynı.",
+      "noDiff": "Metin farkı yok.",
+      "sheetTotals": "{{changed}} değişen, {{added}} eklenen, {{removed}} silinen satır",
+      "row": "Satır {{row}}",
+      "moreRows_one": "… {{count}} satır daha",
+      "moreRows_other": "… {{count}} satır daha",
+      "text": "Metin",
+      "pageTotals": "{{changed}} değişen · {{added}} eklenen · {{removed}} silinen",
+      "antetTag": "(antet)",
+      "moreChanges_one": "… {{count}} değişiklik daha",
+      "moreChanges_other": "… {{count}} değişiklik daha"
+    },
+    "errors": {
+      "noPrevious": "Bu versiyonun karşılaştırılacak önceki bir versiyonu yok.",
+      "pdf": "PDF açılamadı: {{error}}"
+    },
+    "header": {
+      "revisions": "Rev {{from}} → {{to}}",
+      "currentVersion": "V{{version}} (güncel)",
+      "backToFolder": "Klasöre dön",
+      "old": "Eski",
+      "oldVersion": "Eski versiyon",
+      "swap": "Yer değiştir",
+      "new": "Yeni",
+      "newVersion": "Yeni versiyon",
+      "otherFileHint": "Eski taraf için aynı klasörden başka bir dosya seç",
+      "actions": {
+        "otherFile": "Başka Dosyayla…"
+      },
+      "otherFile": "Başka dosya",
+      "chooseFile": "Dosya Seçin…"
+    },
+    "stage": {
+      "regionTitle": "{{kind}} bölge {{n}}",
+      "pageOnlyNew": "Sayfa {{page}} yalnızca yeni versiyonda var.",
+      "pageRemoved": "Sayfa {{page}} yeni versiyonda yok (silinmiş).",
+      "previousPage": "Önceki sayfa",
+      "nextPage": "Sonraki sayfa",
+      "modes": {
+        "overlay": "Üst Üste",
+        "side": "Yan Yana",
+        "slider": "Kaydırıcı"
+      },
+      "zoomOut": "Uzaklaştır",
+      "zoomIn": "Yakınlaştır",
+      "actions": {
+        "fit": "⤢ Sığdır",
+        "regions": "▢ Bölgeler"
+      },
+      "regionsHint": "Değişen bölge çerçeveleri",
+      "alignHint": "Eski sayfayı kaydırarak hizala (1 pt)",
+      "align": "Hizala",
+      "nudge": {
+        "left": "Sola",
+        "up": "Yukarı",
+        "down": "Aşağı",
+        "right": "Sağa"
+      },
+      "resetAlign": "Hizalamayı sıfırla",
+      "same": "Aynı",
+      "loadingPdfs": "PDF'ler yükleniyor…",
+      "oldVersion": "Eski · V{{version}}",
+      "newVersion": "Yeni · V{{version}}"
+    }
+  },
+  "drawer": {
+    "actions": {
+      "download": "⬇ İndir (V{{version}})",
+      "open": "👁 Aç",
+      "compareRevision": "⇄ Önceki Revizyonla Karşılaştır",
+      "openInModel": "🧊 Modelde Aç",
+      "compareVersion": "⇄ Önceki Versiyonla Karşılaştır",
+      "access": "↗ Paylaşım ve Erişim",
+      "move": "↪ Taşı",
+      "rename": "✎ Yeniden Adlandır",
+      "delete": "🗑 Sil",
+      "copy": "▣ Kopyala",
+      "saveAttributes": "Öznitelikleri Kaydet"
+    },
+    "compareRevisionHint": "Güncel versiyonu bir öncekiyle karşılaştırır: görsel fark, metin farkı, yapay zekâ özeti",
+    "accessHint": "Bu dosyayı görebilen proje üyeleri ve nedenleri",
+    "rename": "Yeniden Adlandır",
+    "deleteTitle": "Dosyayı Sil",
+    "deleteConfirm": "\"{{name}}\" silinsin mi? Dosya çöp kutusuna taşınır; proje yöneticisi geri yükleyebilir.",
+    "ifc": {
+      "heading": "IFC Özeti",
+      "summary": "Şema: <b>{{schema}}</b> · Proje: {{project}} · Eleman: <b>{{elements}}</b>"
+    },
+    "otherAttributes": {
+      "heading": "Diğer Öznitelikler"
+    },
+    "noAttributes": "Öznitelik yok.",
+    "freeAttributeName": "Serbest öznitelik adı",
+    "attributeValue": "Değer",
+    "history": {
+      "heading": "Versiyon Geçmişi",
+      "uploader": "Yükleyen",
+      "review": "İnceleme #{{number}}",
+      "model": "Model",
+      "compareHint": "Bir önceki versiyonla karşılaştır"
+    }
+  },
+  "approval": {
+    "title": "İnceleme #{{number}} — {{name}}",
+    "titleCopy": "İnceleme #{{number}} — {{name}} (onaylı kopya)"
+  },
+  "whoCanSee": {
+    "via": {
+      "user": "Kişi",
+      "company": "Firma",
+      "role": "Rol",
+      "projectAdmin": "Proje Yöneticisi",
+      "systemAdmin": "Sistem Yöneticisi"
+    },
+    "titleFile": "Bu Dosyayı Kim Görebilir?",
+    "titleFolder": "Bu Klasörü Kim Görebilir?",
+    "summary_one": "<b>{{count}} kişi</b> görebilir. Yetkiler üst klasörlerden miras gelir; kişinin firması ve rolleri de sayılır. En yüksek yetki geçerlidir.",
+    "summary_other": "<b>{{count}} kişi</b> görebilir. Yetkiler üst klasörlerden miras gelir; kişinin firması ve rolleri de sayılır. En yüksek yetki geçerlidir.",
+    "summaryWithHidden_one": "<b>{{count}} kişi</b> görebilir, {{hidden}} proje üyesi göremez. Yetkiler üst klasörlerden miras gelir; kişinin firması ve rolleri de sayılır. En yüksek yetki geçerlidir.",
+    "summaryWithHidden_other": "<b>{{count}} kişi</b> görebilir, {{hidden}} proje üyesi göremez. Yetkiler üst klasörlerden miras gelir; kişinin firması ve rolleri de sayılır. En yüksek yetki geçerlidir.",
+    "actions": {
+      "hideHidden": "Göremeyenleri Gizle",
+      "showHidden": "Göremeyenleri Göster ({{count}})"
+    },
+    "systemAdminsNote": "Sistem yöneticileri proje üyesi olmasalar da her projeyi görür.",
+    "columns": {
+      "why": "Neden?"
+    },
+    "inactive": "pasif",
+    "noCompany": "Firma yok",
+    "canUpload": "+ yükleyebilir",
+    "inheritedFrom": "miras: {{folder}}",
+    "decisive": "belirleyici"
+  },
+  "markupIssue": {
+    "defaultDescription": "{{file}} · V{{version}} · sayfa {{page}}",
+    "titleMarkup": "İşaretlemeden Sorun Oluştur",
+    "titleVersion": "Versiyona Sorun Oluştur",
+    "createdMarkup": "Sorun #{{number}} oluşturuldu ve işaretlemeye bağlandı.",
+    "createdVersion": "Sorun #{{number}} oluşturuldu ve versiyona bağlandı.",
+    "types": {
+      "design": "Tasarım",
+      "coordination": "Koordinasyon",
+      "site": "Saha",
+      "quality": "Kalite",
+      "safety": "İSG",
+      "other": "Diğer"
+    },
+    "willPublish": "Taslak işaretleme, sorunla birlikte yayınlanır."
+  },
+  "history": {
+    "label": "Sürüm geçmişi",
+    "compareVersions": "Sürümleri karşılaştır",
+    "showing_one": "{{count}} sürüm gösteriliyor",
+    "showing_other": "{{count}} sürüm gösteriliyor",
+    "selected": "{{count}}/2 sürüm seçildi",
+    "selectVersion": "V{{version}} sürümünü seç",
+    "uploadedBy": "{{user}} tarafından {{date}} tarihinde yüklendi",
+    "unknownUser": "Bilinmeyen kullanıcı",
+    "versionActionsFor": "V{{version}} işlemleri",
+    "versionActions": "Sürüm işlemleri",
+    "openInModel": "Modelde aç",
+    "downloadSource": "Kaynak dosyayı indir",
+    "comparePrevious": "Önceki sürümle karşılaştır"
+  },
+  "reportShortcut": {
+    "hint": "{{module}} için rapor: yapay zekâ ile oluşturun veya hazır şablonu seçin"
+  },
+  "cards": {
+    "folderContents": "Klasör içeriği"
+  },
+  "startReview": {
+    "stageDays_one": "{{name}} ({{count}} gün)",
+    "stageDays_other": "{{name}} ({{count}} gün)",
+    "title": "İnceleme Başlat",
+    "pinned_one": "{{count}} dosya, şu anki versiyonlarıyla sabitlenir: {{files}}",
+    "pinned_other": "{{count}} dosya, şu anki versiyonlarıyla sabitlenir: {{files}}",
+    "fields": {
+      "template": "Onay Akışı Şablonu",
+      "subject": "Konu (isteğe bağlı)",
+      "name": "İnceleme Adı",
+      "note": "Not (isteğe bağlı)",
+      "target": "Hedef Klasör",
+      "pattern": "Alt Klasör Deseni (isteğe bağlı)"
+    },
+    "noTemplates": "Projede inceleme şablonu yok. Proje Ayarları → İş Akışları bölümünden ekleyin.",
+    "namePlaceholder": "ör. Mimari avan proje seti",
+    "number": "İnceleme numarası: <b>{{code}}</b> <m>(başlatınca kesinleşir)</m>",
+    "options": {
+      "copy": "Onaylanan Dosyaları Bir Klasöre Kopyala (ör. Çalışma → Paylaşılan)",
+      "fallback": "Alanı Eksik Dosyayı Hedef Klasörün Kendisine Kopyala"
+    },
+    "notSelected": "Seçilmedi",
+    "errors": {
+      "noUpload": "Bu klasöre yükleme yetkiniz yok; inceleme başlatılamaz."
+    },
+    "patternPlaceholder": "{Bölge}/{Disiplin}/{Tip}",
+    "patternHelp": "Alanlar dosya özniteliklerinden ve isimlendirme standardından okunur; eksik klasörler oluşturulur ve üst klasörün yetkilerini alır.",
+    "columns": {
+      "target": "Hedef"
+    },
+    "notCopied": "Kopyalanmayacak",
+    "missing": "eksik: {{fields}}",
+    "actions": {
+      "start": "Başlat"
+    }
+  },
+  "deleted": {
+    "ago": {
+      "now": "az önce",
+      "minutes_one": "{{count}} dk önce",
+      "minutes_other": "{{count}} dk önce",
+      "hours_one": "{{count}} saat önce",
+      "hours_other": "{{count}} saat önce",
+      "days_one": "{{count}} gün önce",
+      "days_other": "{{count}} gün önce"
+    },
+    "newName": "Yeni Ad",
+    "actions": {
+      "restore": "Geri Yükle",
+      "purge": "Kalıcı Sil"
+    },
+    "nameConflict": "ad çakışması",
+    "messages": {
+      "restorePartial_one": "{{count}} öğe geri yüklendi. Yüklenemeyenler: {{errors}}",
+      "restorePartial_other": "{{count}} öğe geri yüklendi. Yüklenemeyenler: {{errors}}",
+      "restoredOne": "\"{{name}}\" eski yerine geri yüklendi.",
+      "restored_one": "{{count}} öğe eski yerine geri yüklendi.",
+      "restored_other": "{{count}} öğe eski yerine geri yüklendi.",
+      "purgePartial_one": "{{count}} öğe kalıcı silindi. Silinemeyenler: {{errors}}",
+      "purgePartial_other": "{{count}} öğe kalıcı silindi. Silinemeyenler: {{errors}}",
+      "purgedOne": "\"{{name}}\" kalıcı olarak silindi.",
+      "purged_one": "{{count}} öğe kalıcı olarak silindi.",
+      "purged_other": "{{count}} öğe kalıcı olarak silindi."
+    },
+    "title": "Silinenler",
+    "description": "Silinen dosya ve klasörler burada tutulur. Geri yüklenen öğe eski yerine döner; klasörle birlikte silinen alt klasörler ve dosyalar da onunla döner.",
+    "purgeNote": "Kalıcı silme bütün versiyonları sunucudan kaldırır ve geri alınamaz.",
+    "purgeAdminOnly": "Kalıcı silme yalnızca sistem yöneticisine açıktır.",
+    "tabs": {
+      "folders": "Klasörler",
+      "files": "Dosyalar"
+    },
+    "searchPlaceholder": "Ad, eski yer veya silen kişi ara…",
+    "searchLabel": "Silinenlerde ara",
+    "selected": "{{count}} seçili",
+    "columns": {
+      "location": "Eski Yeri",
+      "content": "İçerik",
+      "deletedBy": "Silen",
+      "deletedAt": "Silinme"
+    },
+    "noMatch": "Aramaya uyan silinmiş öğe yok.",
+    "empty": "Silinen dosya veya klasör yok.",
+    "projectFiles": "Proje Dosyaları",
+    "parentDeleted": "üst klasör silinmiş",
+    "folderDeleted": "klasörü silinmiş",
+    "restoreHint": "Eski yerine geri yükle",
+    "parentDeletedHint": "Üst klasör de silinmiş; önce onu geri yükleyin.",
+    "folderDeletedHint": "Klasörü de silinmiş; önce klasörü geri yükleyin.",
+    "purgeLabel": "Kalıcı sil",
+    "purgeItem": "{{name}} kalıcı sil",
+    "purge": {
+      "confirmWord": "KALICI SİL",
+      "title": "Kalıcı Olarak Sil",
+      "folder": "\"{{name}}\" klasörü, alt klasörleri ve içindeki tüm dosyalar (bütün versiyonlarıyla) sunucudan silinecek.",
+      "file": "\"{{name}}\" dosyası bütün versiyonlarıyla sunucudan silinecek.",
+      "many_one": "Seçili {{count}} öğe (klasörlerin içindekilerle ve bütün versiyonlarıyla) sunucudan silinecek.",
+      "many_other": "Seçili {{count}} öğe (klasörlerin içindekilerle ve bütün versiyonlarıyla) sunucudan silinecek.",
+      "irreversible": "Bu işlem geri alınamaz.",
+      "more_one": "+{{count}} öğe daha",
+      "more_other": "+{{count}} öğe daha",
+      "typeToConfirm": "Onaylamak için yazın: <b>{{text}}</b>"
+    },
+    "restoredSuffix": "(geri yüklenen)"
+  },
+  "shapes": {
+    "pen": "Kalem",
+    "rect": "Dikdörtgen",
+    "cloud": "Revizyon Bulutu",
+    "arrow": "Ok",
+    "text": "Metin"
+  },
+  "docCompare": {
+    "messages": {
+      "markupsSaved": "{{count}} değişen bölge, {{pages}} sayfada taslak işaretleme olarak kaydedildi.",
+      "nothingToSave": "Kaydedilecek değişen bölge yok.",
+      "noteAdded": "Özet, inceleme #{{number}} zaman çizelgesine not olarak eklendi."
+    },
+    "actions": {
+      "openInViewer": "Görüntüleyicide Aç",
+      "openReview": "İncelemeyi Aç",
+      "saveMarkups": "☁ İşaretleme Olarak Kaydet",
+      "addToReview": "Özeti İncelemeye Ekle"
+    },
+    "issueTitle": "Revizyon farkı: sayfa {{page}}, {{kind}} bölge",
+    "issueDescriptionPage": "{{file}} · V{{from}} → V{{to}} · sayfa {{page}}",
+    "issueDescription": "{{file}} · V{{from}} → V{{to}}",
+    "findingPrevious": "Önceki versiyon aranıyor…",
+    "chooseVersions": "Karşılaştırılacak versiyonları seçin.",
+    "saveMarkupsHint": "Değişen bölgeleri yeni versiyona revizyon bulutu (taslak işaretleme) olarak çizer",
+    "noMarkupPermission": "Bu klasörde işaretleme yetkiniz yok",
+    "rebuildHint": "Karşılaştırmayı yeniden hesaplar",
+    "preparing": "Karşılaştırma hazırlanıyor…",
+    "inReview": "Bu versiyon <a>{{code}}</a> incelemesinde.",
+    "checks": {
+      "heading": "Kontroller"
+    },
+    "regionsHeading": "Değişen Bölgeler ({{count}})",
+    "analysis": "Analiz {{done}}/{{total}}",
+    "visualRunning": "Görsel karşılaştırma tarayıcıda yapılıyor…",
+    "noVisualDiff": "Görsel fark bulunamadı.",
+    "analysedFirst": "Görsel analiz ilk {{count}} sayfada yapıldı."
+  },
+  "viewer": {
+    "tools": {
+      "select": "Seç"
+    },
+    "widths": {
+      "thin": "İnce",
+      "medium": "Orta",
+      "thick": "Kalın"
+    },
+    "deleteTitle": "İşaretlemeyi Sil",
+    "deleteConfirm": "İşaretleme silinsin mi?",
+    "details": "Ayrıntılar",
+    "actions": {
+      "download": "⬇ İndir",
+      "publish": "Yayınla",
+      "createIssue": "⚑ Sorun Oluştur",
+      "publishDrafts": "Taslakları Yayınla ({{count}})",
+      "issueOnVersion": "+ Versiyona Sorun",
+      "details": "☰ Ayrıntılar",
+      "fitWidth": "⤢ Genişliğe Sığdır",
+      "takeoff": "2B Metraj"
+    },
+    "compareHint": "Bir önceki versiyonla karşılaştırır: görsel fark, metin farkı, yapay zekâ özeti",
+    "oldVersion": "Bu eski bir versiyon (V{{version}}). Güncel versiyon V{{current}}.",
+    "noMarkupPermission": "Bu klasörde işaretleme yetkiniz yok; yalnızca görüntüleyebilirsiniz.",
+    "selected": {
+      "heading": "Seçili İşaretleme"
+    },
+    "status": {
+      "published": "Yayında",
+      "draft": "Taslak"
+    },
+    "markups": {
+      "heading": "İşaretlemeler",
+      "empty": "Henüz işaretleme yok.",
+      "emptyCanDraw": "Henüz işaretleme yok. Üstteki araçlarla çizebilirsiniz."
+    },
+    "publishDraftsHint": "Taslaklarınızı herkese görünür yapar",
+    "links": {
+      "heading": "Bağlı Sorunlar",
+      "empty": "Bu versiyona bağlı sorun yok.",
+      "markup": "markup",
+      "version": "versiyon"
+    },
+    "page": "Sayfa",
+    "colour": "Renk {{colour}}",
+    "width": "Kalınlık",
+    "textPlaceholder": "Metin yazın, Enter: kaydet, Esc: vazgeç",
+    "takeoffHint": "Bu çizimde kalibre edilmiş uzunluk, alan ve adet metrajı alın"
+  },
+  "upload": {
+    "suggestion": {
+      "rev": "Rev {{rev}}",
+      "error": "Antet: {{error}}",
+      "label": "Antetten öneri:",
+      "alreadyValid": "ad zaten standarda uygun",
+      "noName": "uygun ad çıkarılamadı",
+      "noNameWithErrors": "uygun ad çıkarılamadı ({{errors}})",
+      "withAi": "Yapay zekâ ile",
+      "aiRejected": "YZ önerisi kullanılmadı",
+      "actions": {
+        "undo": "Geri Al",
+        "details": "Ayrıntı"
+      },
+      "fields": {
+        "name": "Yüklenecek Ad"
+      },
+      "alternatives": " · adaylar: {{values}}",
+      "attributes": "Öznitelikler (öneri uygulanınca bu dosyaya yazılır)",
+      "freeForm": "(serbest)"
+    },
+    "errors": {
+      "failed": "Yüklenemedi.",
+      "titleBlock": "Antet okunamadı: {{error}}"
+    },
+    "title": "Yükle → {{folder}}",
+    "standardRequired": "Bu klasörde <b>{{standard}}</b> isimlendirme standardı zorunlu. Uymayan dosyalar yüklenmez.",
+    "noStandard": "Bu klasörde isimlendirme standardı yok.",
+    "readingTitleBlocks": "PDF antetleri okunuyor…",
+    "suggestionsFound_one": "Antetten öneri: {{count}} dosya için standarda uygun yeni ad bulundu.",
+    "suggestionsFound_other": "Antetten öneri: {{count}} dosya için standarda uygun yeni ad bulundu.",
+    "aiHint": "Yalnız belirsiz alanlar yerel modele sorulur; cevap standarda uymazsa kullanılmaz.",
+    "status": {
+      "aiThinking": "Yapay Zekâ Düşünüyor…"
+    },
+    "actions": {
+      "refineWithAi": "✨ Yapay Zekâ ile Netleştir ({{count}})",
+      "applyAll": "Tümüne Uygula",
+      "upload_one": "{{count}} Dosyayı Yükle",
+      "upload_other": "{{count}} Dosyayı Yükle"
+    },
+    "columns": {
+      "check": "Kontrol"
+    },
+    "uploadedVersion": "Yüklendi · V{{version}}",
+    "checking": "kontrol ediliyor…",
+    "newVersionHint": "Bu klasörde aynı adlı dosya var; yeni dosya olarak değil, yeni versiyonu olarak eklenir.",
+    "newVersion": "Yeni versiyon · V{{version}}",
+    "newFile": "Yeni dosya",
+    "attributes": {
+      "heading": "Öznitelikler",
+      "help": "Değerler yüklenen tüm dosyalara uygulanır ve antetten gelen önerilerin önüne geçer. * işaretli alanlar zorunludur.",
+      "choose": "Seçin…",
+      "missingRequired": "Zorunlu: {{names}} — yeni dosyalarda boş bırakılamaz (mevcut dosyanın yeni versiyonunda önceki değer korunur; uygulanan antet önerisindeki değer de kullanılır)."
+    },
+    "fields": {
+      "comment": "Versiyon Açıklaması (isteğe bağlı)"
+    },
+    "commentPlaceholder": "ör. P02 – yorumlar işlendi"
+  },
+  "grid": {
+    "sortBy": "{{column}} sırala",
+    "actions": {
+      "sort": "sırala"
+    },
+    "columnWidth": "Sütun genişliği",
+    "resizeHint": "Sürükleyerek genişlet; çift tıkla sıfırla"
+  },
+  "selectItem": "{{name}} seç",
+  "columns": {
+    "version": "Versiyon"
+  },
+  "autodesk": {
+    "externalSource": "HARİCİ KAYNAK",
+    "counts": "{{folders}} klasör · {{files}} dosya",
+    "lastSync": "Son aktarım: {{date}}",
+    "empty": "Autodesk metadata kaynağı bulunamadı",
+    "emptyHint": "Bir Autodesk snapshot’ı PostgreSQL’e aktarıldığında burada görünür.",
+    "columns": {
+      "typeVersion": "Tür / Versiyon",
+      "modified": "Değiştirilme",
+      "source": "Kaynak"
+    },
+    "parentFolder": "Üst klasör",
+    "folderEmpty": "Bu klasör boş.",
+    "cdeDocuments": "CDE dokümanları",
+    "openInAutodesk": "Autodesk’te aç",
+    "readOnly": "Salt okunur"
+  },
+  "search": {
+    "titleInFolder": "\"{{query}}\" için bu klasörde arama sonuçları",
+    "titleInProject": "\"{{query}}\" için projede arama sonuçları",
+    "count_one": "{{count}} dosya",
+    "count_other": "{{count}} dosya",
+    "countTruncated_one": "{{count}} dosya — ilk sonuçlar gösteriliyor, aramayı daraltın",
+    "countTruncated_other": "{{count}} dosya — ilk sonuçlar gösteriliyor, aramayı daraltın",
+    "actions": {
+      "close": "Aramayı Kapat"
+    },
+    "searching": "Aranıyor…",
+    "foundInContent": "Dosya içeriğinde bulundu",
+    "snippet": "<m>İçerikte: </m>{{snippet}}"
+  },
+  "description": {
+    "placeholder": "Açıklama girin",
+    "errors": {
+      "saveFailedWith": "Kaydedilemedi: {{error}}",
+      "saveFailed": "Kaydedilemedi"
+    },
+    "edit": "Açıklamayı düzenle"
+  },
+  "filters": {
+    "nameContains": "Ad içerir…",
+    "descriptionContains": "Açıklama içerir…",
+    "contains": "içerir…"
+  },
+  "derivative": {
+    "openAs": "{{kind}} olarak aç",
+    "actions": {
+      "openModel": "Modeli Aç"
+    },
+    "status": {
+      "failed": "Dönüşüm Hatası",
+      "processing": "İşleniyor…"
+    }
+  },
+  "page": {
+    "zipSearchName": "{{code}}-arama",
+    "bulkDelete": {
+      "partial": "{{deleted}} dosya silindi, {{failed}} dosya silinemedi:\n{{errors}}",
+      "dialogTitle": "Dosyaları sil",
+      "body_one": "Seçili <b>{{count}} dosya</b> çöp kutusuna taşınacak. Proje yöneticisi geri yükleyebilir.",
+      "body_other": "Seçili <b>{{count}} dosya</b> çöp kutusuna taşınacak. Proje yöneticisi geri yükleyebilir.",
+      "more_one": "ve {{count}} dosya daha",
+      "more_other": "ve {{count}} dosya daha",
+      "foldersKept": "Seçili klasörler silinmez.",
+      "confirmButton_one": "{{count}} dosyayı sil",
+      "confirmButton_other": "{{count}} dosyayı sil"
+    },
+    "treeWidth": "Klasör paneli genişliği",
+    "showTree": "Klasör panelini göster",
+    "hideTree": "Klasör panelini gizle",
+    "gatedHint": "Dosyalar bu klasöre yalnızca onaylanmış inceleme ile gelir.",
+    "gatedHintBy": "Dosyalar bu klasöre yalnızca onaylanmış inceleme ile gelir (ayar: {{setting}}).",
+    "badges": {
+      "gated": "Yalnızca Onaylı İnceleme"
+    },
+    "yourLevel": "Bu klasördeki yetkiniz",
+    "actions": {
+      "startReview": "İnceleme Başlat ({{count}})",
+      "deleteCount": "Sil ({{count}})",
+      "chooseFiles": "Dosya Seç"
+    },
+    "zipHint": "Seçili dosya ve klasörleri tek zip olarak indir",
+    "deleteHint": "Seçili dosyaları çöp kutusuna taşı",
+    "search": {
+      "placeholderInFolder": "Bu klasörde ara…",
+      "placeholder": "Dosya ara…",
+      "label": "Dosya ara",
+      "hint": "Yazdıkça bu klasördeki dosyalar süzülür. Enter: ad, öznitelik ve içerikte ara.",
+      "goHint": "Ad, öznitelik ve dosya içeriğinde ara",
+      "goInFolder": "Klasörde ara",
+      "goInProject": "Projede ara"
+    },
+    "hints": {
+      "upload": "Dosyaları bu klasöre sürükleyip bırakın ya da Yükle'ye basın. Başka bir klasöre yüklemek için soldan seçin.",
+      "uploadNotAllowed": "Bu klasöre yükleme yetkiniz yok; soldan yükleyebileceğiniz bir klasör seçin.",
+      "review": "İncelemeye gönderilecek dosyaları işaretleyin, sonra İnceleme Başlat'a basın."
+    },
+    "empty": "Bu klasör boş.",
+    "emptyPhoneCanUpload": "Bu klasör boş. Yükle ile dosya ekleyebilirsiniz.",
+    "emptyCanUpload": "Bu klasör boş. Dosyaları sürükleyip bırakarak yükleyebilirsiniz.",
+    "noFilterMatch": "Filtreye uyan dosya yok.",
+    "attributeInherited": "Üst klasörden gelen öznitelik",
+    "attributeOwn": "Bu klasörün özniteliği",
+    "columns": {
+      "lastUploader": "Son Yükleyen",
+      "approval": "Onay"
+    },
+    "virtual": {
+      "hintCanUpload": "Bu klasör henüz oluşturulmadı. Tıklayıp dosya seçin ya da dosyaları buraya bırakın; klasör ilk dosyayla oluşur.",
+      "hint": "Bu klasör henüz oluşturulmadı; ilk dosya yüklendiğinde oluşur.",
+      "createdOnFirstFile": "İlk dosyada oluşur",
+      "createdOnFirstFileWithSub_one": "İlk dosyada oluşur (+{{count}} alt klasör)",
+      "createdOnFirstFileWithSub_other": "İlk dosyada oluşur (+{{count}} alt klasör)",
+      "actions": {
+        "createNow": "Şimdi Oluştur"
+      },
+      "note": "ilk dosyada oluşur",
+      "noteWithSub_one": "ilk dosyada oluşur (+{{count}} alt klasör)",
+      "noteWithSub_other": "ilk dosyada oluşur (+{{count}} alt klasör)",
+      "errorTitle": "Klasör Oluşturulamadı"
+    },
+    "fileActions": "Dosya işlemleri",
+    "fileActionsFor": "{{name}} dosya işlemleri",
+    "openVersionHistory": "{{name}} sürüm geçmişini aç"
+  },
+  "transfer": {
+    "moveTitle": "Dosyayı taşı",
+    "copyTitle": "Dosyayı kopyala",
+    "hint": "<b>{{name}}</b> için hedef klasörü seçin.",
+    "target": "Hedef klasör",
+    "copyName": "Kopyanın adı",
+    "alreadyHere": "Dosya zaten bu klasörde.",
+    "actions": {
+      "move": "Taşı"
+    }
+  },
+  "pdfPages": {
+    "errors": {
+      "notFound": "PDF bulunamadı.",
+      "http": "PDF açılamadı (HTTP {{status}}).",
+      "offline": "PDF bu cihazda yok; bağlantı gelince açılır."
+    },
+    "loading": "PDF yükleniyor…"
+  },
+  "permissions": {
+    "errors": {
+      "lowerThanInherited": "Üst klasörden gelen \"{{level}}\" yetkisinden düşük verilemez."
+    },
+    "status": {
+      "ok": "kaydedildi",
+      "skipped_existing": "zaten yetkisi var"
+    },
+    "roleOption_one": "{{name}} ({{count}} kişi)",
+    "roleOption_other": "{{name}} ({{count}} kişi)",
+    "title": "Yetkiler — {{folder}}",
+    "help": "Yetkiler alt klasörlere geçer. Alt klasörde yetki yükseltilebilir, düşürülemez. Proje yöneticileri her klasörü yönetir.",
+    "columns": {
+      "who": "Kim",
+      "level": "Yetki"
+    },
+    "inherited": "üst klasörden",
+    "subjects": {
+      "user": "Kişi",
+      "role": "Rol",
+      "roleTeam": "Rol / Ekip"
+    },
+    "empty": "Bu klasörde yetki tanımı yok — yalnızca proje yöneticileri görür.",
+    "addHeading": "Yetki Ekle",
+    "choose": "Seçin…",
+    "noRoles": "Projede rol yok. Proje Ayarları → Roller bölümünden ekip tanımlayın.",
+    "actions": {
+      "whoCanSee": "Kim Görebilir?"
+    }
+  },
+  "folderSettings": {
+    "actions": {
+      "delete": "Klasörü Sil"
+    },
+    "deleteConfirm": "\"{{name}}\" klasörü, alt klasörleri ve içindeki dosyalarla birlikte silinsin mi? Proje yöneticisi çöp kutusundan geri yükleyebilir.",
+    "title": "Klasör Ayarları",
+    "fields": {
+      "state": "ISO 19650 Durumu",
+      "standard": "İsimlendirme Standardı (bu klasör ve alt klasörlerde zorunlu)",
+      "attributes": "Öznitelikler (bu klasör ve alt klasörlerinde sütun olarak görünür, yüklemede istenir)"
+    },
+    "options": {
+      "inheritStandard": "Yok / Üst Klasörden Devral",
+      "gate": "Bu Klasöre Yalnızca Onaylı İnceleme ile Dosya Girer"
+    },
+    "noStandards": "Projede tanımlı standart yok. Proje Ayarları → İsimlendirme Standartları bölümünden ekleyin.",
+    "gateHelp": "Açıkken doğrudan yükleme ve taşıma reddedilir; dosyalar yalnızca inceleme onayıyla kopyalanır (ISO 19650 Paylaşılan / Yayınlanan). Alt klasörlere de uygulanır.",
+    "gateInherited": "Şu an \"{{folder}}\" klasöründen geliyor.",
+    "noAttributes": "Projede tanımlı öznitelik yok. Proje Ayarları → Öznitelikler bölümünden ekleyin.",
+    "badges": {
+      "inherited": "Üst Klasörden"
+    }
+  },
+  "antet": {
+    "confidence": {
+      "ambiguousHint": "Belirsiz: birden fazla aday var",
+      "label": "Güven",
+      "ambiguous": "belirsiz"
+    },
+    "sources": {
+      "antet": "antet",
+      "table": "revizyon tablosu",
+      "filename": "dosya adı",
+      "attribute": "öznitelik"
+    },
+    "heading": "Antet",
+    "actions": {
+      "reread": "Yeniden Oku",
+      "revisionTable": "Revizyon Tablosu ({{count}})",
+      "rename": "Adı Öneriye Göre Değiştir",
+      "refineWithAi": "✨ Yapay Zekâ ile Netleştir",
+      "fillAttributes": "Öznitelikleri Doldur",
+      "specAnalysis": "📋 Şartname Analizi",
+      "buildRegister": "📋 Şartnameden Teknik Onay Listesi Çıkar",
+      "analyseSpec": "Şartname Olarak Analiz Et"
+    },
+    "reading": "Antet okunuyor…",
+    "errors": {
+      "readFailed": "Okunamadı: {{error}}"
+    },
+    "badges": {
+      "warning": "Uyarı",
+      "info": "Bilgi"
+    },
+    "fieldLabel": "Etiket: {{label}}",
+    "revision": "Revizyon: <b>{{value}}</b>",
+    "nameMatches": "Ad antetle uyumlu",
+    "suggestion": "Öneri: <m>{{name}}</m>",
+    "noName": "Antetten standarda uygun ad çıkarılamadı.",
+    "aiResolved": "Yapay zekâ belirsiz alanları çözdü.",
+    "attributesFromTitleBlock": "Antetten öznitelik: {{values}}",
+    "status": {
+      "readingSpec": "Şartname Okunuyor…",
+      "reading": "Okunuyor…"
+    }
+  },
+  "modelCompare": {
+    "heading": "⇄ Karşılaştırma",
+    "close": "Karşılaştırmayı kapat",
+    "kinds": {
+      "added": "Eklenen",
+      "changed": "Değişen",
+      "removed": "Silinen",
+      "unchanged": "Değişmeyen"
+    },
+    "options": {
+      "fade": "Değişmeyenleri Soluk Göster",
+      "ghost": "Eski Versiyonu Hayalet Olarak Yükle (silinenler kırmızı)"
+    },
+    "upgrading": "Kat ve özellik ayrıntıları hazırlanıyor (model yeniden indeksleniyor)…",
+    "columns": {
+      "class": "Sınıf"
+    },
+    "removedHint": "Silinen elemanları modelde görmek için eski versiyonu yükleyin.",
+    "unnamed": "(adsız)",
+    "moreProps_one": "+{{count}} özellik",
+    "moreProps_other": "+{{count}} özellik",
+    "moreElements_one": "… ve {{count}} eleman daha",
+    "moreElements_other": "… ve {{count}} eleman daha",
+    "summary": {
+      "preparing": "Değişiklik özeti hazırlanıyor…",
+      "heading": "Değişiklik Özeti",
+      "aiModel": "Yapay zekâ · {{model}}",
+      "aiWriting": "Yapay zekâ yazıyor… {{seconds}} sn",
+      "report": "Rapor (PDF)",
+      "aiError": "Yapay zekâ özeti yok: {{error}}",
+      "noChanges": "Değişiklik yok.",
+      "showInModel": "Modelde göster",
+      "createIssue": "Bu değişiklik için sorun oluştur",
+      "actions": {
+        "issue": "Sorun"
+      },
+      "allGroups": "Tüm Gruplar ({{count}})"
+    },
+    "dialog": {
+      "title": "Versiyonları Karşılaştır",
+      "fields": {
+        "from": "Eski Versiyon",
+        "to": "Yeni Versiyon"
+      },
+      "help": "Yeni versiyon yüklenir: eklenen elemanlar <added>yeşil</added>, değişenler <changed>turuncu</changed>. Silinenler listelenir; isterseniz eski versiyon hayalet olarak yüklenip silinenler <removed>kırmızı</removed> gösterilir. Eşleştirme IFC GlobalId ile, değişiklik tespiti öznitelik ve özellik setleriyle yapılır.",
+      "actions": {
+        "compare": "Karşılaştır"
+      }
+    }
+  }
+}

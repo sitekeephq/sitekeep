@@ -1,0 +1,131 @@
+{
+  "errors": {
+    "adminOnly": "This action requires System Administrator rights.",
+    "invalidDomain": "Enter a valid domain: {{domain}}",
+    "codeInUse": "The code \"{{code}}\" is used by the company \"{{company}}\".",
+    "companyExists": "A company named \"{{name}}\" already exists.",
+    "invalidEmail": "Enter a valid e-mail address.",
+    "selfLockout": "You cannot remove your own administrator rights or disable your own account.",
+    "loadTestOff": "The full load test is turned off on this installation (CAPACITY_LOAD_TEST=0).",
+    "reportWhileRunning": "The report is available once the test has finished.",
+    "runActive": "A capacity test is already running."
+  },
+  "entities": {
+    "user": "User",
+    "capacityRun": "Capacity test",
+    "company": "Company"
+  },
+  "capacity": {
+    "stage": {
+      "starting": "Starting",
+      "done": "Done",
+      "stopped": "Stopped",
+      "error": "Error: {{message}}",
+      "hardware": "Reading the hardware",
+      "cpu": "Measuring the CPU",
+      "disk": "Measuring disk speed",
+      "database": "Measuring the database",
+      "ifc": "Converting a sample IFC",
+      "memory": "Calculating the memory headroom",
+      "users_one": "{{count}} virtual user",
+      "users_other": "{{count}} virtual users",
+      "limitReached": "Limit reached"
+    },
+    "check": {
+      "hardware": "Hardware",
+      "cpu": "CPU",
+      "disk": "Disk",
+      "database": "Database",
+      "ifc": "IFC conversion",
+      "memory": "Memory headroom"
+    },
+    "value": {
+      "hardware": "{{cpus}} vCPU · {{ram}} GB RAM",
+      "hardwareDisk": "{{cpus}} vCPU · {{ram}} GB RAM · {{disk}} GB disk",
+      "cpu": "single core 1.0× · {{cores}} cores {{factor, number(minimumFractionDigits: 1; maximumFractionDigits: 1)}}×",
+      "disk": "write 412 MB/s · read 1.1 GB/s · fsync 0.9 ms",
+      "database": "p50 0.6 ms · p95 2.1 ms",
+      "ifc": "sample model {{seconds}} s",
+      "memory": "{{gb}} GB stays free (for IFC and office)"
+    },
+    "stop": {
+      "p95": "Response time p95 > {{ms}} ms",
+      "p99": "Response time p99 > {{ms}} ms",
+      "errorRate": "Error rate > {{pct}}%",
+      "cpu": "CPU > {{pct}}%",
+      "freeMemory": "Free RAM < {{pct}}%"
+    },
+    "report": {
+      "percent": "{{value}}%",
+      "level": {
+        "ok": "Sufficient",
+        "warn": "Attention",
+        "danger": "Insufficient"
+      },
+      "status": {
+        "running": "Running",
+        "passed": "Completed",
+        "limited": "Limit reached",
+        "cancelled": "Stopped",
+        "failed": "Error"
+      },
+      "chartLabel": "Response time per step",
+      "chartLimit": "limit {{ms}} ms",
+      "chartUsers": "virtual users",
+      "modeQuick": "Quick Check",
+      "modeLoad": "Full Load Test",
+      "pageTitle": "SiteKeep Capacity Report",
+      "heading": "Capacity Report · {{mode}}",
+      "demoTitle": "Sample data.",
+      "demoText": "This report was produced by the sample test engine; no load was put on the server and nothing was measured.",
+      "result": "Result",
+      "resultBig": "~{{concurrent}} concurrent · ~{{registered}} registered users",
+      "resultNoteStopped": "Registered = concurrent / {{ratio}} ({{pct}} of registered users at the same time in the peak hour). Reason for stopping: {{reason}}.",
+      "resultNoteNoLimit": "Registered = concurrent / {{ratio}} ({{pct}} of registered users at the same time in the peak hour). No limit was exceeded up to the top step.",
+      "server": "Server",
+      "cpu": "CPU",
+      "memory": "Memory",
+      "dataDisk": "Data disk",
+      "diskValue": "{{total}} GB · {{free}} GB free",
+      "diskUnreadable": "could not be read",
+      "os": "Operating system",
+      "users": "Users",
+      "usersValue": "{{registered}} registered · {{active}} active (30 days)",
+      "findings": "Gaps and recommendations",
+      "colStatus": "Status",
+      "colTopic": "Topic",
+      "colAction": "What to do",
+      "measurements": "Measurements",
+      "steps": "Load steps",
+      "colUsers": "Users",
+      "colRps": "Requests/s",
+      "colError": "Errors",
+      "colCpu": "CPU",
+      "colRam": "RAM",
+      "stepPassed": "passed",
+      "stepLimit": "limit",
+      "limits": "Limits: p95 {{p95}} ms, p99 {{p99}} ms, errors {{error}}, CPU {{cpu}}, free RAM {{ram}}.",
+      "tiers": "Capacity table",
+      "colTier": "Tier",
+      "colRegistered": "Registered",
+      "colConcurrent": "Concurrent",
+      "colDisk": "Data disk",
+      "measuredAt": "Table measured on {{date}}.",
+      "estimated": "The figures in the table are estimates; a reference measurement is pending.",
+      "concurrencyRatio": "Concurrency ratio {{pct}}."
+    }
+  },
+  "license": {
+    "adminOnly": "Only system administrators manage the licence.",
+    "fileRequired": "Choose a licence file.",
+    "problems": {
+      "format": "This is not a SiteKeep licence file.",
+      "unknown_key": "The licence was signed with a key this version does not know. Update SiteKeep or ask for a new licence.",
+      "dev_key_in_production": "This is a development licence; it does not work on a production installation.",
+      "signature": "The licence signature does not match: the file was changed or damaged.",
+      "payload": "The licence content cannot be read.",
+      "other_installation": "This licence belongs to another installation. Send this installation's id when you ask for a licence.",
+      "build_after_support": "This SiteKeep version was released after your support period ended. Go back to an earlier version or renew support."
+    }
+  }
+}

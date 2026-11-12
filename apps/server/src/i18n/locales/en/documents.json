@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "folder": "Folder",
+    "file": "File",
+    "fileVersion": "File version",
+    "version": "Version",
+    "role": "Role",
+    "attributeDefinition": "Attribute definition",
+    "externalSource": "External document source",
+    "externalFolder": "External folder",
+    "namingStandard": "Naming standard",
+    "modelDerivative": "Model derivative",
+    "trashFile": "File in the Recycle Bin",
+    "trashFolder": "Folder in the Recycle Bin"
+  },
+  "errors": {
+    "rootFolderMove": "The root folder cannot be moved.",
+    "folderIntoItself": "A folder cannot be moved into itself.",
+    "rootFolderRename": "The root folder cannot be renamed.",
+    "rootFolderDelete": "The root folder cannot be deleted.",
+    "searchTooLong": "The search text is too long.",
+    "restoreFolderDeleted": "The file's folder has been deleted too. Restore the folder first.",
+    "restoreParentDeleted": "The parent folder has been deleted too. Restore the parent folder first.",
+    "restoreFileExists": "A file named \"{{name}}\" already exists in the folder \"{{folder}}\". Give it a new name to restore it.",
+    "restoreFolderExists": "A folder named \"{{name}}\" already exists under \"{{folder}}\". Give it a new name to restore it.",
+    "purgeLiveFolders": "The folder contains folders that have not been deleted.",
+    "purgeLiveFiles": "The folder contains files that have not been deleted.",
+    "purgeAdminOnly": "Only a System Administrator can delete permanently.",
+    "invalidFileName": "Invalid file name.",
+    "nameNotStandard": "The name does not follow the naming standard: {{errors}}",
+    "zipNothingSelected": "No files were selected for download.",
+    "zipTooMany": "At most {{max}} files can be downloaded at once.",
+    "multipartExpected": "multipart/form-data expected.",
+    "duplicateInRequest": "The same file was sent twice in one request.",
+    "fileTooLarge": "The file size limit was exceeded.",
+    "attributesNotObject": "The attributes field must be a JSON object ({\"name\": \"value\"}).",
+    "saveFailed": "Could not be saved.",
+    "noFile": "No file was sent.",
+    "copyNeedsDownload": "You need download permission to copy this file.",
+    "existsInTarget": "\"{{name}}\" already exists in the target folder.",
+    "noDownloadPermission": "You do not have permission to download this file.",
+    "modelNotReady": "The model is not ready for viewing yet ({{status}})."
+  },
+  "messages": {
+    "copiedFrom": "Copied from \"{{name}}\"."
+  },
+  "zip": {
+    "intro": "The following files were not added to this zip.",
+    "noDownload": "Files you do not have permission to download:",
+    "notFound": "Records not found or not accessible to you (id):",
+    "missingContent": "Files whose content was not found in storage:"
+  }
+}

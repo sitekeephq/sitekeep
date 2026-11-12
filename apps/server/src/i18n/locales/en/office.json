@@ -1,0 +1,120 @@
+{
+  "errors": {
+    "adminOnly": "This action requires system administrator permission.",
+    "urlScheme": "The address must start with http:// or https://.",
+    "basicAuthFormat": "Format: user:password",
+    "browserOnly": "A browser editing session can only be opened from the browser."
+  },
+  "entities": {
+    "file": "File",
+    "version": "Version"
+  },
+  "converter": {
+    "unreachable": "{{target}} could not be reached ({{cause}}).",
+    "outputTooLarge": "The converter's response exceeds the size limit.",
+    "notPdf": "{{who}} did not return a PDF.",
+    "timeout": "The conversion timed out.",
+    "fileTooLarge": "The file is {{size}} MB; the conversion limit is {{limit}} MB (Administration → Office Integration).",
+    "localLabel": "LibreOffice (this server)",
+    "onlyoffice": {
+      "running": "ONLYOFFICE Docs is running.",
+      "noAnswer": "ONLYOFFICE did not respond (timeout).",
+      "serviceNotFound": "ONLYOFFICE ConvertService not found.",
+      "failed": "ONLYOFFICE could not convert: {{reason}}.",
+      "errorCode": "error {{code}}",
+      "noResultUrl": "ONLYOFFICE returned no result address.",
+      "resultDownload": "The ONLYOFFICE result could not be downloaded: HTTP {{status}}",
+      "codes": {
+        "unknown": "unknown error",
+        "timeout": "conversion timeout",
+        "conversion": "conversion error",
+        "download": "the source file could not be downloaded (ONLYOFFICE cannot reach the CDE address, the 'CDE address as seen by the editor')",
+        "password": "the file is password protected",
+        "database": "ONLYOFFICE database error",
+        "invalidRequest": "invalid request",
+        "invalidJwt": "invalid JWT (the secret key does not match the one in ONLYOFFICE)",
+        "format": "format not recognised",
+        "size": "size limit exceeded"
+      }
+    },
+    "collabora": {
+      "convertToOff": "Collabora convert-to is off or the CDE server is not allowed (net.post_allow).",
+      "running": "Collabora Online is running.",
+      "runningVersion": "Collabora Online is running ({{version}}).",
+      "noAnswer": "Collabora did not respond (timeout).",
+      "failed": "Collabora could not convert: HTTP {{status}} {{detail}}",
+      "notFound": "Collabora convert-to not found."
+    },
+    "gotenberg": {
+      "running": "Gotenberg is running.",
+      "noAnswer": "Gotenberg did not respond (timeout).",
+      "failed": "Gotenberg could not convert: HTTP {{status}} {{detail}}"
+    }
+  },
+  "service": {
+    "converterHint": "There is no converter to turn office files into PDF (optional; files still open in the browser). For an exact PDF, an administrator can connect ONLYOFFICE, Collabora or Gotenberg in Administration → Office Integration (LibreOffice soffice on the server is used as a fallback if present). See docs/features/OFIS_ENTEGRASYONU.md.",
+    "converterOff": "Office → PDF conversion is off (Administration → Office Integration).",
+    "converterUrlMissing": "No {{converter}} address entered (Administration → Office Integration).",
+    "onlyofficeNeedsWopiBase": "ONLYOFFICE conversion needs the 'CDE address as seen by the editor' (ONLYOFFICE downloads the file from there).",
+    "editorNotConfigured": "No editor is set up for browser editing.",
+    "discoveryFailed": "The editor discovery could not be read.",
+    "discoveryFailedAt": "The editor discovery could not be read ({{url}}): {{cause}}"
+  },
+  "test": {
+    "steps": {
+      "editor": "Editor",
+      "discovery": "Editor Discovery",
+      "proofKey": "Proof Key",
+      "cdeAddress": "CDE Address",
+      "pdfConverter": "PDF Converter",
+      "converterStatus": "{{name}} Status",
+      "trial": "Trial Conversion",
+      "settings": "Settings"
+    },
+    "editorUrlMissing": "No editor address entered.",
+    "editableFormats_one": "{{count}} format can be edited ({{list}}).",
+    "editableFormats_other": "{{count}} formats can be edited ({{list}}).",
+    "noEditAction": "The discovery has no edit action (ONLYOFFICE needs WOPI_ENABLED=true).",
+    "proofKeyRead": "The editor's signing key was read; WOPI requests are verified.",
+    "proofKeyMissing": "The discovery has no proof key; signatures cannot be verified.",
+    "proofOff": "Signature verification is off.",
+    "cdeAddressEmpty": "The CDE address as seen by the editor is empty: the address in the browser is used. Fill it in if the editor reaches the CDE under another name.",
+    "trialFileText": "SiteKeep connection test — office converter.",
+    "trialOk": "TXT → PDF {{bytes}} bytes, {{ms}} ms.",
+    "trialTimeout": "The trial conversion timed out.",
+    "allOff": "The editor and the converter are off."
+  },
+  "wopi": {
+    "proofFailed": "The proof could not be verified: {{reason}}",
+    "noAccessToken": "No access_token.",
+    "invalidToken": "Invalid or expired token.",
+    "wrongFile": "The token is not for this file.",
+    "userDisabled": "The user does not exist or is disabled.",
+    "fileNotFound": "File not found.",
+    "versionNotFound": "Version not found.",
+    "viewSession": "Viewing session.",
+    "fileTooLarge": "File size limit exceeded.",
+    "serverError": "Server error.",
+    "largerThanExpected": "The file is larger than the expected size.",
+    "notSupported": "{{override}} is not supported.",
+    "noWrite": "No write permission.",
+    "noLockHeader": "No X-WOPI-Lock header.",
+    "lockTooLong": "The lock is too long.",
+    "lockAscii": "The lock may contain ASCII characters only.",
+    "noOverrideHeader": "No X-WOPI-Override header.",
+    "notFound": "Not found.",
+    "versionComment": "Edited in the browser ({{editor}})",
+    "versionCommentAutosave": "Edited in the browser ({{editor}}, autosave)"
+  },
+  "discovery": {
+    "notXml": "The WOPI discovery is not XML."
+  },
+  "proof": {
+    "unknownFormat": "Unrecognised proof-key format.",
+    "short": "The proof key is too short.",
+    "noProof": "No X-WOPI-Proof header.",
+    "badTimestamp": "X-WOPI-TimeStamp is invalid.",
+    "tooOld": "X-WOPI-TimeStamp is older than 20 minutes.",
+    "badSignature": "The X-WOPI-Proof signature could not be verified."
+  }
+}

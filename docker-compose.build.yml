@@ -1,0 +1,20 @@
+# Build the SiteKeep image from this repository instead of pulling it (docs/onprem/docker-compose.md):
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+# SITEKEEP_EDITION: community (the core only) or enterprise (the core and the Enterprise modules, which
+# need a GitHub token with read:packages in NODE_AUTH_TOKEN); empty builds every module without licence checks.
+# The private viewer and SDK packages also need NODE_AUTH_TOKEN until they are published on npmjs.com.
+services:
+  app:
+    image: sitekeep-local:${SITEKEEP_EDITION:-community}
+    build:
+      context: .
+      args:
+        EDITION: ${SITEKEEP_EDITION:-community}
+        # 0 skips the LibreDWG build (no DWG previews; faster)
+        WITH_LIBREDWG: ${WITH_LIBREDWG:-1}
+      secrets:
+        - npm_token
+
+secrets:
+  npm_token:
+    environment: NODE_AUTH_TOKEN

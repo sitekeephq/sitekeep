@@ -1,0 +1,27 @@
+{
+  "notFound": "{{what}} not found.",
+  "forbidden": "You do not have permission to do this.",
+  "validation": "Invalid request.",
+  "generic": "Error",
+  "duplicate": "A record with the same name already exists.",
+  "internal": "Server error.",
+  "entities": {
+    "record": "Record",
+    "folder": "Folder",
+    "project": "Project"
+  },
+  "unauthorized": "You need to sign in.",
+  "routeNotFound": "Not found.",
+  "projectAdminRequired": "This action requires project administrator permission.",
+  "passwordTooShort": "The password must be at least 10 characters long.",
+  "tokenScope": {
+    "consentSessionOnly": "App consent can only be given from a browser session.",
+    "sessionRequired": "This action requires a browser session; it cannot be done with an API access token.",
+    "tokensSessionOnly": "API access tokens can only be managed from a browser session.",
+    "openCdeOnly": "This access token was issued only for the OpenCDE APIs (BCF, Documents); it has no read or write permission.",
+    "projectLimited": "This access token is limited to specific projects; it cannot make changes outside a project.",
+    "readOnly": "This access token has read-only permission."
+  },
+  "moduleOff": "This module is not enabled on this installation.",
+  "licenseReadOnly": "The licence for this module has expired: it is read-only until the licence is renewed."
+}

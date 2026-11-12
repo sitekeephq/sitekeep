@@ -1,0 +1,2 @@
+SiteKeep Playwright critical-path fixture.
+This file is intentionally tiny and contains no external data.

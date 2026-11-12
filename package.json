@@ -1,0 +1,28 @@
+{
+  "name": "sitekeep",
+  "private": true,
+  "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @sitekeep/server & npm run dev -w @sitekeep/web",
+    "build": "npm run build -w @sitekeep/shared && npm run build -w @sitekeep/cde-tools && npm run build -w @7dimensions-project/sitekeep-sdk && npm run build -w @sitekeep/server && npm run build -w @sitekeep/mcp && npm run build -w @sitekeep/web",
+    "test": "npm run build -w @sitekeep/shared && npm run build -w @sitekeep/cde-tools && npm test -w @sitekeep/shared && npm test -w @sitekeep/cde-tools && npm test -w @sitekeep/server && npm test -w @sitekeep/web",
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "e2e:headed": "playwright test -c e2e/playwright.config.ts --project=chromium --headed",
+    "e2e:ui": "playwright test -c e2e/playwright.config.ts --ui",
+    "e2e:install": "playwright install chromium webkit",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "scenarios": "npm run build -w @sitekeep/shared && npm run build -w @sitekeep/cde-tools && npm run scenarios -w @sitekeep/server --"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "esbuild": "0.28.2"
+  }
+}

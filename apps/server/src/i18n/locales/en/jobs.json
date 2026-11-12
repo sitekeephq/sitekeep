@@ -1,0 +1,62 @@
+{
+  "queue": {
+    "indexNotCreated": "Index not created.",
+    "indexFailed": "The index could not be created.",
+    "ifcTimeout": "The IFC conversion timed out.",
+    "ifcExit": "The IFC conversion process ended with code {{code}}."
+  },
+  "spatial": {
+    "versionNotFound": "IFC version not found.",
+    "timeout": "Reading IFC locations timed out.",
+    "exit": "The IFC location process ended with code {{code}}."
+  },
+  "clash": {
+    "timeLimit": "The clash test exceeded its {{minutes}}-minute time limit. Narrow the selections (file, class or property filter).",
+    "tooManyElements": "Too many elements in the selection ({{count}}; limit {{limit}} per side). Narrow it with a class or file filter.",
+    "tooManyElementsAB": "Too many elements in the selection (A: {{a}}, B: {{b}}; limit {{limit}} per side). Narrow it with a class or file filter.",
+    "geometryTooLarge": "The geometry of the selected elements is too large (limit of {{limit}} triangles exceeded). Narrow the selections.",
+    "tooManyPairs": "Too many candidate pairs in the broad phase (>{{limit}}). Narrow the selections or lower the tolerance.",
+    "tooManyClashes": "Too many clashes found (>{{limit}}). Narrow the selections; the results were not saved.",
+    "failed": "Clash test failed: {{reason}}"
+  },
+  "ids": {
+    "restriction": "restriction",
+    "empty": "empty",
+    "entityExpected": "Class {{expected}} expected, {{found}} found",
+    "predefinedTypeExpected": "Predefined type {{expected}} expected, {{found}} found",
+    "attributeProhibited": "Attribute {{name}} must not be present",
+    "attributeMissing": "Attribute {{name}} is empty or missing",
+    "valueExpected": "{{name}} = \"{{value}}\"; expected {{expected}}",
+    "propertyProhibited": "{{name}} must not be present",
+    "propertyMissing": "Property {{name}} is missing or empty",
+    "dataTypeExpected": "{{name}} data type {{type}}; expected {{expected}}",
+    "schemaSkipped": "Model schema {{schema}}; the specification is for {{versions}}.",
+    "applicabilityUnsupported": "The applicability contains an unsupported facet.",
+    "prohibited": "No element may match this specification",
+    "noApplicable": "No applicable elements; the specification expects at least one.",
+    "unsupportedFacets": "Facets not evaluated: {{facets}}",
+    "failed": "Information requirements check (IDS) failed: {{reason}}"
+  },
+  "paramChange": {
+    "notBoolean": "\"{{value}}\" is not a yes/no value.",
+    "notNumberTyped": "\"{{value}}\" is not a number; the property is numeric ({{type}}).",
+    "notInteger": "\"{{value}}\" is not an integer ({{type}}).",
+    "notNumber": "\"{{value}}\" is not a number.",
+    "kindNotEditable": "This property kind ({{kind}}) cannot be changed; only single-value and enumerated properties.",
+    "elementNotFound": "Element not found in the model.",
+    "duplicate": "The same property of the same element appears twice in the request.",
+    "quantity": "Quantities (Qto) are derived from the geometry and cannot be changed.",
+    "valueUpdated": "Value updated.",
+    "typeOverridden": "Type value overridden on the element.",
+    "typeOverriddenNewSet": "Type value overridden on the element with a new property set.",
+    "typeChanged": "Changed on the type ({{count}} elements affected).",
+    "typePropertyAdded": "Property added to the type ({{count}} elements affected).",
+    "typeSetAdded": "Property set added to the type ({{count}} elements affected).",
+    "propertyAdded": "Property added.",
+    "setAndPropertyAdded": "Property set and property added.",
+    "sharedSetSplit": "{{note}} The shared property set was split off for this element.",
+    "typeConflict": "Different values were requested for elements of the same type; it cannot be changed on the type. Use the write-to-element option.",
+    "notApplied": "Could not be applied.",
+    "ifcOpenFailed": "The IFC file could not be opened."
+  }
+}

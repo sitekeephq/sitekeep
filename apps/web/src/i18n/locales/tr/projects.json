@@ -1,0 +1,136 @@
+{
+  "list": {
+    "title": "Projeler",
+    "description": "Erişiminiz olan proje çalışma alanları. Dokümanlara, modellere ve süreçlere buradan ulaşın.",
+    "actions": {
+      "new": "Yeni proje",
+      "refresh": "Listeyi yenile",
+      "copyName": "Proje adını kopyala"
+    },
+    "searchPlaceholder": "Proje ara: kod, ad veya açıklama",
+    "filterLabel": "Projeleri filtrele",
+    "count_one": "{{count}} proje",
+    "count_other": "{{count}} proje",
+    "filteredCount_one": "{{shown}} / {{count}} proje",
+    "filteredCount_other": "{{shown}} / {{count}} proje",
+    "columns": {
+      "project": "Proje",
+      "description": "Açıklama",
+      "myRole": "Rolüm",
+      "created": "Oluşturulma",
+      "actions": "İşlemler"
+    },
+    "copyNameLabel": "{{name}} proje adını kopyala",
+    "status": {
+      "projectAdmin": "Proje yöneticisi",
+      "member": "Üye"
+    },
+    "emptyFiltered": "Filtreyle eşleşen proje yok.",
+    "empty": "Henüz proje yok",
+    "emptyAdminHint": "İlk projenizi oluşturarak başlayın.",
+    "emptyMemberHint": "Bir projeye eklenmek için yöneticinizle iletişime geçin."
+  },
+  "delete": {
+    "title": "Projeyi sil",
+    "label": "{{name}} projesini sil",
+    "confirm": "<b>{{name}}</b> projesini silmek istediğinizden emin misiniz?",
+    "hint": "Proje ve içindeki kayıtlar kullanıcıların proje listesinden kaldırılacaktır.",
+    "deleting": "Siliniyor…",
+    "actions": {
+      "confirm": "Evet, projeyi sil"
+    }
+  },
+  "wizard": {
+    "title": "Yeni Proje",
+    "steps": {
+      "template": "Şablon",
+      "details": "Proje Bilgisi",
+      "companies": "Firmalar",
+      "preview": "Önizleme"
+    },
+    "template": {
+      "lead": "Şablon klasörleri, yetkileri, isimlendirme standardını, öznitelikleri ve onay akışlarını birlikte kurar.",
+      "folders_one": "{{count}} klasör",
+      "folders_other": "{{count}} klasör",
+      "onDemand_one": "+{{count}} klasör ilk dosyada",
+      "onDemand_other": "+{{count}} klasör ilk dosyada",
+      "workflows_one": "{{count}} akış",
+      "workflows_other": "{{count}} akış",
+      "fromFile": {
+        "title": "JSON dosyasından",
+        "description": "Başka bir projeden dışa aktarılmış şablon (.json)",
+        "actions": {
+          "change": "Değiştir",
+          "choose": "Dosya seç"
+        }
+      },
+      "blank": {
+        "title": "Boş proje",
+        "description": "Yalnız “Proje Dosyaları” kök klasörü; gerisini sonra kurarsınız."
+      }
+    },
+    "details": {
+      "fields": {
+        "code": "Proje kodu",
+        "name": "Proje adı"
+      },
+      "codeHint": "İsimlendirme standardındaki proje kodu alanına yazılır; ayraç (-) içermemeli.",
+      "namePlaceholder": "Örn. Zafer AVM"
+    },
+    "companies": {
+      "lead": "Şablondaki her rol için projedeki firmayı seçin. Klasör yetkileri ve onay adımları bu firmalara verilir. Boş bırakılan rolün yetkileri atlanır, adımları proje yöneticilerine gider. Kod, isimlendirme standardındaki firma kodudur.",
+      "empty": "Bu şablonda rol yok.",
+      "columns": {
+        "role": "Rol",
+        "company": "Firma",
+        "code": "Kod"
+      },
+      "options": {
+        "leaveEmpty": "— boş bırak —",
+        "newCompany": "+ Yeni Firma…"
+      },
+      "companyNamePlaceholder": "Firma adı",
+      "companyCodeHint": "Firma kısa kodu (2–8 harf/rakam, isteğe bağlı)"
+    },
+    "preview": {
+      "dimensions": {
+        "heading": "İskelet Boyutları",
+        "hint": "Her satır bir klasör. Örneğin istasyon ve hat listesini projenize göre düzenleyin, sonra önizlemeyi yenileyin."
+      },
+      "actions": {
+        "refresh": "Önizlemeyi Yenile"
+      },
+      "loading": "Önizleme hazırlanıyor…",
+      "stats": {
+        "foldersNow_one": "klasör hemen",
+        "foldersNow_other": "klasör hemen",
+        "foldersOnDemand_one": "klasör ilk dosyada",
+        "foldersOnDemand_other": "klasör ilk dosyada",
+        "grants_one": "firma yetkisi",
+        "grants_other": "firma yetkisi",
+        "workflows_one": "onay akışı",
+        "workflows_other": "onay akışı",
+        "namingStandards_one": "isimlendirme standardı",
+        "namingStandards_other": "isimlendirme standardı",
+        "attributes_one": "öznitelik",
+        "attributes_other": "öznitelik"
+      },
+      "onDemandHint": "“İlk dosyada” klasörler listede soluk görünür; biri dosya yüklediğinde (veya klasörü açıp oluşturduğunda) gerçek klasör olur. Böylece hiç kullanılmayan boş klasörler birikmez.",
+      "allRoles": "Tüm Roller",
+      "namingStandard": "İsimlendirme standardı",
+      "badges": {
+        "gate": "Yalnızca Onaylı İnceleme"
+      },
+      "grant": "{{role}}: {{level}}"
+    },
+    "errors": {
+      "templateProblem": "Şablonda sorun var: {{errors}}",
+      "invalidJson": "Dosya geçerli bir JSON değil."
+    },
+    "progress": "Adım {{current}} / {{total}}",
+    "creating": "Oluşturuluyor…",
+    "actions": {
+      "create": "Projeyi Oluştur"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "framed": "For security reasons this page cannot be opened inside another page.",
+  "consent": {
+    "failed": {
+      "title": "The Application Could Not Connect"
+    },
+    "request": "<b>{{name}}</b> wants to access your account",
+    "intro": "If you approve, the application can do the following as <b>{{name}}</b> ({{email}}), with your permissions:",
+    "after": "After approval the browser returns to <b>{{target}}</b>. You can remove the access at any time under My Account → Connected Applications.",
+    "actions": {
+      "deny": "Deny",
+      "approve": "Approve",
+      "switchAccount": "Sign In with Another Account"
+    },
+    "notYou": "Not you?",
+    "redirecting": "Redirecting…"
+  },
+  "opencde": {
+    "errors": {
+      "missingKey": "The link is incomplete. Start the action again from the application."
+    },
+    "returning": {
+      "title": "Returning to the Application",
+      "description": "{{client}} will continue the action. You can close this tab."
+    },
+    "failed": {
+      "title": "The Page Could Not Be Opened"
+    },
+    "done": {
+      "title": "This Action Is Complete",
+      "description": "To upload or select again, start the action again from the application."
+    },
+    "options": {
+      "selectFolder": "Select a Folder…",
+      "selectProject": "Select a Project…",
+      "notSelected": "Not Selected"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "startUpload": "Start Upload",
+      "sendSelection": "Send Selection",
+      "sendSelectionCount": "Send Selection ({{n}})"
+    },
+    "upload": {
+      "frameTitle": "Upload from an External Application",
+      "request_one": "<b>{{client}}</b> wants to upload {{count}} file to the CDE",
+      "request_other": "<b>{{client}}</b> wants to upload {{count}} files to the CDE",
+      "intro": "Uploaded as {{name}} with your folder permissions. When done, the browser returns to <b>{{target}}</b>.",
+      "fields": {
+        "targetFolder": "Target Folder",
+        "revision": "Revision",
+        "suitability": "Status / Suitability"
+      },
+      "noWritable": "You have no folder in this project you can upload to.",
+      "standard": "Naming Standard: {{name}}",
+      "noStandard": "This folder has no naming standard.",
+      "columns": {
+        "incoming": "Incoming File",
+        "cdeName": "Name in the CDE"
+      },
+      "newVersion": "New Version (V{{version}})",
+      "matches": "Matches the Standard",
+      "placeholder": {
+        "revision": "e.g. C01",
+        "comment": "What changed in this version?"
+      },
+      "errors": {
+        "emptyName": "The name cannot be empty.",
+        "keepExtension": "The extension must stay .{{ext}}."
+      },
+      "footnote": "Files are sent straight from the application to this server; no data leaves. The upload goes through the same rules as a normal upload (naming, attributes, IFC model preparation, notifications, audit log)."
+    },
+    "select": {
+      "frameTitle": "Select Documents for an External Application",
+      "request": "<b>{{client}}</b> asks you to select documents from the CDE",
+      "description": "The details and download links of the documents you select are passed to the application. Files you have no permission for are not listed.",
+      "placeholder": "Search in File Names",
+      "options": {
+        "onlyExts": "Only {{exts}} Files"
+      },
+      "empty": "No documents.",
+      "pickFolder": "Select a folder or search.",
+      "noDownload": "You may not download this; only its details are passed on."
+    }
+  }
+}

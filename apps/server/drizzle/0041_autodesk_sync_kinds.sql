@@ -1,0 +1,2 @@
+ALTER TABLE "autodesk_connections" ADD COLUMN IF NOT EXISTS "authorized_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "autodesk_connections" ADD COLUMN IF NOT EXISTS "sync_kinds" text[];

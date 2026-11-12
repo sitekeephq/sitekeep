@@ -1,0 +1,572 @@
+{
+  "today": {
+    "title": "Bugün",
+    "mine": {
+      "title": "Bana Düşenler",
+      "empty": "Size bekleyen bir şey yok."
+    },
+    "overdue": {
+      "title": "Gecikenler",
+      "empty": "Geciken kayıt yok."
+    },
+    "upcoming": {
+      "title": "Yaklaşan Terminler",
+      "description_one": "Önümüzdeki {{count}} gün.",
+      "description_other": "Önümüzdeki {{count}} gün.",
+      "empty": "Yaklaşan termin yok."
+    },
+    "changes": {
+      "title": "Son Değişiklikler",
+      "description_one": "Son {{count}} gün; yalnız görebildiğiniz kayıtlar.",
+      "description_other": "Son {{count}} gün; yalnız görebildiğiniz kayıtlar.",
+      "empty": "Son günlerde değişiklik yok.",
+      "system": "Sistem",
+      "more_one": "ve {{count}} kayıt daha",
+      "more_other": "ve {{count}} kayıt daha"
+    },
+    "days": {
+      "today": "Bugün",
+      "yesterday": "Dün"
+    },
+    "showMore": "Devamını Göster",
+    "showLess": "Daha Az Göster"
+  },
+  "summary": {
+    "title": "Günün Özeti",
+    "modelTitle": "Model: {{model}}",
+    "badges": {
+      "ai": "Yapay Zekâ Özeti · {{time}}",
+      "auto": "Otomatik Özet"
+    },
+    "messages": {
+      "writing": "Yapay zekâ özeti hazırlanıyor…",
+      "waitingClient": "Yapay zekâ istemcisi bekleniyor…"
+    },
+    "stale": "Son değişiklikler bu özete henüz yansımadı."
+  },
+  "myTasks": {
+    "title": "Görevlerim",
+    "description": "Tüm projelerde onayınızı, cevabınızı veya işleminizi bekleyen kayıtlar.",
+    "groups": {
+      "overdue": "Termini Geçenler",
+      "dueSoon": "Termini Yaklaşanlar (2 gün)",
+      "awaitingReply": "Cevap Bekleyen Yazılar",
+      "toReceive": "Alındı Onayı Bekleyenler",
+      "assigned": "Bana Atanan İşler"
+    },
+    "metrics": {
+      "tasks": "Onay görevleri"
+    },
+    "tasks": {
+      "title": "Onay Görevlerim",
+      "empty": "Bekleyen onay göreviniz yok."
+    },
+    "columns": {
+      "record": "Kayıt",
+      "step": "Adım"
+    },
+    "empty": "Bugün için bekleyen bir şey yok.",
+    "followedNote": "Takip edilen klasörlerdeki yeni versiyonlar, klasör takibi eklendiğinde burada görünecek."
+  },
+  "list": {
+    "columns": {
+      "type": "Tip",
+      "party": "Gönderen → Alıcı"
+    },
+    "badges": {
+      "replyAwaited": "Cevap Bekleniyor"
+    },
+    "options": {
+      "groupBy": {
+        "none": "Gruplama Yok",
+        "type": "Tipe Göre",
+        "status": "Duruma Göre",
+        "company": "Karşı Firmaya Göre",
+        "month": "Aya Göre"
+      },
+      "due": {
+        "overdue": "Termini Geçenler",
+        "soon": "Termini Yaklaşanlar"
+      },
+      "openOnly": "Yalnız Açık İşler",
+      "allStatuses": "Tüm Durumlar",
+      "allDueDates": "Tüm Terminler",
+      "list": "Liste"
+    },
+    "fields": {
+      "quickFilter": "Hızlı Filtre",
+      "groupBy": "Gruplama",
+      "display": "Gösterim"
+    },
+    "groups": {
+      "expand": "{{name}} Grubunu Aç",
+      "collapse": "{{name}} Grubunu Kapat",
+      "expandAll": "Tümünü Aç",
+      "collapseAll": "Tümünü Kapat"
+    },
+    "noCompany": "Firma Yok",
+    "chips": {
+      "search": "Ara: \"{{query}}\"",
+      "type": "Tip: {{type}}",
+      "status": "Durum: {{status}}"
+    },
+    "empty": {
+      "filtered": "Filtrelere uyan kayıt yok.",
+      "all": "Henüz iş yok. \"+ Yeni\" ile yazı, gönderim formu, bilgi talebi ya da tanımlı başka bir iş oluşturun.",
+      "sections": {
+        "correspondence": "Henüz yazı yok. \"+ Yeni\" ile başlayın.",
+        "rfi": "Henüz bilgi talebi yok. \"+ Yeni\" ile başlayın.",
+        "submittal": "Henüz teknik onay yok. \"+ Yeni\" ile başlayın.",
+        "meeting": "Henüz toplantı yok. \"+ Yeni\" ile başlayın.",
+        "transmittal": "Henüz gönderim formu yok. \"+ Yeni\" ile başlayın."
+      }
+    },
+    "placeholder": "Ara: numara, konu, alan…",
+    "specRegisterHint": "Şartname PDF'inden taslak teknik onay listesi çıkarın",
+    "actions": {
+      "specRegister": "Şartnameden Teknik Onay Listesi"
+    }
+  },
+  "hub": {
+    "sharedBy": "{{owner}} · projeyle paylaşıldı",
+    "badges": {
+      "shared": "Paylaşılan"
+    },
+    "saveViewHint": "Bu görünümü filtreleri, gruplaması ve aramasıyla kaydedin",
+    "moduleOff": "Bu modül projede kapalı. Mevcut kayıtlar açılabilir; yeni kayıt oluşturulamaz.",
+    "saveDialog": {
+      "description": "Görünüm, filtreleri, gruplaması ve aramasıyla birlikte \"Kayıtlı Görünümler\" altında durur.",
+      "shareHint": "projenin bütün üyeleri görür"
+    },
+    "manage": {
+      "fields": {
+        "viewName": "Görünüm Adı"
+      },
+      "private": "Size özel",
+      "sharedBy": "{{owner}} · paylaşılan",
+      "actions": {
+        "moveUp": "Yukarı Taşı",
+        "up": "Yukarı",
+        "moveDown": "Aşağı Taşı",
+        "down": "Aşağı",
+        "unshare": "Paylaşımı Kaldır",
+        "share": "Projeyle Paylaş"
+      },
+      "delete": {
+        "title": "Görünümü Sil",
+        "confirm": "\"{{name}}\" görünümü silinsin mi?"
+      }
+    }
+  },
+  "newRecord": {
+    "title": "Ne Yapmak İstiyorsunuz?",
+    "placeholder": "Örn. Prota'ya B3 kazısı için bilgi talebi aç",
+    "inputLabel": "Ne yapmak istiyorsunuz?",
+    "suggestion": "Öneri: <b>{{kind}}</b>{{details}}. Enter ile devam edin ya da başka bir tipe tıklayın.",
+    "suggestionFrom": "gönderen {{company}}",
+    "suggestionTo": "alıcı {{company}}",
+    "suggestionTitle": "başlık \"{{title}}\"",
+    "notUnderstood": "Tip anlaşılamadı; aşağıdan seçin. Yazdığınız cümle başlık olur.",
+    "hint": "Bir cümle yazın ya da doğrudan bir kayıt tipi seçin.",
+    "loadingTypes": "Kayıt tipleri yükleniyor…",
+    "actions": {
+      "continue": "Devam"
+    },
+    "kindHelp": {
+      "incomingLetter": "Gelen resmi yazıyı kaydet",
+      "outgoingLetter": "Resmi yazı hazırla ve gönder",
+      "rfi": "Tasarımcıya veya müşavire soru sor",
+      "submittal": "Malzeme, numune veya çizim onayı iste",
+      "meeting": "Toplantı, gündem ve tutanak",
+      "action": "Bir kişiye termini olan iş ver",
+      "transmittal": "Dosyaları kapak sayfasıyla gönder",
+      "issue": "Sahada veya modelde gördüğün sorunu aç",
+      "form": "Şablondan saha formu doldur",
+      "review": "Dosyaları onay zincirine gönder",
+      "paramChange": "IFC modelinde eleman bilgilerini değiştir (yeni versiyon)",
+      "upload": "Dokümanlar'a dosya yükle"
+    }
+  },
+  "newIssue": {
+    "title": "Yeni Sorun",
+    "fields": {
+      "title": "Başlık *"
+    },
+    "pinHint": "Modeldeki bir noktaya bağlı sorun için Model → Görüntüleyici'de \"📍 Noktadan Sorun\"u kullanın."
+  },
+  "newForm": {
+    "title": "Yeni Form",
+    "noTemplates": "Bu projede form şablonu yok. Formlar → Şablonlar'dan hazır şablon ekleyin."
+  },
+  "createWork": {
+    "title": "Yeni İş",
+    "titleOfType": "Yeni {{type}}",
+    "fields": {
+      "title": "Başlık / Konu *",
+      "fromCompany": "Gönderen Firma",
+      "toIncoming": "Muhatap (gereği) Firmalar",
+      "to": "Gereği (alıcı firmalar)",
+      "cc": "Bilgi (dağıtım)"
+    },
+    "options": {
+      "replyRequired": "Cevap Gerekiyor"
+    },
+    "numberHint": "Numara kaydedilince verilir: <mono>{{pattern}}</mono>",
+    "attachmentsHint": "Ekler kayıttan sonra detay ekranından eklenir.",
+    "noCompanies": "Firma tanımlı değil."
+  },
+  "send": {
+    "title": "{{number}} Gönder",
+    "fields": {
+      "reference": "Gönderim No / Referans",
+      "note": "Not"
+    },
+    "referencePlaceholder": "ör. KEP gönderim no",
+    "signedRequired": "Bu kanal için en az bir PDF eki \"İmzalı PDF\" olarak işaretlenmeli.",
+    "transmittalHint": "Gönderimde kapak sayfası (PDF) üretilip \"Gönderim formları\" klasörüne kaydedilir.",
+    "letterHint": "Gönderimde resmi yazı (PDF) üretilip Yazılar klasörüne kaydedilir. Yabancı dilde basılacak yazılar için çeviri zorunludur."
+  },
+  "filePicker": {
+    "title": "Dosya Versiyonu Ekle",
+    "placeholder": "Dosya adı veya öznitelik ara…",
+    "columns": {
+      "version": "Versiyon"
+    },
+    "selected_one": "{{count}} seçili · seçilen versiyon sabitlenir",
+    "selected_other": "{{count}} seçili · seçilen versiyon sabitlenir"
+  },
+  "linkPicker": {
+    "title": "İlgi / Bağlantı Ekle",
+    "options": {
+      "work": "İş / Yazı",
+      "issue": "Sorun",
+      "review": "İnceleme"
+    },
+    "placeholder": "Ara…",
+    "empty": "Kayıt yok."
+  },
+  "editWork": {
+    "title": "{{number}} Düzenle",
+    "fields": {
+      "title": "Başlık / Konu",
+      "to": "Gereği",
+      "cc": "Bilgi"
+    },
+    "sentRecipientsLocked": "Gönderilmiş işin alıcıları değiştirilemez."
+  },
+  "detail": {
+    "badges": {
+      "due": "Termin {{date}}"
+    },
+    "actions": {
+      "send": "Gönder…",
+      "receive": "Alındı",
+      "reply": "Cevap Yaz",
+      "refreshCover": "Kapak PDF Yenile",
+      "addFileVersion": "+ Dosya Versiyonu",
+      "link": "+ Bağla"
+    },
+    "fields": {
+      "from": "Gönderen"
+    },
+    "receipts": {
+      "title": "Alındı Onayları"
+    },
+    "attachments": {
+      "empty": "Ek yok."
+    },
+    "links": {
+      "title": "İlgi ve Bağlantılar",
+      "backlinksHeading": "Bu Yazıyı İlgi Tutanlar",
+      "replyToThis": "Bu yazıya cevap",
+      "refersToThis": "Bu işe atıf yapıyor",
+      "empty": "Bağlantı yok.",
+      "officialLetterPdf": "Resmi Yazı (PDF)",
+      "reply": "cevap",
+      "signedPdf": "imzalı PDF"
+    },
+    "options": {
+      "signedPdf": "İmzalı PDF (e-imza)"
+    },
+    "timeline": {
+      "title": "Zaman Çizelgesi"
+    },
+    "commentPlaceholder": "Not / yorum yazın…",
+    "delivery": {
+      "heading": "Gönderim:",
+      "referencePlaceholder": "Gönderim no (KEP vb.)",
+      "reference": "Gönderim no: {{reference}}"
+    },
+    "thread": {
+      "title_one": "Yazışma Zinciri ({{count}})",
+      "title_other": "Yazışma Zinciri ({{count}})"
+    },
+    "events": {
+      "created": "oluşturdu",
+      "createdWithNote": "oluşturdu ({{note}})",
+      "updated": "güncelledi",
+      "status": "durumu değiştirdi: {{from}} → {{to}}",
+      "linked": "bağlantı ekledi",
+      "unlinked": "bağlantı kaldırdı",
+      "sent": "gönderdi ({{channel}})",
+      "sentWithReference": "gönderdi ({{channel}} · {{reference}})",
+      "delivery": "teslim bilgisini güncelledi",
+      "deliveryWithStatus": "teslim bilgisini güncelledi: {{status}}",
+      "received": "alındı olarak işaretledi ({{company}})",
+      "replied": "cevap yazdı",
+      "answered": "cevaplandı",
+      "coverPdf": "kapak PDF'i üretildi: {{file}}",
+      "comment": "not ekledi:",
+      "minutes": "tutanağı kaydetti",
+      "minutesWithNote": "tutanağı kaydetti ({{note}})",
+      "submitted": "onaya gönderdi",
+      "submittedWithNote": "onaya gönderdi: {{note}}",
+      "responded": "cevap verdi",
+      "respondedWithResult": "cevap verdi: {{result}}",
+      "respondedWithNote": "cevap verdi ({{note}})",
+      "respondedWithResultAndNote": "cevap verdi: {{result}} ({{note}})",
+      "decided": "sonuçlandı: {{result}}",
+      "revised": "revizyon başlattı",
+      "cancelled": "iptal etti",
+      "cancelledWithNote": "iptal etti: {{note}}",
+      "archived": "arşivledi",
+      "reopened": "taslağa aldı",
+      "letter": "yazı metnini güncelledi",
+      "letterPdf": "resmi yazı PDF'i üretildi: {{file}}",
+      "mail": "e-posta gönderdi"
+    }
+  },
+  "letter": {
+    "title": "Yazı",
+    "dialogTitle": "{{number}} · Yazı",
+    "actions": {
+      "edit": "Yazıyı Düzenle",
+      "previewPdf": "PDF Önizle",
+      "prepareEml": "E-posta Hazırla (.eml)",
+      "sendMail": "E-posta Gönder",
+      "markMailed": "Gönderildi İşaretle",
+      "archive": "Arşivle",
+      "cancel": "İptal Et",
+      "reopen": "Taslağa Al",
+      "fillFromCompany": "Firmadan Doldur",
+      "translateWithAi": "Yapay Zekâ ile Çevir"
+    },
+    "fields": {
+      "language": "Dil",
+      "recipient": "Muhatap",
+      "signature": "İmza",
+      "letterLanguage": "Yazı Dili",
+      "secondLanguage": "İkinci Dil",
+      "layout": "Çift Dil Düzeni",
+      "recipientName": "Makam / Kişi",
+      "address": "Adres",
+      "ccEmails": "CC E-postalar (virgülle)",
+      "signerName": "Ad Soyad",
+      "signerTitleTr": "Ünvan (Türkçe)",
+      "signerTitle": "Ünvan",
+      "referenceTextLong": "İlgi Metni (serbest; ilgi bağlantıları ayrıca a), b)… diye basılır)",
+      "referenceText": "İlgi Metni",
+      "body": "İçerik",
+      "bodyRequired": "İçerik *",
+      "body2Long": "İçerik 2 (ayrı sayfada basılır)",
+      "body2": "İçerik 2",
+      "subjectRequired": "Konu *"
+    },
+    "badges": {
+      "mailSent": "Gönderildi · {{date}}",
+      "mailNotSent": "Gönderilmedi"
+    },
+    "mailPreparedOnSend": "Yazı gönderilince hazırlanır",
+    "emlHint": "Yazı PDF ekli e-posta taslağı (.eml); e-posta programınızda açılır.",
+    "emlNeedsEmail": "Önce muhatabın e-posta adresini girin.",
+    "errors": {
+      "noRecipientEmail": "E-posta için muhatabın e-posta adresini girin (Yazıyı düzenle)."
+    },
+    "cancel": {
+      "title": "Yazıyı İptal Et",
+      "confirm": "{{number}} iptal edilsin mi?"
+    },
+    "delete": {
+      "title": "Yazıyı Sil",
+      "confirm": "{{number}} kalıcı olarak silinsin mi?"
+    },
+    "messages": {
+      "suggestionApplied": "Öneri forma yazıldı; kontrol edip kaydedin."
+    },
+    "tabs": {
+      "general": "Genel",
+      "text": "Metin",
+      "translations": "Çeviriler",
+      "translationsCount": "Çeviriler ({{count}})"
+    },
+    "options": {
+      "singleLanguage": "— (tek dil)"
+    },
+    "languageHint": "Türkçe metin ana metindir; başlık Türkçe konudur. Diğer diller \"Çeviriler\" bölümüne girilir, boş bırakılan alanda Türkçe metin basılır.",
+    "fillFromCompanyHint": "{{company}} bilgileriyle doldur",
+    "noCounterpart": "Karşı firma seçili değil",
+    "ccPlaceholder": "proje@firma.com, arsiv@firma.com",
+    "formattingHint": "Boş satır yeni paragraf, \"- \" ile başlayan satır madde, **kalın** kalın yazı olur.",
+    "turkishOnly": "Yazı yalnızca Türkçe. Çeviri için \"Genel\" bölümünde yazı dilini veya ikinci dili seçin.",
+    "status": {
+      "translating": "Çevriliyor…"
+    },
+    "translationHint": "Boş bırakılan alanda Türkçe metin basılır. Gönderimden önce konu (ve Türkçe içerik varsa içerik) çevirisi zorunludur."
+  },
+  "build": {
+    "badges": {
+      "rev": "Rev {{rev}}",
+      "ballInCourt": "Sıradaki taraf: {{names}}"
+    },
+    "parent": "Üst iş: <link>{{number}}</link>",
+    "submitNotePlaceholder": "Gönderim notu (isteğe bağlı)",
+    "actions": {
+      "submitItems": "Kalemleri Onaya Gönder",
+      "submit": "Onaya Gönder",
+      "revise": "Yeni Revizyon (Rev {{rev}})"
+    },
+    "cancel": {
+      "title": "İşi İptal Et",
+      "confirm": "İş iptal edilsin mi? Süren onay akışı da durur."
+    },
+    "rfi": {
+      "question": "Soru",
+      "proposedSolution": "Önerilen Çözüm",
+      "officialResponse": "Resmi Cevap",
+      "notAnswered": "Henüz cevaplanmadı."
+    },
+    "revisions": {
+      "title": "Revizyon Geçmişi",
+      "inReview": "İncelemede",
+      "cancelled": "İptal"
+    },
+    "columns": {
+      "rev": "Rev",
+      "submission": "Gönderim"
+    },
+    "flow": {
+      "title": "Onay Akışı · Rev {{rev}}",
+      "due": "termin {{date}}",
+      "onBehalfOf": "{{names}} adına",
+      "fields": {
+        "officialResponseRequired": "Resmi Cevap *"
+      },
+      "actions": {
+        "respond": "Yanıtla"
+      }
+    }
+  },
+  "meeting": {
+    "title": "Toplantı",
+    "actions": {
+      "minutesPdf": "PDF Tutanak",
+      "createNext": "Sonraki Toplantıyı Oluştur",
+      "openNext": "Sonraki Toplantı →"
+    },
+    "attendees": {
+      "title": "Katılımcılar",
+      "namePlaceholder": "Ad soyad",
+      "options": {
+        "present": "Katıldı",
+        "addMember": "+ Üye Ekle"
+      },
+      "actions": {
+        "addExternal": "+ Dış Katılımcı"
+      }
+    },
+    "agenda": {
+      "title": "Gündem",
+      "actions": {
+        "add": "+ Gündem Maddesi"
+      }
+    },
+    "messages": {
+      "saved": "Katılımcılar ve gündem kaydedildi.",
+      "minutesSaved": "Tutanak kaydedildi: {{created}} yeni, {{updated}} güncellenen eylem."
+    },
+    "minutes": {
+      "title": "Tutanak",
+      "hint": "Sorumlu ya da termini olan madde \"Eylem\" işi olur ve sorumluya atanır.",
+      "subjectPlaceholder": "Konu",
+      "decisionPlaceholder": "Karar",
+      "options": {
+        "ownerPerson": "Sorumlu Kişi —",
+        "ownerCompany": "Sorumlu Firma —"
+      },
+      "fields": {
+        "notes": "Notlar"
+      },
+      "actions": {
+        "addItem": "+ Madde",
+        "save": "Tutanağı Kaydet"
+      }
+    },
+    "ai": {
+      "title": "Tutanaktan Eylem Çıkar (YZ)",
+      "placeholder": "Serbest tutanak metnini yapıştırın",
+      "actions": {
+        "addToMinutes": "Tutanağa Ekle"
+      },
+      "empty": "Öneri yok."
+    },
+    "actionsList": {
+      "title": "Eylemler",
+      "empty": "Bu toplantıdan eylem yok."
+    },
+    "carried": {
+      "title": "Önceki Toplantılardan Devreden"
+    }
+  },
+  "register": {
+    "rfi": {
+      "title": "Bilgi Talebi Listesi",
+      "summary_one": "{{count}} bilgi talebi · {{open}} açık · {{overdue}} termini geçmiş",
+      "summary_other": "{{count}} bilgi talebi · {{open}} açık · {{overdue}} termini geçmiş",
+      "empty": "Henüz bilgi talebi yok."
+    },
+    "submittal": {
+      "title": "Teknik Onay Listesi",
+      "count_one": "{{count}} kalem",
+      "count_other": "{{count}} kalem",
+      "empty": "Henüz teknik onay kalemi yok. Şartnameden çıkarılan listeyi içe aktarabilir ya da \"+ Yeni Teknik Onay\" ile kalem açabilirsiniz."
+    },
+    "actions": {
+      "excel": "Excel",
+      "import": "Şartname Listesini İçe Aktar"
+    },
+    "columns": {
+      "subject": "Konu",
+      "discipline": "Disiplin",
+      "ballInCourt": "Sıradaki Taraf",
+      "daysOpen": "Açık Gün",
+      "package": "Paket"
+    },
+    "options": {
+      "groupBy": {
+        "section": "Şartname Bölümüne Göre",
+        "kind": "Türe Göre",
+        "discipline": "Disipline Göre"
+      }
+    }
+  },
+  "import": {
+    "messages": {
+      "created": "{{items}} kalem, {{packages}} paket oluşturuldu."
+    },
+    "description": "CSV, XLSX ya da JSON. Sütunlar: bölüm kodu, bölüm adı, tür (MOS, UCZ…), disiplin, açıklama, sayfa, alıntı. Önce önizleme yapılır.",
+    "options": {
+      "bySection": "Şartname Bölümüne Göre Paketle",
+      "byKind": "Türe Göre Paketle",
+      "none": "Paket Oluşturma"
+    },
+    "preview": "{{valid}} geçerli · {{invalid}} hatalı satır · {{packages}} paket ({{existing}} mevcut)",
+    "columns": {
+      "section": "Bölüm",
+      "problem": "Sorun"
+    },
+    "actions": {
+      "create_one": "{{count}} Kalemi Oluştur",
+      "create_other": "{{count}} Kalemi Oluştur"
+    }
+  }
+}

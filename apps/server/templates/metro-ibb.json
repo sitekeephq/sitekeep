@@ -1,0 +1,1598 @@
+{
+  "format": "7d-cde/project-template@1",
+  "name": "Metro / Raylı Sistem (İBB tipi)",
+  "description": "İBB Raylı Sistemler CDE esasları (PKF ve MBE projelerinden, yalnız yapı): 00-Genel, durum alanları (Tasarım / Yapım), taraf WIP alanları 96–99 ve bölge × disiplin × doküman tipi iskeleti. Boş kalan yaprak klasörler ilk dosya geldiğinde oluşur.",
+  "modules": { "correspondence": true, "rfi": true, "submittals": true, "meetings": true, "transmittals": true, "issues": true, "reviews": true, "forms": true, "coordination": true, "schedule": true, "spec": true, "reports": true },
+  "slots": [
+    {
+      "key": "idare",
+      "label": "İdare",
+      "party": "client",
+      "code": "IBB",
+      "description": "İBB Raylı Sistemler (işveren)."
+    },
+    {
+      "key": "musavir",
+      "label": "Müşavir",
+      "party": "consultant",
+      "code": "MSV",
+      "description": "Danışman / kontrol firması."
+    },
+    {
+      "key": "yuklenici",
+      "label": "Yüklenici",
+      "party": "contractor",
+      "code": "YKL",
+      "description": "Yüklenici; naming'de YÜKLENİCİ KODU."
+    },
+    {
+      "key": "tasarimci",
+      "label": "Tasarımcı",
+      "party": "designer",
+      "code": "TSR",
+      "description": "Tasarım firması; naming'de ALT YÜKLENİCİ KODU."
+    }
+  ],
+  "dimensions": {
+    "Bölge grubu": [
+      {
+        "name": "000-Genel",
+        "insert": [
+          "Genel konular"
+        ],
+        "stop": true
+      },
+      {
+        "name": "001-Güzergah",
+        "insert": [
+          "Güzergah kesimi"
+        ],
+        "stop": true
+      },
+      {
+        "name": "002-İstasyonlar",
+        "insert": [
+          "İstasyon"
+        ]
+      },
+      {
+        "name": "003-Hat Yapıları",
+        "insert": [
+          "Hat"
+        ]
+      }
+    ],
+    "Genel konular": [
+      "00-Genel",
+      "01-BIM Uygulama Planı",
+      "02-Teknik Doküman Kodlama Sistemi",
+      "03-Toplantı Dokümanları",
+      "04-BIM Faaliyet Raporu",
+      "05-CDE Esasları",
+      "06-Tasarım El Kitapları",
+      "07-Sistem Mühendisliği"
+    ],
+    "Güzergah kesimi": [
+      "01-Genel Güzergah",
+      "02-Tip Tüneller"
+    ],
+    "İstasyon": [
+      "S00 İstasyonlar (Genel)",
+      "S01 İstasyon 1",
+      "S02 İstasyon 2"
+    ],
+    "Hat": [
+      "L00 Hatlar (Genel)",
+      "L01 Hat 1",
+      "B00 İstasyon Dışı Yapılar"
+    ],
+    "Disiplin": [
+      "00-Koordinasyon Modeli",
+      "01-Mimari",
+      "02-Yapısal",
+      "03-Geoteknik",
+      "04-Mekanik",
+      "05-Elektrik",
+      "06-Elektronik",
+      "07-Altyapı"
+    ],
+    "Doküman tipi": [
+      "01-Modeller",
+      "02-Çizimler",
+      "03-Raporlar"
+    ],
+    "Yapım konusu": [
+      "000-Genel",
+      "001-İnşa Alanları Kullanım Planlaması",
+      "002-Faz Planlama ve İlerleme Takibi",
+      "003-Saha Fotoğrafları",
+      "004-Saha Takip Formları"
+    ]
+  },
+  "folders": [
+    {
+      "name": "00-GENEL",
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download_markup"
+        }
+      ],
+      "children": [
+        {
+          "name": "Kalite Kontrol",
+          "children": [
+            "Aylık Kalite Raporları",
+            "Malzeme Sunumları",
+            "Prosedürler",
+            "Yapım Yöntemi"
+          ]
+        },
+        "Kullanım Kılavuzları",
+        {
+          "name": "Standartlar",
+          "children": [
+            "BIM Standartları",
+            "Elektromekanik Standartlar",
+            "Tasarım İşleri Standartları",
+            "Yapım İşleri Standartları"
+          ]
+        },
+        {
+          "name": "Yazışmalar",
+          "attributes": [
+            "Gönderen",
+            "Dağıtım",
+            "İlgi",
+            "Yazı Tarihi",
+            "Ek",
+            "Sayı"
+          ]
+        },
+        "Toplantı Tutanakları",
+        "Yer Teslim Tutanakları",
+        {
+          "name": "İhale Dokümanları",
+          "children": [
+            "Sözleşme",
+            "Teklif Dosyası",
+            "Teknik Şartname"
+          ]
+        },
+        "İş Programı"
+      ]
+    },
+    {
+      "name": "01-TASARIM ÇALIŞMALARI",
+      "grants": [
+        {
+          "slot": "idare",
+          "level": "view_download_markup"
+        },
+        {
+          "slot": "musavir",
+          "level": "view_download_markup"
+        },
+        {
+          "slot": "tasarimci",
+          "level": "view_download_markup"
+        },
+        {
+          "slot": "yuklenici",
+          "level": "edit"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-Paylaşılan (Shared for Review)",
+          "state": "shared",
+          "stateLabel": "İnceleme için",
+          "naming": "Metro Kodlama Sistemi",
+          "gate": true,
+          "skeleton": {
+            "order": [
+              "Bölge grubu",
+              "Disiplin"
+            ]
+          }
+        },
+        {
+          "name": "02-Onaya Sunulan (Shared for Approval)",
+          "state": "shared",
+          "stateLabel": "Onay için",
+          "naming": "Metro Kodlama Sistemi",
+          "gate": true,
+          "attributes": [
+            "STATUS",
+            "REVİZYON",
+            "Sayı",
+            "PAFTA - DOKÜMAN ADI"
+          ],
+          "skeleton": {
+            "order": [
+              "Bölge grubu",
+              "Disiplin"
+            ]
+          }
+        },
+        {
+          "name": "03-Onaylanan (Published)",
+          "state": "published",
+          "naming": "Metro Kodlama Sistemi",
+          "gate": true,
+          "skeleton": {
+            "order": [
+              "Bölge grubu",
+              "Disiplin"
+            ]
+          }
+        },
+        {
+          "name": "04-İş Sonu (As-Built)",
+          "state": "published",
+          "stateLabel": "İş Sonu",
+          "naming": "Metro Kodlama Sistemi",
+          "gate": true,
+          "skeleton": {
+            "order": [
+              "Bölge grubu"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02-YAPIM ÇALIŞMALARI",
+      "grants": [
+        {
+          "slot": "idare",
+          "level": "view_download_markup"
+        },
+        {
+          "slot": "musavir",
+          "level": "view_download_markup"
+        },
+        {
+          "slot": "yuklenici",
+          "level": "edit"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-Paylaşılan (Shared for Review)",
+          "state": "shared",
+          "stateLabel": "İnceleme için",
+          "skeleton": {
+            "order": [
+              "Yapım konusu"
+            ]
+          }
+        },
+        {
+          "name": "02-Onaya Sunulan (Shared for Approval)",
+          "state": "shared",
+          "stateLabel": "Onay için",
+          "skeleton": {
+            "order": [
+              "Yapım konusu"
+            ]
+          }
+        },
+        {
+          "name": "03-Onaylanan (Published)",
+          "state": "published",
+          "skeleton": {
+            "order": [
+              "Yapım konusu"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "96-İŞVEREN ORTAK ALAN",
+      "state": "wip",
+      "grants": [
+        {
+          "slot": "idare",
+          "level": "edit"
+        }
+      ]
+    },
+    {
+      "name": "97-DANIŞMAN ORTAK ALAN",
+      "state": "wip",
+      "grants": [
+        {
+          "slot": "musavir",
+          "level": "edit"
+        },
+        {
+          "slot": "idare",
+          "level": "view_download"
+        }
+      ],
+      "children": [
+        "KONTROL"
+      ]
+    },
+    {
+      "name": "98-YÜKLENİCİ ORTAK ALAN",
+      "state": "wip",
+      "grants": [
+        {
+          "slot": "yuklenici",
+          "level": "edit"
+        }
+      ],
+      "children": [
+        {
+          "name": "Onaylı Dokümanlar Geçici Konum",
+          "attributes": [
+            "Yazı Tarihi",
+            "Sayı",
+            "Rev No",
+            "Revizyon Tarihi"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "99-TASARIMCI ORTAK ALAN",
+      "state": "wip",
+      "grants": [
+        {
+          "slot": "tasarimci",
+          "level": "manage"
+        }
+      ],
+      "skeleton": {
+        "order": [
+          "Bölge grubu",
+          "Disiplin",
+          "Doküman tipi"
+        ]
+      }
+    }
+  ],
+  "namingStandards": [
+    {
+      "name": "Metro Kodlama Sistemi",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "YÜKLENİCİ KODU",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "ALT YÜKLENİCİ KODU",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "DGR",
+              "description": "Diğer"
+            }
+          ]
+        },
+        {
+          "name": "PROJE KODU",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Proje"
+            }
+          ]
+        },
+        {
+          "name": "ALAN",
+          "type": "list",
+          "values": [
+            {
+              "code": "000",
+              "description": "Genel"
+            },
+            {
+              "code": "G00",
+              "description": "Güzergâh genel"
+            },
+            {
+              "code": "S00",
+              "description": "İstasyonlar genel"
+            },
+            {
+              "code": "S01",
+              "description": "İstasyon 1"
+            },
+            {
+              "code": "S02",
+              "description": "İstasyon 2"
+            },
+            {
+              "code": "L00",
+              "description": "Hatlar genel"
+            },
+            {
+              "code": "L01",
+              "description": "Hat 1"
+            },
+            {
+              "code": "B00",
+              "description": "İstasyon dışı yapılar"
+            }
+          ]
+        },
+        {
+          "name": "ALT ALAN",
+          "type": "list",
+          "values": [
+            {
+              "code": "000",
+              "description": "Genel"
+            },
+            {
+              "code": "CT0",
+              "description": "Aç-kapa"
+            },
+            {
+              "code": "TD0",
+              "description": "Tünel"
+            },
+            {
+              "code": "NTM",
+              "description": "NATM"
+            },
+            {
+              "code": "TBM",
+              "description": "TBM"
+            },
+            {
+              "code": "ST0",
+              "description": "İstasyon yapısı"
+            },
+            {
+              "code": "Z00",
+              "description": "Şaft"
+            }
+          ]
+        },
+        {
+          "name": "SEVİYE",
+          "type": "list",
+          "values": [
+            {
+              "code": "00"
+            },
+            {
+              "code": "01"
+            },
+            {
+              "code": "02"
+            },
+            {
+              "code": "03"
+            },
+            {
+              "code": "04"
+            },
+            {
+              "code": "05"
+            },
+            {
+              "code": "06"
+            },
+            {
+              "code": "07"
+            },
+            {
+              "code": "08"
+            },
+            {
+              "code": "09"
+            },
+            {
+              "code": "10"
+            },
+            {
+              "code": "11"
+            },
+            {
+              "code": "CP"
+            },
+            {
+              "code": "YT"
+            },
+            {
+              "code": "H0"
+            },
+            {
+              "code": "H1"
+            },
+            {
+              "code": "H2"
+            },
+            {
+              "code": "P0"
+            },
+            {
+              "code": "P1"
+            },
+            {
+              "code": "P2"
+            },
+            {
+              "code": "P3"
+            },
+            {
+              "code": "P4"
+            },
+            {
+              "code": "T1"
+            },
+            {
+              "code": "T2"
+            },
+            {
+              "code": "G0"
+            },
+            {
+              "code": "G1"
+            },
+            {
+              "code": "G2"
+            },
+            {
+              "code": "Z"
+            },
+            {
+              "code": "K"
+            },
+            {
+              "code": "L"
+            },
+            {
+              "code": "M"
+            },
+            {
+              "code": "N"
+            },
+            {
+              "code": "F"
+            },
+            {
+              "code": "E"
+            },
+            {
+              "code": "R"
+            },
+            {
+              "code": "B"
+            }
+          ]
+        },
+        {
+          "name": "SİSTEM",
+          "type": "list",
+          "values": [
+            {
+              "code": "A1",
+              "description": "Genel Dokümanlar"
+            },
+            {
+              "code": "00",
+              "description": "Mimari İşler"
+            },
+            {
+              "code": "01",
+              "description": "Kaba İnşaat İşleri"
+            },
+            {
+              "code": "02",
+              "description": "Güç Temini ve Cer Gücü Sistemi"
+            },
+            {
+              "code": "03",
+              "description": "Sinyalizasyon Sistemi"
+            },
+            {
+              "code": "04",
+              "description": "Haberleşme ve Kontrol Sistemleri"
+            },
+            {
+              "code": "05",
+              "description": "Çevresel Kontrol Sistemi"
+            },
+            {
+              "code": "06",
+              "description": "Yardımcı Tesisler"
+            },
+            {
+              "code": "07",
+              "description": "Yürüyen Merdivenler ve Asansörler"
+            },
+            {
+              "code": "08",
+              "description": "Demiryolu İşleri"
+            },
+            {
+              "code": "09",
+              "description": "Test ve Devreye Alma"
+            },
+            {
+              "code": "10",
+              "description": "Genel Hizmetler - BIM"
+            },
+            {
+              "code": "11",
+              "description": "İşletme"
+            }
+          ]
+        },
+        {
+          "name": "ALT SİSTEM",
+          "type": "list",
+          "values": [
+            {
+              "code": "00"
+            },
+            {
+              "code": "01"
+            },
+            {
+              "code": "02"
+            },
+            {
+              "code": "03"
+            },
+            {
+              "code": "04"
+            },
+            {
+              "code": "05"
+            },
+            {
+              "code": "06"
+            },
+            {
+              "code": "07"
+            },
+            {
+              "code": "08"
+            },
+            {
+              "code": "09"
+            },
+            {
+              "code": "10"
+            },
+            {
+              "code": "11"
+            },
+            {
+              "code": "12"
+            },
+            {
+              "code": "13"
+            },
+            {
+              "code": "14"
+            },
+            {
+              "code": "15"
+            },
+            {
+              "code": "16"
+            },
+            {
+              "code": "17"
+            },
+            {
+              "code": "18"
+            },
+            {
+              "code": "19"
+            },
+            {
+              "code": "20"
+            },
+            {
+              "code": "21"
+            },
+            {
+              "code": "22"
+            },
+            {
+              "code": "23"
+            },
+            {
+              "code": "24"
+            },
+            {
+              "code": "25"
+            },
+            {
+              "code": "26"
+            },
+            {
+              "code": "27"
+            },
+            {
+              "code": "28"
+            },
+            {
+              "code": "29"
+            },
+            {
+              "code": "30"
+            },
+            {
+              "code": "31"
+            },
+            {
+              "code": "32"
+            },
+            {
+              "code": "33"
+            },
+            {
+              "code": "34"
+            },
+            {
+              "code": "35"
+            },
+            {
+              "code": "36"
+            },
+            {
+              "code": "37"
+            },
+            {
+              "code": "38"
+            }
+          ]
+        },
+        {
+          "name": "AŞAMA",
+          "type": "list",
+          "values": [
+            {
+              "code": "G",
+              "description": "Genel Proje"
+            },
+            {
+              "code": "O",
+              "description": "Ön Proje"
+            },
+            {
+              "code": "K",
+              "description": "Kesin Proje"
+            },
+            {
+              "code": "U",
+              "description": "Uygulama Projesi"
+            },
+            {
+              "code": "A",
+              "description": "İş sonu (as-built)"
+            },
+            {
+              "code": "Y",
+              "description": "Malzeme Sunumları"
+            },
+            {
+              "code": "Z",
+              "description": "Alt Yüklenici Sunumları"
+            },
+            {
+              "code": "T",
+              "description": "Tedarikçi Sunumları"
+            }
+          ]
+        },
+        {
+          "name": "DİL",
+          "type": "list",
+          "values": [
+            {
+              "code": "T",
+              "description": "Türkçe"
+            },
+            {
+              "code": "E",
+              "description": "English"
+            },
+            {
+              "code": "M",
+              "description": "Multi"
+            }
+          ]
+        },
+        {
+          "name": "DOKÜMAN TİPİ",
+          "type": "list",
+          "values": [
+            {
+              "code": "1A",
+              "description": "Rapor"
+            },
+            {
+              "code": "1B",
+              "description": "Rapor"
+            },
+            {
+              "code": "1C",
+              "description": "Rapor"
+            },
+            {
+              "code": "1D",
+              "description": "Rapor"
+            },
+            {
+              "code": "1E",
+              "description": "Rapor"
+            },
+            {
+              "code": "1F",
+              "description": "Rapor"
+            },
+            {
+              "code": "1G",
+              "description": "Rapor"
+            },
+            {
+              "code": "1H",
+              "description": "Rapor"
+            },
+            {
+              "code": "1I",
+              "description": "Rapor"
+            },
+            {
+              "code": "1J",
+              "description": "Rapor"
+            },
+            {
+              "code": "1K",
+              "description": "Rapor"
+            },
+            {
+              "code": "1L",
+              "description": "Rapor"
+            },
+            {
+              "code": "1M",
+              "description": "Rapor"
+            },
+            {
+              "code": "1N",
+              "description": "Rapor"
+            },
+            {
+              "code": "1O",
+              "description": "Rapor"
+            },
+            {
+              "code": "1P",
+              "description": "Rapor"
+            },
+            {
+              "code": "1Q",
+              "description": "Rapor"
+            },
+            {
+              "code": "1R",
+              "description": "Rapor"
+            },
+            {
+              "code": "1S",
+              "description": "Rapor"
+            },
+            {
+              "code": "1T",
+              "description": "Rapor"
+            },
+            {
+              "code": "1U",
+              "description": "Rapor"
+            },
+            {
+              "code": "1V",
+              "description": "Rapor"
+            },
+            {
+              "code": "1W",
+              "description": "Rapor"
+            },
+            {
+              "code": "1X",
+              "description": "Rapor"
+            },
+            {
+              "code": "1Y",
+              "description": "Rapor"
+            },
+            {
+              "code": "1Z",
+              "description": "Rapor"
+            },
+            {
+              "code": "2A",
+              "description": "Çizim"
+            },
+            {
+              "code": "2B",
+              "description": "Çizim"
+            },
+            {
+              "code": "2C",
+              "description": "Çizim"
+            },
+            {
+              "code": "2D",
+              "description": "Çizim"
+            },
+            {
+              "code": "2E",
+              "description": "Çizim"
+            },
+            {
+              "code": "2F",
+              "description": "Çizim"
+            },
+            {
+              "code": "2G",
+              "description": "Çizim"
+            },
+            {
+              "code": "2H",
+              "description": "Çizim"
+            },
+            {
+              "code": "2I",
+              "description": "Çizim"
+            },
+            {
+              "code": "2J",
+              "description": "Çizim"
+            },
+            {
+              "code": "2K",
+              "description": "Çizim"
+            },
+            {
+              "code": "2L",
+              "description": "Çizim"
+            },
+            {
+              "code": "2M",
+              "description": "Çizim"
+            },
+            {
+              "code": "2N",
+              "description": "Çizim"
+            },
+            {
+              "code": "2O",
+              "description": "Çizim"
+            },
+            {
+              "code": "2P",
+              "description": "Çizim"
+            },
+            {
+              "code": "2Q",
+              "description": "Çizim"
+            },
+            {
+              "code": "2R",
+              "description": "Çizim"
+            },
+            {
+              "code": "2S",
+              "description": "Çizim"
+            },
+            {
+              "code": "2T",
+              "description": "Çizim"
+            },
+            {
+              "code": "2U",
+              "description": "Çizim"
+            },
+            {
+              "code": "2V",
+              "description": "Çizim"
+            },
+            {
+              "code": "2W",
+              "description": "Çizim"
+            },
+            {
+              "code": "2X",
+              "description": "Çizim"
+            },
+            {
+              "code": "2Y",
+              "description": "Çizim"
+            },
+            {
+              "code": "2Z",
+              "description": "Çizim"
+            },
+            {
+              "code": "3A",
+              "description": "Tünel"
+            },
+            {
+              "code": "3B",
+              "description": "Tünel"
+            },
+            {
+              "code": "3C",
+              "description": "Tünel"
+            },
+            {
+              "code": "3D",
+              "description": "Tünel"
+            },
+            {
+              "code": "3E",
+              "description": "Tünel"
+            },
+            {
+              "code": "3F",
+              "description": "Tünel"
+            },
+            {
+              "code": "3G",
+              "description": "Tünel"
+            },
+            {
+              "code": "3H",
+              "description": "Tünel"
+            },
+            {
+              "code": "3I",
+              "description": "Tünel"
+            },
+            {
+              "code": "3J",
+              "description": "Tünel"
+            },
+            {
+              "code": "3K",
+              "description": "Tünel"
+            },
+            {
+              "code": "4A",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4B",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4C",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4D",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4E",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4F",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4G",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "4H",
+              "description": "Deplase / trafik"
+            },
+            {
+              "code": "5A",
+              "description": "Demiryolu"
+            },
+            {
+              "code": "5B",
+              "description": "Demiryolu"
+            },
+            {
+              "code": "5C",
+              "description": "Demiryolu"
+            },
+            {
+              "code": "5D",
+              "description": "Demiryolu"
+            },
+            {
+              "code": "5E",
+              "description": "Demiryolu"
+            },
+            {
+              "code": "6A",
+              "description": "Model"
+            },
+            {
+              "code": "6B",
+              "description": "Model"
+            },
+            {
+              "code": "6C",
+              "description": "Model"
+            },
+            {
+              "code": "6D",
+              "description": "Model"
+            },
+            {
+              "code": "6E",
+              "description": "Model"
+            },
+            {
+              "code": "6F",
+              "description": "Model"
+            },
+            {
+              "code": "6G",
+              "description": "Model"
+            },
+            {
+              "code": "6H",
+              "description": "Model"
+            },
+            {
+              "code": "6I",
+              "description": "Model"
+            },
+            {
+              "code": "6J",
+              "description": "Model"
+            },
+            {
+              "code": "6K",
+              "description": "Koordinasyon modeli"
+            },
+            {
+              "code": "6L",
+              "description": "Model"
+            },
+            {
+              "code": "6M",
+              "description": "Model"
+            },
+            {
+              "code": "6N",
+              "description": "Model"
+            },
+            {
+              "code": "6O",
+              "description": "Model"
+            },
+            {
+              "code": "6P",
+              "description": "Model"
+            },
+            {
+              "code": "6Q",
+              "description": "Model"
+            },
+            {
+              "code": "6R",
+              "description": "Model"
+            },
+            {
+              "code": "6S",
+              "description": "Model"
+            },
+            {
+              "code": "7A",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7B",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7C",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7D",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7E",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7F",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7G",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7H",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7I",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7J",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7K",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7L",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7M",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7N",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7O",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7P",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7Q",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7R",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7S",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7T",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7U",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7V",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7W",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7X",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7Y",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "7Z",
+              "description": "Yönetim / plan / prosedür"
+            },
+            {
+              "code": "8A",
+              "description": "Kalite"
+            },
+            {
+              "code": "8B",
+              "description": "Kalite"
+            },
+            {
+              "code": "8C",
+              "description": "Kalite"
+            },
+            {
+              "code": "8D",
+              "description": "Kalite"
+            },
+            {
+              "code": "8E",
+              "description": "Kalite"
+            },
+            {
+              "code": "8F",
+              "description": "Kalite"
+            },
+            {
+              "code": "8G",
+              "description": "Kalite"
+            },
+            {
+              "code": "8H",
+              "description": "Kalite"
+            },
+            {
+              "code": "8I",
+              "description": "Kalite"
+            },
+            {
+              "code": "8J",
+              "description": "Kalite"
+            },
+            {
+              "code": "8K",
+              "description": "Kalite"
+            },
+            {
+              "code": "8L",
+              "description": "Kalite"
+            },
+            {
+              "code": "8M",
+              "description": "Kalite"
+            },
+            {
+              "code": "8N",
+              "description": "Kalite"
+            },
+            {
+              "code": "8O",
+              "description": "Kalite"
+            },
+            {
+              "code": "1AA",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AB",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AC",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AD",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AE",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AF",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AG",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AH",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AI",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AJ",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AK",
+              "description": "Rapor"
+            },
+            {
+              "code": "1AL",
+              "description": "Rapor"
+            }
+          ]
+        },
+        {
+          "name": "Number",
+          "type": "number",
+          "digits": 3,
+          "minDigits": 2,
+          "maxDigits": 3
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Gönderen",
+      "type": "list",
+      "options": [
+        "İdare",
+        "Müşavir",
+        "Yüklenici",
+        "Tasarımcı"
+      ]
+    },
+    {
+      "name": "Dağıtım",
+      "type": "list",
+      "options": [
+        "Gereği",
+        "Bilgi"
+      ]
+    },
+    {
+      "name": "İlgi",
+      "type": "text"
+    },
+    {
+      "name": "Yazı Tarihi",
+      "type": "date"
+    },
+    {
+      "name": "Ek",
+      "type": "text"
+    },
+    {
+      "name": "Sayı",
+      "type": "text"
+    },
+    {
+      "name": "Rev No",
+      "type": "text"
+    },
+    {
+      "name": "Revizyon Tarihi",
+      "type": "date"
+    },
+    {
+      "name": "STATUS",
+      "type": "list",
+      "options": [
+        "ONAY İÇİN",
+        "ONAYLANDI",
+        "ŞARTLI ONAYLANDI",
+        "REDDEDİLDİ",
+        "BİLGİ"
+      ]
+    },
+    {
+      "name": "REVİZYON",
+      "type": "text"
+    },
+    {
+      "name": "PAFTA - DOKÜMAN ADI",
+      "type": "text"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Tasarımcı → Yüklenici (iç kontrol)",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Yüklenici Onayı",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 7,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yüklenici → Müşavir",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Müşavir Onayı",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 15,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yüklenici → Müşavir → İdare",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Müşavir İncelemesi",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 15,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "rejected"
+          ]
+        },
+        {
+          "name": "İdare Onayı",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 30,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "rejected"
+          ]
+        }
+      ]
+    }
+  ],
+  "issueTypes": [
+    {
+      "name": "Koordinasyon",
+      "subtypes": [
+        "Koordinasyon",
+        "Çakışma"
+      ]
+    },
+    {
+      "name": "Tasarım",
+      "subtypes": [
+        "Mimari",
+        "Yapısal",
+        "Geoteknik",
+        "Mekanik",
+        "Elektrik"
+      ]
+    }
+  ],
+  "notes": [
+    "İstasyon ve Hat listeleri örnektir; proje oluştururken kendi istasyon ve hat kodlarınızla değiştirin.",
+    "Naming standard'daki ALAN listesi de örnektir; proje ayarlarından güncelleyin.",
+    "Number alanındaki minDigits/maxDigits (2–3 hane) ileriye dönüktür; bugünkü doğrulayıcı 3 hane bekler."
+  ]
+}

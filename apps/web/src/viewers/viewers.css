@@ -1,0 +1,175 @@
+/* In-browser viewers (loaded with the lazy viewer chunk). Colours come from theme tokens;
+   only the DWG/DXF canvas background presets are fixed (CadViewer.tsx). */
+
+.vw { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--bg); }
+.vw-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.vw-title { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: min(520px, 60vw); }
+.vw-body { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
+.vw-center { margin: auto; padding: 24px 16px; max-width: 560px; width: 100%; }
+.vw-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.vw-card h2 { margin: 0 0 8px; font-size: 18px; word-break: break-word; }
+.vw-meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px; margin: 12px 0; }
+.vw-meta dt { color: var(--muted); }
+.vw-meta dd { margin: 0; word-break: break-word; }
+.vw-spin { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: vw-spin 0.8s linear infinite; vertical-align: -2px; margin-right: 6px; }
+@keyframes vw-spin { to { transform: rotate(360deg); } }
+.vw-tool { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding: 6px 10px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.vw-tool input[type="search"] { width: 180px; max-width: 45vw; padding: 4px 8px; }
+.vw-tool .on { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.vw-stage { flex: 1; min-height: 0; overflow: auto; position: relative; background: color-mix(in srgb, var(--text) 6%, var(--bg)); }
+
+/* Spreadsheet grid */
+.sh-tabs { display: flex; gap: 2px; overflow-x: auto; padding: 4px 8px 0; background: var(--surface-2); border-top: 1px solid var(--border); flex-shrink: 0; }
+.sh-tab { border: 1px solid var(--border); border-top: 0; border-radius: 0 0 6px 6px; padding: 4px 12px; background: var(--surface-2); color: var(--text); white-space: nowrap; font-size: 13px; cursor: pointer; }
+.sh-tab.active { background: var(--surface); font-weight: 600; color: var(--primary); }
+.sh-tab.hidden-sheet { color: var(--muted); font-style: italic; }
+.sh-scroll { flex: 1; min-height: 0; overflow: auto; position: relative; background: var(--surface); font-size: 12px; }
+.sh-canvas { position: relative; }
+.sh-cell { position: absolute; box-sizing: border-box; padding: 0 4px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 23px; background: var(--surface); color: var(--text); }
+.sh-cell.num { text-align: right; font-variant-numeric: tabular-nums; }
+.sh-cell.merged { white-space: normal; line-height: 1.3; display: flex; align-items: center; z-index: 1; }
+.sh-cell.hit { background: var(--warn-soft); }
+.sh-cell.current { outline: 2px solid var(--primary); outline-offset: -2px; z-index: 2; }
+.sh-head { position: absolute; box-sizing: border-box; background: var(--surface-2); color: var(--muted); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; line-height: 23px; font-size: 11px; overflow: hidden; }
+.sh-sticky-top { position: sticky; top: 0; z-index: 4; height: 0; }
+.sh-sticky-left { position: sticky; left: 0; z-index: 3; width: 0; height: 0; }
+.sh-corner { position: sticky; top: 0; left: 0; z-index: 5; width: 0; height: 0; }
+.sh-frozen .sh-cell { font-weight: 600; background: var(--surface-2); }
+.sh-formula { display: flex; gap: 8px; align-items: center; padding: 4px 10px; border-bottom: 1px solid var(--border); background: var(--surface); font-size: 12px; min-height: 26px; }
+.sh-formula .ref { color: var(--muted); min-width: 56px; font-family: ui-monospace, Consolas, monospace; }
+.sh-formula .val { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Presentations */
+.sl { display: grid; grid-template-columns: 160px 1fr; flex: 1; min-height: 0; }
+.sl-thumbs { overflow: auto; padding: 8px; border-right: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
+.sl-thumb { display: block; width: 100%; padding: 0; border: 2px solid transparent; border-radius: 6px; background: var(--surface-2); cursor: pointer; position: relative; }
+.sl-thumb.active { border-color: var(--primary); }
+.sl-thumb > canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
+.sl-thumb > span { position: absolute; left: 4px; top: 2px; font-size: 11px; color: var(--muted); background: var(--surface); border-radius: 4px; padding: 0 4px; }
+.sl-main { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
+.sl-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: color-mix(in srgb, var(--text) 6%, var(--bg)); overflow: hidden; }
+.sl-stage > canvas { box-shadow: var(--shadow); max-width: 100%; max-height: 100%; }
+.sl-notes { max-height: 30%; overflow: auto; padding: 10px 14px; border-top: 1px solid var(--border); background: var(--surface); white-space: pre-wrap; font-size: 13px; }
+.sl-present { background: #141b24; position: fixed; inset: 0; z-index: 100; }
+.sl-present .sl-stage { background: #141b24; padding: 0; cursor: none; }
+.sl-present .sl-stage > canvas { box-shadow: none; }
+.sl-present-hint { position: absolute; right: 12px; bottom: 10px; color: var(--topbar-muted); font-size: 12px; }
+
+/* DWG / DXF */
+.cad { display: grid; grid-template-columns: 1fr 240px; flex: 1; min-height: 0; }
+.cad-canvas { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.cad-canvas.measuring { cursor: crosshair; }
+.cad-layers { overflow: auto; border-left: 1px solid var(--border); background: var(--surface); padding: 8px; font-size: 13px; }
+.cad-layer { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; margin: 0; color: var(--text); font-size: 13px; }
+.cad-layer input { width: auto; margin: 0; }
+.cad-swatch { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--border); flex-shrink: 0; }
+.cad-overlay { position: absolute; inset: 0; pointer-events: none; }
+.cad-status { position: absolute; left: 10px; bottom: 10px; background: var(--surface); color: var(--text); border-radius: 6px; padding: 4px 10px; box-shadow: var(--shadow); font-size: 12px; z-index: 2; }
+.cad-tool-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
+.cad-hint { position: absolute; left: 10px; top: 10px; right: 10px; max-width: max-content; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px 4px 10px; box-shadow: var(--shadow); font-size: 12.5px; z-index: 3; }
+.cad-live { font-weight: 600; color: var(--primary); font-variant-numeric: tabular-nums; }
+.cad-hint-actions { display: inline-flex; gap: 4px; }
+.cad-results { position: absolute; right: 10px; top: 56px; width: 280px; max-height: calc(100% - 76px); overflow: auto; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px 10px; font-size: 12.5px; z-index: 3; display: flex; flex-direction: column; gap: 6px; }
+.cad-results-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.cad-results-units { display: flex; gap: 8px; }
+.cad-results-units label { display: flex; flex-direction: column; gap: 2px; margin: 0; font-size: 11.5px; color: var(--muted); flex: 1; min-width: 0; }
+.cad-results-units select { padding: 2px 4px; font-size: 12.5px; }
+.cad-results-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.cad-results-list li { display: grid; grid-template-columns: auto 1fr auto; gap: 6px; align-items: start; padding: 4px 0; border-top: 1px solid var(--border); }
+.cad-results-name { color: var(--muted); white-space: nowrap; }
+.cad-results-value { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; word-break: break-word; }
+.cad-results-value small { display: block; font-weight: 400; color: var(--muted); }
+.cad-results-list button { padding: 0 6px; line-height: 1.6; }
+.cad-results-foot { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* Image, text, media, e-mail */
+.img-stage { flex: 1; min-height: 0; overflow: hidden; position: relative; cursor: grab; touch-action: none; background: color-mix(in srgb, var(--text) 6%, var(--bg)); }
+.img-stage.dragging { cursor: grabbing; }
+.img-stage img { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; -webkit-user-drag: none; max-width: none; }
+.txt { flex: 1; min-height: 0; overflow: auto; background: var(--surface); }
+.txt-lines { display: grid; grid-template-columns: max-content 1fr; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12.5px; line-height: 1.5; }
+.txt-no { padding: 0 10px; text-align: right; color: var(--muted); user-select: none; border-right: 1px solid var(--border); background: var(--surface-2); }
+.txt-line { padding: 0 12px; white-space: pre-wrap; word-break: break-word; }
+.md-page { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+.media { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; background: color-mix(in srgb, var(--text) 6%, var(--bg)); min-height: 0; }
+.media video { max-width: 100%; max-height: 100%; }
+.media audio { width: min(560px, 100%); }
+.eml { max-width: 860px; margin: 0 auto; padding: 16px; width: 100%; }
+.eml-body { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.5; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+
+@media (max-width: 760px) {
+  .sl { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .sl-thumbs { order: 2; flex-direction: row; border-right: 0; border-top: 1px solid var(--border); max-height: 96px; }
+  .sl-thumb { width: 96px; flex-shrink: 0; }
+  .cad { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .cad-layers { border-left: 0; border-top: 1px solid var(--border); max-height: 32vh; }
+  .vw-title { max-width: 100%; }
+}
+
+@media (max-width: 700px) {
+  .cad-results { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 42%; }
+  .cad-hint { left: 8px; top: 8px; right: 8px; max-width: none; }
+}
+
+/* Office files in the browser (DocumentViewer, SlidesViewer html slides, print menu). The paper
+   stays white in dark mode: it is the document. */
+.vw-pop-wrap { position: relative; }
+.vw-pop { position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; width: min(320px, calc(100vw - 24px)); background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(16, 24, 40, 0.18); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.vw-pop p { margin: 0; }
+.vw-pop-options { display: flex; flex-direction: column; gap: 4px; }
+.vw-pop-options label { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: var(--text); cursor: pointer; }
+.vw-pop-options input { width: auto; margin: 0; }
+.vw-zoom, .vw-find { display: inline-flex; align-items: center; gap: 4px; }
+.vw-zoom select { width: auto; padding: 3px 4px; font-size: 12px; }
+.vw-find input[type="search"] { width: 160px; max-width: 40vw; padding: 4px 8px; }
+/* The app's global table / heading / label rules must not reach rendered documents and slides;
+   the libraries' own rules and inline styles still win (same or higher specificity, later). */
+:is(.doc-host, .vw-doc, .sl-html, .vw-print-slide) table { width: auto; }
+:is(.doc-host, .vw-doc, .sl-html, .vw-print-slide) :is(th, td) { padding: 0; border-bottom: 0; text-align: inherit; vertical-align: top; background: none; position: static; font-size: inherit; color: inherit; font-weight: inherit; }
+:is(.doc-host, .vw-doc, .sl-html, .vw-print-slide) :is(h1, h2, h3) { font-size: inherit; margin: 0; }
+:is(.doc-host, .vw-doc, .sl-html, .vw-print-slide) label { display: inline; margin: 0; font-size: inherit; color: inherit; }
+.doc-stage { overflow: auto; }
+.doc-host { min-height: 100%; }
+.doc-stage .docx-wrapper { background: transparent !important; padding: 16px 12px 0 !important; align-items: flex-start !important; width: max-content; min-width: 100%; box-sizing: border-box; }
+.doc-stage .docx-wrapper > section.docx { margin: 0 auto 16px !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important; }
+::highlight(vw-find) { background-color: #ffe08a; color: #000; }
+::highlight(vw-find-current) { background-color: #ff9632; color: #000; }
+.odf-page { box-sizing: border-box; width: 210mm; min-height: 297mm; margin: 16px auto; padding: 20mm; background: #fff; color: #111; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); font-family: Carlito, Calibri, "Liberation Sans", Arial, sans-serif; font-size: 11pt; line-height: 1.4; }
+.odf-page p { margin: 0 0 6pt; white-space: pre-wrap; overflow-wrap: break-word; }
+.odf-page h1, .odf-page h2, .odf-page h3, .odf-page h4, .odf-page h5, .odf-page h6 { margin: 12pt 0 6pt; line-height: 1.25; white-space: pre-wrap; color: #111; }
+.odf-page h1 { font-size: 18pt; } .odf-page h2 { font-size: 15pt; } .odf-page h3 { font-size: 13pt; } .odf-page h4, .odf-page h5, .odf-page h6 { font-size: 11pt; }
+.odf-page ul, .odf-page ol { margin: 0 0 6pt; padding-left: 22pt; }
+.odf-page table { border-collapse: collapse; margin: 0 0 8pt; max-width: 100%; }
+.odf-page td { border: 1px solid #999; padding: 2pt 5pt; vertical-align: top; }
+.odf-page td p { margin: 0; }
+.odf-page img { max-width: 100%; height: auto; vertical-align: middle; }
+.odf-page a { color: #1a55a6; }
+.odf-break { border: 0; border-top: 1px dashed #b5b5b5; margin: 18pt 0; }
+.sl-html { position: relative; overflow: hidden; background: #fff; flex-shrink: 0; }
+.sl-html.shadow { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); }
+.sl-thumb .sl-html { pointer-events: none; border-radius: 4px; }
+.sl-present .sl-html.shadow { box-shadow: none; }
+
+/* Print / save as PDF: only #vw-print-root is printed (office/print.ts). */
+/* Laid out off screen while it is prepared (charts need a real size), never seen on screen. */
+#vw-print-root { position: fixed; left: -10000px; top: 0; visibility: hidden; pointer-events: none; }
+@media print {
+  html.vw-printing body > *:not(#vw-print-root) { display: none !important; }
+  html.vw-printing, html.vw-printing body { background: #fff !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  html.vw-printing #vw-print-root { position: static; left: auto; visibility: visible; pointer-events: auto; color: #000; background: #fff; }
+  #vw-print-root * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #vw-print-root .docx-wrapper { background: none !important; padding: 0 !important; display: block !important; }
+  #vw-print-root .docx-wrapper > section.docx { box-shadow: none !important; margin: 0 !important; min-height: 0 !important; break-after: page; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  #vw-print-root .docx-wrapper > section.docx:last-child { break-after: auto; }
+  #vw-print-root .odf-page { box-shadow: none; margin: 0; padding: 0; width: auto; min-height: 0; }
+  #vw-print-root .odf-break { break-after: page; border: 0; margin: 0; }
+  #vw-print-root .vw-print-slide { position: relative; overflow: hidden; break-after: page; background: #fff; }
+  #vw-print-root .vw-print-slide:last-child { break-after: auto; }
+  #vw-print-root .vw-print-sheet + .vw-print-sheet { break-before: page; }
+  #vw-print-root .vw-print-sheet h2 { font: 600 12pt/1.3 Arial, sans-serif; margin: 0 0 6pt; }
+  #vw-print-root .vw-print-sheet table { border-collapse: collapse; table-layout: fixed; font: 9pt/1.25 Arial, sans-serif; }
+  #vw-print-root .vw-print-sheet td { border: 0.5pt solid #999; padding: 1pt 3pt; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; vertical-align: top; }
+  #vw-print-root .vw-print-sheet td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  #vw-print-root .vw-print-sheet tr { break-inside: avoid; }
+  #vw-print-root .vw-print-sheet p { font: 9pt Arial, sans-serif; color: #555; }
+}

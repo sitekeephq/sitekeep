@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "folder": "Klasör",
+    "file": "Dosya",
+    "fileVersion": "Dosya versiyonu",
+    "version": "Versiyon",
+    "role": "Rol",
+    "attributeDefinition": "Öznitelik tanımı",
+    "externalSource": "Harici doküman kaynağı",
+    "externalFolder": "Harici klasör",
+    "namingStandard": "İsimlendirme standardı",
+    "modelDerivative": "Model türevi",
+    "trashFile": "Çöp kutusunda dosya",
+    "trashFolder": "Çöp kutusunda klasör"
+  },
+  "errors": {
+    "rootFolderMove": "Kök klasör taşınamaz.",
+    "folderIntoItself": "Klasör kendi altına taşınamaz.",
+    "rootFolderRename": "Kök klasörün adı değiştirilemez.",
+    "rootFolderDelete": "Kök klasör silinemez.",
+    "searchTooLong": "Arama metni çok uzun.",
+    "restoreFolderDeleted": "Dosyanın bulunduğu klasör de silinmiş. Önce klasörü geri yükleyin.",
+    "restoreParentDeleted": "Üst klasör de silinmiş. Önce üst klasörü geri yükleyin.",
+    "restoreFileExists": "\"{{folder}}\" klasöründe \"{{name}}\" adlı bir dosya zaten var. Geri yüklemek için yeni bir ad verin.",
+    "restoreFolderExists": "\"{{folder}}\" altında \"{{name}}\" adlı bir klasör zaten var. Geri yüklemek için yeni bir ad verin.",
+    "purgeLiveFolders": "Klasörün altında silinmemiş klasör var.",
+    "purgeLiveFiles": "Klasörün altında silinmemiş dosya var.",
+    "purgeAdminOnly": "Kalıcı silme yalnızca sistem yöneticisine açıktır.",
+    "invalidFileName": "Geçersiz dosya adı.",
+    "nameNotStandard": "Ad standarda uymuyor: {{errors}}",
+    "zipNothingSelected": "İndirilecek dosya seçilmedi.",
+    "zipTooMany": "Tek seferde en fazla {{max}} dosya indirilebilir.",
+    "multipartExpected": "multipart/form-data bekleniyor.",
+    "duplicateInRequest": "Aynı istekte aynı dosya iki kez gönderildi.",
+    "fileTooLarge": "Dosya boyutu sınırı aşıldı.",
+    "attributesNotObject": "attributes alanı JSON nesnesi olmalı ({\"ad\": \"değer\"}).",
+    "saveFailed": "Kaydedilemedi.",
+    "noFile": "Dosya gönderilmedi.",
+    "copyNeedsDownload": "Bu dosyayı kopyalamak için indirme yetkiniz olmalı.",
+    "existsInTarget": "\"{{name}}\" hedef klasörde zaten var.",
+    "noDownloadPermission": "Bu dosyayı indirme yetkiniz yok.",
+    "modelNotReady": "Model henüz görüntülemeye hazır değil ({{status}})."
+  },
+  "messages": {
+    "copiedFrom": "\"{{name}}\" dosyasından kopyalandı."
+  },
+  "zip": {
+    "intro": "Aşağıdaki dosyalar bu zip'e eklenmedi.",
+    "noDownload": "İndirme yetkiniz olmayan dosyalar:",
+    "notFound": "Bulunamayan veya erişiminiz olmayan kayıtlar (id):",
+    "missingContent": "Depolamada içeriği bulunamayan dosyalar:"
+  }
+}

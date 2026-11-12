@@ -1,0 +1,201 @@
+{
+  "language": {
+    "title": "Language",
+    "choose": "Language: {{language}}",
+    "beta": "beta"
+  },
+  "nav": {
+    "items": {
+      "bugun": "Today",
+      "isler": "Work",
+      "dokumanlar": "Documents",
+      "model": "Model",
+      "raporlar": "Reports",
+      "ayarlar": "Project Settings"
+    },
+    "workSections": {
+      "yazismalar": "Correspondence",
+      "yazismalarNew": "New Letter",
+      "bilgiTalepleri": "RFIs",
+      "bilgiTalepleriNew": "New RFI",
+      "teknikOnaylar": "Submittals",
+      "teknikOnaylarNew": "New Submittal",
+      "toplantilar": "Meetings",
+      "toplantilarNew": "New Meeting",
+      "gonderimler": "Transmittals",
+      "gonderimlerNew": "New Transmittal"
+    },
+    "quickFilters": {
+      "rfi": "RFI",
+      "submittal": "Submittal",
+      "meeting": "Meeting",
+      "action": "Action",
+      "rfiLog": "RFI Log",
+      "register": "Submittal Register",
+      "awaiting": "Awaiting Reply",
+      "unmailed": "Not E-mailed",
+      "archived": "Archive",
+      "cancelled": "Cancelled"
+    },
+    "hubViews": {
+      "bana": "Assigned to Me",
+      "tum": "All Work",
+      "yazismalar": "Correspondence",
+      "bilgiTalepleri": "RFIs",
+      "teknikOnaylar": "Submittals",
+      "toplantilar": "Meetings",
+      "gonderimler": "Transmittals",
+      "sorunlar": "Issues",
+      "incelemeler": "Reviews",
+      "formlar": "Forms"
+    },
+    "modelTabs": {
+      "viewer": "Viewer",
+      "coordination": "Coordination",
+      "schedule": "Schedule",
+      "params": "Parameter Changes"
+    },
+    "settingsTabs": {
+      "uyeler": "Members",
+      "roller": "Roles",
+      "moduller": "Modules",
+      "konumlar": "Locations",
+      "sablon": "Template",
+      "yapayZeka": "AI",
+      "isimlendirme": "Naming Standards",
+      "isAkislari": "Workflows",
+      "isTipleri": "Work Types",
+      "oznitelikler": "Attributes",
+      "aktivite": "Activity Log",
+      "sistemDurumu": "System Status"
+    },
+    "hub": {
+      "views": "Views",
+      "savedViews": "Saved Views",
+      "saveView": "Save View",
+      "manageViews": "Edit Views",
+      "newRecord": "+ New",
+      "filters": "Filters",
+      "clearFilters": "Clear Filters",
+      "shareWithProject": "Share with Project"
+    },
+    "ask": "Ask…",
+    "showAdvanced": "Show Advanced Settings"
+  },
+  "projectNav": {
+    "groups": {
+      "work": "Work",
+      "model": "Model and Coordination",
+      "planning": "Planning and Analysis",
+      "admin": "Administration"
+    },
+    "items": {
+      "today": "Today",
+      "works": "Work",
+      "files": "Documents",
+      "reviews": "Reviews",
+      "forms": "Forms",
+      "viewer": "Model Viewer",
+      "coordination": "Coordination",
+      "issues": "Issues",
+      "paramChanges": "Parameter Changes",
+      "schedule": "Schedule",
+      "contracts": "Contracts and Progress Payments",
+      "quantities": "Quantities",
+      "locations": "Locations",
+      "reports": "Reports",
+      "spec": "Specification Analysis",
+      "deleted": "Recycle Bin",
+      "settings": "Project Settings",
+      "sistemDurumu": "System Status",
+      "formaEsitleme": "Forma Sync"
+    }
+  },
+  "topbar": {
+    "homeLabel": "SiteKeep home",
+    "tour": "Product Tour",
+    "myTasks": "My Tasks",
+    "project": "Project",
+    "chooseProject": "Choose a project",
+    "projects": "Projects",
+    "noProjects": "You have no projects you can access.",
+    "allProjects": "View all projects",
+    "searchPages": "Search pages or projects",
+    "searchProjects": "Search projects",
+    "search": "Search",
+    "noResults": "Nothing found.",
+    "accountSettings": "Account Settings",
+    "systemAdmin": "System Administration",
+    "signOut": "Sign Out"
+  },
+  "projectShell": {
+    "navLabel": "Project navigation",
+    "closeMenu": "Close project menu",
+    "openMenu": "Project menu",
+    "ask": "Ask the project",
+    "askTitle": "Ask the project a question (Ctrl+K)",
+    "askBlocked": "Ask the Project is unavailable while Ask the Model is open.",
+    "dismissMenu": "Close menu",
+    "projectAdmin": "Project administrator",
+    "projectMember": "Project member",
+    "expand": "Expand menu",
+    "collapse": "Collapse menu",
+    "expandShort": "Expand",
+    "breadcrumbs": "Location",
+    "projects": "Projects"
+  },
+  "app": {
+    "loading": "Loading SiteKeep…"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadLabel": "Notifications ({{count}} unread)",
+    "actions": {
+      "readAll": "Mark All as Read"
+    },
+    "empty": "No notifications."
+  },
+  "privacyBanner": {
+    "message": "All external connections are off: the server does not connect outside the network, AI runs fully locally.",
+    "link": "Privacy Centre"
+  },
+  "assignee": {
+    "types": {
+      "user": "Person",
+      "company": "Company",
+      "role": "Role / Team"
+    },
+    "deletedRole": "(deleted role)",
+    "roleMembers_one": "{{name}} ({{count}} person)",
+    "roleMembers_other": "{{name}} ({{count}} people)",
+    "none": "No assignees",
+    "remove": "Remove",
+    "choose": "Choose…"
+  },
+  "filterBar": {
+    "placeholder": "Search…",
+    "search": "Search",
+    "removeFilter": "Remove the {{filter}} filter",
+    "remove": "Remove"
+  },
+  "location": {
+    "field": "Location",
+    "none": "— No location —"
+  },
+  "moreMenu": {
+    "label": "More"
+  },
+  "attribute": {
+    "invalid": "{{value}} (invalid)"
+  },
+  "about": {
+    "viewer": "The viewer runs on That Open Company's open source components (MIT)."
+  },
+  "apiErrors": {
+    "sheet": "The table could not be read (HTTP {{status}}).",
+    "file": "The file could not be read (HTTP {{status}})."
+  },
+  "recordCard": {
+    "due": "Due {{date}}"
+  }
+}

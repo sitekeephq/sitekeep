@@ -1,0 +1,80 @@
+{
+  "page": {
+    "badges": {
+      "baseline": "Temel Plan"
+    },
+    "actions": {
+      "import": "İçe Aktar",
+      "more": "İşlemler",
+      "compare": "Karşılaştır",
+      "summary": "Özet",
+      "sCurve": "S-eğrisi",
+      "sim4d": "4D Simülasyon",
+      "cost": "Maliyet (5D)",
+      "makeBaseline": "Temel Plan Yap"
+    },
+    "costHint": "Birim fiyatlar, maliyet kuralları, nakit akışı",
+    "empty": "Bu projede henüz iş programı yok. Proje yöneticisi içe aktarabilir."
+  },
+  "view": {
+    "actions": {
+      "today": "Bugün"
+    }
+  },
+  "drawer": {
+    "actions": {
+      "showInModel": "Modelde Göster"
+    }
+  },
+  "import": {
+    "title": "İş Programı İçe Aktar",
+    "description": "MS Project XML (.xml), Primavera P6 (.xer), Excel (.xlsx) veya CSV. Aynı programın yeni hali, seçilen programın yeni versiyonu olur; ilk versiyon temel plan kabul edilir.",
+    "stats": "{{activities}} faaliyet · {{summaries}} iş kırılımı özeti · {{dependencies}} bağımlılık",
+    "mappingHeading": "Sütun Eşleştirme",
+    "previewHeading": "Önizleme",
+    "options": {
+      "none": "— yok —",
+      "newSchedule": "Yeni Program",
+      "newVersion": "{{name}} — yeni versiyon (v{{version}})",
+      "makeBaseline": "Bu Versiyonu Temel Plan Yap"
+    },
+    "actions": {
+      "basicFields": "Yalnız Temel Alanlar",
+      "otherFields": "Diğer Alanlar (iş kırılımı, temel plan, gerçekleşen, kritik, kaynak…)"
+    },
+    "warnings_one": "{{count}} Uyarı",
+    "warnings_other": "{{count}} Uyarı",
+    "fields": {
+      "target": "Hedef",
+      "name": "Program Adı",
+      "dataDate": "Veri Tarihi"
+    }
+  },
+  "compare": {
+    "title": "Versiyon Karşılaştırma — {{name}} v{{version}}",
+    "fields": {
+      "from": "Karşılaştırılan"
+    },
+    "empty": "Karşılaştırılacak başka versiyon yok.",
+    "projectFinish": "Proje Bitişi {{days}} gün",
+    "slipped_one": "{{count}} ötelenen",
+    "slipped_other": "{{count}} ötelenen",
+    "improved_one": "{{count}} öne çekilen",
+    "improved_other": "{{count}} öne çekilen",
+    "becameCritical_one": "{{count}} kritik yola giren",
+    "becameCritical_other": "{{count}} kritik yola giren",
+    "addedRemoved": "{{added}} eklenen · {{removed}} kaldırılan",
+    "columns": {
+      "fromFinish": "Önceki Bitiş",
+      "toFinish": "Yeni Bitiş",
+      "startSlip": "Başlangıç Kayması",
+      "finishSlip": "Bitiş Kayması"
+    },
+    "critical": "kritik",
+    "becameCriticalList": "Kritik yola giren:",
+    "noLongerCriticalList": "Kritik yoldan çıkan:"
+  },
+  "summary": {
+    "title": "Durum Özeti — {{name}} v{{version}}"
+  }
+}

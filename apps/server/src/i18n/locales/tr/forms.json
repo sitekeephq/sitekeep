@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "form": "Form"
+  },
+  "errors": {
+    "aiUnavailable": "Yapay zekâ kullanılamıyor: {{reason}}",
+    "assigneeNotMember": "Atanan kişi proje üyesi değil.",
+    "editNotAllowed": "Formu yalnızca hazırlayan kişi veya proje yöneticisi değiştirebilir.",
+    "multipartExpected": "multipart/form-data bekleniyor.",
+    "noFile": "Dosya gönderilmedi.",
+    "noRunningWorkflow": "Formun çalışan bir onay akışı yok.",
+    "notInReview": "Form incelemede değil.",
+    "numberFailed": "Form numarası üretilemedi.",
+    "outcomeNotAllowed": "Bu adımda bu sonuç verilemez.",
+    "workflowTemplateNotFound": "Onay akışı şablonu bulunamadı."
+  },
+  "messages": {
+    "issueDescription": "Form: {{number}} – {{template}}\nMadde: {{item}}\nCevap: {{answer}}",
+    "issueDescriptionRow": "Form: {{number}} – {{template}}\nMadde: {{item}} ({{row}}. satır)\nCevap: {{answer}}",
+    "mergeAlmostSame": "\"{{drop}}\" neredeyse aynı: \"{{keep}}\" içine birleştirip arşivleyin.",
+    "mergeSimilar": "\"{{drop}}\" benzer: farkları \"{{keep}}\" şablonunun yeni sürümüne taşıyıp tek şablonda birleştirin.",
+    "records_one": "{{count}} kayıt",
+    "records_other": "{{count}} kayıt",
+    "reservedByStep": "{{step}}. adım: {{name}}",
+    "root": "kök"
+  },
+  "notifications": {
+    "approved": "Form {{number}} onaylandı",
+    "awaitingApproval": "Form {{number}} onayınızı bekliyor",
+    "infoApproved": "Bilgi: Form {{number}} onaylandı",
+    "infoReturned": "Bilgi: Form {{number}} geri döndü",
+    "returnedForCorrection": "Form {{number}} düzeltme için geri döndü",
+    "returnedToYou": "Form {{number}} size geri döndü"
+  },
+  "pdf": {
+    "approvalRecords": "Onay Kayıtları",
+    "deletedLocation": "(silinmiş konum)",
+    "errors": {
+      "encrypted": "Şifreli (parola korumalı) PDF kullanılamaz. Şifresiz kopyasını yükleyin.",
+      "notPdf": "Geçerli bir PDF değil.",
+      "password": "PDF parola korumalı.",
+      "timeout": "PDF okuma zaman aşımına uğradı.",
+      "unreadable": "PDF okunamadı.",
+      "workerExit": "PDF okuma işlemi {{code}} koduyla bitti."
+    },
+    "extraPage": "{{project}} · {{number}} · Ek sayfa {{page}} / {{pages}}",
+    "footer": "{{footer}}  ·  SiteKeep  ·  Sayfa {{page}} / {{pages}}",
+    "formNo": "Form No: {{number}}",
+    "issues": "Sorun: {{refs}}",
+    "messages": {
+      "acroForm_one": "Doldurulabilir PDF: {{count}} alan PDF'in kendisinden okundu.",
+      "acroForm_other": "Doldurulabilir PDF: {{count}} alan PDF'in kendisinden okundu.",
+      "textFound_one": "Metin katmanından {{count}} alan bulundu. Kutuları kontrol edin; eksik alanı sayfada çizerek ekleyin.",
+      "textFound_other": "Metin katmanından {{count}} alan bulundu. Kutuları kontrol edin; eksik alanı sayfada çizerek ekleyin.",
+      "textNone": "Metin katmanında alan bulunamadı. Alanları sayfa üzerinde elle yerleştirin.",
+      "tooManyPages": "PDF {{count}} sayfa; yalnız ilk {{max}} sayfa form olarak kullanılır."
+    },
+    "meta": {
+      "date": "Tarih",
+      "location": "Konum",
+      "preparedBy": "Hazırlayan",
+      "score": "Puan",
+      "submittedBy": "Gönderen"
+    },
+    "noImage": "görüntü yok",
+    "percent": "%{{value}}",
+    "photoAppendix": "{{number}} · Ek: Fotoğraflar",
+    "photoNote_one": "Ek: {{label}} ({{count}} fotoğraf)",
+    "photoNote_other": "Ek: {{label}} ({{count}} fotoğraf)",
+    "scanned": "Bu PDF taranmış görünüyor: metin katmanı ve doldurulabilir alan yok. Otomatik alan bulmak için görüntü modeli (ör. Qwen2.5-VL) veya OCR gerekir; bu sunucuda kurulu değil. Alanları sayfa üzerinde elle yerleştirebilirsiniz.",
+    "signatures": "İmzalar",
+    "signed": "{{label}}: İmzalı (imzalar bölümünde)",
+    "stamp": {
+      "filled": "1. Doldurdu",
+      "step": "{{n}}. {{name}}",
+      "stepUnnamed": "{{n}}. Adım",
+      "submitted": "Gönderildi"
+    },
+    "tableContinued": "{{number}} · {{label}} (devam, {{from}}–{{to}}. satırlar)",
+    "templateLine": "{{number}}  ·  Şablon {{code}} v{{version}}  ·  {{status}}",
+    "unknownFile": "(dosya)",
+    "visionNote": "Taranmış PDF'ler için görüntü modeli bağlanabilir (ör. Qwen2.5-VL); şu an kurulu değil."
+  },
+  "status": {
+    "closed": "Kapalı",
+    "draft": "Taslak",
+    "inReview": "İncelemede",
+    "submitted": "Gönderildi"
+  },
+  "warnings": {
+    "attributeMissing": "{{step}}. adım: \"{{field}}\" alanı formda yok; atama elle seçilmeli.",
+    "fieldNotFound": "{{step}}. adım: \"{{field}}\" alanı bulunamadı."
+  },
+  "yesNo": {
+    "na": "U.D.",
+    "no": "Hayır",
+    "yes": "Evet"
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "actions": {
+    "cancel": "İptal"
+  },
+  "mode": {
+    "options": {
+      "off": "Kapalı",
+      "localOnly": "Tam Yerel",
+      "allowExternal": "Dış Sağlayıcılara İzin Ver"
+    },
+    "badges": {
+      "off": "Yapay Zekâ Kapalı",
+      "localOnly": "Tam Yerel Mod",
+      "allowExternal": "Dış Sağlayıcılara İzinli"
+    },
+    "localOnlyHint": "Yapay zekâ çağrıları ağ dışına çıkmaz",
+    "allowExternalHint": "İzin veren projelerde veri bulut sağlayıcısına gidebilir"
+  },
+  "presets": {
+    "localName": "{{label}} (yerel)",
+    "custom": {
+      "label": "Özel (OpenAI Uyumlu)",
+      "dataLocation": "Girdiğiniz adresin sunucusunda."
+    },
+    "cost": {
+      "low": "düşük",
+      "medium": "orta",
+      "high": "yüksek"
+    }
+  },
+  "tasks": {
+    "defaultClient": "Yapay zekâ istemcisi",
+    "messages": {
+      "working": "{{client}} üzerinde çalışıyor…",
+      "waiting": "Yapay zekâ istemcisinde bekliyor — bağlı istemcinize (Claude, ChatGPT…) “bekleyen SiteKeep görevlerini yap” deyin."
+    }
+  },
+  "provider": {
+    "aria": {
+      "provider": "Yapay zekâ sağlayıcısı",
+      "model": "Yanıt modeli"
+    },
+    "project": "Proje Sağlayıcısı",
+    "projectWith": "Proje Sağlayıcısı · {{name}}",
+    "keyNeeded": "{{name}} · anahtar gerekli",
+    "notAllowed": "{{name}} · izin yok",
+    "useOwnKey": "Kendi API anahtarını kullan"
+  },
+  "ask": {
+    "actions": {
+      "ask": "Sor"
+    }
+  },
+  "modelAsk": {
+    "title": "Modele Sor",
+    "compareTitle": "Değişikliklere Sor",
+    "aria": {
+      "model": "Model",
+      "question": "Soru",
+      "display": "Gösterim",
+      "remove": "{{text}} kaldır"
+    },
+    "placeholder": "Örn. 2. kattaki yangın kapıları",
+    "placeholderCompare": "Örn. hangi kapılar değişti?",
+    "examples": {
+      "notEi60": "EI60 olmayan kapılar",
+      "slabArea": "Kaç m² döşeme var?",
+      "wallsByStorey": "Katlara göre duvarlar",
+      "fireDoors": "1. kattaki yangın kapıları"
+    },
+    "compareExamples": {
+      "changedDoors": "Hangi kapılar değişti?",
+      "deletedWalls": "Silinen duvarlar",
+      "addedByStorey": "Eklenenler katlara göre"
+    },
+    "messages": {
+      "searching": "Aranıyor…",
+      "aiWorking": "Yapay zekâ sorguyu inceliyor… {{seconds}} sn",
+      "keywordAnswer": "Anahtar kelimelerle cevaplandı; filtreleri düzeltebilirsiniz.",
+      "aiFailed": "(Yapay zekâ kullanılamadı: {{error}})",
+      "reportSaved": "Rapor paneli kaydedildi (yalnızca siz).",
+      "more_one": "… ve {{count}} eleman daha (hepsi modelde vurgulu)",
+      "more_other": "… ve {{count}} eleman daha (hepsi modelde vurgulu)"
+    },
+    "errors": {
+      "waitCurrent": "Mevcut sorgunun tamamlanmasını bekleyin.",
+      "tooShort": "Önce en az iki karakterlik bir soru yazın."
+    },
+    "badges": {
+      "ai": "Yapay Zekâ",
+      "quick": "Hızlı Sonuç",
+      "filter": "Filtre"
+    },
+    "cached": "önbellek",
+    "allModels": "Tüm Açık Modeller ({{count}})",
+    "matchCount": "{{n}} / {{total}} eleman",
+    "empty": "Filtre yok: tüm elemanlar.",
+    "unnamed": "(adsız)",
+    "firstElementsHint": "İlk 5000 eleman seçilir",
+    "defaultIssueTitle": "Model sorgusu",
+    "actions": {
+      "addFilter": "+ Filtre",
+      "closeBuilder": "Oluşturucuyu Kapat",
+      "buildWithoutAi": "Yapay Zekâ Olmadan Filtre Oluştur",
+      "saveReport": "Rapor Olarak Kaydet",
+      "createIssue": "Sorun Oluştur"
+    },
+    "display": {
+      "options": {
+        "color": "Renklendir",
+        "isolate": "Yalıt",
+        "none": "Gizle"
+      }
+    },
+    "fields": {
+      "type": "Tip",
+      "name": "Ad",
+      "material": "Malzeme",
+      "storey": "Kat",
+      "class": "Sınıf"
+    }
+  },
+  "filterBuilder": {
+    "loading": "Model sözlüğü yükleniyor…",
+    "aria": {
+      "addClass": "Sınıf ekle",
+      "addStorey": "Kat ekle",
+      "changeKind": "Değişiklik türü",
+      "field": "Alan",
+      "condition": "Koşul",
+      "value": "Değer",
+      "groupBy": "Grupla",
+      "total": "Toplam"
+    },
+    "options": {
+      "addClass": "+ Sınıf",
+      "addStorey": "+ Kat",
+      "addChange": "+ Değişiklik",
+      "property": "Özellik…",
+      "noGrouping": "Gruplama Yok",
+      "groupByField": "{{field}} Bazında",
+      "countOnly": "Yalnızca Adet",
+      "aggregate": "{{op}} {{field}}"
+    },
+    "placeholder": "Değer"
+  }
+}

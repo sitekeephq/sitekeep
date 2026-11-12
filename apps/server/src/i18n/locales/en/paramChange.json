@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "request": "Change request"
+  },
+  "errors": {
+    "changedMeanwhile": "The request changed in the meantime; refresh the page."
+  },
+  "warnings": {
+    "noElements": "No elements match the selection or query.",
+    "unknownSelected_one": "{{count}} selected element is not in this version; skipped ({{list}}).",
+    "unknownSelected_other": "{{count}} selected elements are not in this version; skipped ({{list}}).",
+    "newProperty_one": "\"{{field}}\" does not exist in the model; it will be added to {{count}} element as a new property.",
+    "newProperty_other": "\"{{field}}\" does not exist in the model; it will be added to {{count}} elements as a new property."
+  },
+  "guard": {
+    "classMissing": "The class \"{{name}}\" does not exist in the model.",
+    "storeyMissing": "The storey \"{{name}}\" does not exist in the model.",
+    "propertyMissing": "The property \"{{name}}\" does not exist in the model.",
+    "valueMissing": "The value \"{{value}}\" is neither in the sentence nor in the model.",
+    "inventedProperty": "The property \"{{name}}\" does not exist in the model (invented property).",
+    "noBoolean": "The sentence contains no yes/no value for \"{{name}}\".",
+    "newValueMissing": "The new value \"{{value}}\" is not in the sentence.",
+    "noScope": "It is not clear which elements will change (no class, storey or condition).",
+    "notJson": "The answer is not JSON.",
+    "answer": "answer"
+  },
+  "jobs": {
+    "timeout": "The Parameter Change exceeded the time limit.",
+    "workerExit": "The process ended with code {{code}}."
+  },
+  "notifications": {
+    "pending": "Parameter Change awaiting approval: {{code}} {{title}}",
+    "approved": "Parameter Change approved: {{code}} {{title}}",
+    "rejected": "Parameter Change rejected: {{code}} {{title}}",
+    "authoring": "Parameter Change to be applied in Revit: {{code}} {{title}}",
+    "verified": "Parameter Change verified in V{{version}}: {{title}}"
+  }
+}

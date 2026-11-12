@@ -1,0 +1,9 @@
+{
+  "errors": {
+    "noNewVersionPermission": "Bu dosyanın yeni versiyonunu yükleme yetkiniz yok.",
+    "noUploadPermission": "Bu klasöre yükleme yetkiniz yok.",
+    "editLocked": "Dosya şu anda {{name}} tarafından tarayıcıda düzenleniyor. Düzenleme kapandıktan sonra yeni versiyon yükleyin.",
+    "editLockedUnknown": "Dosya şu anda bir kullanıcı tarafından tarayıcıda düzenleniyor. Düzenleme kapandıktan sonra yeni versiyon yükleyin.",
+    "nameNotStandard": "Dosya adı klasörün isimlendirme standardına uymuyor: {{errors}}"
+  }
+}

@@ -1,0 +1,830 @@
+{
+  "title": "Yönetim",
+  "adminOnly": "Bu sayfa sistem yöneticisi içindir.",
+  "messages": {
+    "saved": "Kaydedildi."
+  },
+  "shared": {
+    "actions": {
+      "testConnection": "Bağlantıyı Test Et",
+      "removeKey": "Kayıtlı Anahtarı Sil"
+    },
+    "placeholder": {
+      "keyStored": "Kayıtlı anahtar var — değiştirmek için yazın"
+    }
+  },
+  "tabs": {
+    "users": "Kullanıcılar ve Firmalar",
+    "ai": "Yapay Zekâ ve MCP",
+    "office": "Office Entegrasyonu",
+    "oauth": "OAuth Uygulamaları",
+    "privacy": "Gizlilik Merkezi",
+    "status": "Sistem Durumu",
+    "forma": "Forma Eşitleme",
+    "license": "Lisans"
+  },
+  "users": {
+    "title": "Kullanıcılar",
+    "actions": {
+      "add": "+ Kullanıcı",
+      "setPassword": "Şifre Belirle",
+      "revokeAdmin": "Yöneticiliği Al",
+      "makeAdmin": "Yönetici Yap"
+    },
+    "columns": {
+      "systemAdmin": "Sistem Yöneticisi"
+    },
+    "passwordPrompt": "{{name}} için yeni şifre (en az 10 karakter)."
+  },
+  "companies": {
+    "title": "Firmalar",
+    "help": "Kısa kod (2–8 harf/rakam) iş numaralarında ({Gönderen}, {Alıcı}) ve yeni proje sihirbazında firma kodu olarak kullanılır. Boşsa numaradaki kod firma adından üretilir. Adres ve e-posta resmi yazılarda muhatap bilgisi olarak önerilir.",
+    "columns": {
+      "shortCode": "Kısa Kod",
+      "address": "Adres",
+      "people": "Kişi"
+    },
+    "fields": {
+      "addressOf": "{{name}} Adresi",
+      "emailOf": "{{name}} E-postası"
+    },
+    "aria": {
+      "shortCode": "{{name}} kısa kodu"
+    },
+    "placeholder": {
+      "name": "Firma adı",
+      "code": "Kod (ör. PAS)"
+    }
+  },
+  "googleDomain": {
+    "title": "İzinli Alan Adı",
+    "description": "Açıkken Google ile gelen ve listedeki alan adına sahip kişi CDE’de yoksa normal kullanıcı olarak açılır. Yönetici olmaz. Kapalı hesap yine giremez.",
+    "options": {
+      "autoCreate": "Yeni Kullanıcıyı Otomatik Aç"
+    },
+    "empty": "Henüz alan adı yok. Örnek: 7dimensions.eu",
+    "placeholder": "ör. 7dimensions.eu",
+    "inputLabel": "İzinli alan adı",
+    "actions": {
+      "addDomain": "Alan Ekle"
+    }
+  },
+  "newUser": {
+    "title": "Yeni Kullanıcı",
+    "capacityWarning": "Bu ekleme ile {{finding}}. {{action}} Ayrıntı: Sistem Durumu → Kapasite.",
+    "fields": {
+      "fullName": "Ad Soyad",
+      "initialPassword": "İlk Şifre (en az 10 karakter — kullanıcı Hesabım ekranından değiştirir)",
+      "systemAdmin": "Sistem Yöneticisi"
+    }
+  },
+  "capacity": {
+    "title": "Kapasite",
+    "badges": {
+      "ok": "Uygun",
+      "warn": "Dikkat",
+      "danger": "Eksik",
+      "sampleData": "Örnek Veri",
+      "estimatedTable": "Tahmini Tablo",
+      "thisServer": "Bu Sunucu",
+      "needed": "Gereken",
+      "sample": "Örnek"
+    },
+    "findingNames": {
+      "users": "Kullanıcı",
+      "memory": "Bellek",
+      "cpu": "İşlemci",
+      "disk": "Veri diski",
+      "test": "Kapasite testi",
+      "measured": "Ölçülen kapasite"
+    },
+    "findingAction": "Ne yapılmalı",
+    "modes": {
+      "quick": "Hızlı Kontrol",
+      "load": "Tam Yük Testi"
+    },
+    "status": {
+      "running": "Sürüyor",
+      "passed": "Tamamlandı",
+      "limited": "Sınıra Ulaşıldı",
+      "cancelled": "Durduruldu",
+      "failed": "Hata",
+      "stepPassed": "Geçti",
+      "stepLimit": "Sınır"
+    },
+    "tierWithMax": "{{tier}} (≤ {{max}})",
+    "tierUnbounded": "{{tier}} (500+)",
+    "tierBelow": "en küçük kademenin altında",
+    "summary": "Sunucu: {{tier}} · {{registered}} kayıtlı, {{active}} aktif kullanıcı (30 gün).",
+    "lastTest": "Son test {{date}} · {{mode}}.",
+    "lastTestWithResult": "Son test {{date}} · {{mode}} · ~{{concurrent}} eşzamanlı / ~{{registered}} kayıtlı.",
+    "noTest": "Henüz kapasite testi yapılmadı.",
+    "actions": {
+      "watchTest": "Testi İzle",
+      "runTest": "Canlı Test Et",
+      "guide": "Kapasite Rehberi",
+      "reports": "Raporlar",
+      "startTest": "Testi Başlat",
+      "stop": "Durdur",
+      "downloadReport": "Raporu İndir",
+      "downloadPackage": "7D Paketini İndir",
+      "newTest": "Yeni Test",
+      "report": "Rapor"
+    },
+    "test": {
+      "title": "Canlı Test Et",
+      "description": "Sunucu kendini ölçer, sonuçta kaç kişiyi taşıyacağı ve eksikler çıkar. Proje dosyalarına dokunulmaz.",
+      "demoNotice": "Örnek veri: test motoru henüz örnek. Sunucuya yük bindirilmez; grafikler örnek bir koşuyu oynatır.",
+      "quickMeta": "1–2 dk · her zaman güvenli",
+      "quickText": "Donanım, işlemci, disk ve veritabanı hızı, örnek IFC dönüşümü, bellek payı.",
+      "loadMeta": "10–20 dk · mesai dışında",
+      "loadText": "Sanal kullanıcılar adım adım artar; yanıt süresi p95 {{p95}} ms'yi, hata {{errorRate}}'i veya işlemci {{cpu}}'ı geçince durur.",
+      "loadWarning": "Test süresince çalışan kullanıcılar yavaşlık hissedebilir. Gerçek kullanıcı trafiği başlarsa test kendini durdurur.",
+      "options": {
+        "afterHours": "Mesai Dışındayım"
+      },
+      "disabledHere": "Bu kurulumda kapalı"
+    },
+    "run": {
+      "progressLabel": "Test ilerlemesi",
+      "result": "~{{concurrent}} eşzamanlı · ~{{registered}} kayıtlı kullanıcı",
+      "stopReason": "Durma nedeni: {{reason}}.",
+      "noLimit": "Üst basamağa kadar sınır aşılmadı.",
+      "firstStepOver": "İlk basamak bile sınırın üstünde kaldı: {{reason}}.",
+      "findings": {
+        "title": "Eksikler ve Öneriler"
+      },
+      "waiting": "bekliyor…"
+    },
+    "charts": {
+      "responseTime": "Yanıt süresi (p95)",
+      "virtualUsers": "Sanal kullanıcı",
+      "requestsPerSecond": "İstek / sn",
+      "cpu": "İşlemci",
+      "chartLabel": "{{title}} grafiği",
+      "limitCaption": "Kesikli çizgi: sınır {{limit}}",
+      "columns": {
+        "users": "Kullanıcı",
+        "p95": "p95",
+        "rps": "İstek/sn",
+        "errors": "Hata",
+        "cpu": "İşlemci"
+      }
+    },
+    "guide": {
+      "title": "Kapasite Rehberi",
+      "intro": "Kaç kullanıcıya nasıl sunucu gerekir.",
+      "measuredOn": "Sayılar {{date}} tarihinde ölçüldü.",
+      "estimated": "Sayılar tahminidir; referans ölçümle güncellenecek.",
+      "concurrency": "Yoğun saatte kayıtlı kullanıcıların {{percent}}'inin aynı anda çalıştığı varsayılır.",
+      "tiers": {
+        "title": "Kademeler"
+      },
+      "columns": {
+        "tier": "Kademe",
+        "registered": "Kayıtlı",
+        "concurrent": "Eşzamanlı",
+        "vcpu": "vCPU",
+        "ram": "RAM",
+        "disk": "Veri Diski (SSD)",
+        "database": "Veritabanı"
+      },
+      "perProject": "projeye göre",
+      "serverSummary": "Bu sunucu: {{cpu}} vCPU · {{ram}} GB RAM · {{os}}.",
+      "serverSummaryDisk": "Bu sunucu: {{cpu}} vCPU · {{ram}} GB RAM · {{total}} veri diski ({{free}} boş) · {{os}}.",
+      "everyTier": {
+        "title": "Her Kademede"
+      },
+      "disk": {
+        "title": "Disk Nasıl Hesaplanır",
+        "description": "Disk kullanıcıyla değil model hacmiyle büyür: yüklenen dosyalar × 1,6 (Fragments ve önizlemeler) + veritabanı + %30 boş alan. Yedek ayrı hedefte tutulur."
+      },
+      "operations": {
+        "title": "Yönetim Nasıl Olmalı",
+        "whenToTest": "Kapasite testini ilk kurulumda, donanım değişince ve büyük sürüm yükseltmesinden sonra çalıştırın.",
+        "oldTest": "{{days}} günden eski test sarı görünür.",
+        "plan": "Kullanıcı sayısı kademe sınırının %90'ına gelince donanım planlayın; sınırı aşınca uyarı kırmızı olur.",
+        "afterHours": "Tam yük testini mesai dışında çalıştırın; Hızlı Kontrol her zaman güvenlidir.",
+        "disk": "Disk %80'i geçmeden genişletin.",
+        "office": "Büyük IFC dönüşümü ve ofis sunucusu ek bellek ister; ofis sunucusu için ayrı makine önerilir."
+      },
+      "meaning": {
+        "title": "Uyarıların Anlamı",
+        "ok": "Sunucu bu kullanıcı sayısını karşılıyor.",
+        "warn": "Sınıra yaklaşıldı, test eski veya disk doluyor. Planlayın.",
+        "danger": "Sunucu kullanıcı sayısını karşılamıyor. Ekrandaki eylemi uygulayın (RAM, işlemci, disk)."
+      }
+    },
+    "runs": {
+      "title": "Kapasite Raporları",
+      "empty": "Henüz test yok. Canlı Test Et ile başlayın.",
+      "columns": {
+        "test": "Test"
+      },
+      "result": "~{{concurrent}} eşzamanlı / ~{{registered}} kayıtlı",
+      "footnote": "Testler sunucu yeniden başlayınca silinir; kalıcı rapor geçmişi sonraki adımda gelecek."
+    }
+  },
+  "systemStatus": {
+    "title": "Sistem Durumu",
+    "badges": {
+      "ok": "Yeşil",
+      "warn": "Sarı",
+      "danger": "Kırmızı",
+      "up": "Ayakta",
+      "down": "Düşük",
+      "valid": "Geçerli",
+      "latest": "Son",
+      "allExternalOff": "Tüm Dış Bağlantılar Kapalı",
+      "externalOn": "Dış Bağlantılar Açık",
+      "queued": "Bekleyen {{n}}",
+      "running": "Çalışan {{n}}",
+      "failed": "Başarısız {{n}}",
+      "done": "Biten {{n}}"
+    },
+    "time": {
+      "ago": "{{time}} önce",
+      "in": "{{time}} sonra",
+      "seconds": "{{n}} sn",
+      "minutes": "{{n}} dk",
+      "hours": "{{n}} sa",
+      "hoursMinutes": "{{h}} sa {{m}} dk"
+    },
+    "checked": "Son kontrol {{time}}. Otomatik yedek çalışıyor; Grafana veya SSH gerekmez.",
+    "health": {
+      "title": "Canlılık",
+      "app": "Uygulama",
+      "appDetail": "sürüm {{version}} · {{node}} · ayakta {{uptime}}",
+      "database": "Veritabanı",
+      "databaseDetail": "{{kind}} · {{size}}",
+      "databaseDown": "bağlanılamıyor",
+      "licence": "Lisans",
+      "monthsLeft_one": "{{count}} ay kaldı",
+      "monthsLeft_other": "{{count}} ay kaldı"
+    },
+    "resources": {
+      "title": "Kaynaklar",
+      "cpu": "İşlemci",
+      "cpuUsage": "{{percent}} kullanım",
+      "memory": "Bellek",
+      "disk": "Disk",
+      "usage": "{{percent}} dolu · {{free}} boş / {{total}}",
+      "process": "Süreç {{size}}",
+      "unreadable": "okunamadı",
+      "last24": "Son 24 saat. Makine; proje içeriği değil."
+    },
+    "queue": {
+      "title": "İş Kuyruğu",
+      "description": "Dönüşüm, önizleme ve gece yedeği bu kuyrukta yürür.",
+      "actions": {
+        "view": "İşleri Gör"
+      },
+      "spark": "Bekleyen, son 24 saat — kuyruk eriyor",
+      "dialogDescription": "Dönüşüm, önizleme, çakışma ve yedek. Başarısız iş yeniden kuyruğa alınabilir.",
+      "columns": {
+        "job": "İş",
+        "target": "Hedef"
+      },
+      "status": {
+        "queued": "Bekliyor",
+        "running": "Çalışıyor",
+        "done": "Bitti",
+        "failed": "Başarısız"
+      }
+    },
+    "demo": {
+      "kinds": {
+        "preview": "Önizleme",
+        "clash": "Çakışma",
+        "backup": "Gece Yedeği"
+      },
+      "targets": {
+        "estimate": "Keşif.pdf",
+        "facade": "Cephe.dwg",
+        "clash": "Mimari ∩ Mekanik",
+        "localDisk": "Yerel disk",
+        "meetingNote": "Toplantı notu.pdf",
+        "now": "Şimdi"
+      },
+      "sources": {
+        "queue": "Kuyruk",
+        "backup": "Yedek",
+        "preview": "Önizleme"
+      },
+      "logs": {
+        "ifcStarted": "IFC → Fragments başladı: {{file}}",
+        "backupDone": "Gece yedeği bitti · {{size}} · {{minutes}} dk",
+        "ifcTimeout": "IFC → Fragments zaman aşımı: {{file}}",
+        "noDwg": "DWG dönüştürücü yok; {{file}} kuyrukta bekliyor"
+      }
+    },
+    "backup": {
+      "title": "Otomatik Yedek",
+      "nightly": "Her gece 02:00.",
+      "lastSuccess": "Son başarılı yedek {{time}}.",
+      "next": "Sonraki {{time}}.",
+      "copies_one": "{{count}} kopya tutuluyor.",
+      "copies_other": "{{count}} kopya tutuluyor.",
+      "notScheduled": "Zamanlama henüz açık değil. Hedef ve gece saati kurulunca yedek işi kuyruğa düşer.",
+      "queued": "Yedek kuyruğa alındı; birkaç dakika içinde biter.",
+      "actions": {
+        "viewCopies": "Kopyaları Gör",
+        "backupNow": "Şimdi Yedekle",
+        "delete": "Yedeği Sil"
+      },
+      "copiesTitle": "Yedek Kopyaları",
+      "copiesDescription": "Her kopya veritabanı, dosyalar ve Kurtarma Paketi. Son kopya silinmez. Eski kopyayı yalnız sistem yöneticisi siler.",
+      "columns": {
+        "taken": "Alındı"
+      },
+      "minutes": "{{n}} dk",
+      "deleteConfirm": "{{date}} yedeği silinsin mi? Geri alınamaz."
+    },
+    "maintenance": {
+      "title": "Bakım",
+      "cleaned": "Türevler silindi; dosyalar duruyor. Önizleme ve Fragments ilk açılışta yeniden üretilir.",
+      "description": "Önizleme ve Fragments yeniden üretilebilir. Proje dosyası ve veritabanı buradan silinmez.",
+      "actions": {
+        "clean": "Türevleri Temizle"
+      },
+      "confirm": "Önizleme ve Fragments silinecek (yaklaşık {{size}}). Yüklenen dosyalar ve veritabanı durur."
+    },
+    "recentErrors": {
+      "title": "Son Hatalar",
+      "description": "Sırlar maskeli. Ham sunucu günlüğü değil; kuyruk ve yedek satırları.",
+      "actions": {
+        "view": "Hataları Gör"
+      },
+      "dialogDescription": "Anahtar, oturum ve erişim anahtarı satırda yok. Proje dosyası açılmaz.",
+      "columns": {
+        "level": "Düzey",
+        "source": "Kaynak",
+        "message": "Mesaj"
+      },
+      "levels": {
+        "info": "Bilgi",
+        "warn": "Uyarı",
+        "error": "Hata"
+      }
+    },
+    "external": {
+      "title": "Dış Bağlantılar"
+    }
+  },
+  "privacy": {
+    "tabs": {
+      "summary": "Özet",
+      "connections": "Dış Bağlantılar",
+      "log": "Giden Bağlantı Kaydı"
+    },
+    "kill": {
+      "title": "Tüm Dış Bağlantıları Kapat",
+      "reopenTitle": "Dış Bağlantıları Yeniden Aç",
+      "actions": {
+        "turnOffAll": "Tüm Dış Bağlantıları Kapat",
+        "reopenAll": "Dış Bağlantıları Yeniden Aç",
+        "turnOff": "Kapat",
+        "reopen": "Yeniden Aç"
+      },
+      "confirmOff": "Sunucunun ağ dışındaki bütün adreslere bağlantısı kesilecek: bulut yapay zekâ, dış e-posta ve ofis sunucuları. Yapay zekâ tam yerel moda geçer, dış istemci kuyruğu durur.",
+      "confirmOn": "Dış bağlantılar yeniden açılacak; her bağlantı kendi ayarına döner.",
+      "on": "Açık. Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır, dış istemci kuyruğu durdu.",
+      "onSince": "Açık ({{date}}). Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır, dış istemci kuyruğu durdu.",
+      "onSinceBy": "Açık ({{date}}, {{name}}). Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır, dış istemci kuyruğu durdu.",
+      "off": "Kapalı. Açıldığında sunucu ağ dışındaki hiçbir adrese bağlanmaz; yerel ağ ve iç ağ listesi çalışmaya devam eder."
+    },
+    "summary": {
+      "fields": {
+        "aiMode": "Yapay Zekâ Modu",
+        "externalProjects": "Dış Yapay Zekâya İzin Veren Projeler",
+        "database": "Veritabanı",
+        "files": "Dosyalar"
+      },
+      "selectedMode": "Seçilen mod: {{mode}}; dış bağlantılar kapalı olduğu için tam yerel çalışıyor.",
+      "noExternal": "Hiçbir proje dış yapay zekâya izin vermiyor.",
+      "permissionsInvalid": "İzinler şu an geçersiz: sistem modu dış sağlayıcılara kapalı."
+    },
+    "aiModes": {
+      "off": "Kapalı",
+      "localOnly": "Tam Yerel",
+      "allowExternal": "Dış Sağlayıcılara İzin Var"
+    },
+    "settings": {
+      "title": "Ayarlar",
+      "options": {
+        "redactLocal": "Yerel Modelde de Maskele",
+        "redactNames": "Proje Üyelerinin Adlarını Maskele"
+      },
+      "redactLocalHint": "(kişisel veriler yerel modele de yer tutucuyla gider)",
+      "redactNamesHint": "(ad yerine rol ve firma gider, ör. \"Proje Müdürü (Poyraz)\")",
+      "always": "Ağ dışındaki yapay zekâya giden her istemde e-posta, telefon, TC kimlik no ve IBAN her zaman yer tutucuyla değiştirilir. Cevap size gösterilirken asılları geri konur; eşleme yalnız o çağrı boyunca bellekte tutulur.",
+      "fields": {
+        "retention": "Kayıt Saklama Süresi (gün)",
+        "lanHosts": "İç Ağ Sunucuları"
+      },
+      "lanPlaceholder": "ai.firma.com.tr\n*.firma.local\n100.64.0.0/10",
+      "lanHelp": "Adı genel görünse de sizin ağınızda olan sunucular (her satıra bir ad, \"*.alan\" ya da IPv4 aralığı). Özel IP aralıkları ve tek parçalı adlar zaten yereldir. Bu listedekiler yerel sayılır: tüm dış bağlantılar kapalıyken de çalışır, yapay zekâ istemleri maskelenmez."
+    },
+    "location": {
+      "local": "Yerel Ağ",
+      "external": "Dış",
+      "inbound": "Gelen",
+      "cloud": "Bulut",
+      "localShort": "Yerel",
+      "localHint": "Ağınızın içinde (özel IP aralığı ya da iç ağ listesi)",
+      "externalHint": "Ağınızın dışında (bulut)",
+      "inboundHint": "Dış istemciler CDE'ye bağlanır; sunucu dışarıya bağlanmaz"
+    },
+    "connections": {
+      "columns": {
+        "connection": "Bağlantı",
+        "server": "Sunucu",
+        "lastUsed": "Son Kullanım"
+      },
+      "options": {
+        "on": "Açık"
+      },
+      "badges": {
+        "on": "Açık",
+        "off": "Kapalı"
+      },
+      "stoppedHint": "Dış bağlantılar kapalıyken çalışmaz."
+    },
+    "log": {
+      "chars_one": "{{formatted}} karakter",
+      "chars_other": "{{formatted}} karakter",
+      "redacted": "maskelenen: {{list}}",
+      "redactions": {
+        "eposta": "E-posta",
+        "telefon": "Telefon",
+        "tckn": "TC Kimlik No",
+        "iban": "IBAN",
+        "kisi": "Kişi Adı"
+      },
+      "fields": {
+        "purpose": "Amaç",
+        "server": "Sunucu"
+      },
+      "options": {
+        "aiAll": "Yapay Zekâ (tümü)",
+        "onlyBlocked": "Yalnız Engellenenler"
+      },
+      "actions": {
+        "downloadCsv": "CSV İndir"
+      },
+      "description": "Her dış çağrının zamanı, amacı, sunucusu, boyutu ve sonucu tutulur; içerik asla tutulmaz. Kayıtlar saklama süresi dolunca her gün silinir.",
+      "columns": {
+        "purpose": "Amaç",
+        "server": "Sunucu",
+        "outIn": "Giden / Gelen",
+        "user": "Kullanıcı",
+        "details": "Ayrıntı"
+      },
+      "badges": {
+        "local": "Yerel",
+        "external": "Dış",
+        "blocked": "Engellendi",
+        "ok": "Tamam"
+      },
+      "empty": "Kayıt yok. Sunucu bu süzgece uyan hiçbir dış bağlantı kurmadı.",
+      "count": "{{shown}} / {{total}} kayıt"
+    }
+  },
+  "ai": {
+    "mode": {
+      "title": "Yapay Zekâ Modu",
+      "killSwitch": "Tüm dış bağlantılar kapalı (Gizlilik Merkezi): yapay zekâ tam yerel çalışıyor ve dış istemci kuyruğu durdu. Seçtiğiniz mod, bağlantılar yeniden açılınca geçerli olur.",
+      "projectsLimit": "Projeler bu sınırı aşamaz: proje yöneticisi Proje Ayarları → Yapay Zekâ bölümünden yapay zekâyı kapatabilir veya yalnız sistem modunun izin verdiği sağlayıcıları seçebilir. Dış modeller yalnız izin veren projelerde çalışır.",
+      "current": "Şu An Kullanılan: {{option}}",
+      "order": "Sıra: yerel model → bulut model → \"Kendi AI'ımla Çalıştır\" (yedek). Seçenekler birlikte kullanılabilir."
+    },
+    "queue": {
+      "options": {
+        "allowWrite": "Okuma + Yazma Erişim Anahtarlarına İzin Ver (görev kuyruğu ve kaydetme araçları için gerekir)",
+        "everyone": "Tüm Kullanıcılar",
+        "projectAdmins": "Proje Yöneticileri ve Sistem Yöneticileri",
+        "admins": "Yalnız Sistem Yöneticileri",
+        "unlimited": "Sınırsız"
+      },
+      "fields": {
+        "tokenCreators": "Erişim Anahtarı Oluşturabilecekler",
+        "maxTokenDays": "Erişim Anahtarının En Uzun Süresi"
+      },
+      "days_one": "{{count}} gün",
+      "days_other": "{{count}} gün"
+    },
+    "provider": {
+      "embedding": "arama modeli: {{model}}",
+      "actions": {
+        "makeDefault": "Varsayılan Yap"
+      }
+    }
+  },
+  "office": {
+    "editorNames": {
+      "none": "Kapalı",
+      "onlyoffice": "ONLYOFFICE Docs",
+      "collabora": "Collabora Online"
+    },
+    "editorTexts": {
+      "none": "Ofis dosyaları yalnız tarayıcı görüntüleyicilerinde açılır; düzenleme için indirilip yeniden yüklenir.",
+      "onlyoffice": "AGPL-3.0. Microsoft biçimlerine (docx/xlsx/pptx) en sadık editör. Ücretsiz sürüm en çok 20 eşzamanlı bağlantı. WOPI_ENABLED=true ve JWT gerekir.",
+      "collabora": "MPL-2.0, LibreOffice tabanlı. ODF ve eski biçimlerde (doc/xls/ppt) güçlü. CODE sürümünde bağlantı sınırı yok ama yük artınca uyarı gösterir."
+    },
+    "converterNames": {
+      "auto": "Otomatik",
+      "none": "Kapalı",
+      "onlyoffice": "ONLYOFFICE (ConvertService)",
+      "collabora": "Collabora (convert-to)",
+      "gotenberg": "Gotenberg",
+      "local": "Sunucudaki LibreOffice (soffice)"
+    },
+    "converterTexts": {
+      "auto": "Editör ayarlıysa onun sunucusu; değilse bu sunucuda LibreOffice varsa o; yoksa PDF yapılmaz (dosyalar tarayıcıda yine açılır).",
+      "onlyoffice": "ConvertService API (JWT). ONLYOFFICE dosyayı CDE'den tek kullanımlık bir adresten indirir.",
+      "collabora": "/cool/convert-to/pdf. Collabora'da CDE sunucusuna izin verilmeli (net.post_allow).",
+      "gotenberg": "MIT lisanslı, LibreOffice içeren hafif dönüştürme servisi (/forms/libreoffice/convert). Yalnız dönüştürür, düzenlemez.",
+      "local": "Bu sunucuya kurulu soffice. Son çare; Docker imajında artık yok.",
+      "none": "Dönüştürme kapalı. Ofis dosyalarında PDF görünümü, işaretleme ve görsel karşılaştırma olmaz."
+    },
+    "overview": {
+      "title": "Durum",
+      "testHint": "Kayıtlı ayarlarla editörü ve dönüştürücüyü dener",
+      "testing": "Test Ediliyor…",
+      "fields": {
+        "browserEditing": "Tarayıcıda Düzenleme",
+        "officeToPdf": "Ofis → PDF"
+      },
+      "editableWithProof_one": "{{count}} biçim düzenlenebilir · proof key var",
+      "editableWithProof_other": "{{count}} biçim düzenlenebilir · proof key var",
+      "editableNoProof_one": "{{count}} biçim düzenlenebilir · proof key yok",
+      "editableNoProof_other": "{{count}} biçim düzenlenebilir · proof key yok",
+      "off": "Kapalı",
+      "converterAuto": "{{label}} (otomatik)",
+      "fromEnv": "Ortam değişkeninden gelen varsayılanlar: <code>{{vars}}</code>. Buradan kaydedilen değer önceliklidir."
+    },
+    "wopi": {
+      "title": "Tarayıcıda Düzenleme (WOPI)",
+      "fields": {
+        "editorUrl": "Editör Adresi (CDE sunucusunun ulaştığı)",
+        "publicUrl": "Tarayıcının Kullandığı Adres (farklıysa)",
+        "wopiBase": "CDE'nin Editörden Görünen Adresi",
+        "jwt": "ONLYOFFICE JWT Gizli Anahtarı (JWT_SECRET ile aynı)",
+        "sessionTtl": "Editör Oturumu Süresi"
+      },
+      "placeholder": {
+        "publicUrl": "ör. https://office.firma.com — boşsa editörün bildirdiği adres",
+        "wopiBase": "boşsa tarayıcıdaki adres ({{origin}})"
+      },
+      "options": {
+        "verifyProof": "WOPI İsteklerinin İmzasını Doğrula (X-WOPI-Proof, editörün discovery anahtarıyla). Kapatmayın; yalnız sorun ararken."
+      },
+      "actions": {
+        "useThis": "Bu Adresi Kullan"
+      },
+      "help": "Editör dosyayı buradan okur ve buraya kaydeder (ör. Docker ağında <code>http://app:8080</code>). ONLYOFFICE dönüştürmesi de bu adresi kullanır.",
+      "hours_one": "{{count}} saat",
+      "hours_other": "{{count}} saat",
+      "minutes_one": "{{count}} dakika",
+      "minutes_other": "{{count}} dakika"
+    },
+    "converter": {
+      "title": "Ofis → PDF Dönüştürücü",
+      "description": "Ofis dosyalarının PDF görünümü, işaretleme, görsel revizyon karşılaştırma ve toplu PDF için. Dosyalar yalnız buradaki adrese gönderilir.",
+      "fields": {
+        "url": "Dönüştürücü Adresi",
+        "gotenbergAuth": "Gotenberg Temel Kimlik Doğrulama (isteğe bağlı, kullanıcı:şifre)",
+        "timeout": "Süre Sınırı (sn)",
+        "maxFile": "En Büyük Dosya (MB)",
+        "concurrency": "Aynı Anda",
+        "retries": "Tekrar Deneme"
+      },
+      "placeholder": {
+        "sameAsEditor": "boşsa editör adresi",
+        "stored": "Kayıtlı — değiştirmek için yazın"
+      },
+      "actions": {
+        "removeStored": "Kayıtlı Bilgiyi Sil"
+      }
+    },
+    "actions": {
+      "revert": "Geri Al"
+    }
+  },
+  "oauth": {
+    "values": {
+      "baseUrl": "Sunucu Adresi (Foundation URL)",
+      "versions": "Sürüm Listesi",
+      "auth": "Yetkilendirme Adresi (auth URL)",
+      "token": "Erişim Anahtarı Adresi (token URL)",
+      "clientId": "İstemci Kimliği (client_id)",
+      "redirect": "Yönlendirme Adresi"
+    },
+    "connection": {
+      "title": "Bağlantı Bilgileri",
+      "description": "OpenCDE istemcileri (Solibri, IfcOpenShell, BCF araçları) önce sunucu adresini ister; diğer adresleri /foundation/versions ve /foundation/1.1/auth üzerinden kendileri bulur. Bazı formlar hepsini ayrı ayrı sorar.",
+      "notConfigured": "Bu adresler isteğin geldiği adresten üretildi. Sunucuda CDE_PUBLIC_URL değişkenini müşterinin kullandığı HTTPS adresiyle tanımlayın (ör. https://cde.firma.local)."
+    },
+    "secretNotice": "\"{{name}}\" için gizli anahtarı şimdi kopyalayın, bir daha gösterilmeyecek:",
+    "apps": {
+      "title": "OAuth Uygulamaları",
+      "aecPilotHint": "Revit / Civil 3D eklentisi için hazır kayıt: açık istemci, yerel yönlendirme, OpenCDE Dokümanları izni",
+      "description": "Uygulamalar kullanıcının onayıyla, kullanıcının kendi proje ve klasör yetkileriyle bağlanır. Kullanıcı erişimi Hesabım → Bağlı Uygulamalar bölümünden kaldırabilir.",
+      "actions": {
+        "addAecPilot": "AEC Pilot Ekle",
+        "add": "+ Uygulama",
+        "connectionDetails": "Bağlantı Bilgileri",
+        "disable": "Devre Dışı Bırak",
+        "enable": "Etkinleştir",
+        "rotate": "Gizli Anahtarı Yenile",
+        "regenerate": "Yenile"
+      },
+      "columns": {
+        "app": "Uygulama",
+        "clientId": "İstemci Kimliği",
+        "scopes": "İzinler",
+        "usage": "Kullanım"
+      },
+      "badges": {
+        "disabled": "Devre Dışı"
+      },
+      "users_one": "{{count}} kullanıcı",
+      "users_other": "{{count}} kullanıcı",
+      "lastUsed": "Son kullanım {{date}}",
+      "neverUsed": "Kullanılmadı",
+      "rotateTitle": "Gizli Anahtarı Yenile",
+      "rotateConfirm": "\"{{name}}\" için yeni gizli anahtar üretilsin mi? Eski anahtar hemen geçersiz olur.",
+      "deleteTitle": "Uygulamayı Sil",
+      "deleteConfirm": "\"{{name}}\" silinsin mi? Bütün kullanıcıların onayları ve erişim anahtarları da silinir.",
+      "empty": "Kayıtlı uygulama yok."
+    },
+    "info": {
+      "title": "{{name}}: Bağlantı Bilgileri",
+      "description": "Solibri özel bağlantı (private connection) formu ve diğer OpenCDE istemcileri bu değerleri ister.",
+      "secretHint": "Gizli anahtar yalnız oluşturulduğunda gösterilir; kaybolduysa yenileyin.",
+      "copyAll": {
+        "title": "Tümünü Kopyala"
+      }
+    },
+    "dialog": {
+      "editTitle": "Uygulamayı Düzenle",
+      "newTitle": "Yeni OAuth Uygulaması",
+      "placeholder": {
+        "name": "ör. Solibri Office",
+        "description": "Onay sayfasında gösterilir",
+        "redirects": "http://127.0.0.1/callback\nhttps://uygulama.firma.local/oauth/geri"
+      },
+      "fields": {
+        "redirects": "Yönlendirme Adresleri (her satıra bir adres)",
+        "scopes": "İzinler"
+      },
+      "redirectHelp": "Adresler birebir eşleşir. http://127.0.0.1 ve http://localhost adresleri masaüstü uygulamaları için her bağlantı noktasıyla (port) eşleşir. Diğer adresler https olmalı.",
+      "scopesHelp": "Okuma ve Yazma mevcut SiteKeep API'sini açar. BCF ve Documents izinleri OpenCDE API'leri içindir."
+    },
+    "tokens": {
+      "title": "API erişim anahtarları"
+    }
+  },
+  "forma": {
+    "title": "Forma Eşitleme",
+    "description": "Autodesk ACC / Forma klasör ve dosyaları. Kayıt (sorun, inceleme) ayrı çalışır; dosya motoru henüz yok — bu ekran örnektir.",
+    "status": {
+      "ok": "Tamam",
+      "warn": "Uyarı",
+      "paused": "Duraklatıldı"
+    },
+    "fileActions": {
+      "new": "Yeni",
+      "version": "Versiyon",
+      "skipped": "Atlandı",
+      "error": "Hata"
+    },
+    "syncNow": {
+      "title": "Şimdi Eşitle",
+      "confirm": "Dosya eşitlemesi kuyruğa alınmış gibi görünecek. Motor henüz yok; ACC’den dosya inmez.",
+      "queued": "Dosya eşitlemesi kuyruğa alındı (örnek)."
+    },
+    "actions": {
+      "queue": "Kuyruğa Al",
+      "syncNow": "Şimdi Eşitle",
+      "addMapping": "+ Eşleme Ekle",
+      "openList": "Listeyi Aç"
+    },
+    "badges": {
+      "sample": "Örnek",
+      "live": "Canlı",
+      "apsConfigured": "APS Ayarlı",
+      "apsMissing": "APS Ayarı Eksik",
+      "issues": "Sorun: {{n}}",
+      "reviews": "İnceleme: {{n}}",
+      "rfis": "Bilgi Talebi: {{n}}",
+      "forms": "Form: {{n}}",
+      "pending": "Bekleyen Dosya: {{n}}",
+      "lastCopied": "Son Turda Kopyalanan: {{n}}"
+    },
+    "connection": {
+      "none": "Bağlantı Yok",
+      "meta": "{{project}} · kayıt her {{minutes}} dk",
+      "hint": "Proje Ayarları → Autodesk ile ACC projesi bağlanır."
+    },
+    "metrics": {
+      "lastRecordSync": "Son Kayıt Eşitlemesi",
+      "nextScan": "Sonraki Tarama",
+      "lastFileRun": "Son Dosya Turu"
+    },
+    "mappings": {
+      "title": "Dosya Eşlemeleri",
+      "columns": {
+        "forma": "Forma",
+        "cde": "CDE",
+        "direction": "Yön",
+        "lastRun": "Son Tur"
+      },
+      "added": "Eşleme eklendi (örnek; kayıt yok)."
+    },
+    "recent": {
+      "title": "Son Aktarılanlar",
+      "description": "İsim uymayan atlanır; kaynakta silinen CDE’de durur. Motor bağlanınca bu liste `integration_sync_runs` olur.",
+      "columns": {
+        "action": "İşlem"
+      }
+    },
+    "addDialog": {
+      "title": "Eşleme Ekle",
+      "fields": {
+        "formaFolder": "Forma Klasörü",
+        "cdeFolder": "CDE Klasörü",
+        "direction": "Yön",
+        "kinds": "Dosya Türleri"
+      },
+      "sampleFolder": "04-Şartname",
+      "hint": "Kaydedilmez. Data Management bağlanınca klasör ağacından seçilir."
+    }
+  },
+  "license": {
+    "title": "Lisans",
+    "status": {
+      "none": "Lisans Yok",
+      "not_yet": "Henüz Başlamadı",
+      "active": "Geçerli",
+      "expiring": "Bitmek Üzere",
+      "grace": "Süresi Doldu (Ek Süre)",
+      "read_only": "Salt Okunur",
+      "invalid": "Geçersiz"
+    },
+    "statusText": {
+      "none": "SiteKeep Community: çekirdek ücretsizdir ve kısıtlanmaz. Enterprise modüllerini açmak için lisans yükleyin.",
+      "not_yet": "Lisans geçerlilik tarihinde başlar; o güne kadar Enterprise modülleri kapalı kalır.",
+      "active": "Lisans geçerli.",
+      "expiring": "Lisansın bitmesine {{days}} gün kaldı. Enterprise modüllerini korumak için yenileyin.",
+      "grace": "Lisansın süresi doldu. Yenilenmezse Enterprise modülleri {{date}} tarihinde salt okunur olur.",
+      "read_only": "Lisansın süresi doldu: Enterprise modülleri yenilenene kadar salt okunur. Çekirdek etkilenmez.",
+      "invalid": "Lisans dosyası kullanılamıyor."
+    },
+    "notEnforced": "Bu kurulumda lisans kontrolü kapalı (SITEKEEP_LICENSE_ENFORCE): modüller kurulu paketleri izler.",
+    "clockBehind": "Sunucu saati görülen en son zamanın gerisinde; lisans o zamana göre değerlendiriliyor.",
+    "installationTitle": "Kurulum Kimliği",
+    "installationText": "Lisans isterken bu kimliği gönderin; lisans bu kurulum için üretilir.",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "detailsTitle": "Lisans Bilgileri",
+    "fields": {
+      "customer": "Müşteri",
+      "lid": "Lisans Numarası",
+      "modules": "Modüller",
+      "seats": "Kullanıcılar",
+      "validUntil": "Geçerlilik Sonu",
+      "supportUntil": "Güncelleme Sonu"
+    },
+    "seatsOf": "{{used}} / {{seats}} etkin kullanıcı",
+    "seatsUnlimited": "{{used}} etkin kullanıcı (sınırsız)",
+    "perpetual": "Süresiz",
+    "moduleNames": {
+      "field": "Field",
+      "coordinate": "Coordinate",
+      "planning": "Planning",
+      "cost": "Cost",
+      "ai": "AI",
+      "manage": "Manage",
+      "connect": "Connect"
+    },
+    "uploadTitle": "Lisans Yükle",
+    "replaceTitle": "Lisansı Değiştir",
+    "uploadText": "Size gönderilen lisans dosyasını (license.json) seçin.",
+    "fileLabel": "Lisans dosyası",
+    "installed": "Lisans yüklendi.",
+    "remove": "Lisansı Kaldır",
+    "removeTitle": "Lisans kaldırılsın mı?",
+    "removeText": "Enterprise modülleri kapanır; verileri durur ve lisansla geri gelir.",
+    "problems": {
+      "format": "Bu bir SiteKeep lisans dosyası değil.",
+      "unknown_key": "Lisans bu sürümün tanımadığı bir anahtarla imzalanmış.",
+      "dev_key_in_production": "Bu bir geliştirme lisansı; canlı kurulumda çalışmaz.",
+      "signature": "Lisans imzası tutmuyor: dosya değiştirilmiş ya da bozulmuş.",
+      "payload": "Lisansın içeriği okunamıyor.",
+      "other_installation": "Bu lisans başka bir kuruluma ait.",
+      "build_after_support": "Bu SiteKeep sürümü destek süresi bittikten sonra çıktı."
+    },
+    "seatsOver": "Lisansın izin verdiğinden {{count}} fazla etkin kullanıcı var: hesaplar kapatılana ya da koltuk eklenene kadar Enterprise modülleri salt okunur."
+  }
+}

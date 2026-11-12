@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wopi-discovery>
+    <net-zone name="external-http">
+        <app favIconUrl="http://localhost:9980/browser/1a2b3c4/images/x-office-document.svg" name="writer">
+            <action default="true" ext="sxw" name="view" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="odt" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="doc" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="docx" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="docm" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="rtf" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="odt" name="view_comment" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app favIconUrl="http://localhost:9980/browser/1a2b3c4/images/x-office-spreadsheet.svg" name="calc">
+            <action default="true" ext="ods" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="xls" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="xlsx" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="csv" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app favIconUrl="http://localhost:9980/browser/1a2b3c4/images/x-office-presentation.svg" name="impress">
+            <action default="true" ext="odp" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="ppt" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+            <action default="true" ext="pptx" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app name="application/vnd.oasis.opendocument.text">
+            <action default="true" ext="" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app name="application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            <action default="true" ext="" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app name="application/vnd.ms-visio.drawing">
+            <action default="true" ext="" name="view" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app name="image/svg+xml">
+            <action default="true" ext="" name="view" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app name="application/vnd.oasis.opendocument.presentation">
+            <action default="true" ext="" name="edit" urlsrc="http://localhost:9980/browser/1a2b3c4/cool.html?"/>
+        </app>
+        <app name="Capabilities">
+            <action ext="" name="getinfo" urlsrc="http://localhost:9980/hosting/capabilities"/>
+        </app>
+    </net-zone>
+    <proof-key exponent="AQAB" modulus="xGi4cq0lxB6ngq/ldJPWrMkNECUCMeGhxY8CE0uyeHpIhE7hhmodtFYLEPdWQhCaTh7/o4V8+YC1jawnrisCYAxGgflYeZUt9ZLyMirict4JqRtX1u8S/ScEXLmTYg7Q663pIXH1zcKurXc6OzkLb7KcH3FnzjXugqnDjshyBqdBzcJJPQp/0ZFO7UmbXF8NKvNb0wOPAt1yoHs1LWkJMWs3UH11lZ7aAOquYBJuj3PAg+5xyAk6bavf0Rk31+UgSLYGB+1BPzcPduGePdab5M3DTIwQzgfdVuFhtb10H8SPhd4LVOYUmRtlnXtTiXmsPZL5gsdGA0+pMzTKloY8dQ==" oldexponent="AQAB" oldmodulus="ncCarw/qezm0etGQ0Kj2h2jX14EuDdU4LHQPB9Lmpoevigc6QbjJnEjYTGriejtxH/XAeTlj8cZIf5HBclYav/2iankO1ylcbrh3Z104w5aYP0Rjx/G5NTcoCcCJCn95ptrnspLeVxyYOlaDEvWKfFGnXkPRVIENePcAmIpBnOtcByiDjynOLqEfU7Fq/RWo9I/V//BPjFlhUCizHaS5ARU1a8C6xCmSCxI0VfRNzgXikcDesGFIqmstqS6cDfQUnMXp9sxVfdc7wGxV8vUCY67kXzTxhK2ZgoShhhUxM83mGjSQDN9d8gxpOJLAhmaO4gj0mRYWCfLpjF4CH4e21w==" oldvalue="BgIAAACkAABSU0ExAAgAAAEAAQDXtocfAl6M6fIJFhaZ9AjijmaGwJI4aQzyXd8MkDQa5s0zMRWGoYSCma2E8TRf5K5jAvXyVWzAO9d9Vcz26cWcFPQNnC6pLWuqSGGw3sCR4gXOTfRVNBILkinEusBrNRUBuaQdsyhQYVmMT/D/1Y/0qBX9arFTH6EuzimPgygHXOucQYqYAPd4DYFU0UNep1F8ivUSg1Y6mBxX3pKy59qmeX8KicAJKDc1ufHHY0Q/mJbDOF1nd7huXCnXDnlqov2/GlZywZF/SMbxYzl5wPUfcTt64mpM2EicybhBOgeKr4em5tIHD3QsONUNLoHX12iH9qjQkNF6tDl76g+vmsCd" value="BgIAAACkAABSU0ExAAgAAAEAAQB1PIaWyjQzqU8DRseC+ZI9rHmJU3udZRuZFOZUC96Fj8QfdL21YeFW3QfOEIxMw83km9Y9nuF2Dzc/Qe0HBrZIIOXXNxnR36ttOgnIce6DwHOPbhJgruoA2p6VdX1QN2sxCWktNXugct0CjwPTW/MqDV9cm0ntTpHRfwo9ScLNQacGcsiOw6mC7jXOZ3EfnLJvCzk7OnetrsLN9XEh6a3r0A5ik7lcBCf9Eu/WVxupCd5y4ioy8pL1LZV5WPmBRgxgAiuuJ6yNtYD5fIWj/x5OmhBCVvcQC1a0HWqG4U6ESHp4sksTAo/FoeExAiUQDcms1pN05a+Cpx7EJa1yuGjE"/>
+</wopi-discovery>

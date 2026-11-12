@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "form": "Form"
+  },
+  "errors": {
+    "aiUnavailable": "AI is not available: {{reason}}",
+    "assigneeNotMember": "The assignee is not a project member.",
+    "editNotAllowed": "Only the person who prepared the form or a Project Administrator can change it.",
+    "multipartExpected": "multipart/form-data expected.",
+    "noFile": "No file was sent.",
+    "noRunningWorkflow": "The form has no running approval workflow.",
+    "notInReview": "The form is not in review.",
+    "numberFailed": "The form number could not be generated.",
+    "outcomeNotAllowed": "This outcome cannot be given at this step.",
+    "workflowTemplateNotFound": "Approval workflow template not found."
+  },
+  "messages": {
+    "issueDescription": "Form: {{number}} – {{template}}\nItem: {{item}}\nAnswer: {{answer}}",
+    "issueDescriptionRow": "Form: {{number}} – {{template}}\nItem: {{item}} (row {{row}})\nAnswer: {{answer}}",
+    "mergeAlmostSame": "\"{{drop}}\" is almost the same: merge it into \"{{keep}}\" and archive it.",
+    "mergeSimilar": "\"{{drop}}\" is similar: move the differences into a new version of the template \"{{keep}}\" and merge them into one template.",
+    "records_one": "{{count}} record",
+    "records_other": "{{count}} records",
+    "reservedByStep": "Step {{step}}: {{name}}",
+    "root": "root"
+  },
+  "notifications": {
+    "approved": "Form {{number}} approved",
+    "awaitingApproval": "Form {{number}} is awaiting your approval",
+    "infoApproved": "For information: Form {{number}} approved",
+    "infoReturned": "For information: Form {{number}} returned",
+    "returnedForCorrection": "Form {{number}} returned for correction",
+    "returnedToYou": "Form {{number}} has been returned to you"
+  },
+  "pdf": {
+    "approvalRecords": "Approval Records",
+    "deletedLocation": "(deleted location)",
+    "errors": {
+      "encrypted": "An encrypted (password-protected) PDF cannot be used. Upload an unencrypted copy.",
+      "notPdf": "Not a valid PDF.",
+      "password": "The PDF is password-protected.",
+      "timeout": "Reading the PDF timed out.",
+      "unreadable": "The PDF could not be read.",
+      "workerExit": "Reading the PDF ended with code {{code}}."
+    },
+    "extraPage": "{{project}} · {{number}} · Extra page {{page}} / {{pages}}",
+    "footer": "{{footer}}  ·  SiteKeep  ·  Page {{page}} / {{pages}}",
+    "formNo": "Form No: {{number}}",
+    "issues": "Issue: {{refs}}",
+    "messages": {
+      "acroForm_one": "Fillable PDF: {{count}} field was read from the PDF itself.",
+      "acroForm_other": "Fillable PDF: {{count}} fields were read from the PDF itself.",
+      "textFound_one": "{{count}} field found in the text layer. Check the boxes; add a missing field by drawing it on the page.",
+      "textFound_other": "{{count}} fields found in the text layer. Check the boxes; add a missing field by drawing it on the page.",
+      "textNone": "No fields found in the text layer. Place the fields on the page by hand.",
+      "tooManyPages": "The PDF has {{count}} pages; only the first {{max}} pages are used as the form."
+    },
+    "meta": {
+      "date": "Date",
+      "location": "Location",
+      "preparedBy": "Prepared by",
+      "score": "Score",
+      "submittedBy": "Submitted by"
+    },
+    "noImage": "no image",
+    "percent": "{{value}}%",
+    "photoAppendix": "{{number}} · Appendix: Photos",
+    "photoNote_one": "Attachment: {{label}} ({{count}} photo)",
+    "photoNote_other": "Attachment: {{label}} ({{count}} photos)",
+    "scanned": "This PDF appears to be scanned: it has no text layer and no fillable fields. Finding fields automatically needs an image model (e.g. Qwen2.5-VL) or OCR, which is not installed on this server. You can place the fields on the page by hand.",
+    "signatures": "Signatures",
+    "signed": "{{label}}: Signed (see the signatures section)",
+    "stamp": {
+      "filled": "1. Filled in",
+      "step": "{{n}}. {{name}}",
+      "stepUnnamed": "{{n}}. Step",
+      "submitted": "Submitted"
+    },
+    "tableContinued": "{{number}} · {{label}} (continued, rows {{from}}–{{to}})",
+    "templateLine": "{{number}}  ·  Template {{code}} v{{version}}  ·  {{status}}",
+    "unknownFile": "(file)",
+    "visionNote": "An image model (e.g. Qwen2.5-VL) can be connected for scanned PDFs; none is installed at the moment."
+  },
+  "status": {
+    "closed": "Closed",
+    "draft": "Draft",
+    "inReview": "In Review",
+    "submitted": "Submitted"
+  },
+  "warnings": {
+    "attributeMissing": "Step {{step}}: the form has no field \"{{field}}\"; choose the assignee by hand.",
+    "fieldNotFound": "Step {{step}}: field \"{{field}}\" not found."
+  },
+  "yesNo": {
+    "na": "N/A",
+    "no": "No",
+    "yes": "Yes"
+  }
+}

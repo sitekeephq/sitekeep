@@ -1,0 +1,402 @@
+{
+  "actions": {
+    "fit": "Sığdır",
+    "zoomIn": "Yakınlaştır",
+    "zoomOut": "Uzaklaştır",
+    "previous": "Önceki",
+    "next": "Sonraki"
+  },
+  "messages": {
+    "notFound": "Bulunamadı"
+  },
+  "open": {
+    "loading": "Görüntüleyici yükleniyor…",
+    "bar": {
+      "backHint": "Klasöre dön",
+      "actions": {
+        "folder": "Klasör"
+      }
+    },
+    "badges": {
+      "oldVersion": "Eski Versiyon"
+    },
+    "fields": {
+      "version": "Versiyon",
+      "uploaded": "Yüklenme"
+    },
+    "currentVersion": "(güncel: V{{version}})",
+    "preview": {
+      "messages": {
+        "queued": "Önizleme sırada…",
+        "processing": "Önizleme hazırlanıyor…",
+        "unavailable": "Bu sunucuda önizleme aracı kurulu değil.",
+        "askAdmin": "Sistem yöneticinize iletin."
+      },
+      "errors": {
+        "failed": "Önizleme yapılamadı.",
+        "failedWith": "Önizleme yapılamadı: {{error}}"
+      }
+    },
+    "converter": {
+      "title": "Önizleme için Dönüştürücü Gerekli",
+      "description": ".{{extension}} eski bir ikili biçim; tarayıcıda doğrudan gösterilemiyor. Dosyayı indirip açabilirsiniz.",
+      "hintDocx": "Yeni biçim (.docx) tarayıcıda açılır.",
+      "hintPptx": "Yeni biçim (.pptx) tarayıcıda açılır.",
+      "adminHint": "Yönetici: Yönetim → Office Entegrasyonu'ndan bir dönüştürücü (ONLYOFFICE, Collabora ya da Gotenberg) bağlanırsa bu dosyalar da açılır.",
+      "userHint": "Bu dosyaların sistemde açılmasını istiyorsanız sistem yöneticinize iletin.",
+      "errors": {
+        "failed": "Dönüştürme yapılamadı.",
+        "failedWith": "Dönüştürme yapılamadı: {{error}}"
+      }
+    },
+    "noPreview": {
+      "title": "Önizleme Yok — İndir",
+      "description": ".{{extension}} dosyaları tarayıcıda gösterilemiyor. Dosyayı indirip uygun programla açın."
+    },
+    "messages": {
+      "noDownload": "Bu dosyayı indirme yetkiniz yok."
+    }
+  },
+  "office": {
+    "pdfLayout": {
+      "hint": "Dönüştürücünün yaptığı PDF: birebir sayfa düzeni, işaretleme yapılabilir",
+      "actions": {
+        "open": "Sayfa Düzeninde Aç (PDF)",
+        "retry": "PDF Tekrar Dene"
+      },
+      "status": {
+        "preparing": "PDF Hazırlanıyor…"
+      }
+    },
+    "print": {
+      "hint": "Yazdır ya da PDF olarak kaydet",
+      "title": "Yazdır / PDF Olarak Kaydet",
+      "actions": {
+        "menu": "Yazdır / PDF",
+        "print": "Yazdır"
+      },
+      "help": "Yazdırma penceresinde “PDF olarak kaydet”i seçin. Sayfa düzeni yaklaşıktır.",
+      "noExactPdf": "Birebir PDF için yönetici sunucuda bir dönüştürücü etkinleştirebilir.",
+      "exactPdf": "<link>Birebir PDF'i aç</link> (dönüştürücüyle yapıldı)."
+    },
+    "zoom": {
+      "fields": {
+        "zoom": "Yakınlık"
+      },
+      "fitHint": "Sayfayı pencere genişliğine sığdır"
+    },
+    "find": {
+      "placeholder": "Belgede ara"
+    },
+    "largeFile": {
+      "title": "Dosya Büyük",
+      "description": "{{size}} MB. Tarayıcıda açmak yavaş olabilir ve çok bellek kullanır.",
+      "actions": {
+        "openAnyway": "Yine de Aç"
+      }
+    }
+  },
+  "document": {
+    "pagesHint": "Word'ün kaydettiği sayfa sonlarına göre; yaklaşık",
+    "pages_one": "{{count}} sayfa",
+    "pages_other": "{{count}} sayfa",
+    "simpleViewHint": "Basit görünüm: yazı, başlık, liste, tablo ve resimler. Sayfa düzeni değil.",
+    "badges": {
+      "simpleView": "Basit Görünüm"
+    },
+    "messages": {
+      "preparing": "Belge hazırlanıyor…"
+    },
+    "errors": {
+      "noContent": "content.xml yok; dosya OpenDocument değil.",
+      "openFailed": "Belge açılamadı."
+    },
+    "failed": {
+      "title": "Belge Tarayıcıda Açılamadı",
+      "description": "Dosya bozuk ya da desteklenmeyen bir özellik içeriyor olabilir. İndirip açabilirsiniz."
+    },
+    "empty": "Boş belge.",
+    "pageBreak": "Sayfa sonu"
+  },
+  "sheet": {
+    "messages": {
+      "loading": "Tablo yükleniyor…"
+    },
+    "empty": "Boş dosya.",
+    "hiddenSheet": "Gizli sayfa",
+    "find": {
+      "placeholder": "Sayfada ara"
+    },
+    "freezeHint": "İlk satırı kaydırırken sabit tut",
+    "actions": {
+      "freeze": "İlk Satırı Sabitle"
+    },
+    "size": "{{rows}} satır × {{cols}} sütun",
+    "truncated": "(sınırda kesildi)",
+    "print": {
+      "options": {
+        "thisSheet": "Bu Sayfa ({{name}})",
+        "allSheets": "Tüm Sayfalar ({{count}})"
+      },
+      "help": "A4; geniş tablolar yatay basılır ve sayfa genişliğine küçültülür.",
+      "rowLimit": "Sayfa başına ilk {{rows}} satır basılır.",
+      "moreRows": "… {{rows}} satır daha (basılmadı)."
+    }
+  },
+  "slides": {
+    "errors": {
+      "openFailed": "Sunum açılamadı: {{message}}",
+      "browserFailed": "Sunum tarayıcıda açılamadı: {{message}}",
+      "slideFailed": "Bu slayt çizilemedi."
+    },
+    "messages": {
+      "loading": "Sunum yükleniyor…",
+      "preparingBrowser": "Sunum tarayıcıda hazırlanıyor…"
+    },
+    "previousSlide": "Önceki slayt",
+    "nextSlide": "Sonraki slayt",
+    "slideLabel": "Slayt {{n}}",
+    "presentHint": "Tam ekran (F)",
+    "browserViewHint": "Tarayıcıda çizildi: yazı, resim, şekil, tablo ve grafikler. Animasyon yok; yazı tipleri farklı olabilir.",
+    "browserViewButtonHint": "Slaytları tarayıcıda çiz (dönüştürücüsüz görünüm)",
+    "markupHint": "PDF görüntüleyicide aç (işaretleme)",
+    "exactPdfTab": "Birebir PDF yeni sekmede açılır; oradan yazdırın ya da kaydedin.",
+    "presentExit": "{{slide}} / {{total}} · Esc ile çık",
+    "actions": {
+      "present": "Sunum Modu",
+      "notes": "Notlar",
+      "browserView": "Tarayıcı Görünümü",
+      "markup": "İşaretle"
+    },
+    "badges": {
+      "browserView": "Tarayıcı Görünümü"
+    }
+  },
+  "simple": {
+    "image": {
+      "error": "Görsel gösterilemedi (tarayıcı bu biçimi desteklemiyor olabilir)."
+    },
+    "text": {
+      "actions": {
+        "source": "Kaynak",
+        "wrap": "Satır Kaydır"
+      },
+      "summary": "{{lines}} satır · {{size}}",
+      "truncated": "Dosyanın başı gösteriliyor; tamamı için indirin."
+    },
+    "media": {
+      "videoError": "Bu video biçimi tarayıcıda oynatılamıyor. Dosyayı indirip açın.",
+      "audioError": "Bu ses biçimi tarayıcıda oynatılamıyor. Dosyayı indirip açın."
+    },
+    "email": {
+      "noSubject": "(konu yok)",
+      "noBody": "(gövde yok)",
+      "attachmentName": "ek",
+      "attachmentsHint": "Ekleri görmek için dosyayı indirip e-posta programında açın.",
+      "fields": {
+        "from": "Kimden",
+        "to": "Kime",
+        "cc": "Bilgi"
+      }
+    }
+  },
+  "modelMore": {
+    "actions": {
+      "pinIssue": "Noktadan Sorun",
+      "viewIssue": "Görünümden Sorun",
+      "fourD": "Takvim"
+    }
+  },
+  "cad": {
+    "messages": {
+      "loading": "Çizim yükleniyor…",
+      "missingGlyphs": "Bazı karakterler yazı tipinde yok; kutu olarak görünebilir."
+    },
+    "errors": {
+      "webgl": "WebGL başlatılamadı: {{message}}",
+      "openFailed": "Çizim açılamadı: {{message}}",
+      "sceneUnknown": "Sahne dosyası tanınmadı.",
+      "sceneFormat": "Sahne biçimi desteklenmiyor ({{version}}).",
+      "sceneDownload": "Sahne indirilemedi (HTTP {{status}})."
+    },
+    "phases": {
+      "font": "Yazı tipi",
+      "fetch": "İndiriliyor",
+      "parse": "Okunuyor",
+      "prepare": "Hazırlanıyor"
+    },
+    "progress": "{{phase}}…",
+    "progressPercent": "{{phase}} {{percent}}…",
+    "notices": {
+      "civil3dPartial": "Civil 3D nesneleri (hizalama, koridor, yüzey) gösterilemiyor; yalnız AutoCAD nesneleri görünüyor.",
+      "converterPartial_one": "Dönüştürücü bu çizimdeki bazı nesneleri okuyamadı ({{count}} hata); çizim eksik görünebilir.",
+      "converterPartial_other": "Dönüştürücü bu çizimdeki bazı nesneleri okuyamadı ({{count}} hata); çizim eksik görünebilir."
+    },
+    "toolbar": {
+      "fitHint": "Çizimin ana gövdesini göster",
+      "fitAllHint": "Uzaktaki nesneler dahil tüm çizim",
+      "snapHint": "Uç nokta, orta nokta, merkez ve çizgi üzerine yakala",
+      "backgroundHint": "Arka plan",
+      "modelOnlyHint": "Kağıt alanı (layout) nesnelerini gizle",
+      "actions": {
+        "fitAll": "Tümünü Göster",
+        "snap": "Yakalama",
+        "lightBackground": "Açık Arka Plan",
+        "darkBackground": "Koyu Arka Plan",
+        "modelSpaceOnly": "Yalnız Model Alanı",
+        "layers": "Katmanlar ({{count}})"
+      }
+    },
+    "layers": {
+      "placeholder": "Katman ara",
+      "actions": {
+        "allOn": "Tümünü Aç",
+        "allOff": "Tümünü Kapat"
+      },
+      "empty": "Katman yok.",
+      "noMatch": "Eşleşen katman yok."
+    },
+    "tools": {
+      "length": "Uzunluk",
+      "chain": "Zincir Uzunluk",
+      "area": "Alan",
+      "angle": "Açı",
+      "coord": "Koordinat",
+      "info": "Bilgi"
+    },
+    "hints": {
+      "lengthFirst": "Birinci noktaya tıklayın.",
+      "lengthSecond": "İkinci noktaya tıklayın.",
+      "chainStart": "Başlangıç noktasına tıklayın.",
+      "chainNext": "Sonraki noktaya tıklayın.",
+      "chainNextOrFinish": "Sonraki noktaya tıklayın; bitirmek için çift tıklayın ya da Enter.",
+      "areaCorners": "Alanın köşelerine sırayla tıklayın.",
+      "areaNextOrClose": "Sonraki köşeye tıklayın; kapatmak için çift tıklayın ya da Enter.",
+      "angleFirstArm": "Birinci kolun ucuna tıklayın.",
+      "angleVertex": "Köşeye tıklayın.",
+      "angleSecondArm": "İkinci kolun ucuna tıklayın.",
+      "coord": "Noktaya tıklayın.",
+      "info": "Bir çizgiye tıklayın: katmanı ve türü gösterilir."
+    },
+    "snapKinds": {
+      "end": "Uç Nokta",
+      "mid": "Orta Nokta",
+      "center": "Merkez",
+      "near": "Üzerinde"
+    },
+    "shapes": {
+      "line": "Çizgi",
+      "polyline": "Çoklu Çizgi",
+      "arc": "Yay",
+      "circle": "Daire",
+      "point": "Nokta"
+    },
+    "units": {
+      "unknown": "Belirsiz",
+      "unitShort": "birim",
+      "names": {
+        "unitless": "Birimsiz",
+        "inch": "İnç",
+        "foot": "Fit",
+        "mile": "Mil",
+        "millimetre": "Milimetre",
+        "centimetre": "Santimetre",
+        "metre": "Metre",
+        "kilometre": "Kilometre",
+        "microinch": "Mikroinç",
+        "mil": "Binde İnç",
+        "yard": "Yarda",
+        "angstrom": "Angstrom",
+        "nanometre": "Nanometre",
+        "micron": "Mikron",
+        "decimetre": "Desimetre",
+        "decametre": "Dekametre",
+        "hectometre": "Hektometre",
+        "gigametre": "Gigametre",
+        "astronomicalUnit": "Astronomik Birim",
+        "lightYear": "Işık Yılı",
+        "parsec": "Parsek",
+        "usSurveyFoot": "ABD Ölçme Fiti",
+        "usSurveyInch": "ABD Ölçme İnçi",
+        "usSurveyYard": "ABD Ölçme Yardası",
+        "usSurveyMile": "ABD Ölçme Mili"
+      }
+    },
+    "measure": {
+      "title": "Ölçümler",
+      "segments_one": "{{count}} Parça",
+      "segments_other": "{{count}} Parça",
+      "perimeter": "Çevre {{length}}",
+      "unitManual": "{{unit}} (elle seçildi)",
+      "unitAssumed": "{{unit}} (m varsayıldı)",
+      "clipboardHeading": "Ölçümler — {{file}} (Çizim Birimi: {{unitNote}}; gösterim: {{unit}})",
+      "unitSummary": "Çizim Birimi: {{unit}}",
+      "infoHit": "Katman: <b>{{layer}}</b> · Tür: {{shape}}",
+      "deleteLabel": "{{n}}. ölçümü sil",
+      "empty": "Henüz ölçüm yok.",
+      "fields": {
+        "drawingUnit": "Çizim Birimi",
+        "displayUnit": "Gösterim"
+      },
+      "options": {
+        "fromFile": "Dosyadan ({{unit}})"
+      },
+      "messages": {
+        "copied": "Panoya kopyalandı.",
+        "preparingSnap": "Yakalama hazırlanıyor…",
+        "noLineNearby": "Yakında çizgi bulunamadı."
+      },
+      "errors": {
+        "copyFailed": "Kopyalanamadı; tarayıcı izin vermedi."
+      },
+      "actions": {
+        "finish": "Bitir",
+        "undo": "Geri Al",
+        "copy": "Panoya Kopyala",
+        "clearAll": "Ölçümleri Temizle"
+      },
+      "takeoff": {
+        "add": "Metraja Ekle",
+        "addLabel": "{{n}}. ölçümü metraja ekle",
+        "saved": "Metrajda",
+        "open": "2B Metrajı Aç"
+      }
+    },
+    "gate": {
+      "phases": {
+        "parse": "Çizim okunuyor",
+        "build": "Sahne kuruluyor",
+        "compress": "Paketleniyor"
+      },
+      "civil3d": {
+        "title": "Civil 3D Çizimi",
+        "description": "Bu çizim Civil 3D nesneleri içeriyor (hizalama, koridor, yüzey). Açık kaynak dönüştürücü bu nesneleri okuyamaz. Civil 3D'de 'AutoCAD'e Aktar' (EXPORTTOAUTOCAD) ile kaydedip yeniden yükleyin; 3B model için IFC 4.3 olarak dışa aktarın."
+      },
+      "empty": {
+        "title": "Çizim Okunamadı",
+        "description": "Çizimde gösterilecek nesne bulunamadı. Dönüştürücü bu dosyayı okuyamamış olabilir. AutoCAD'de DXF ya da güncel DWG olarak kaydedip yeniden yükleyin."
+      },
+      "tooBig": "Bu çizim telefonda açılamayacak kadar büyük ({{size}} DXF). Hızlı görünüm (2B sahne) hazır olunca burada açılır; bilgisayardan açabilirsiniz.",
+      "preparingLarge": "Büyük çizim ({{size}} DXF): sunucu hızlı görünümü (2B sahne) bir kez hazırlıyor, hazır olunca burada açılır.",
+      "openRawDxfHint": "Tarayıcıda okunur; büyük çizimlerde uzun sürer",
+      "actions": {
+        "openRawDxf": "Ham DXF'i Aç"
+      },
+      "errors": {
+        "sceneFailed": "Hızlı görünüm hazırlanamadı.",
+        "sceneFailedWith": "Hızlı görünüm hazırlanamadı: {{error}}",
+        "sceneUnavailable": "Hızlı görünüm bu sunucuda hazırlanamıyor."
+      },
+      "messages": {
+        "preparing": "Hazırlanıyor…",
+        "preparingQueued": "Hazırlanıyor (sırada)…",
+        "preparingPhase": "Hazırlanıyor: {{phase}}…"
+      },
+      "fields": {
+        "objects": "Nesne",
+        "civil3dClasses": "Civil 3D Sınıfı",
+        "converterErrors": "Dönüştürücü Hatası"
+      }
+    }
+  }
+}

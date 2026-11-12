@@ -1,0 +1,377 @@
+{
+  "clash": {
+    "penetration": "{{mm}} mm penetration",
+    "side": "{{side}}: {{name}}",
+    "unnamed": "(unnamed)",
+    "fields": {
+      "class": "Class",
+      "storey": "Storey",
+      "system": "System"
+    },
+    "title": "⚠ Clash",
+    "closeView": "Close clash view",
+    "options": {
+      "isolatePair": "Show Only These Two Elements"
+    },
+    "actions": {
+      "active": "Active",
+      "resolved": "Resolved",
+      "approve": "Approve",
+      "createIssue": "Create Issue (with This Viewpoint)"
+    },
+    "approveHint": "Not a clash (approved)",
+    "issueLink": "Issue #{{number}} →",
+    "assignedCompany": "Assigned company: {{company}}"
+  },
+  "issueLinks": {
+    "title": "Linked Documents",
+    "clashGroup": "Clash Group",
+    "clashGroupMeta": "Clash Group · {{file}} V{{version}}",
+    "markupMeta": "V{{version}} · page {{page}} · markup",
+    "versionMeta": "V{{version}} · version"
+  },
+  "paramFile": {
+    "hint": "Requests to change this model's element data (new IFC version)",
+    "actions": {
+      "open": "✎ Parameter Changes"
+    },
+    "lostHint_one": "This version lacks {{count}} value from earlier parameter changes.",
+    "lostHint_other": "This version lacks {{count}} values from earlier parameter changes.",
+    "lost": "⚠ Values Lost: {{requests}}"
+  },
+  "setPanel": {
+    "closeSet": "Close model set",
+    "modelCount_one": "{{count}} model",
+    "modelCount_other": "{{count}} models",
+    "coordination": "Coordination",
+    "messages": {
+      "hiddenModel": "A model you are not allowed to see was skipped.",
+      "missingFile": "A file/version in the set no longer exists.",
+      "derivative": "{{file}}: viewer conversion {{status}}."
+    },
+    "views": "Viewpoints",
+    "noViews": "No saved viewpoints.",
+    "ruleCount_one": "{{count}} rule",
+    "ruleCount_other": "{{count}} rules",
+    "modelsOff_one": "{{count}} model off",
+    "modelsOff_other": "{{count}} models off",
+    "actions": {
+      "saveView": "+ Save Viewpoint to Set"
+    }
+  },
+  "saveView": {
+    "title": "Save Viewpoint",
+    "placeholder": "e.g. Mechanical — ducts in red",
+    "hint": "The camera position, switched-off models ({{n}}), sections and measurements are saved. Class rules let you hide, isolate or colour elements.",
+    "columns": {
+      "classes": "IFC Classes (comma-separated)",
+      "action": "Action",
+      "colour": "Colour"
+    },
+    "options": {
+      "color": "Colour",
+      "hide": "Hide",
+      "isolate": "Only These"
+    },
+    "actions": {
+      "addRule": "+ Rule",
+      "preview": "Preview"
+    }
+  },
+  "bcfExport": {
+    "title": "Export as BCF",
+    "descriptionSelected_one": "The {{count}} selected issue is written to a .bcfzip file with its comments, viewpoints (camera, selection, visibility, colour, section) and snapshots. Coordinates are IFC world coordinates (metres, Z up).",
+    "descriptionSelected_other": "The {{count}} selected issues are written to a .bcfzip file with their comments, viewpoints (camera, selection, visibility, colour, section) and snapshots. Coordinates are IFC world coordinates (metres, Z up).",
+    "descriptionList_one": "The {{count}} issue in the list is written to a .bcfzip file with its comments, viewpoints (camera, selection, visibility, colour, section) and snapshots. Coordinates are IFC world coordinates (metres, Z up).",
+    "descriptionList_other": "The {{count}} issues in the list are written to a .bcfzip file with their comments, viewpoints (camera, selection, visibility, colour, section) and snapshots. Coordinates are IFC world coordinates (metres, Z up).",
+    "options": {
+      "v21": "BCF 2.1 (Most Compatible)"
+    },
+    "v21Hint": "Works with Navisworks, Revit add-ins, BIMcollab ZOOM and Solibri. The field of view is clamped to 45–60°.",
+    "messages": {
+      "downloaded": "File downloaded."
+    },
+    "status": {
+      "preparing": "Preparing…"
+    },
+    "actions": {
+      "export": "Export"
+    }
+  },
+  "bcfImport": {
+    "title": "Import BCF",
+    "result": "{{created}} new, {{updated}} updated, {{unchanged}} unchanged issues{{skipped}}. {{comments}} comments and {{viewpoints}} viewpoints added.",
+    "resultSkipped_one": "; fields of {{count}} issue were kept",
+    "resultSkipped_other": "; fields of {{count}} issues were kept",
+    "hint": "A BCF 2.0, 2.1 or 3.0 file (.bcfzip). Issues are matched by their GUIDs: importing the same file again creates no copies, it only adds new comments and viewpoints.",
+    "status": {
+      "reading": "Reading file…",
+      "importing": "Importing…"
+    },
+    "summary_one": "BCF {{version}} · {{count}} issue: {{states}}",
+    "summary_other": "BCF {{version}} · {{count}} issues: {{states}}",
+    "summaryWithProject_one": "BCF {{version}} · {{project}} · {{count}} issue: {{states}}",
+    "summaryWithProject_other": "BCF {{version}} · {{project}} · {{count}} issues: {{states}}",
+    "stateCount_one": "{{count}} {{state}}",
+    "stateCount_other": "{{count}} {{state}}",
+    "columns": {
+      "title": "Title",
+      "status": "Status",
+      "import": "Import",
+      "commentsViews": "Comments / Viewpoints"
+    },
+    "importTopic": "Import This Issue",
+    "warningCount_one": "{{count}} warning",
+    "warningCount_other": "{{count}} warnings",
+    "commentsOnly": "Comments only",
+    "mapping": {
+      "title": "Mapping",
+      "status": "Status: {{value}} ({{n}})",
+      "priority": "Priority: {{value}} ({{n}})",
+      "type": "Type: {{value}} ({{n}})",
+      "person": "Person: {{value}} ({{n}})",
+      "model": "Model: {{value}} ({{n}})",
+      "noType": "No type",
+      "unmatched": "Unmatched",
+      "notLinked": "Not linked",
+      "hint": "Unmatched people stay unassigned on the issue; the e-mail in the file is kept and written back on export. Viewpoints of unlinked models open without a model."
+    },
+    "conflicts_one": "{{count}} issue changed both here and in the file (conflict):",
+    "conflicts_other": "{{count}} issues changed both here and in the file (conflict):",
+    "options": {
+      "keep": "Keep Changes Made Here",
+      "overwrite": "Apply Values from the File"
+    },
+    "actions": {
+      "import": "Import",
+      "importCount": "Import ({{n}})"
+    }
+  },
+  "issues": {
+    "title": "Issues",
+    "options": {
+      "allStatuses": "All Statuses"
+    },
+    "actions": {
+      "newInModel": "New Issue in Model",
+      "report": "Report",
+      "exportBcfCount": "Export as BCF ({{n}})"
+    },
+    "empty": "No issues yet. Create one with \"+ New\" or with \"📍 Issue from Pin\" in Model → Viewer.",
+    "columns": {
+      "number": "No.",
+      "title": "Title",
+      "status": "Status",
+      "priority": "Priority",
+      "assignee": "Assignee",
+      "due": "Due Date",
+      "updated": "Updated"
+    },
+    "selectIssue": "Select Issue"
+  },
+  "issue": {
+    "viewpoint": "Viewpoint",
+    "viewpointN": "Viewpoint {{n}}",
+    "actions": {
+      "openInModel": "🧊 Open Viewpoint in Model"
+    },
+    "importedFrom": "Imported from a BCF {{version}} file",
+    "importedFromFile": "Imported from a BCF {{version}} file ({{file}})",
+    "assignedInFile": "Assigned in file: {{name}}",
+    "editHint": "The creator, the assignee or a project administrator can change the status.",
+    "comments": "Comments",
+    "noComments": "No comments yet.",
+    "commentPlaceholder": "Write a comment…"
+  },
+  "paramChanges": {
+    "title": "Parameter Changes",
+    "description": "Changes elements' information parameters (property sets) in the CDE and produces a new IFC version. Geometry does not change; geometry changes are made in Revit.",
+    "options": {
+      "open": "Open Requests"
+    },
+    "actions": {
+      "new": "+ New Change Request"
+    },
+    "fileFilter": "File: {{file}}",
+    "selectedIfc": "selected IFC",
+    "removeFileFilter": "Remove file filter",
+    "empty": "No requests. To change element data in an IFC model, use “+ New Change Request”.",
+    "columns": {
+      "number": "No.",
+      "title": "Title",
+      "file": "File",
+      "status": "Status",
+      "elements": "Elements",
+      "date": "Date"
+    }
+  },
+  "run": {
+    "queued": "Queued",
+    "running": "Running",
+    "done": "Completed",
+    "failed": "Error"
+  },
+  "page": {
+    "title": "Coordination",
+    "tabs": {
+      "sets": "Model Sets",
+      "tests": "Clash Tests",
+      "ids": "Information Requirement Checks"
+    }
+  },
+  "sets": {
+    "description": "A model set is a group of IFC files opened together (federated model). For each file the latest version or a fixed version is chosen; viewpoints (camera, switched-off models, class colours) are saved to the set.",
+    "actions": {
+      "new": "+ New Model Set",
+      "openInViewer": "Open in Viewer"
+    },
+    "columns": {
+      "name": "Name",
+      "models": "Models",
+      "views": "Viewpoints",
+      "createdBy": "Created By"
+    },
+    "hiddenModel": "(a model you cannot access)",
+    "missingFile": "missing file",
+    "pinnedVersion": "V{{version}} (fixed)",
+    "latestVersion": "latest (V{{version}})",
+    "deleteTitle": "Delete Model Set",
+    "deleteConfirm": "Delete \"{{name}}\"?",
+    "empty": "No model sets yet."
+  },
+  "setDialog": {
+    "editTitle": "Edit Model Set",
+    "newTitle": "New Model Set",
+    "namePlaceholder": "e.g. Block A — all disciplines",
+    "fields": {
+      "ifcFiles": "IFC Files"
+    },
+    "noIfc": "The project has no IFC files.",
+    "options": {
+      "latest": "Latest Version (V{{version}})",
+      "pinned": "V{{version}} Fixed · {{date}}"
+    }
+  },
+  "tests": {
+    "allModels": "all models",
+    "allElements": "all elements",
+    "description": "Deterministic clash test on the server with IFC geometry: hard (intersection) or clearance (distance < tolerance). On a rerun the same element pair gets the same ID; statuses are kept, and clashes that are gone become \"Resolved\".",
+    "needSet": "Create a model set first",
+    "actions": {
+      "new": "+ New Clash Test",
+      "run": "▶ Run"
+    },
+    "columns": {
+      "test": "Test",
+      "type": "Type",
+      "lastRun": "Last Run",
+      "clashes": "Clashes"
+    },
+    "hard": "Hard",
+    "clearance": "Clearance",
+    "runStats": "{{seconds}} s · {{a}}×{{b}} elements",
+    "notRun": "Not run",
+    "status": {
+      "running": "Running…"
+    },
+    "deleteTitle": "Delete Clash Test",
+    "deleteConfirm": "Delete \"{{name}}\" and its results?",
+    "empty": "No clash tests yet.",
+    "typeTolerance": "{{type}} · {{mm}} mm"
+  },
+  "results": {
+    "statuses": "Statuses",
+    "groups": "Groups ({{n}})",
+    "choose": "Choose…"
+  },
+  "ids": {
+    "description": "An information requirement check verifies whether the model carries the required information. Upload the IDS (Information Delivery Specification) file to the project as a normal file, then run it against an IFC version. Supported subset: entity, attribute and property facets; classification, material and partOf facets are reported as \"not evaluated\".",
+    "fields": {
+      "idsFile": "IDS File",
+      "ifcVersion": "IFC Version"
+    },
+    "versionLatest": "{{file}} V{{version}} (latest)",
+    "actions": {
+      "check": "Check",
+      "downloadCsv": "Download CSV"
+    },
+    "columns": {
+      "status": "Status",
+      "result": "Result",
+      "date": "Date",
+      "spec": "Specification",
+      "applicable": "Applicable",
+      "passed": "Passed",
+      "failed": "Failed",
+      "class": "Class",
+      "name": "Name",
+      "reason": "Reason"
+    },
+    "passedN": "Passed {{n}}",
+    "failedN": "Failed {{n}}",
+    "skippedN": "Skipped {{n}}",
+    "empty": "No information requirement checks yet.",
+    "status": {
+      "pass": "Passed",
+      "fail": "Failed",
+      "skipped": "Skipped"
+    },
+    "back": "← Information Requirement Checks",
+    "specCount": "{{n}} specifications",
+    "elementsChecked": "{{n}} objects checked",
+    "truncated": "The list is limited to the first {{n}} elements; the counts cover all elements."
+  },
+  "viewer": {
+    "errors": {
+      "init": "The viewer could not start: {{error}}",
+      "view": "The viewpoint could not be applied: {{error}}",
+      "clash": "The clash could not be shown: {{error}}",
+      "clashElementMissing": "One of the clashing elements was not found in the model (the version may have changed).",
+      "selectMissing": "The requested elements were not found in the open models.",
+      "compareColours": "The comparison colours could not be applied: {{error}}"
+    },
+    "status": {
+      "loadingModel": "Loading model…",
+      "comparing": "Calculating comparison…",
+      "pickPin": "Click a point in the model for the issue location (Esc: cancel)"
+    },
+    "models": "Models",
+    "selectedCount": "{{n}} selected",
+    "selectHint": "Select one or more",
+    "noModels": "No viewable IFC files. Upload IFC files in Documents.",
+    "issues": "Issues",
+    "actions": {
+      "models": "☰ Models",
+      "modelsCount": "☰ Models ({{n}})",
+      "fit": "⤢ Fit",
+      "pinIssue": "📍 Issue from Pin",
+      "viewIssue": "+ Issue from Viewpoint",
+      "fourD": "🗓 Schedule",
+      "ask": "✦ Ask the Model"
+    },
+    "fourDHint": "Colour by schedule (4D)",
+    "askHint": "Ask the model: lists, counts, m², reports",
+    "emptyWide": "Select one or more models on the left.",
+    "emptyNarrow": "Select one or more models with the Models button.",
+    "compareHint": "Compare two versions of this file"
+  },
+  "newIssue": {
+    "title": "New Issue",
+    "created": "Issue #{{number}} created.",
+    "types": {
+      "coordination": "Coordination",
+      "design": "Design",
+      "site": "Site",
+      "quality": "Quality",
+      "ohs": "OHS",
+      "other": "Other"
+    },
+    "viewpoint": "Viewpoint",
+    "capturing": "Capturing image…",
+    "saved": "The camera and open models are saved.",
+    "savedWithSelection": "The camera, open models and {{n}} selected elements are saved.",
+    "pinAdded": "Pin location added.",
+    "sectionsSaved": "Sections are saved too.",
+    "measurementsSaved": "{{n}} measurements are saved too."
+  }
+}

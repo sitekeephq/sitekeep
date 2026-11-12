@@ -1,0 +1,210 @@
+{
+  "rule": {
+    "fields": {
+      "storey": "Storey",
+      "class": "Class",
+      "nameContains": "Name Contains",
+      "property": "Property"
+    },
+    "noStoreys": "The model has no storey information.",
+    "classSearch": "Search classes",
+    "namePlaceholder": "e.g. shear wall",
+    "propertyCondition": "Property condition",
+    "options": {
+      "noProperty": "No Property Condition",
+      "propertyValue": "Property = Value",
+      "propertyItemCode": "Property = Item Code",
+      "propertyActivity": "Property = Activity Code / WBS",
+      "contains": "Contains"
+    },
+    "propertyPlaceholder": "Property name (e.g. WBS)",
+    "comparison": "Comparison",
+    "valuePlaceholder": "Value",
+    "matchedField": "Matched field"
+  },
+  "linkRules": {
+    "errors": {
+      "failed": "{{action}}: {{message}}",
+      "apply": "Could not apply",
+      "suggest": "Could not get suggestions",
+      "add": "Could not add",
+      "remove": "Could not delete"
+    },
+    "messages": {
+      "applied": "{{elements}} elements linked to {{activities}} activities ({{links}} links).",
+      "suggested_one": "{{count}} rule suggested.",
+      "suggested_other": "{{count}} rules suggested.",
+      "noSuggestions": "No rules could be derived from the activity names.",
+      "added_one": "{{count}} rule added. Press \"Apply\" to write the links.",
+      "added_other": "{{count}} rules added. Press \"Apply\" to write the links.",
+      "removed": "The rule and the links it wrote were deleted.",
+      "ruleAdded": "Rule added."
+    },
+    "title": "Link Rules",
+    "description": "Links activities to model elements by storey, class, property or name. Rules run on the element index on the server and are re-applied automatically when a new model version arrives. Manually linked elements are kept.",
+    "fields": {
+      "model": "Model",
+      "activity": "Activity"
+    },
+    "options": {
+      "noModel": "No IFC Model",
+      "chooseActivity": "Choose Activity"
+    },
+    "previewStats": "{{matched}} / {{total}} elements · {{activities}} activities",
+    "multiTarget_one": "{{count}} element in more than one activity",
+    "multiTarget_other": "{{count}} elements in more than one activity",
+    "stale": "There is a new version of the model; apply the rules again.",
+    "empty": "There are no rules for this model. You can start with \"Suggest Rules\".",
+    "byProperty": "By Property Value",
+    "unknownValues": "Unmatched values: {{list}}",
+    "matchedHint": "Elements matching the rule",
+    "elements_one": "{{count}} element",
+    "elements_other": "{{count}} elements",
+    "removeRule": "Delete rule",
+    "suggestedHeading": "Suggested Rules",
+    "skipped_one": "No suitable elements in the model for {{count}} activity.",
+    "skipped_other": "No suitable elements in the model for {{count}} activities.",
+    "actions": {
+      "addSelected": "Add Selected ({{count}})",
+      "suggest": "Suggest Rules",
+      "add": "+ Add Rule"
+    },
+    "newRule": "New Rule",
+    "activitySearch": "Search activities",
+    "chooseCondition": "Choose at least one condition."
+  },
+  "cost": {
+    "title": "Cost (5D)",
+    "tabs": {
+      "summary": "Summary",
+      "items": "Unit Rates",
+      "rules": "Cost Rules",
+      "learned": "Learned Mappings"
+    },
+    "summary": {
+      "calculating": "Calculating…",
+      "kpis": {
+        "total": "Total Cost",
+        "elements": "Elements",
+        "lines": "Cost Lines",
+        "missing": "Missing Quantity"
+      },
+      "models": "Models: {{list}}",
+      "groups": {
+        "category": "By Category",
+        "storey": "By Storey",
+        "class": "By Class",
+        "activity": "By Activity"
+      },
+      "missingElements": "Elements with Missing Quantity ({{count}})"
+    },
+    "columns": {
+      "quantity": "Quantity",
+      "amount": "Amount",
+      "element": "Element",
+      "rule": "Rule"
+    },
+    "chart": {
+      "title": "Cash flow",
+      "forecast": "Forecast",
+      "unscheduled": "{{amount}} not linked to an activity is not on the curve"
+    },
+    "items": {
+      "deleteTitle": "Delete Unit Rate",
+      "deleteConfirm": "Delete \"{{code}}\"? Cost rules that use this unit rate are deleted too.",
+      "searchPlaceholder": "Search by item code or description",
+      "count_one": "{{count}} item",
+      "count_other": "{{count}} items",
+      "empty": "No unit rates. Import the Excel list or add them below.",
+      "codePlaceholder": "Item code",
+      "pricePlaceholder": "Unit rate (₺)",
+      "actions": {
+        "add": "+ Add"
+      }
+    },
+    "rules": {
+      "total": "Total: {{amount}}",
+      "noItems": "Add or import the unit rates first.",
+      "empty": "There are no cost rules for this model.",
+      "codeFromProperty": "Item Code from Property",
+      "activity": "activity {{code}}",
+      "missing_one": "{{count}} without quantity",
+      "missing_other": "{{count}} without quantity",
+      "added": "Cost rule added.",
+      "actions": {
+        "add": "+ Add Cost Rule"
+      }
+    },
+    "newRule": {
+      "title": "New Cost Rule",
+      "missing_one": "{{count}} element has no quantity",
+      "missing_other": "{{count}} elements have no quantity",
+      "options": {
+        "chooseItem": "Choose Item",
+        "otherProperty": "Other Property",
+        "from4d": "From the 4D Link"
+      },
+      "quantitySource": "Quantity source",
+      "propertyName": "Property name",
+      "multiplier": "Multiplier",
+      "multiplierHint": "Multiplier (e.g. 100 kg/m³ for reinforcement)"
+    }
+  },
+  "poz": {
+    "title": "Suggest Items",
+    "intro": "Unit price suggestions for the element groups of {{model}}. Accepted rows become cost rules and are suggested first in later projects.",
+    "useAi": "Use AI",
+    "aiUsed": "AI: {{model}}",
+    "aiNotUsed": "AI not used.",
+    "aiError": "AI unavailable ({{error}}). Showing learned and keyword suggestions.",
+    "loading": "Preparing suggestions…",
+    "covered_one": "{{count}} group is already priced by a cost rule.",
+    "covered_other": "{{count}} groups are already priced by a cost rule.",
+    "empty": "No groups left to suggest.",
+    "elements_one": "{{count}} element",
+    "elements_other": "{{count}} elements",
+    "badge": "Suggestion",
+    "changed": "Item changed; accepting teaches this choice.",
+    "confidence": "Confidence {{value}}%",
+    "selectedTotal": "Selected amount: {{amount}}",
+    "selectRow": "Select {{group}}",
+    "itemFor": "Item for {{group}}",
+    "rejectRow": "Reject Suggestion for {{group}}",
+    "rejected": "{{code}} will not be suggested for this group again.",
+    "accepted_one": "{{count}} cost rule added.",
+    "accepted_other": "{{count}} cost rules added.",
+    "unmatched": "Groups Without a Suggestion ({{count}})",
+    "columns": {
+      "select": "Select",
+      "group": "Element Group",
+      "item": "Suggested Item",
+      "source": "Source"
+    },
+    "source": {
+      "memory": "Learned",
+      "ai": "AI",
+      "keywords": "Keywords"
+    },
+    "actions": {
+      "open": "Suggest Items",
+      "refresh": "Suggest Again",
+      "reject": "Reject",
+      "accept_one": "Turn Selected into Rules ({{count}})",
+      "accept_other": "Turn Selected into Rules ({{count}})"
+    },
+    "learned": {
+      "intro": "Accepted and rejected element group ↔ item mappings, shared by all projects. Remove a wrong mapping here.",
+      "empty": "Nothing learned yet. Rows you accept in Suggest Items appear here.",
+      "decision": "Decision",
+      "uses": "Approvals",
+      "decisions": {
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "remove": "Remove {{code}} Mapping",
+      "deleteTitle": "Remove Mapping",
+      "deleteConfirm": "Remove the {{group}} ↔ {{code}} mapping? Existing cost rules stay as they are."
+    },
+    "noItems": "This project has no unit prices yet. Add them or import an Excel list under Schedule → Cost (5D) → Unit Prices."
+  }
+}

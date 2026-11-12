@@ -1,0 +1,113 @@
+# SiteKeep with Docker Compose: PostgreSQL + SiteKeep (docs/onprem/docker-compose.md).
+#   cp .env.example .env   (set ADMIN_EMAIL, ADMIN_PASSWORD, POSTGRES_PASSWORD)
+#   docker compose up -d
+# The published image is pulled: SiteKeep Community by default (ghcr.io/sitekeephq/sitekeep);
+# SITEKEEP_IMAGE=ghcr.io/sitekeephq/sitekeep-enterprise for SiteKeep Enterprise (licence in
+# Yönetim → Lisans). Build from source instead: docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+# Data: the "pgdata" volume (database) and "cdedata" volume (files and model derivatives).
+#
+# Optional office services (profiles; see docs/features/OFIS_ENTEGRASYONU.md):
+#   docker compose --profile onlyoffice up -d   ONLYOFFICE Docs: browser editing (WOPI) + office → PDF
+#   docker compose --profile collabora up -d    Collabora Online: browser editing (WOPI) + office → PDF
+#   docker compose --profile gotenberg up -d    Gotenberg: office → PDF only
+# Set the CDE_OFFICE_* values in .env for the chosen profile (or later in Yönetim → Office entegrasyonu).
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cde
+      POSTGRES_USER: cde
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cde -d cde"]
+      interval: 10s
+      retries: 10
+
+  app:
+    image: ${SITEKEEP_IMAGE:-ghcr.io/sitekeephq/sitekeep}:${SITEKEEP_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://cde:${POSTGRES_PASSWORD}@db:5432/cde
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      SECURE_COOKIES: ${SECURE_COOKIES:-0}
+      # Office integration defaults (empty = off; the admin page overrides them).
+      CDE_OFFICE_EDITOR: ${CDE_OFFICE_EDITOR:-}
+      CDE_OFFICE_EDITOR_URL: ${CDE_OFFICE_EDITOR_URL:-}
+      CDE_OFFICE_EDITOR_PUBLIC_URL: ${CDE_OFFICE_EDITOR_PUBLIC_URL:-}
+      CDE_OFFICE_CONVERTER: ${CDE_OFFICE_CONVERTER:-}
+      CDE_OFFICE_CONVERTER_URL: ${CDE_OFFICE_CONVERTER_URL:-}
+      CDE_OFFICE_JWT_SECRET: ${ONLYOFFICE_JWT_SECRET:-}
+      # The CDE as the editor containers reach it (WOPISrc, ONLYOFFICE conversion source).
+      CDE_WOPI_BASE_URL: ${CDE_WOPI_BASE_URL:-http://app:8080}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-}
+      AUTODESK_CLIENT_ID: ${AUTODESK_CLIENT_ID:-}
+      AUTODESK_CALLBACK_URL: ${AUTODESK_CALLBACK_URL:-}
+    ports:
+      - "${CDE_PORT:-8080}:8080"
+    volumes:
+      - cdedata:/data
+
+  # ONLYOFFICE Docs (AGPL-3.0; the free edition allows 20 simultaneous connections).
+  onlyoffice:
+    image: onlyoffice/documentserver:${ONLYOFFICE_TAG:-latest}
+    profiles: ["onlyoffice"]
+    restart: unless-stopped
+    environment:
+      WOPI_ENABLED: "true"
+      JWT_ENABLED: "true"
+      # Same value as the CDE's CDE_OFFICE_JWT_SECRET (above).
+      JWT_SECRET: ${ONLYOFFICE_JWT_SECRET:-}
+      # The CDE is on the private docker network; ONLYOFFICE must be allowed to download from it.
+      ALLOW_PRIVATE_IP_ADDRESS: "true"
+    ports:
+      - "${ONLYOFFICE_PORT:-8081}:80"
+    volumes:
+      - onlyoffice-data:/var/www/onlyoffice/Data
+      - onlyoffice-lib:/var/lib/onlyoffice
+
+  # Collabora Online Development Edition (MPL-2.0, LibreOffice based).
+  collabora:
+    image: collabora/code:${COLLABORA_TAG:-latest}
+    profiles: ["collabora"]
+    restart: unless-stopped
+    cap_add:
+      - MKNOD
+    environment:
+      # WOPI hosts Collabora may open files from: the CDE as Collabora reaches it.
+      aliasgroup1: ${CDE_WOPI_BASE_URL:-http://app:8080}
+      # Host name (and port) the browser uses for Collabora.
+      server_name: ${COLLABORA_SERVER_NAME:-localhost:9980}
+      # Plain HTTP inside the network; put TLS on the reverse proxy (then add --o:ssl.termination=true).
+      # frame_ancestors: the CDE page that embeds the editor (its browser host); without it the
+      # browser blocks the editor frame (CSP frame-ancestors only lists the aliasgroup hosts).
+      extra_params: --o:ssl.enable=false --o:net.frame_ancestors=${CDE_PUBLIC_HOST:-localhost:*} ${COLLABORA_EXTRA_PARAMS:-}
+      username: ${COLLABORA_ADMIN_USER:-admin}
+      password: ${COLLABORA_ADMIN_PASSWORD:-}
+    ports:
+      - "${COLLABORA_PORT:-9980}:9980"
+    # The image ships no WOPI proof key, so requests arrive unsigned. Create one and mount it:
+    #   ssh-keygen -t rsa -N "" -m PEM -f ./collabora/proof_key
+    # volumes:
+    #   - ./collabora/proof_key:/etc/coolwsd/proof_key:ro
+
+  # Gotenberg (MIT): office → PDF only (LibreOffice inside), no editing. Not published to the host.
+  gotenberg:
+    image: gotenberg/gotenberg:${GOTENBERG_TAG:-8}
+    profiles: ["gotenberg"]
+    restart: unless-stopped
+    command: ["gotenberg", "--api-timeout=180s", "--libreoffice-restart-after=50"]
+
+volumes:
+  pgdata:
+  cdedata:
+  onlyoffice-data:
+  onlyoffice-lib:

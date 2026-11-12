@@ -1,0 +1,120 @@
+{
+  "errors": {
+    "adminOnly": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
+    "urlScheme": "Adres http:// veya https:// ile başlamalı.",
+    "basicAuthFormat": "Biçim: kullanıcı:şifre",
+    "browserOnly": "Tarayıcıda düzenleme oturumu yalnız tarayıcıdan açılır."
+  },
+  "entities": {
+    "file": "Dosya",
+    "version": "Versiyon"
+  },
+  "converter": {
+    "unreachable": "{{target}} adresine ulaşılamadı ({{cause}}).",
+    "outputTooLarge": "Dönüştürücünün cevabı boyut sınırını aşıyor.",
+    "notPdf": "{{who}} PDF döndürmedi.",
+    "timeout": "Dönüşüm zaman aşımına uğradı.",
+    "fileTooLarge": "Dosya {{size}} MB; dönüştürme sınırı {{limit}} MB (Yönetim → Office Entegrasyonu).",
+    "localLabel": "LibreOffice (bu sunucu)",
+    "onlyoffice": {
+      "running": "ONLYOFFICE Docs çalışıyor.",
+      "noAnswer": "ONLYOFFICE cevap vermedi (zaman aşımı).",
+      "serviceNotFound": "ONLYOFFICE ConvertService bulunamadı.",
+      "failed": "ONLYOFFICE dönüştüremedi: {{reason}}.",
+      "errorCode": "hata {{code}}",
+      "noResultUrl": "ONLYOFFICE sonuç adresi vermedi.",
+      "resultDownload": "ONLYOFFICE sonucu indirilemedi: HTTP {{status}}",
+      "codes": {
+        "unknown": "bilinmeyen hata",
+        "timeout": "dönüşüm zaman aşımı",
+        "conversion": "dönüşüm hatası",
+        "download": "kaynak dosya indirilemedi (ONLYOFFICE, CDE adresine — 'CDE'nin editörden görünen adresi' — ulaşamıyor)",
+        "password": "dosya parola korumalı",
+        "database": "ONLYOFFICE veritabanı hatası",
+        "invalidRequest": "geçersiz istek",
+        "invalidJwt": "geçersiz JWT (gizli anahtar ONLYOFFICE'tekiyle aynı değil)",
+        "format": "biçim tanınmadı",
+        "size": "boyut sınırı aşıldı"
+      }
+    },
+    "collabora": {
+      "convertToOff": "Collabora convert-to kapalı ya da CDE sunucusuna izin verilmemiş (net.post_allow).",
+      "running": "Collabora Online çalışıyor.",
+      "runningVersion": "Collabora Online çalışıyor ({{version}}).",
+      "noAnswer": "Collabora cevap vermedi (zaman aşımı).",
+      "failed": "Collabora dönüştüremedi: HTTP {{status}} {{detail}}",
+      "notFound": "Collabora convert-to bulunamadı."
+    },
+    "gotenberg": {
+      "running": "Gotenberg çalışıyor.",
+      "noAnswer": "Gotenberg cevap vermedi (zaman aşımı).",
+      "failed": "Gotenberg dönüştüremedi: HTTP {{status}} {{detail}}"
+    }
+  },
+  "service": {
+    "converterHint": "Ofis dosyalarını PDF'e çevirecek bir dönüştürücü yok (isteğe bağlı; dosyalar tarayıcıda yine açılır). Birebir PDF için yönetici: Yönetim → Office Entegrasyonu'ndan ONLYOFFICE, Collabora ya da Gotenberg bağlayın (sunucuda LibreOffice soffice varsa yedek olarak kullanılır). Bkz. docs/features/OFIS_ENTEGRASYONU.md.",
+    "converterOff": "Ofis → PDF dönüştürme kapalı (Yönetim → Office Entegrasyonu).",
+    "converterUrlMissing": "{{converter}} adresi girilmemiş (Yönetim → Office Entegrasyonu).",
+    "onlyofficeNeedsWopiBase": "ONLYOFFICE dönüştürme için 'CDE'nin editörden görünen adresi' ayarlanmalı (ONLYOFFICE dosyayı oradan indirir).",
+    "editorNotConfigured": "Tarayıcıda düzenleme için editör ayarlanmamış.",
+    "discoveryFailed": "Editör discovery okunamadı.",
+    "discoveryFailedAt": "Editör discovery okunamadı ({{url}}): {{cause}}"
+  },
+  "test": {
+    "steps": {
+      "editor": "Editör",
+      "discovery": "Editör Discovery",
+      "proofKey": "Proof Key",
+      "cdeAddress": "CDE Adresi",
+      "pdfConverter": "PDF Dönüştürücü",
+      "converterStatus": "{{name}} Durumu",
+      "trial": "Deneme Dönüşümü",
+      "settings": "Ayar"
+    },
+    "editorUrlMissing": "Editör adresi girilmemiş.",
+    "editableFormats_one": "{{count}} biçim düzenlenebilir ({{list}}).",
+    "editableFormats_other": "{{count}} biçim düzenlenebilir ({{list}}).",
+    "noEditAction": "Discovery'de düzenleme eylemi yok (ONLYOFFICE'te WOPI_ENABLED=true olmalı).",
+    "proofKeyRead": "Editörün imza anahtarı okundu; WOPI istekleri doğrulanır.",
+    "proofKeyMissing": "Discovery'de proof-key yok; imza doğrulaması yapılamaz.",
+    "proofOff": "İmza doğrulaması kapalı.",
+    "cdeAddressEmpty": "CDE'nin editörden görünen adresi boş: tarayıcıdaki adres kullanılır. Editör CDE'ye başka adla ulaşıyorsa doldurun.",
+    "trialFileText": "SiteKeep bağlantı testi — ofis dönüştürücü.",
+    "trialOk": "TXT → PDF {{bytes}} bayt, {{ms}} ms.",
+    "trialTimeout": "Deneme dönüşümü zaman aşımına uğradı.",
+    "allOff": "Editör ve dönüştürücü kapalı."
+  },
+  "wopi": {
+    "proofFailed": "Proof doğrulanamadı: {{reason}}",
+    "noAccessToken": "access_token yok.",
+    "invalidToken": "Geçersiz ya da süresi dolmuş token.",
+    "wrongFile": "Token bu dosya için değil.",
+    "userDisabled": "Kullanıcı yok ya da devre dışı.",
+    "fileNotFound": "Dosya bulunamadı.",
+    "versionNotFound": "Versiyon bulunamadı.",
+    "viewSession": "Görüntüleme oturumu.",
+    "fileTooLarge": "Dosya boyutu sınırı aşıldı.",
+    "serverError": "Sunucu hatası.",
+    "largerThanExpected": "Dosya beklenen boyuttan büyük.",
+    "notSupported": "{{override}} desteklenmiyor.",
+    "noWrite": "Yazma yetkisi yok.",
+    "noLockHeader": "X-WOPI-Lock başlığı yok.",
+    "lockTooLong": "Kilit çok uzun.",
+    "lockAscii": "Kilit yalnız ASCII karakter içerebilir.",
+    "noOverrideHeader": "X-WOPI-Override başlığı yok.",
+    "notFound": "Bulunamadı.",
+    "versionComment": "Tarayıcıda düzenlendi ({{editor}})",
+    "versionCommentAutosave": "Tarayıcıda düzenlendi ({{editor}}, otomatik kayıt)"
+  },
+  "discovery": {
+    "notXml": "WOPI discovery XML değil."
+  },
+  "proof": {
+    "unknownFormat": "Tanınmayan proof-key biçimi.",
+    "short": "Proof-key kısa.",
+    "noProof": "X-WOPI-Proof başlığı yok.",
+    "badTimestamp": "X-WOPI-TimeStamp geçersiz.",
+    "tooOld": "X-WOPI-TimeStamp 20 dakikadan eski.",
+    "badSignature": "X-WOPI-Proof imzası doğrulanamadı."
+  }
+}

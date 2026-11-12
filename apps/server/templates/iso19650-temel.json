@@ -1,0 +1,379 @@
+{
+  "format": "7d-cde/project-template@1",
+  "name": "ISO 19650 Temel",
+  "description": "Taraf başına çalışma (WIP) alanı, ortak paylaşılan alan (inceleme / onay), yayınlanan ve arşivlenen. Kodlama paylaşılan ve yayınlanan alanlarda zorunlu; dosyalar bu alanlara yalnız onaylı inceleme ile girer.",
+  "modules": { "correspondence": true, "rfi": false, "submittals": false, "meetings": false, "transmittals": false, "issues": true, "reviews": true, "forms": false, "coordination": false, "schedule": false, "spec": false, "reports": true },
+  "slots": [
+    {
+      "key": "idare",
+      "label": "İdare",
+      "party": "client",
+      "code": "IDR",
+      "description": "İşveren / idare: yayınlananı onaylar, her şeyi görür."
+    },
+    {
+      "key": "musavir",
+      "label": "Müşavir",
+      "party": "consultant",
+      "code": "MSV",
+      "description": "Müşavir / danışman / kontrol: paylaşılanı inceler, inceleme adımlarında onaylar."
+    },
+    {
+      "key": "tasarimci",
+      "label": "Tasarımcı",
+      "party": "designer",
+      "code": "TSR",
+      "description": "Tasarım firması: kendi çalışma alanında üretir, inceleme ile paylaşır."
+    },
+    {
+      "key": "yuklenici",
+      "label": "Yüklenici",
+      "party": "contractor",
+      "code": "YKL",
+      "description": "Yüklenici: kendi alanında düzenler, tasarımı kontrol eder, idareye sunar."
+    }
+  ],
+  "root": {
+    "attributes": [
+      "Revizyon",
+      "Uygunluk Kodu"
+    ]
+  },
+  "folders": [
+    {
+      "name": "01-WIP (Çalışmada)",
+      "state": "wip",
+      "children": [
+        {
+          "name": "İdare",
+          "grants": [
+            {
+              "slot": "idare",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Müşavir",
+          "grants": [
+            {
+              "slot": "musavir",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Tasarımcı",
+          "grants": [
+            {
+              "slot": "tasarimci",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Yüklenici",
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02-SHARED (Paylaşılan)",
+      "state": "shared",
+      "naming": "ISO 19650 Kodlama",
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download_markup"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-İnceleme için",
+          "state": "shared",
+          "stateLabel": "İnceleme için"
+        },
+        {
+          "name": "02-Onay için",
+          "state": "shared",
+          "stateLabel": "Onay için"
+        }
+      ]
+    },
+    {
+      "name": "03-PUBLISHED (Yayınlanan)",
+      "state": "published",
+      "naming": "ISO 19650 Kodlama",
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        }
+      ],
+      "children": [
+        {
+          "name": "İş sonu",
+          "state": "published",
+          "stateLabel": "İş Sonu",
+          "lazy": true
+        }
+      ]
+    },
+    {
+      "name": "04-ARCHIVED (Arşiv)",
+      "state": "archived",
+      "grants": [
+        {
+          "slot": "idare",
+          "level": "view_download"
+        }
+      ]
+    }
+  ],
+  "namingStandards": [
+    {
+      "name": "ISO 19650 Kodlama",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "Proje",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Proje kodu"
+            }
+          ]
+        },
+        {
+          "name": "Kaynak",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Hacim",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ",
+              "description": "Tüm hacimler"
+            },
+            {
+              "code": "XX",
+              "description": "Hacim yok"
+            }
+          ]
+        },
+        {
+          "name": "Seviye",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ"
+            },
+            {
+              "code": "XX"
+            },
+            {
+              "code": "B2"
+            },
+            {
+              "code": "B1"
+            },
+            {
+              "code": "00"
+            },
+            {
+              "code": "01"
+            },
+            {
+              "code": "02"
+            },
+            {
+              "code": "03"
+            },
+            {
+              "code": "RF"
+            }
+          ]
+        },
+        {
+          "name": "Tip",
+          "type": "list",
+          "values": [
+            {
+              "code": "M3",
+              "description": "3B model"
+            },
+            {
+              "code": "DR",
+              "description": "Çizim"
+            },
+            {
+              "code": "RP",
+              "description": "Rapor"
+            },
+            {
+              "code": "SP",
+              "description": "Şartname"
+            },
+            {
+              "code": "SH",
+              "description": "Liste / tablo"
+            },
+            {
+              "code": "CO",
+              "description": "Yazışma"
+            }
+          ]
+        },
+        {
+          "name": "Rol",
+          "type": "list",
+          "values": [
+            {
+              "code": "A",
+              "description": "Mimari"
+            },
+            {
+              "code": "S",
+              "description": "Yapısal"
+            },
+            {
+              "code": "M",
+              "description": "Mekanik"
+            },
+            {
+              "code": "E",
+              "description": "Elektrik"
+            },
+            {
+              "code": "C",
+              "description": "İnşaat / altyapı"
+            },
+            {
+              "code": "L",
+              "description": "Peyzaj"
+            },
+            {
+              "code": "Z",
+              "description": "Genel"
+            }
+          ]
+        },
+        {
+          "name": "Numara",
+          "type": "number",
+          "digits": 4
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Revizyon",
+      "type": "text"
+    },
+    {
+      "name": "Uygunluk Kodu",
+      "type": "list",
+      "options": [
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "CR"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Tasarımcı → Müşavir → İdare",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Müşavir İncelemesi",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 15,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "İdare Onayı",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 30,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ekip İçi Kontrol",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Proje Yöneticisi Kontrolü",
+          "assignees": [
+            {
+              "role": "project_admin"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit"
+          ]
+        }
+      ]
+    }
+  ]
+}

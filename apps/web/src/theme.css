@@ -1,0 +1,49 @@
+/* SiteKeep design tokens. Loaded after styles.css; only :root tokens and brand overrides live here.
+   Inter is bundled locally via @fontsource-variable/inter (works offline). */
+
+:root {
+  color-scheme: light;
+
+  /* Neutrals */
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f8f9fa;
+  --surface-3: #eef0f3;
+  --border: #e1e4e8;
+  --border-strong: #c4c9d0;
+  --text: #16191f;
+  --text-2: #3b4350;
+  --muted: #5f6b7a;
+
+  /* Accent */
+  --primary: #0b6bcb;
+  --primary-hover: #0958a8;
+  --primary-soft: #eaf3fd;
+  --on-primary: #ffffff;
+
+  /* Status */
+  --danger: #c02b25;
+  --danger-soft: #fdf1f0;
+  --ok: #157a3d;
+  --ok-soft: #eef8f1;
+  --warn: #8a5a00;
+  --warn-soft: #fff7e6;
+
+  /* Shape */
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(16, 24, 32, 0.06);
+  --shadow-pop: 0 8px 24px rgba(16, 24, 32, 0.14), 0 1px 3px rgba(16, 24, 32, 0.08);
+
+  /* Global header */
+  --header-h: 52px;
+  --topbar-bg: #021e45;
+  --topbar-text: #ffffff;
+  --topbar-muted: #b8c4d6;
+
+  font-family: "Inter Variable", "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  font-size: 14px;
+  font-feature-settings: "cv11", "ss01";
+}
+
+.topbar { --brand-keep: #f2a33a; }

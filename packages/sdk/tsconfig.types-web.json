@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "../..",
+    "outDir": "types",
+    "types": ["vite/client"],
+    "paths": { "@sitekeep/shared": ["../shared/src/index.ts"] }
+  },
+  "files": ["../../apps/web/src/sdk/index.ts", "../../apps/web/src/i18n/i18next.d.ts"]
+}

@@ -1,0 +1,344 @@
+{
+  "format": "7d-cde/project-template@1",
+  "name": "Bina (veri merkezi tipi)",
+  "description": "ZAVM demo projesinin yapısı: ISO 19650 durum klasörleri, çalışma alanında (01-WIP) disiplin klasörleri, Data Center kodlama sistemi ve Yüklenici → Tasarımcı → Müşavir → İdare onay sırası.",
+  "modules": { "correspondence": true, "rfi": true, "submittals": true, "meetings": true, "transmittals": true, "issues": true, "reviews": true, "forms": true, "coordination": true, "schedule": true, "spec": true, "reports": true },
+  "slots": [
+    {
+      "key": "yuklenici",
+      "label": "Yüklenici",
+      "party": "contractor",
+      "code": "PAS",
+      "description": "Ana yüklenici (ör. Poyraz İnşaat)."
+    },
+    {
+      "key": "tasarimci",
+      "label": "Tasarımcı",
+      "party": "designer",
+      "code": "CNS",
+      "description": "Tasarım ve mühendislik firması (ör. Çınar Tasarım)."
+    },
+    {
+      "key": "musavir",
+      "label": "Müşavir",
+      "party": "consultant",
+      "code": "HLL",
+      "description": "Proje yönetimi / müşavir (ör. Hilal Müşavirlik)."
+    },
+    {
+      "key": "idare",
+      "label": "İdare",
+      "party": "client",
+      "code": "ZRT",
+      "description": "İşveren (ör. Zirve Teknoloji)."
+    }
+  ],
+  "root": {
+    "attributes": [
+      "Durum",
+      "Revizyon"
+    ]
+  },
+  "folders": [
+    {
+      "name": "01-WIP (Çalışmada)",
+      "state": "wip",
+      "naming": "Data Center Kodlama Sistemi",
+      "grants": [
+        {
+          "slot": "yuklenici",
+          "level": "view_download"
+        },
+        {
+          "slot": "tasarimci",
+          "level": "edit"
+        }
+      ],
+      "children": [
+        "Mimari",
+        "Statik",
+        "Mekanik",
+        "Elektrik"
+      ]
+    },
+    {
+      "name": "02-SHARED (Paylaşılan)",
+      "state": "shared",
+      "naming": "Data Center Kodlama Sistemi",
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        }
+      ]
+    },
+    {
+      "name": "03-PUBLISHED (Yayınlanan)",
+      "state": "published",
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        }
+      ]
+    },
+    {
+      "name": "04-ARCHIVED (Arşiv)",
+      "state": "archived"
+    }
+  ],
+  "namingStandards": [
+    {
+      "name": "Data Center Kodlama Sistemi",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "Proje",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Proje kodu"
+            }
+          ]
+        },
+        {
+          "name": "Firma",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            }
+          ]
+        },
+        {
+          "name": "Hacim",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ"
+            },
+            {
+              "code": "XX"
+            }
+          ]
+        },
+        {
+          "name": "Rol",
+          "type": "list",
+          "values": [
+            {
+              "code": "A"
+            },
+            {
+              "code": "S"
+            },
+            {
+              "code": "M"
+            },
+            {
+              "code": "E"
+            },
+            {
+              "code": "C"
+            },
+            {
+              "code": "L"
+            },
+            {
+              "code": "Z"
+            }
+          ]
+        },
+        {
+          "name": "Kat",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ"
+            },
+            {
+              "code": "XX"
+            },
+            {
+              "code": "00"
+            },
+            {
+              "code": "01"
+            },
+            {
+              "code": "02"
+            },
+            {
+              "code": "B1"
+            },
+            {
+              "code": "B2"
+            },
+            {
+              "code": "RF"
+            }
+          ]
+        },
+        {
+          "name": "Alt Disiplin",
+          "type": "number",
+          "digits": 4
+        },
+        {
+          "name": "Tip",
+          "type": "list",
+          "values": [
+            {
+              "code": "M3"
+            },
+            {
+              "code": "DR"
+            },
+            {
+              "code": "RP"
+            },
+            {
+              "code": "SP"
+            },
+            {
+              "code": "RI"
+            }
+          ]
+        },
+        {
+          "name": "Aşama",
+          "type": "list",
+          "values": [
+            {
+              "code": "DE"
+            },
+            {
+              "code": "SD"
+            },
+            {
+              "code": "CD"
+            },
+            {
+              "code": "MC"
+            },
+            {
+              "code": "HO"
+            }
+          ]
+        },
+        {
+          "name": "Numara",
+          "type": "number",
+          "digits": 4
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Durum",
+      "type": "list",
+      "options": [
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "name": "Revizyon",
+      "type": "text"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Yüklenici → Tasarımcı → Müşavir → İdare",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Yüklenici Ön Kontrol",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Tasarımcı İnceleme",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Müşavir Kontrol",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "İdare Onay",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ]
+        }
+      ]
+    }
+  ]
+}

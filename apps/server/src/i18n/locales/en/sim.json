@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "schedule": "Schedule",
+    "modelVersion": "Model version",
+    "model": "Model"
+  },
+  "errors": {
+    "plannerOnly": "Only a project administrator (planning permission) can change 4D / 5D rules and unit prices.",
+    "ruleNeedsCondition": "A rule needs at least one condition (storey, class, property or name).",
+    "activityNotInSchedule": "There is no activity with code \"{{code}}\" in this Schedule.",
+    "multipartExpected": "multipart/form-data expected.",
+    "noFile": "No file was sent.",
+    "notIfc": "{{name}} is not an IFC file.",
+    "indexUpgradeFailed": "The model index could not be converted to the new format; try uploading the file again.",
+    "indexUpgrading": "The model index is being updated (storey and property information is being added). Please try again shortly.",
+    "datasetUnavailable": "The cost dataset is not ready."
+  },
+  "import": {
+    "fields": {
+      "code": "Item No",
+      "description": "Description",
+      "unit": "Unit",
+      "unitPrice": "Unit Price",
+      "category": "Category",
+      "currency": "Currency",
+      "pozCode": "Official Item Code"
+    },
+    "unsupportedFormat": "Supported formats: XLSX, XLS, ODS, CSV.",
+    "unreadable": "The file could not be read: {{reason}}",
+    "noTable": "No table was found in the file.",
+    "columnFallback": "Column {{n}}",
+    "columnRequired": "The \"{{column}}\" column must be selected.",
+    "unknownUnit": "Row {{line}}: unit \"{{unit}}\" was not recognised (m, m², m³, pcs, kg, t).",
+    "duplicateCode": "Row {{line}}: \"{{code}}\" appears twice; the last one was used."
+  },
+  "warnings": {
+    "oldIndex": "The model index is in an old format; it has no storey and property information.",
+    "targetNotFound": "\"{{target}}\" not found; the rule is not applied.",
+    "noTarget": "The rule has no target.",
+    "noMatches": "No elements match the rule."
+  },
+  "groups": {
+    "noStorey": "No Storey",
+    "noCategory": "Uncategorised",
+    "noActivity": "Not Linked to an Activity"
+  },
+  "suggest": {
+    "noElements": "The model has no {{words}} elements.",
+    "noElementsOnStorey": "There are no {{words}} elements on storey {{storey}}.",
+    "reasonStorey": "\"{{words}}\" in the name → {{classes}}; storey: {{storey}}.",
+    "reasonAllStoreys": "\"{{words}}\" in the name → {{classes}}; no storey name, all storeys.",
+    "reasonBaseSlabStorey": "\"{{words}}\" in the name → {{classes}} (base slab); storey: {{storey}}.",
+    "reasonBaseSlabAllStoreys": "\"{{words}}\" in the name → {{classes}} (base slab); no storey name, all storeys.",
+    "propertyCode_one": "The values of property \"{{key}}\" match the code of {{count}} activity.",
+    "propertyCode_other": "The values of property \"{{key}}\" match the codes of {{count}} activities.",
+    "propertyWbs_one": "The values of property \"{{key}}\" match the WBS of {{count}} activity.",
+    "propertyWbs_other": "The values of property \"{{key}}\" match the WBS of {{count}} activities."
+  },
+  "poz": {
+    "reason": {
+      "memory1": "Accepted {{count}} time(s) before for the same class, type and material.",
+      "memory2": "Accepted {{count}} time(s) before for the same type.",
+      "memory3": "Accepted {{count}} time(s) before for the same material.",
+      "memory4": "Accepted {{count}} time(s) before for this class.",
+      "keywords": "Matching words in the description: {{words}}.",
+      "ai": "AI: {{reason}}",
+      "aiPlain": "The AI picked this item."
+    },
+    "unmatched": {
+      "noItem": "No fitting item in the unit price list.",
+      "inexact": "This group cannot be singled out by one rule (other elements of the class have no type or material)."
+    },
+    "errors": {
+      "aiInvalid": "The AI answer could not be read; keyword suggestions are shown.",
+      "otherProject": "This mapping was learned in another project; only a system administrator can remove it."
+    }
+  }
+}

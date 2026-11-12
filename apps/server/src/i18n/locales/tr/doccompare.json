@@ -1,0 +1,149 @@
+{
+  "entities": {
+    "comparison": "Karşılaştırma"
+  },
+  "errors": {
+    "versionIdsRequired": "from ve to versiyon kimlikleri gerekli.",
+    "sameVersion": "Aynı versiyon kendisiyle karşılaştırılamaz.",
+    "textNotReady": "Metin karşılaştırması henüz bitmedi.",
+    "notReady": "Karşılaştırma henüz bitmedi.",
+    "aiUnavailable": "Bu projede yapay zekâ kullanılamıyor.",
+    "notInReview": "Bu versiyon bu incelemede değil ya da inceleme sürmüyor.",
+    "ifcInViewer": "IFC modelleri model görüntüleyicide karşılaştırılır (Modelde aç → Karşılaştır).",
+    "unsupportedType": "Bu dosya türü karşılaştırılamıyor (.{{extension}}). Desteklenen: PDF, XLSX, CSV, DOCX, TXT.",
+    "mixedTypes": "İki dosya aynı türde olmalı (ör. PDF ile PDF).",
+    "fileTooLarge": "Dosya çok büyük ({{mb}} MB); sınır {{limit}} MB.",
+    "preparing": "Karşılaştırma hazırlanıyor; model indeksi oluşturuluyor. Biraz sonra tekrar deneyin.",
+    "xlsxNoSheets": "XLSX dosyasında çalışma sayfası yok.",
+    "docxInvalid": "Geçerli bir DOCX dosyası değil (word/document.xml yok)."
+  },
+  "notes": {
+    "noText": "Metin katmanı yok, yalnızca görsel karşılaştırma.",
+    "pagesLimited": "Metin yalnız ilk {{pages}} sayfada karşılaştırıldı."
+  },
+  "antet": {
+    "revisionTableRow": "Revizyon Tablosu (son satır)"
+  },
+  "flags": {
+    "identical": "İki versiyon birebir aynı (aynı dosya).",
+    "noText": "Metin katmanı yok, yalnızca görsel karşılaştırma yapıldı.",
+    "pageCountChanged": "Sayfa sayısı değişmiş: {{from}} → {{to}}.",
+    "revisionUnknown": "Antette revizyon okunamadı; revizyon kontrolü yapılamadı.",
+    "revisionNotUpdated": "İçerik değişmiş ama revizyon aynı ({{revision}}). Revizyon bulutu/tablosu güncellenmemiş olabilir.",
+    "revisionBackwards": "Revizyon geri gitmiş: {{from}} → {{to}}.",
+    "revisionWithoutChange": "Revizyon değişmiş ({{from}} → {{to}}) ama antet dışında içerik değişikliği bulunamadı.",
+    "revisionTableNotUpdated": "Revizyon {{revision}} olmuş ama revizyon tablosunun son satırı \"{{row}}\"; tablo güncellenmemiş olabilir.",
+    "revisionTableEmpty": "Revizyon {{revision}} olmuş ama revizyon tablosunun son satırı boş; tablo güncellenmemiş olabilir."
+  },
+  "changes": {
+    "added": "eklendi: {{text}}",
+    "removed": "silindi: {{text}}",
+    "rowChanged": "satır {{row}}: {{cells}}",
+    "rowAdded": "satır {{row}} eklendi: {{text}}",
+    "rowRemoved": "satır {{row}} silindi: {{text}}"
+  },
+  "counts": {
+    "changed": "{{count}} değişen",
+    "added": "{{count}} eklenen",
+    "removed": "{{count}} silinen",
+    "of": {
+      "row": "{{parts}} satır",
+      "text": "{{parts}} metin",
+      "paragraph": "{{parts}} paragraf"
+    },
+    "noDiff": {
+      "row": "satır farkı yok",
+      "text": "metin farkı yok",
+      "paragraph": "paragraf farkı yok"
+    }
+  },
+  "summary": {
+    "antet": "Antet: {{changes}}.",
+    "sheetAdded": "Sayfa \"{{name}}\" eklendi.",
+    "sheetRemoved": "Sayfa \"{{name}}\" silindi.",
+    "sheetChanged": "\"{{name}}\": {{counts}}.",
+    "sheetChangedExamples": "\"{{name}}\": {{counts}} ({{examples}}).",
+    "visualRegions_one": "{{count}} görsel bölge",
+    "visualRegions_other": "{{count}} görsel bölge",
+    "page": "Sayfa {{page}}: {{parts}}.",
+    "pageExamples": "Sayfa {{page}}: {{parts}}. Örnek: {{examples}}.",
+    "text": "Metin: {{parts}}.",
+    "textExamples": "Metin: {{parts}}. Örnek: {{examples}}.",
+    "noTextDiffVisualPending": "Metinde fark bulunamadı; görsel karşılaştırma tarayıcıda yapılıyor.",
+    "noDiff": "Fark bulunamadı."
+  },
+  "ai": {
+    "interrupted": "Özet yarıda kaldı (sunucu yeniden başlamış olabilir); yeniden başlatın.",
+    "externalProvider": "Dış sağlayıcı: {{name}}. Yalnızca fark özeti gönderilir.",
+    "writing": "Model yazıyor… ({{chars}} karakter, {{seconds}} sn)",
+    "thinking": "Model düşünüyor… ({{seconds}} sn)",
+    "emptySummary": "Model boş bir özet döndürdü."
+  },
+  "reviewNote": {
+    "title": "Revizyon karşılaştırması: {{file}} V{{from}} → V{{to}}",
+    "titleAi": "Revizyon karşılaştırması: {{file}} V{{from}} → V{{to}} (yapay zekâ özeti)"
+  },
+  "report": {
+    "fileSuffix": "karsilastirma",
+    "docTitle": "Revizyon karşılaştırması: {{file}}",
+    "title": "Revizyon Karşılaştırma Raporu",
+    "file": "Dosya: {{file}}",
+    "oldFile": "Eski: {{file}}",
+    "versions": "Versiyon: V{{versionA}} → V{{versionB}}",
+    "versionsWithRevision": "Versiyon: V{{versionA}} → V{{versionB}} · Revizyon: {{revisionA}} → {{revisionB}}",
+    "newFile": "Yeni: {{file}} (V{{versionB}}) · Eski versiyon V{{versionA}}",
+    "preparedBy": "Hazırlayan: {{name}} · {{date}}",
+    "summary": "Değişiklik Özeti",
+    "aiSummary": "Yapay zekâ özeti ({{model}}); kontrol edilmeden karar verilmemelidir.",
+    "ruleSummary": "Kural tabanlı özet.",
+    "ruleSummaryWithNote": "Kural tabanlı özet. {{note}}",
+    "checks": "Kontroller",
+    "antetChanges": "Antet Değişiklikleri",
+    "columns": {
+      "field": "Alan",
+      "old": "Eski",
+      "new": "Yeni"
+    },
+    "sheetChanges": "Tablo Değişiklikleri",
+    "sheetCounts": "{{name}}: {{changed}} değişen, {{added}} eklenen, {{removed}} silinen satır",
+    "rowChanged": "Satır {{row}}: {{cells}}",
+    "rowAdded": "Satır {{row}} eklendi: {{text}}",
+    "rowRemoved": "Satır {{row}} silindi: {{text}}",
+    "textChanges": "Metin Değişiklikleri",
+    "pageCounts": "Sayfa {{page}}: {{changed}} değişen, {{added}} eklenen, {{removed}} silinen",
+    "textCounts": "Metin: {{changed}} değişen, {{added}} eklenen, {{removed}} silinen",
+    "inAntet": "{{text}} (antet)",
+    "more_one": "… {{count}} değişiklik daha",
+    "more_other": "… {{count}} değişiklik daha",
+    "visual": "Görsel Karşılaştırma",
+    "legend": "Kırmızı: eski versiyonda olup yenide olmayan; mavi: yeni eklenen; gri: değişmeyen.",
+    "page": "Sayfa {{page}}",
+    "pageOnlyNew": "Sayfa {{page}} · yalnızca yeni versiyonda",
+    "pageNotInNew": "Sayfa {{page}} · yeni versiyonda yok",
+    "pageRegions_one": "Sayfa {{page}} · {{count}} değişen bölge",
+    "pageRegions_other": "Sayfa {{page}} · {{count}} değişen bölge",
+    "footer": "SiteKeep · Revizyon Karşılaştırma"
+  },
+  "modelReport": {
+    "title": "Model karşılaştırması: {{file}} V{{from}} → V{{to}}",
+    "print": "Yazdır / PDF",
+    "added": "Eklenen",
+    "changed": "Değişen",
+    "removed": "Silinen",
+    "unchanged": "Değişmeyen",
+    "summary": "Değişiklik özeti",
+    "aiModel": "(yapay zekâ: {{model}})",
+    "noChanges": "Değişiklik yok.",
+    "oldIndex": "Model indeksi eski biçimde; kat ve özellik ayrıntısı yok.",
+    "byClass": "Sınıflara göre",
+    "groups": "Değişiklik grupları",
+    "columns": {
+      "class": "Sınıf",
+      "kind": "Tür",
+      "storey": "Kat",
+      "property": "Özellik",
+      "count": "Adet",
+      "elements": "Elemanlar"
+    }
+  }
+}

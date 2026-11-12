@@ -1,0 +1,70 @@
+{
+  "errors": {
+    "adminOnly": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
+    "invalidDate": "Tarih YYYY-AA-GG biçiminde olmalı.",
+    "oauthManagedElsewhere": "OAuth uygulamaları Yönetim → OAuth Uygulamaları sayfasından açılıp kapatılır.",
+    "unknownConnection": "Bilinmeyen bağlantı."
+  },
+  "outbound": {
+    "killSwitch": "Tüm dış bağlantılar kapalı (Yönetim → Gizlilik Merkezi): {{host}} adresine bağlanılmadı.",
+    "connectionDisabled": "Bu bağlantı Gizlilik Merkezi'nden kapatıldı ({{purpose}}, {{host}}). Yönetim → Gizlilik Merkezi → Dış Bağlantılar'dan açılabilir."
+  },
+  "data": {
+    "localDisk": "Yerel disk: {{root}}",
+    "configuredStorage": "Yapılandırılmış depolama",
+    "pglite": "PGlite (gömülü veritabanı)"
+  },
+  "connections": {
+    "default": "Varsayılan",
+    "apiKeyStored": "API anahtarı kayıtlı",
+    "reportModel": "Rapor Oluşturucu Modeli (AI_BASE_URL)",
+    "fromEnvironment": "Ortam değişkeniyle tanımlı",
+    "smtp": "E-posta Sunucusu (SMTP)",
+    "smtpSends": "Resmî yazıları gönderir",
+    "smtpNotConfigured": "Tanımlı değil (CDE_SMTP_URL)",
+    "officeEditor": "Ofis Editörü",
+    "officeEditorWith": "Ofis Editörü ({{name}})",
+    "browserAddress": "Tarayıcı adresi: {{host}}",
+    "notConfigured": "Tanımlı değil",
+    "officeConverter": "Ofis → PDF Dönüştürücü",
+    "officeConverterWith": "Ofis → PDF Dönüştürücü ({{name}})",
+    "localLibreOffice": "Bu sunucudaki LibreOffice",
+    "mcp": "MCP Sunucusu (Yapay Zekâ İstemcileri)",
+    "writeTokensOn": "Yazma anahtarları açık",
+    "readOnly": "Yalnız okuma",
+    "accessTokens_one": "{{count}} erişim anahtarı",
+    "accessTokens_other": "{{count}} erişim anahtarı",
+    "aiQueue": "Yapay Zekâ Görev Kuyruğu (Dış İstemciler)",
+    "externalClientsAllowed": "Tam yerel modda da dış istemcilere izin var",
+    "stoppedByKillSwitch": "Tüm dış bağlantılar kapalı olduğu için durdu",
+    "oauth": "OAuth Uygulamaları (OpenCDE)",
+    "oauthApps_one": "{{count}} uygulama, {{enabled}} açık",
+    "oauthApps_other": "{{count}} uygulama, {{enabled}} açık",
+    "oauthManaged": "Yönetim → OAuth Uygulamaları'ndan yönetilir",
+    "comingSoon": "Yakında"
+  },
+  "csv": {
+    "fileName": "giden-baglanti-kaydi.csv",
+    "columns": {
+      "time": "Zaman",
+      "purpose": "Amaç",
+      "connection": "Bağlantı",
+      "host": "Sunucu",
+      "method": "Yöntem",
+      "location": "Konum",
+      "blocked": "Engellendi",
+      "bytesOut": "Giden Bayt",
+      "bytesIn": "Gelen Bayt",
+      "status": "Durum",
+      "error": "Hata",
+      "duration": "Süre (ms)",
+      "user": "Kullanıcı",
+      "project": "Proje",
+      "details": "Ayrıntı"
+    },
+    "local": "Yerel",
+    "external": "Dış",
+    "yes": "Evet",
+    "no": "Hayır"
+  }
+}

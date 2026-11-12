@@ -1,0 +1,76 @@
+{
+  "tour": {
+    "label": "Ürün turu",
+    "progress": "{{current}} / {{total}}",
+    "actions": {
+      "skip": "Atla",
+      "finish": "Bitir"
+    },
+    "steps": {
+      "navToday": {
+        "title": "Bugün",
+        "body": "Projenin giriş ekranı. Size düşen işler, gecikenler ve yaklaşan terminler burada toplanır."
+      },
+      "todayGrid": {
+        "title": "Günlük özet",
+        "body": "Kartlar: bana düşenler, gecikenler, yaklaşan terminler ve son değişiklikler. Yeni kayıt sağ üstten açılır."
+      },
+      "navFiles": {
+        "title": "Dokümanlar",
+        "body": "Proje dosyaları bu menüde. IFC, PDF, CAD ve ofis dosyaları klasörlere yüklenir."
+      },
+      "filesTree": {
+        "title": "Klasörler",
+        "body": "Soldan (telefonda alttan) klasör seçin. Şimdi istasyon klasörüne ineceğiz."
+      },
+      "filesUpload": {
+        "title": "Yükle",
+        "body": "Dosyayı buradan seçin veya listeye sürükleyin. IFC yüklenince model görüntüleyici için otomatik hazırlanır."
+      },
+      "folderTasarim": {
+        "title": "Tasarım çalışmaları",
+        "body": "Proje Dosyaları altındaki 01-TASARIM ÇALIŞMALARI. İleri bu klasörü açar."
+      },
+      "folderOnaya": {
+        "title": "Onaya sunulan",
+        "body": "02-Onaya Sunulan (Shared for Approval) — paylaşılan tasarım klasörü."
+      },
+      "folderIstasyonlar": {
+        "title": "İstasyonlar",
+        "body": "002-İstasyonlar. Her istasyonun kendi klasörü burada."
+      },
+      "folderS16": {
+        "title": "S16",
+        "body": "S16 istasyonu. Disiplin modelleri bu klasörün içinde."
+      },
+      "disciplineFolders": {
+        "title": "Beş disiplin",
+        "body": "Sağda beş klasör: 00-Koordinasyon Modeli, 01-Mimari, 02-Yapısal, 04-Mekanik, 05-Elektrik."
+      },
+      "folderMimari": {
+        "title": "Mimari",
+        "body": "01-Mimari klasörünü açın. Model dosyası ve onay durumu burada."
+      },
+      "docsMeta": {
+        "title": "Tarih ve onay",
+        "body": "Tabloyu sağa kaydırın. Tarih ve onay sütunları ismin sağında; model hazırsa Modeli Aç çıkar."
+      },
+      "openModel": {
+        "title": "Modeli aç",
+        "body": "Modeli Aç — IFC görüntüleyiciye gider. Dönüşüm bitmeden bu rozet çıkmaz."
+      },
+      "navViewer": {
+        "title": "Model görüntüleyici",
+        "body": "Yüklenen IFC modelleri 3B burada açılır. Koordinasyon ve sorunlar da bu sahneye bağlanır."
+      },
+      "viewerModels": {
+        "title": "Modeller",
+        "body": "Listeden bir veya birkaç modeli işaretleyin. Telefonda listeyi Modeller düğmesi açar."
+      },
+      "viewerHud": {
+        "title": "Sahne araçları",
+        "body": "Sığdır, sorun aç, iş programı (4D) ve Modele Sor bu çubukta. Tur bitti; Atla ile de kapatabilirsiniz."
+      }
+    }
+  }
+}

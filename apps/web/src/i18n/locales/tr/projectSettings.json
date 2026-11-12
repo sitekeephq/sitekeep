@@ -1,0 +1,657 @@
+{
+  "activity": {
+    "events": {
+      "project": {
+        "created": "Proje oluşturuldu",
+        "updated": "Proje güncellendi",
+        "ai_updated": "Yapay zekâ ayarı değişti",
+        "created_from_template": "Proje şablondan oluşturuldu"
+      },
+      "member": {
+        "added": "Üye eklendi",
+        "updated": "Üye güncellendi",
+        "removed": "Üye çıkarıldı",
+        "roles_set": "Üyenin rolleri değişti"
+      },
+      "folder": {
+        "created": "Klasör oluşturuldu",
+        "updated": "Klasör güncellendi",
+        "deleted": "Klasör silindi",
+        "permissions_set": "Klasör yetkileri değişti",
+        "restored": "Klasör geri yüklendi",
+        "purged": "Klasör kalıcı silindi",
+        "attributes_bound": "Klasör öznitelikleri değişti",
+        "attribute_bound": "Klasöre öznitelik bağlandı",
+        "attribute_unbound": "Klasörden öznitelik kaldırıldı",
+        "settings_updated": "Klasör ayarı değişti",
+        "materialized": "Klasör oluşturuldu (ilk dosya)"
+      },
+      "naming": {
+        "created": "İsimlendirme standardı eklendi",
+        "updated": "İsimlendirme standardı güncellendi"
+      },
+      "file": {
+        "uploaded": "Dosya yüklendi",
+        "version_added": "Yeni versiyon yüklendi",
+        "updated": "Dosya güncellendi",
+        "deleted": "Dosya silindi",
+        "downloaded": "Dosya indirildi",
+        "zip_downloaded": "Toplu indirme (zip)",
+        "restored": "Dosya geri yüklendi",
+        "purged": "Dosya kalıcı silindi",
+        "attributes_updated": "Dosya öznitelikleri değişti"
+      },
+      "attribute": {
+        "created": "Öznitelik eklendi",
+        "updated": "Öznitelik güncellendi",
+        "deleted": "Öznitelik silindi"
+      },
+      "issue": {
+        "created": "Sorun oluşturuldu",
+        "updated": "Sorun güncellendi",
+        "commented": "Soruna yorum yazıldı",
+        "linked": "Sorun bağlantısı eklendi",
+        "unlinked": "Sorun bağlantısı kaldırıldı"
+      },
+      "workflow_template": {
+        "created": "İş akışı şablonu eklendi",
+        "updated": "İş akışı şablonu güncellendi",
+        "deleted": "İş akışı şablonu silindi"
+      },
+      "review": {
+        "started": "İnceleme başlatıldı",
+        "submitted": "İnceleme adımı yanıtlandı",
+        "step_completed": "İnceleme adımı tamamlandı",
+        "completed": "İnceleme tamamlandı",
+        "cancelled": "İnceleme iptal edildi",
+        "reassigned": "İnceleme atananları değişti",
+        "file_copied": "Onaylı dosya kopyalandı",
+        "files_returned": "İnceleme dosyaları iade edildi"
+      },
+      "role": {
+        "created": "Rol eklendi",
+        "updated": "Rol güncellendi",
+        "deleted": "Rol silindi",
+        "member_added": "Üyeye rol verildi",
+        "member_removed": "Üyeden rol alındı"
+      },
+      "role_package": {
+        "applied": "Firmaya rol paketi uygulandı"
+      },
+      "mcp": {
+        "tool": "MCP aracı çağrıldı"
+      },
+      "markup": {
+        "created": "İşaretleme eklendi",
+        "updated": "İşaretleme güncellendi",
+        "deleted": "İşaretleme silindi",
+        "published": "İşaretleme yayınlandı"
+      },
+      "report": {
+        "created": "Rapor paneli oluşturuldu",
+        "updated": "Rapor paneli güncellendi",
+        "deleted": "Rapor paneli silindi",
+        "restored": "Rapor paneli sürümü geri yüklendi",
+        "generated": "Rapor paneli yapay zekâyla üretildi"
+      },
+      "work": {
+        "created": "İş oluşturuldu",
+        "updated": "İş güncellendi",
+        "sent": "İş gönderildi",
+        "received": "İş alındı",
+        "submitted": "İş onaya gönderildi",
+        "responded": "İşe cevap verildi",
+        "cancelled": "İş iptal edildi",
+        "minutes_saved": "Toplantı tutanağı kaydedildi"
+      },
+      "work_type": {
+        "created": "İş tipi eklendi",
+        "updated": "İş tipi güncellendi",
+        "archived": "İş tipi arşivlendi",
+        "numbering_preset": "Numaralandırma hazır ayarı uygulandı"
+      },
+      "work_automation": {
+        "updated": "İş otomasyonu değişti"
+      },
+      "submittal": {
+        "register_imported": "Teknik onay listesi içe aktarıldı"
+      },
+      "schedule": {
+        "imported": "İş programı içe aktarıldı",
+        "updated": "İş programı güncellendi",
+        "deleted": "İş programı silindi",
+        "link_added": "Faaliyete bağlantı eklendi",
+        "link_removed": "Faaliyetten bağlantı kaldırıldı",
+        "summary": "İş programı özeti alındı"
+      },
+      "model_set": {
+        "created": "Model seti eklendi",
+        "updated": "Model seti güncellendi",
+        "deleted": "Model seti silindi"
+      },
+      "clash_test": {
+        "created": "Çakışma testi eklendi",
+        "updated": "Çakışma testi güncellendi",
+        "deleted": "Çakışma testi silindi",
+        "run": "Çakışma testi çalıştırıldı"
+      },
+      "clash_group": {
+        "updated": "Çakışma grubu güncellendi"
+      },
+      "clash": {
+        "status": "Çakışma durumu değişti"
+      },
+      "ids": {
+        "check": "Bilgi gereksinimi kontrolü (IDS) çalıştırıldı"
+      },
+      "form": {
+        "created": "Form oluşturuldu",
+        "saved": "Form kaydedildi",
+        "submitted": "Form gönderildi",
+        "reviewed": "Form incelendi",
+        "returned": "Form iade edildi",
+        "closed": "Form kapatıldı",
+        "deleted": "Form silindi",
+        "pdf": "Form PDF'i alındı",
+        "attachment_added": "Forma ek eklendi"
+      },
+      "form_template": {
+        "created": "Form şablonu eklendi",
+        "updated": "Form şablonu güncellendi",
+        "archived": "Form şablonu arşivlendi",
+        "merged": "Form şablonları birleştirildi"
+      },
+      "location": {
+        "created": "Konum eklendi",
+        "updated": "Konum güncellendi",
+        "deleted": "Konum silindi",
+        "imported_csv": "Konumlar CSV'den içe aktarıldı",
+        "import_ifc_queued": "Konumlar IFC'den içe aktarılıyor",
+        "linked": "Konum bağlantısı değişti"
+      },
+      "docintel": {
+        "spec_register": "Şartname analiz edildi",
+        "spec_register_updated": "Şartname listesi güncellendi",
+        "ai_suggest": "Antet önerisi (yapay zekâ)"
+      },
+      "ai": {
+        "ask": "Sor asistanı kullanıldı",
+        "clash_summary": "Çakışma özeti (yapay zekâ)",
+        "form_template_generated": "Form şablonu yapay zekâyla üretildi"
+      }
+    },
+    "columns": {
+      "time": "Zaman",
+      "person": "Kişi",
+      "action": "İşlem",
+      "details": "Ayrıntı"
+    }
+  },
+  "modules": {
+    "help": {
+      "correspondence": "Gelen ve giden resmi yazılar, cevap zinciri, KEP ve e-posta.",
+      "rfi": "Bilgi talepleri ve bilgi talebi listesi.",
+      "submittals": "Teknik onay kalemleri, paketler ve teknik onay listesi.",
+      "meetings": "Toplantılar, tutanaklar ve eylemler.",
+      "transmittals": "Gönderim formları ve kapak sayfaları.",
+      "issues": "Sahada ve modelde açılan sorunlar.",
+      "reviews": "Doküman incelemeleri ve onay zincirleri.",
+      "forms": "Saha formları, kontrol listeleri ve form şablonları.",
+      "coordination": "Model setleri, çakışma testleri ve bilgi gereksinimi kontrolleri (IDS).",
+      "schedule": "İş programı, Gantt şeması ve 4D.",
+      "spec": "Şartname PDF'inden taslak teknik onay listesi.",
+      "reports": "Rapor panelleri ve hazır rapor şablonları."
+    },
+    "messages": {
+      "saved": "Kaydedildi."
+    },
+    "description": "Kapalı modül menüde, İşler görünümlerinde, \"+ Yeni\" penceresinde, Model sekmelerinde, Sor asistanında ve raporlarda görünmez. Verisi silinmez: mevcut kayıtlar açılır, yalnız yeni kayıt oluşturulamaz. Dokümanlar her zaman açıktır."
+  },
+  "title": "Proje Ayarları",
+  "members": {
+    "columns": {
+      "name": "Ad",
+      "email": "E-posta",
+      "company": "Firma (bu projede)",
+      "roles": "Roller",
+      "projectAdmin": "Proje Yöneticisi"
+    },
+    "projectAdminLabel": "{{name}} proje yöneticisi",
+    "remove": {
+      "title": "Üyeyi Çıkar",
+      "confirm": "{{name}} projeden çıkarılsın mı?"
+    },
+    "actions": {
+      "remove": "Çıkar"
+    },
+    "add": {
+      "heading": "Üye Ekle",
+      "options": {
+        "chooseUser": "Kullanıcı Seçin…"
+      },
+      "roleLabel": "Rol",
+      "hint": "Listede olmayan kişileri sistem yöneticisi Yönetim ekranından oluşturur."
+    }
+  },
+  "naming": {
+    "description": "Standardı klasöre Dokümanlar → Klasör ayarları ekranından bağlayın. Bağlı klasörde ve alt klasörlerinde yüklemede ad kontrol edilir.",
+    "actions": {
+      "add": "+ Standart"
+    },
+    "badges": {
+      "delimiter": "Ayraç \"{{delimiter}}\""
+    },
+    "example": "Örnek: {{example}}",
+    "empty": "Tanımlı standart yok.",
+    "exampleText": "Metin",
+    "editor": {
+      "editTitle": "Standardı Düzenle",
+      "newTitle": "Yeni İsimlendirme Standardı",
+      "fields": {
+        "delimiter": "Ayraç",
+        "fields": "Alanlar — her satır bir alan: \"Ad | list | KOD=Açıklama, KOD2\" · \"Ad | number | 4\" (veya \"2-3\") · \"Ad | text\" · ada girmeyen alan için sona \"| meta\""
+      },
+      "exampleName": "Örnek ad: {{example}}",
+      "defaultFields": "Proje | list | PRJ\nFirma | list | ABC, XYZ\nDisiplin | list | A, S, M, E\nTip | list | M3, DR\nNumara | number | 4"
+    }
+  },
+  "templateExport": {
+    "heading": "Şablon Olarak Dışa Aktar",
+    "description": "Bu projenin yapısı tek bir JSON dosyasına yazılır: klasörler (durum ve alt durumlarıyla, henüz oluşturulmamış “ilk dosyada” klasörler dahil), firma rollerine göre klasör yetkileri, isimlendirme standartları, öznitelikler ve onay akışları. Dosyalar, kayıtlar ve kişiler dosyaya girmez. Yeni proje oluştururken “JSON dosyasından” seçeneğiyle kullanabilirsiniz.",
+    "preparing": "Hazırlanıyor…",
+    "actions": {
+      "export": "Şablon Olarak Dışa Aktar (.json)"
+    }
+  },
+  "roles": {
+    "remove": {
+      "title": "Rolü Sil",
+      "confirm": "\"{{name}}\" rolü silinsin mi? Rolün klasör yetkileri de kaldırılır."
+    },
+    "messages": {
+      "grantsRemoved_one": "{{count}} klasör yetkisi kaldırıldı.",
+      "grantsRemoved_other": "{{count}} klasör yetkisi kaldırıldı."
+    },
+    "description": "Her projede Görüntüleyici, Düzenleyici ve Yönetici hazırdır (tüm klasörlere kökten yetki). Üye eklerken birini seçin; ek ekipler (+ Rol) klasör yetkisinde ve onay adımında da kullanılır.",
+    "actions": {
+      "applyPackage": "Firmaya Rol Paketi Uygula",
+      "add": "+ Rol"
+    },
+    "columns": {
+      "role": "Rol",
+      "description": "Açıklama",
+      "members": "Üye"
+    },
+    "empty": "Tanımlı rol yok.",
+    "matrix": {
+      "heading": "Üye – Rol Eşlemesi",
+      "columns": {
+        "member": "Üye"
+      },
+      "noCompany": "Firma yok",
+      "cellLabel": "{{member}} — {{role}}"
+    },
+    "editor": {
+      "editTitle": "Rolü Düzenle",
+      "newTitle": "Yeni Rol",
+      "namePlaceholder": "ör. Danışman Mimari Ekip",
+      "descriptionPlaceholder": "ör. Mimari paftaları kontrol eder",
+      "actions": {
+        "defaultColour": "Varsayılan"
+      },
+      "previewName": "Önizleme"
+    }
+  },
+  "rolePackage": {
+    "title": "Firmaya Rol Paketi Uygula",
+    "description": "Paket, ISO 19650 durumu atanmış klasörlere (Çalışma / Paylaşılan / Yayınlanan / Arşivlenen) firma yetkisi yazar. Mevcut yetkiler düşürülmez ve silinmez; alt klasörde üstten gelen yetkiden düşük yetki yazılmaz. Önce önizleyin, sonra uygulayın.",
+    "fields": {
+      "package": "Paket",
+      "ownArea": "Kendi Alanı"
+    },
+    "options": {
+      "choose": "Seçin…",
+      "hasOwnArea": "Firmanın Kendi Alanı Var (ör. 01-WIP / 99-Tasarımcı Ortak Alan)"
+    },
+    "stateLevel": "{{state}}: {{level}}",
+    "noAccess": "erişim yok",
+    "ownAreaLevel": "Kendi alanı: {{level}}",
+    "notSelected": "Seçilmedi",
+    "resultHeading": "{{status}} — {{company}}",
+    "status": {
+      "applied": "Uygulandı",
+      "preview": "Önizleme"
+    },
+    "written_one": "{{count}} yetki yazıldı.",
+    "written_other": "{{count}} yetki yazıldı.",
+    "toWrite_one": "{{count}} yetki yazılacak.",
+    "toWrite_other": "{{count}} yetki yazılacak.",
+    "noMembers": "Bu firmadan projede üye yok; yetkiler şimdilik kimseye ulaşmaz.",
+    "columns": {
+      "folder": "Klasör",
+      "state": "Durum",
+      "packageLevel": "Paket Yetkisi",
+      "current": "Şu An (doğrudan)",
+      "result": "Sonuç"
+    },
+    "badges": {
+      "ownArea": "kendi alanı"
+    },
+    "inherited": "üstten: {{level}}",
+    "empty": "Projede ISO 19650 durumu atanmış klasör yok. Klasör ayarlarından durum atayın.",
+    "actions": {
+      "preview": "Önizle",
+      "apply": "Uygula"
+    }
+  },
+  "attributes": {
+    "remove": {
+      "title": "Özniteliği Sil",
+      "confirm": "\"{{name}}\" özniteliği silinsin mi? Dosyalardaki değerler serbest öznitelik olarak kalır."
+    },
+    "description": "Öznitelikleri klasöre Dokümanlar → Klasör ayarları ekranından bağlayın. Bağlı klasörde ve alt klasörlerinde tabloda sütun olarak görünür, yüklemede istenir; zorunlu olanlar boş bırakılamaz.",
+    "actions": {
+      "add": "+ Öznitelik"
+    },
+    "columns": {
+      "name": "Ad",
+      "type": "Tür",
+      "options": "Seçenekler",
+      "required": "Zorunlu"
+    },
+    "badges": {
+      "required": "Zorunlu"
+    },
+    "notRequired": "Hayır",
+    "empty": "Tanımlı öznitelik yok.",
+    "editor": {
+      "editTitle": "Özniteliği Düzenle",
+      "newTitle": "Yeni Öznitelik",
+      "namePlaceholder": "ör. Durum, Revizyon, Teslim tarihi",
+      "fields": {
+        "options": "Seçenekler — her satıra bir değer"
+      },
+      "options": {
+        "required": "Zorunlu (bağlı klasörlere yüklemede boş bırakılamaz)"
+      },
+      "renameNotice": "Ad değişince projedeki dosyalarda bu özniteliğin anahtarı da yeni adla güncellenir."
+    }
+  },
+  "ai": {
+    "personal": {
+      "heading": "Kendi API Anahtarlarım",
+      "description": "Anahtarlar sunucuda AES-256-GCM ile şifrelenir; arayüzde ve API cevaplarında hiçbir zaman açık gösterilmez. Hash kullanılmaz, çünkü sağlayıcıya yeniden gönderilmesi gereken bir anahtar hash değerinden geri üretilemez.",
+      "notAllowed": "Anahtarınızı kaydedebilir ve bağlantıyı test edebilirsiniz. Proje verisiyle kullanmak için: {{reason}}",
+      "badges": {
+        "hasKey": "Anahtar Kayıtlı",
+        "noKey": "Anahtar Yok"
+      },
+      "createKey": "API anahtarı oluştur ↗",
+      "fields": {
+        "apiKey": "API Anahtarı",
+        "model": "Model",
+        "workspaceId": "Workspace ID (isteğe bağlı)"
+      },
+      "replacePlaceholder": "{{masked}} · değiştirmek için yenisini yazın",
+      "pastePlaceholder": "API anahtarını yapıştırın",
+      "actions": {
+        "test": "Test Et",
+        "deleteKey": "Anahtarı Sil",
+        "loadModels": "Modelleri Getir"
+      },
+      "verifying": "Doğrulanıyor…",
+      "workspaceHelp": "Anahtarınız birden çok Workspace'te çalışabiliyorsa gerekir; her isteğe anthropic-workspace-id olarak eklenir. Anthropic Console → Workspaces sayfasında bulunur.",
+      "workspacePlaceholder": "wrkspc_…",
+      "loadingModels": "Modeller getiriliyor…",
+      "modelsHelp": "Liste, anahtarınızın kullanabildiği modellerle Anthropic'ten getirilir."
+    }
+  },
+  "workTypes": {
+    "heading": "İş Tipleri",
+    "actions": {
+      "add": "+ Yeni Tip",
+      "restore": "Geri Al",
+      "archive": "Arşivle"
+    },
+    "columns": {
+      "name": "Ad",
+      "category": "Tür",
+      "pattern": "Numara Deseni",
+      "fields": "Alan"
+    },
+    "badges": {
+      "builtIn": "hazır",
+      "archived": "arşiv"
+    },
+    "tokensHint": "Desen alanları: {{tokens}}. Sıra no, deseninin geri kalanı aynı olan kayıtlar arasında artar (ör. her gönderen/alıcı/yıl için ayrı).",
+    "editor": {
+      "editTitle": "{{name}} Tipini Düzenle",
+      "newTitle": "Yeni İş Tipi",
+      "fields": {
+        "key": "Anahtar",
+        "category": "Tür",
+        "icon": "Simge",
+        "pattern": "Numara Deseni",
+        "counterGroup": "Ortak Sayaç Grubu",
+        "workflow": "Varsayılan İş Akışı",
+        "dueDays": "Cevap Süresi (gün)"
+      },
+      "counterGroupPlaceholder": "(yok)",
+      "dueDaysHint": "Onaya gönderilince termin bugün + bu kadar gün olur. İş akışı yoksa gereği firması tek adımda cevaplar.",
+      "options": {
+        "incoming": "Gelen Kayıt (gönderilmez, alındı olarak kaydedilir)"
+      },
+      "fieldsHeading": "Alanlar",
+      "columns": {
+        "key": "Anahtar",
+        "label": "Etiket",
+        "type": "Tip",
+        "options": "Seçenekler (virgülle)",
+        "required": "Zorunlu"
+      },
+      "actions": {
+        "addField": "+ Alan"
+      },
+      "removeField": "Alanı kaldır"
+    }
+  },
+  "automation": {
+    "heading": "İnceleme Tamamlanınca Otomatik Gönderim Formu",
+    "description": "Seçili inceleme şablonuyla başlatılan bir inceleme bitince onaylanan dosyalar (onaylı kopyaları varsa onlar) bir gönderim formuna eklenir, kapak sayfası üretilir ve alıcı firmalara CDE içinden gönderilir. Alıcı seçilmezse incelemeyi başlatan firmaya gider.",
+    "columns": {
+      "template": "İnceleme Şablonu",
+      "on": "Açık",
+      "recipients": "Alıcı Firmalar",
+      "purpose": "Amaç",
+      "files": "Dosyalar",
+      "sendNow": "Hemen Gönder"
+    },
+    "options": {
+      "approved": "Yalnız Onaylananlar",
+      "all": "Hepsi"
+    },
+    "empty": "İnceleme şablonu yok. \"İş akışları\" sekmesinden ekleyin."
+  },
+  "numbering": {
+    "applied": "{{preset}} uygulandı. Yeni numaralar bu desenle verilir.",
+    "heading": "Bilgi Talebi ve Teknik Onay Numaraları",
+    "presets": {
+      "standart": "Standart"
+    },
+    "hint": "Standart: <code>{{standard}}</code> · ZAVM: <code>{{zavm}}</code>. Sayaç disipline göre ayrı yürür; {Konu} sayaca girmez."
+  },
+  "locations": {
+    "remove": {
+      "title": "Konumu Sil",
+      "confirm": "\"{{name}}\" ve altındaki konumlar silinsin mi?"
+    },
+    "unlink": {
+      "title": "Bağlantıları Kaldır",
+      "confirm": "{{message}} Bağlantılar kaldırılarak silinsin mi?"
+    },
+    "title": "Konumlar",
+    "actions": {
+      "add": "+ Konum",
+      "report": "Rapor",
+      "importCsv": "CSV İçe Aktar",
+      "fromIfc": "IFC'den Oluştur"
+    },
+    "description": "İstasyon, bölge, kat, mahal veya km aralıklı hat / tünel kesimleri. Sorunlar, formlar ve dosyalar bir konuma bağlanır; filtreler alt konumları da kapsar.",
+    "columns": {
+      "name": "Ad",
+      "code": "Kod",
+      "type": "Tip",
+      "km": "Km",
+      "ifc": "IFC"
+    },
+    "empty": "Henüz konum yok. Elle ekleyin, CSV'den alın veya bir IFC modelinin mekân yapısından oluşturun.",
+    "new": {
+      "title": "Yeni Konum"
+    },
+    "form": {
+      "namePlaceholder": "ör. Pendik Merkez İstasyonu",
+      "codePlaceholder": "ör. SG1",
+      "fields": {
+        "type": "Tip",
+        "kmStart": "Km Başlangıç",
+        "kmEnd": "Km Bitiş",
+        "parent": "Üst Konum"
+      },
+      "options": {
+        "topLevel": "— En üst seviye —"
+      }
+    },
+    "detail": {
+      "messages": {
+        "saved": "Kaydedildi."
+      },
+      "actions": {
+        "addChild": "+ Alt Konum"
+      },
+      "linksHeading": "Bağlı Kayıtlar (alt konumlar dahil)",
+      "noLinks": "Bağlı sorun, form veya dosya yok."
+    },
+    "csv": {
+      "title": "CSV'den Konum İçe Aktar",
+      "description": "Başlık satırı gerekli. Sütunlar: <code>Kod</code>, <code>Ad</code>, <code>Tip</code>, <code>Üst kod</code>, <code>Km başlangıç</code>, <code>Km bitiş</code>, <code>Sıra</code> (ayraç ; , veya sekme). Aynı kodlu konumlar güncellenir. Bir satırda hata varsa hiçbir kayıt değişmez.",
+      "fields": {
+        "parent": "Üst kodu boş satırlar şuraya eklenir"
+      },
+      "lineError": "{{line}}. satır: {{message}}",
+      "result": "{{created}} konum eklendi, {{updated}} güncellendi.",
+      "actions": {
+        "import": "İçe Aktar"
+      }
+    },
+    "ifc": {
+      "done": "Tamamlandı: {{created}} konum eklendi, {{updated}} güncellendi.",
+      "failed": "İşlem başarısız.",
+      "reading": "IFC okunuyor…",
+      "queued": "Sırada…",
+      "title": "IFC'den Konum Oluştur",
+      "description": "Modelin mekân yapısı (Saha → Bina → Kat → Mahal, IFC 4.3'te tesis ve kesimler) konum ağacına aktarılır. Aynı modeli tekrar aktarmak adları günceller, kopya oluşturmaz.",
+      "fields": {
+        "model": "IFC Modeli",
+        "parent": "Şunun Altına Ekle"
+      },
+      "options": {
+        "choose": "— Seçin —"
+      }
+    }
+  },
+  "workflows": {
+    "remove": {
+      "title": "Şablonu Sil",
+      "confirm": "\"{{name}}\" şablonu silinsin mi? Devam eden incelemeler etkilenmez."
+    },
+    "byAttribute": "{{attribute}} değerine göre",
+    "description": "Onay akışı şablonları inceleme başlatılırken seçilir. Başlatılan inceleme şablonun o anki kopyasıyla çalışır; sonradan yapılan değişiklik yalnızca yeni incelemelere uygulanır.",
+    "actions": {
+      "add": "+ Şablon"
+    },
+    "originBadge": "{{party}} (başlatan)",
+    "days_one": " · {{count}} gün",
+    "days_other": " · {{count}} gün",
+    "stopBadge": " · iade",
+    "stepSummary": "{{name}} ({{assignees}})",
+    "stepBadge": "{{n}}. {{name}}",
+    "stepRule": "{{assignees}} · {{rule}}",
+    "copySubfolder": "Kopya alt klasörü: <code>{{pattern}}</code>",
+    "empty": "Tanımlı şablon yok.",
+    "editor": {
+      "editTitle": "Şablonu Düzenle",
+      "newTitle": "Yeni Onay Akışı Şablonu",
+      "namePlaceholder": "ör. PAS → CNS → HLL → ZRT",
+      "fields": {
+        "kind": "Kullanım",
+        "originParty": "Başlatan Taraf",
+        "party": "Taraf",
+        "displayName": "Görünen Ad",
+        "days": "Süre (gün)",
+        "onRevise": "Revize / Red",
+        "namePattern": "İnceleme Numarası Deseni (isteğe bağlı)",
+        "copyFolder": "Onaylananların Kopyalanacağı Klasör",
+        "subfolderPattern": "Alt Klasör Deseni"
+      },
+      "stagesHeading": "Kademeler (taraflar)",
+      "stagesHint": "İsteğe bağlı. Adımlar taraf kademelerine bağlanır (Tasarımcı → Yüklenici → Müşavir → İdare). Kademe süresi ilk adımından itibaren işler; \"iade\" kademesinde revize/red alan dosya zincirden çıkar ve başlatana döner.",
+      "stageN": "{{n}}. kademe",
+      "actions": {
+        "remove": "Kaldır",
+        "addStage": "+ Kademe",
+        "addStep": "+ Adım Ekle",
+        "choose": "Seç"
+      },
+      "stepsHeading": "Adımlar",
+      "numberHeading": "Numara ve Kopya Hedefi",
+      "namePatternHint": "{Proje}, {Yıl}, {Ay} ve dosya alanları (öznitelik veya isimlendirme alanı) kullanılabilir; {0000} sayaçtır. Sayaç proje ve önek başına benzersizdir.",
+      "copyFolderNotSet": "Seçilmedi (inceleme başlatılırken seçilir)",
+      "options": {
+        "copyToBase": "Alanı Eksik Dosyayı Hedef Klasörün Kendisine Kopyala (yoksa kopyalanmaz, raporlanır)"
+      },
+      "finalHeading": "Son Adımın Sonucu → Dosyanın Onay Durumu",
+      "finalHint": "Varsayılan: aynı kod. \"Onaylandı\" ve \"Notlu Onaylandı\" durumundaki dosyalar hedef klasöre kopyalanır.",
+      "finalMap": "{{outcome}} →"
+    },
+    "step": {
+      "heading": "{{n}}. adım",
+      "actions": {
+        "up": "Yukarı",
+        "down": "Aşağı",
+        "removeOutcome": "Sonucu kaldır",
+        "addOutcome": "+ Sonuç",
+        "fillParty": "{{party}} Etiketleriyle Doldur"
+      },
+      "fields": {
+        "name": "Adım Adı",
+        "stage": "Kademe",
+        "rule": "Kural",
+        "assignees": "Atananlar (kişi, firma veya rol / ekip)",
+        "outcomes": "İzinli Sonuçlar",
+        "requiredAttributes": "Bu Adımda Zorunlu Öznitelikler (virgülle; dosyaya yazılır)"
+      },
+      "namePlaceholder": "ör. CNS inceleme",
+      "stageOption": "{{n}}. {{name}}",
+      "assigneesHint": "Firma veya ekip atandığında üyelerden biri kendi hesabıyla yanıtlar; kayıtta kişi ve \"… adına\" birlikte görünür. Ortak hesap gerekmez.",
+      "options": {
+        "byAttribute": "Ayrıca Dosya Alanına Göre Ata (tek şablon tüm disiplinler için)",
+        "customOutcomes": "Özel Sonuç Etiketleri (ör. \"İDARE ŞARTLI ONAYLANDI\")"
+      },
+      "codePlaceholder": "Kod",
+      "labelPlaceholder": "Etiket",
+      "requiredAttributesPlaceholder": "ör. Yazı No, Revizyon"
+    },
+    "rule": {
+      "fields": {
+        "attribute": "Alan",
+        "fallback": "Eşleşmeyen Değerler için (isteğe bağlı)"
+      },
+      "attributeHint": "Öznitelik veya isimlendirme alanı adı. Bir incelemedeki dosyalar aynı atananlara düşmelidir.",
+      "actions": {
+        "removeValue": "Değeri kaldır",
+        "addValue": "+ Değer"
+      },
+      "valuePlaceholder": "Değer, ör. S"
+    }
+  }
+}

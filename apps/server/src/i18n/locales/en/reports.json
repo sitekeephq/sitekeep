@@ -1,0 +1,842 @@
+{
+  "datasets": {
+    "files": {
+      "label": "Files",
+      "description": "Files in the folders you can view (one row per file, with the current version).",
+      "fields": {
+        "id": "File ID",
+        "name": "File Name",
+        "extension": "Extension",
+        "folder": "Folder",
+        "folderPath": "Folder Path",
+        "folderState": "ISO 19650 State",
+        "currentVersion": "Current Version No.",
+        "size": "Size (bytes)",
+        "uploader": "Last Uploaded By",
+        "uploaderCompany": "Last Uploader's Company",
+        "uploadedAt": "Last Upload Date",
+        "createdBy": "First Uploaded By",
+        "createdAt": "First Upload Date"
+      },
+      "hints": {
+        "extension": "lower case, without the dot: pdf, ifc, dwg",
+        "folderPath": "without the root folder, separated by ' / '",
+        "size": "size of the current version"
+      },
+      "dynamicDescription": "File attributes, e.g. attributes.Status, attributes.Revision, attributes.Discipline"
+    },
+    "versions": {
+      "label": "Versions",
+      "description": "All versions of the files you can view (one row per upload). Use it for upload activity.",
+      "fields": {
+        "fileId": "File ID",
+        "file": "File Name",
+        "extension": "Extension",
+        "folderPath": "Folder Path",
+        "folderState": "ISO 19650 State",
+        "version": "Version No.",
+        "isLatest": "Is Current Version",
+        "uploader": "Uploaded By",
+        "uploaderCompany": "Uploader's Company",
+        "uploadedAt": "Upload Date",
+        "size": "Size (bytes)",
+        "derivativeStatus": "Model Conversion Status"
+      }
+    },
+    "issues": {
+      "label": "Issues",
+      "description": "Issues in the project (one row per issue).",
+      "fields": {
+        "number": "No.",
+        "title": "Title",
+        "status": "Status",
+        "isOpen": "Is Open",
+        "priority": "Priority",
+        "type": "Type",
+        "assignee": "Assignee",
+        "assigneeCompany": "Assigned Company",
+        "createdBy": "Created By",
+        "createdByCompany": "Creator's Company",
+        "dueDate": "Due Date",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "overdue": "Is Overdue",
+        "daysOverdue": "Delay (days)"
+      },
+      "hints": {
+        "isOpen": "true unless the status is 'closed'",
+        "assigneeCompany": "the assigned company or the assignee's company",
+        "dueDate": "YYYY-MM-DD",
+        "overdue": "due date before today and the issue is not closed",
+        "daysOverdue": "days past the due date; otherwise null"
+      }
+    },
+    "activity": {
+      "label": "Activity Log",
+      "description": "The project's audit log: uploads, downloads, issue and permission changes. Project administrators only.",
+      "fields": {
+        "targetType": "Target Type",
+        "user": "User",
+        "userCompany": "User's Company",
+        "at": "Time",
+        "action": "Action"
+      },
+      "hints": {
+        "targetType": "file, folder, issue, user, dashboard",
+        "action": "e.g. file.uploaded, file.version_added, file.downloaded, file.deleted, issue.created, issue.updated, issue.commented, folder.permissions_set, member.added, report.saved"
+      }
+    },
+    "members": {
+      "label": "Project Members",
+      "description": "Project members and their companies.",
+      "fields": {
+        "name": "Name",
+        "company": "Company",
+        "projectAdmin": "Is Project Administrator"
+      }
+    },
+    "models": {
+      "label": "Models (IFC)",
+      "description": "IFC versions you can view; one row per IFC class (ifcClass, classCount). Use sum(classCount) for the class breakdown; elementCount repeats on every row.",
+      "fields": {
+        "fileId": "File ID",
+        "file": "File Name",
+        "folderPath": "Folder Path",
+        "version": "Version No.",
+        "isLatest": "Is Current Version",
+        "uploadedAt": "Upload Date",
+        "uploader": "Uploaded By",
+        "uploaderCompany": "Uploader's Company",
+        "derivativeStatus": "Conversion Status",
+        "schema": "IFC Schema",
+        "elementCount": "Total Elements (version)",
+        "ifcClass": "IFC Class",
+        "classCount": "Elements in This Class"
+      },
+      "hints": {
+        "schema": "IFC2X3, IFC4, IFC4X3",
+        "ifcClass": "e.g. IfcWall, IfcSlab, IfcDoor"
+      }
+    },
+    "workCommon": {
+      "fields": {
+        "number": "Number",
+        "title": "Title",
+        "type": "Work Type",
+        "status": "Status",
+        "statusLabel": "Status Name",
+        "isOpen": "Is Open",
+        "fromCompany": "Sender Company",
+        "toCompany": "Recipient Company",
+        "toCompanies": "Recipient Companies",
+        "ballInCourt": "Ball in Court",
+        "assignee": "Assignee",
+        "assigneeCompany": "Assignee's Company",
+        "createdBy": "Created By",
+        "dueDate": "Due Date",
+        "overdue": "Is Overdue",
+        "daysOverdue": "Delay (days)",
+        "daysOpen": "Days Open",
+        "createdAt": "Created",
+        "sentAt": "Sent",
+        "answeredAt": "Answered",
+        "closedAt": "Closed",
+        "replyRequired": "Reply Required",
+        "awaitingReply": "Is Awaiting Reply",
+        "deliveryChannel": "Delivery Channel",
+        "deliveryStatus": "Delivery Status",
+        "mailSent": "E-mail Sent",
+        "letterLanguage": "Letter Language",
+        "discipline": "Discipline"
+      },
+      "hints": {
+        "isOpen": "true unless the status is closed",
+        "toCompany": "first recipient (for action) company",
+        "toCompanies": "comma-separated",
+        "ballInCourt": "the company (or companies) whose turn it is; empty for closed work items",
+        "dueDate": "YYYY-MM-DD",
+        "overdue": "open and due before today",
+        "daysOverdue": "days past the due date; otherwise null",
+        "daysOpen": "days from sending to the reply / closing, or to today",
+        "awaitingReply": "reply required and the status is sent/received",
+        "discipline": "e.g. 'A - Architecture'",
+        "status": "status code; statusLabel holds its name"
+      }
+    },
+    "works": {
+      "label": "Work (all)",
+      "description": "All work items you can see: correspondence, RFIs, submittals, meetings, actions, transmittals. One row per work item.",
+      "fields": {
+        "category": "Category",
+        "parent": "Parent Work Item"
+      },
+      "hints": {
+        "parent": "number of the package / meeting"
+      }
+    },
+    "correspondence": {
+      "label": "Correspondence",
+      "description": "Incoming and outgoing letters (one row per letter): awaiting reply, due date, company, delivery channel, language.",
+      "fields": {
+        "title": "Subject",
+        "direction": "Direction",
+        "counterparty": "Counterparty",
+        "letterDate": "Letter Date"
+      },
+      "hints": {
+        "counterparty": "the sender of an incoming letter, the recipient company of an outgoing one"
+      }
+    },
+    "rfis": {
+      "label": "RFIs",
+      "description": "RFIs (one row per RFI): ball in court, days open, discipline, category, impact, answer.",
+      "fields": {
+        "title": "Subject",
+        "answered": "Is Answered",
+        "rfiCategory": "Category",
+        "priority": "Priority",
+        "costImpact": "Cost Impact",
+        "scheduleImpact": "Schedule Impact",
+        "submittedAt": "Sent",
+        "revisionCount": "Submission Count"
+      },
+      "hints": {
+        "rfiCategory": "e.g. Design Coordination, Site Works",
+        "priority": "Low, Normal, High, Urgent",
+        "costImpact": "None, Yes, Unknown",
+        "scheduleImpact": "None, Yes, Unknown"
+      }
+    },
+    "submittals": {
+      "label": "Submittals",
+      "description": "Submittal items (one row per item): revision, last outcome, specification section, type, discipline, package, ball in court, delay.",
+      "fields": {
+        "sectionCode": "Specification Section Code",
+        "sectionTitle": "Specification Section Title",
+        "kind": "Type",
+        "package": "Package",
+        "rev": "Revision",
+        "outcome": "Outcome",
+        "outcomeLabel": "Outcome Name",
+        "decided": "Is Decided",
+        "submittedAt": "Sent",
+        "decidedAt": "Decision Date",
+        "reviewDays": "Review Time (days)"
+      },
+      "hints": {
+        "sectionCode": "e.g. 05 12 00",
+        "package": "number of the submittal package",
+        "rev": "0 = first submission",
+        "submittedAt": "submission of the last revision",
+        "reviewDays": "last revision: from submission to decision, or to today",
+        "outcome": "code of the last decision; null without a decision"
+      }
+    },
+    "meetings": {
+      "label": "Meetings",
+      "description": "Meetings (one row per meeting): type, date, participants, numbers of minutes items and actions.",
+      "fields": {
+        "kind": "Meeting Type",
+        "date": "Meeting Date",
+        "place": "Place",
+        "attendeeCount": "Participants",
+        "presentCount": "Attendees",
+        "minutesItemCount": "Minutes Items",
+        "actionCount": "Actions",
+        "openActionCount": "Open Actions"
+      },
+      "hints": {
+        "kind": "e.g. Coordination, Progress, Health and Safety"
+      }
+    },
+    "actions": {
+      "label": "Actions",
+      "description": "Meeting actions (one row per action): responsible person and company, due date, delay, meeting.",
+      "fields": {
+        "title": "Action",
+        "assignee": "Responsible Person",
+        "responsibleCompany": "Responsible Company",
+        "meeting": "Meeting No.",
+        "meetingTitle": "Meeting",
+        "meetingDate": "Meeting Date"
+      }
+    },
+    "transmittals": {
+      "label": "Transmittals",
+      "description": "Transmittals (one row per transmittal): purpose, recipient, sent and received dates, number of attached files.",
+      "fields": {
+        "purpose": "Purpose",
+        "received": "Is Received",
+        "receivedAt": "Received",
+        "fileCount": "Files"
+      },
+      "hints": {
+        "received": "at least one recipient company acknowledged receipt",
+        "receivedAt": "first acknowledgement of receipt"
+      }
+    },
+    "reviews": {
+      "label": "Reviews",
+      "description": "Document reviews (one row per review): status, current step, step due date, delay, file outcomes, total time, target folder gate.",
+      "fields": {
+        "number": "No.",
+        "name": "Name",
+        "code": "Review Code",
+        "workflow": "Workflow Template",
+        "status": "Status",
+        "isOpen": "Is Running",
+        "currentStep": "Current Step",
+        "stepNo": "Step No.",
+        "stepCount": "Steps",
+        "stepDueAt": "Step Due Date",
+        "overdue": "Is Overdue",
+        "daysInStep": "Days in Step",
+        "totalDays": "Total Time (days)",
+        "fileCount": "Files",
+        "approvedCount": "Approved Files",
+        "reviseCount": "Files to Revise",
+        "rejectedCount": "Rejected Files",
+        "targetFolder": "Target Folder",
+        "gated": "Is Gated Folder",
+        "startedBy": "Started By",
+        "startedByCompany": "Starter's Company",
+        "startedAt": "Start",
+        "completedAt": "Finish"
+      },
+      "hints": {
+        "currentStep": "name of the step while running",
+        "stepNo": "starts at 1",
+        "overdue": "running and the step due date has passed",
+        "totalDays": "from start to finish, or to today",
+        "gated": "files enter the target folder only through an approved review"
+      }
+    },
+    "reviewFiles": {
+      "label": "Review Files",
+      "description": "Files in reviews (one row per review × file): last outcome and decision date per file.",
+      "fields": {
+        "review": "Review No.",
+        "reviewName": "Review",
+        "reviewStatus": "Review Status",
+        "file": "File Name",
+        "extension": "Extension",
+        "folderPath": "Source Folder",
+        "version": "Version No.",
+        "outcome": "Outcome",
+        "outcomeLabel": "Outcome Name",
+        "decided": "Is Decided",
+        "decidedAt": "Decision Date",
+        "stoppedAtStep": "Stopped at Step",
+        "copied": "Is Copied to Target"
+      },
+      "hints": {
+        "outcomeLabel": "the template's label (e.g. A - Approved)",
+        "stoppedAtStep": "if the chain stopped at this step (starts at 1)",
+        "outcome": "the file's last outcome; null without a decision"
+      }
+    },
+    "workflowSteps": {
+      "label": "Workflow Steps",
+      "description": "Steps in the approval workflows of reviews, RFIs, submittals and forms (one row per step pass): responsible, responsible company, start, finish, duration (days), overdue. Use the sum/average of days for 'who kept it waiting how long'.",
+      "fields": {
+        "subjectType": "Record Type",
+        "subject": "Record",
+        "workflow": "Workflow",
+        "stepNo": "Step No.",
+        "stepName": "Step",
+        "responsible": "Responsible",
+        "responsibleCompany": "Responsible Company",
+        "status": "Step Status",
+        "outcome": "Step Outcome",
+        "startedAt": "Step Start",
+        "endedAt": "Step Finish",
+        "days": "Duration (days)",
+        "dueAt": "Step Due Date",
+        "late": "Is Late"
+      },
+      "hints": {
+        "subject": "review name / work item number / form number",
+        "stepNo": "starts at 1",
+        "responsible": "person, company or team assigned to the step (comma-separated)",
+        "endedAt": "null while running",
+        "days": "to the finish or to today, with decimals",
+        "late": "past its due date (finished or running step)"
+      }
+    },
+    "locations": {
+      "label": "Locations",
+      "description": "Location tree (block, level, room, chainage; one row per location) with the numbers of forms and issues linked to it.",
+      "fields": {
+        "name": "Name",
+        "code": "Code",
+        "type": "Type",
+        "path": "Path",
+        "level": "Depth",
+        "parent": "Top Location",
+        "kmStart": "Start Chainage (km)",
+        "kmEnd": "End Chainage (km)",
+        "formCount": "Forms",
+        "openFormCount": "Open Forms",
+        "failedItemCount": "Failed Items",
+        "issueCount": "Issues",
+        "openIssueCount": "Open Issues"
+      },
+      "hints": {
+        "type": "e.g. Block, Level, Room, Station",
+        "level": "1 = top",
+        "failedItemCount": "total of the forms at this location"
+      }
+    },
+    "docComparisons": {
+      "label": "Document Comparisons",
+      "description": "Comparisons between two versions (one row per comparison): numbers of changed pages and lines, title block changes, revision warnings.",
+      "fields": {
+        "file": "File Name",
+        "extension": "Extension",
+        "folderPath": "Folder Path",
+        "fromVersion": "Old Version",
+        "toVersion": "New Version",
+        "fromRevision": "Old Revision",
+        "toRevision": "New Revision",
+        "status": "Status",
+        "identical": "Is Identical",
+        "contentChanged": "Content Changed",
+        "pagesChanged": "Changed Pages",
+        "added": "Added",
+        "removed": "Removed",
+        "changed": "Changed",
+        "antetChanges": "Title Block Changes",
+        "warningCount": "Warnings",
+        "hasWarnings": "Has Warnings",
+        "warnings": "Warnings",
+        "createdBy": "Compared By",
+        "createdAt": "Compared"
+      },
+      "hints": {
+        "contentChanged": "text change outside the title block",
+        "antetChanges": "number of changed title block fields",
+        "warningCount": "e.g. revision not updated, revision table not updated"
+      }
+    },
+    "specRegisters": {
+      "label": "Specification Submittal Registers",
+      "description": "Submittal items extracted from specifications (one row per item): source file, section, type, discipline, page.",
+      "fields": {
+        "file": "Specification File",
+        "version": "Version No.",
+        "sectionCode": "Section Code",
+        "sectionTitle": "Section Title",
+        "description": "Item",
+        "kind": "Type",
+        "discipline": "Discipline",
+        "page": "Page",
+        "excluded": "Is Excluded",
+        "usedAi": "AI Used",
+        "updatedAt": "Updated"
+      },
+      "hints": {
+        "description": "short description, e.g. 'Data sheet / catalogue – Air handling unit'"
+      }
+    }
+  },
+  "values": {
+    "subject": {
+      "review": "Document Review",
+      "rfi": "RFI",
+      "submittal": "Submittal",
+      "form": "Form",
+      "work": "Work Item"
+    },
+    "stepStatus": {
+      "running": "Running",
+      "done": "Done",
+      "cancelled": "Cancelled"
+    },
+    "compareStatus": {
+      "running": "Running",
+      "done": "Done",
+      "failed": "Failed"
+    },
+    "direction": {
+      "gelen": "Incoming",
+      "giden": "Outgoing"
+    }
+  },
+  "templates": {
+    "issueStatus": {
+      "name": "Issue Status (company and priority)",
+      "description": "Open/closed issue counts, open issues by company and priority breakdown."
+    },
+    "text": {
+      "openIssuesByCompany": "Open Issues by Company",
+      "highCriticalOpen": "High / Critical (open)",
+      "byPriorityOpen": "By Priority (open)",
+      "issueStatus": "Issue Status",
+      "closedIssue": "Closed Issues",
+      "openIssue": "Open Issues",
+      "overdueByCompany": "Overdue by Company",
+      "dueNext7Days": "Due in the Next 7 Days",
+      "noOverdueIssues": "No overdue issues.",
+      "averageDelayDays": "Average Delay (days)",
+      "overdueIssues": "Overdue Issues",
+      "overdueIssue": "Overdue Issues",
+      "overdueItems": "Overdue Items",
+      "longestDelay": "Longest Delay",
+      "delayDays": "Delay (days)",
+      "priority": "Priority",
+      "title": "Title",
+      "assignee": "Assignee",
+      "dueDate": "Due Date",
+      "company": "Company",
+      "daysSuffix": " days",
+      "no": "No.",
+      "last12Weeks": "Last 12 weeks, weekly (weeks start on Monday)",
+      "uploadActivity": "Document Upload Activity",
+      "weeklyUploads": "Weekly Uploads",
+      "uploadsVersions": "Uploads (versions)",
+      "topUploaders": "Top Uploaders",
+      "weeklyAverage": "Weekly Average",
+      "byCompanies": "By Company",
+      "totalSize": "Total Size",
+      "elementsByIfcClass": "Elements by IFC Class",
+      "noConvertedIfc": "No converted IFC yet.",
+      "modelElements": "Model Element Breakdown",
+      "modelsCurrentIfc": "Models (current IFC)",
+      "totalElements": "Total Elements",
+      "ifcClass": "IFC Classes",
+      "models": "Models",
+      "folder": "Folder",
+      "elements": "Elements",
+      "file": "File",
+      "schema": "Schema",
+      "openLettersByCompany": "Open Letters by Company",
+      "monthlyInOut": "Monthly Incoming / Outgoing Letters",
+      "noLettersAwaitingReply": "No letters awaiting reply.",
+      "lettersAwaitingReply": "Letters Awaiting Reply",
+      "correspondenceStatus": "Correspondence Status",
+      "awaitingReply": "Awaiting Reply",
+      "ballInCourt": "Ball in Court",
+      "overdue": "Overdue",
+      "totalLetters": "Total Letters",
+      "counterparty": "Counterparty",
+      "openLetters": "Open Letters",
+      "daysOpen": "Days Open",
+      "date": "Date",
+      "number": "Number",
+      "subject": "Subject",
+      "openRfisByBallInCourt": "Open RFIs by Ball in Court",
+      "averageResponseDays": "Average Response Time (days)",
+      "noOpenRfis": "No open RFIs.",
+      "openRfis": "Open RFIs",
+      "longestOpenDays": "Longest Open (days)",
+      "openRfi": "Open RFIs",
+      "rfis": "RFIs",
+      "byDiscipline": "By Discipline",
+      "discipline": "Discipline",
+      "closed": "Closed",
+      "numberShort": "Number",
+      "open": "Open",
+      "itemsByRevision": "Items by Revision Count",
+      "averageReviewDays": "Average Review Time (days)",
+      "noOverdueItems": "No overdue items.",
+      "overdueItemsList": "Overdue Items",
+      "submittalRegister": "Submittal Register",
+      "submittalItems": "Submittal Items",
+      "outcomeBreakdown": "Outcome Breakdown",
+      "byKind": "By Type",
+      "section": "Section",
+      "status": "Status",
+      "openActionsByCompany": "Open Actions by Responsible Company",
+      "meetingsActions": "Meetings and Actions",
+      "monthlyMeetings": "Meetings per Month",
+      "overdueAction": "Overdue Actions",
+      "meetingsLast6Months": "Meetings (last 6 months)",
+      "noOpenActions": "No open actions.",
+      "recentMeetings": "Recent Meetings",
+      "onTime": "On Time",
+      "openActions": "Open Actions",
+      "responsibleCompany": "Responsible Company",
+      "noMeetings": "No meetings.",
+      "openAction": "Open Actions",
+      "meeting": "Meeting",
+      "responsible": "Responsible",
+      "attendees": "Attendees",
+      "action": "Action",
+      "kind": "Type",
+      "waitingByCompany": "Total Waiting by Company (days)",
+      "averageStepDays": "Average Time per Step (days)",
+      "reviewsByStatus": "Reviews by Status",
+      "lateSteps": "Late Steps (all)",
+      "noRunningReviews": "No running reviews.",
+      "stepOverdue": "Step Overdue",
+      "runningReviews": "Running Reviews",
+      "runningReview": "Running Reviews",
+      "stepDue": "Step Due Date",
+      "daysInStep": "In Step (days)",
+      "reviews": "Reviews",
+      "review": "Review",
+      "step": "Step",
+      "noOpenFormsWithFailedItems": "No open forms with failed items.",
+      "openFormsWithFailedItems": "Open Forms with Failed Items",
+      "openFormsWithFailures": "Open Forms with Failures",
+      "failedItemsByLocation": "Failed Items by Location",
+      "weeklyForms": "Forms per Week",
+      "failedItems": "Failed Items",
+      "byTemplate": "By Template",
+      "openForms": "Open Forms",
+      "failed": "Failed",
+      "forms": "Forms",
+      "template": "Template",
+      "location": "Location",
+      "form": "Forms",
+      "sCurve": "S-Curve (cumulative completed activities, %)",
+      "lateActivitiesByWbs": "Late Activities by WBS",
+      "noLateCriticalActivities": "No late critical activities.",
+      "lateCriticalActivities": "Late Critical Activities",
+      "lateCriticalActivity": "Late Critical Activities",
+      "averageCompletion": "Average Completion",
+      "activityStatuses": "Activity Statuses",
+      "baselineFinish": "Baseline Finish",
+      "lateActivity": "Late Activities",
+      "schedule": "Schedule",
+      "currentPlan": "Current Plan",
+      "actual": "Actual",
+      "wbs": "WBS",
+      "varianceDays": "Variance (days)",
+      "baseline": "Baseline",
+      "activity": "Activities",
+      "finish": "Finish",
+      "code": "Code",
+      "costByCategory": "Cost by Category",
+      "cashflowCumulative": "Cash Flow (cumulative)",
+      "plannedToDate": "Planned to Date",
+      "linesMissingQuantity": "Lines Missing a Quantity",
+      "noCostLines": "No cost lines.",
+      "costByStorey": "Cost by Storey",
+      "top10Items": "Top 10 Items",
+      "totalCost": "Total Cost",
+      "costLines": "Cost Lines",
+      "cost5d": "Cost (5D)",
+      "planned": "Planned",
+      "forecast": "Forecast",
+      "quantity": "Quantity",
+      "item": "Item",
+      "unit": "Unit",
+      "amount": "Amount",
+      "openClashesByClassPair": "Open Clashes by Class Pair",
+      "openClashesByCompany": "Open Clashes by Assigned Company",
+      "approvedNotClash": "Approved (not a clash)",
+      "openClashesByStorey": "Open Clashes by Storey",
+      "statusByTest": "Status by Test",
+      "openClashes": "Open Clashes",
+      "clashes": "Clashes",
+      "resolved": "Resolved",
+      "monthlyComparisons": "Comparisons per Month",
+      "docComparisons": "Document Comparisons",
+      "comparisonsWithWarnings": "Comparisons with Warnings",
+      "noComparisons": "No comparisons yet.",
+      "recentComparisons": "Recent Comparisons",
+      "titleBlockChanges": "Title Block Changes",
+      "revisionWarnings": "Revision Warnings",
+      "comparisons": "Comparisons",
+      "changedPages": "Changed Pages",
+      "oldRevision": "Old Rev",
+      "newRevision": "New Rev",
+      "warnings": "Warnings",
+      "oldVersion": "Old V",
+      "newVersion": "New V",
+      "titleBlock": "Title Block",
+      "noOverdueWork": "No overdue work items.",
+      "byBallInCourt": "By Ball in Court",
+      "overdueWork": "Overdue Work Items",
+      "byCategory": "By Category",
+      "openWork": "Open Work",
+      "category": "Category",
+      "openWorkItems": "Open Work Items",
+      "sCurveComment": "S-curve: cumulative percentage of monthly finishes.",
+      "newDashboard": "New dashboard",
+      "blankComment": "d.<query id> holds the rows. Charts: CDE.bar / CDE.line / CDE.pie / CDE.kpi / CDE.table",
+      "addQueryHint": "Add a query in the Advanced section."
+    },
+    "overdue": {
+      "name": "Overdue Items",
+      "description": "Overdue open issues, their breakdown by company and due dates in the next 7 days."
+    },
+    "uploadActivity": {
+      "name": "Document Upload Activity (weekly)",
+      "description": "Weekly uploads over the last 12 weeks, breakdown by company and top uploaders."
+    },
+    "modelElements": {
+      "name": "Model Element Breakdown",
+      "description": "Element counts by IFC class in the current IFC versions and totals per model."
+    },
+    "correspondenceStatus": {
+      "name": "Correspondence Status",
+      "description": "Open letters, letters awaiting reply, overdue letters, breakdown by company and monthly incoming/outgoing letters."
+    },
+    "rfiLog": {
+      "name": "RFIs",
+      "description": "Open RFIs, breakdown by ball in court and discipline, days open and average response time."
+    },
+    "submittalRegister": {
+      "name": "Submittal Register",
+      "description": "Outcome breakdown of submittal items, revision counts, status by type and overdue items."
+    },
+    "meetingsActions": {
+      "name": "Meetings and Actions",
+      "description": "Open actions, breakdown by responsible company, overdue actions and recent meetings."
+    },
+    "reviewsSteps": {
+      "name": "Reviews (step durations)",
+      "description": "Running reviews, overdue steps, average time per step and waiting time by company."
+    },
+    "formsFailures": {
+      "name": "Forms (failed items)",
+      "description": "Form counts, failed items by location and template, forms per week and open forms with failed items."
+    },
+    "scheduleProgress": {
+      "name": "Schedule (delays, critical path, S-curve)",
+      "description": "Activity statuses, late critical activities, delays by WBS and the S-curve of planned / forecast / actual finishes."
+    },
+    "cost5d": {
+      "name": "Cost (5D)",
+      "description": "Cost of model elements at unit rates: totals by category and storey, largest items, missing quantities and planned / actual cash flow (S-curve)."
+    },
+    "clashOverview": {
+      "name": "Clashes",
+      "description": "Open clashes, IFC class pairs, assigned companies and status breakdown by test."
+    },
+    "docCompare": {
+      "name": "Document Comparisons",
+      "description": "Version comparisons: changed pages, title block changes and revision warnings."
+    },
+    "worksOverview": {
+      "name": "Open Work (ball in court)",
+      "description": "Open work items by category, breakdown by ball in court and overdue work items."
+    }
+  },
+  "defaults": {
+    "dashboardName": "New dashboard"
+  },
+  "entities": {
+    "template": "Template",
+    "dashboard": "Dashboard",
+    "version": "Version",
+    "query": "Query"
+  },
+  "errors": {
+    "htmlTooLarge": "The dashboard HTML can be at most {{kb}} KB.",
+    "changedMeanwhile": "The dashboard has changed in the meantime; reload the page and try again.",
+    "sharingOwnerOnly": "Only the dashboard's owner can change its sharing.",
+    "editOwnerOrAdmin": "Only the owner or a project administrator can change this dashboard.",
+    "datasetGone": "The '{{dataset}}' dataset no longer exists or you cannot use it; create the query again.",
+    "nothingToRepair": "This query is valid; there is nothing to repair.",
+    "aiNotConfigured": "AI is not configured.",
+    "aiNoAnswer": "The AI did not answer: {{error}}",
+    "aiRepairFailed": "The AI could not repair the query; fix it by hand in the Advanced section.",
+    "aiInvalidDashboard": "The AI could not produce a valid dashboard. Rephrase the request and try again.",
+    "invalidQuery": "Query '{{id}}': {{problems}}",
+    "queryProblem": "{{id}}: {{problems}}"
+  },
+  "messages": {
+    "invalidSavedQuery": "The saved query no longer fits the current data structure (a field may have been removed or renamed): {{problems}}"
+  },
+  "validation": {
+    "at": "{{where}}: {{problem}}",
+    "unknownField": "The '{{dataset}}' dataset has no '{{field}}' field (fields: {{fields}}).",
+    "unknownFieldSimilar": "The '{{dataset}}' dataset has no '{{field}}' field (similar field: '{{similar}}') (fields: {{fields}}).",
+    "unknownFieldBrief": "The '{{dataset}}' dataset has no '{{field}}' field.",
+    "unknownFieldSimilarBrief": "The '{{dataset}}' dataset has no '{{field}}' field (similar field: '{{similar}}').",
+    "inNeedsArray": "value must be an array for 'in'.",
+    "betweenNeedsPair": "value must be [low, high] for 'between'.",
+    "isNullNeedsBoolean": "value must be true/false for 'isNull'.",
+    "singleValue": "value must be a single value for '{{op}}' (use 'in' for an array).",
+    "valueMissing": "value is missing.",
+    "containsNeedsText": "'contains' works on text fields only.",
+    "notOnBoolean": "'{{op}}' cannot be used on a yes/no field.",
+    "bucketNeedsDate": "bucket works on date fields only ('{{field}}' is {{type}}).",
+    "fieldRequired": "field is required for '{{op}}'.",
+    "needsNumber": "'{{op}}' works on number fields only ('{{field}}' is {{type}}).",
+    "needsNumberOrDate": "'{{op}}' needs a number or date field.",
+    "duplicateOutput": "Duplicate output column: '{{column}}' (give metrics an 'as').",
+    "notAnOutput": "'{{field}}' is not an output column (available: {{outputs}}).",
+    "unknownDataset": "There is no '{{dataset}}' dataset (datasets: {{datasets}}).",
+    "adminOnly": "The '{{dataset}}' dataset is open to project administrators only."
+  },
+  "examples": {
+    "general": {
+      "openIssuesByCompany": "Open issues by company and priority breakdown",
+      "uploadsByCompany": "Which company uploaded how many files in the last 30 days? Show it weekly",
+      "lettersAwaitingReply": "Letters awaiting reply, by company, oldest first",
+      "openRfisByBallInCourt": "Open RFIs by ball in court and days open",
+      "reviewWaitingByCompany": "Which company kept reviews waiting how long?",
+      "failedFormItemsByLocation": "Failed form items by location"
+    },
+    "documents": {
+      "uploadsByCompany": "Files uploaded by company in the last 30 days, weekly",
+      "filesByState": "File count and size by ISO 19650 state"
+    },
+    "issues": {
+      "openByCompany": "Open issues and priority by company",
+      "overdueTable": "Table of overdue issues"
+    },
+    "works": {
+      "openByCategory": "Open work items by category and ball in court",
+      "overdueOldestFirst": "Overdue work items, oldest first"
+    },
+    "correspondence": {
+      "awaitingReply": "Letters awaiting reply, by company",
+      "monthlyInOut": "Monthly incoming and outgoing letters over the last 6 months",
+      "overdueTable": "Table of overdue letters"
+    },
+    "rfi": {
+      "openByBallInCourt": "Open RFIs by ball in court",
+      "byDiscipline": "RFIs and average days open by discipline"
+    },
+    "submittals": {
+      "outcomes": "Submittal outcome breakdown and revision counts",
+      "overdue": "Overdue submittal items"
+    },
+    "meetings": {
+      "openActionsByCompany": "Open actions by responsible company",
+      "overdueActions": "Overdue actions and their meetings"
+    },
+    "transmittals": {
+      "byRecipient": "Transmittals and receipt status by recipient company"
+    },
+    "reviews": {
+      "waitingByCompany": "Which company kept reviews waiting how long?",
+      "overdueSteps": "Running reviews with an overdue step"
+    },
+    "forms": {
+      "failedByLocation": "Failed items by location",
+      "weeklyByTemplate": "Forms per week by template"
+    },
+    "locations": {
+      "openByLocation": "Open forms and issues by location"
+    },
+    "schedule": {
+      "lateCritical": "Late critical activities",
+      "completionByWbs": "Average completion by top WBS"
+    },
+    "coordination": {
+      "byClassPair": "Open clashes by class pair",
+      "byCompany": "Open clashes by assigned company"
+    },
+    "doccompare": {
+      "withWarnings": "Comparisons with revision warnings",
+      "monthly": "Comparisons per month"
+    },
+    "spec": {
+      "bySection": "Submittal items by specification section",
+      "byKindDiscipline": "Item counts by type and discipline"
+    },
+    "models": {
+      "elementsByClass": "Element counts by class in the current IFC models"
+    },
+    "project": {
+      "downloadsByUser": "Who downloaded how many files in the last 30 days?",
+      "membersByCompany": "Project members by company"
+    }
+  }
+}

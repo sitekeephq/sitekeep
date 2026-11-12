@@ -1,0 +1,377 @@
+{
+  "clash": {
+    "penetration": "{{mm}} mm girme",
+    "side": "{{side}}: {{name}}",
+    "unnamed": "(adsız)",
+    "fields": {
+      "class": "Sınıf",
+      "storey": "Kat",
+      "system": "Sistem"
+    },
+    "title": "⚠ Çakışma",
+    "closeView": "Çakışma görünümünü kapat",
+    "options": {
+      "isolatePair": "Yalnız Bu İki Elemanı Göster"
+    },
+    "actions": {
+      "active": "Aktif",
+      "resolved": "Çözüldü",
+      "approve": "Onayla",
+      "createIssue": "Sorun Oluştur (bu görünümle)"
+    },
+    "approveHint": "Çakışma değil (onaylandı)",
+    "issueLink": "Sorun #{{number}} →",
+    "assignedCompany": "Atanan firma: {{company}}"
+  },
+  "issueLinks": {
+    "title": "Bağlı Dokümanlar",
+    "clashGroup": "Çakışma Grubu",
+    "clashGroupMeta": "Çakışma Grubu · {{file}} V{{version}}",
+    "markupMeta": "V{{version}} · sayfa {{page}} · işaretleme",
+    "versionMeta": "V{{version}} · versiyon"
+  },
+  "paramFile": {
+    "hint": "Bu modelin eleman bilgilerini değiştirme talepleri (yeni IFC versiyonu)",
+    "actions": {
+      "open": "✎ Parametre Değişiklikleri"
+    },
+    "lostHint_one": "Bu versiyonda önceki parametre değişikliklerinin {{count}} değeri yok.",
+    "lostHint_other": "Bu versiyonda önceki parametre değişikliklerinin {{count}} değeri yok.",
+    "lost": "⚠ Değerler Kayboldu: {{requests}}"
+  },
+  "setPanel": {
+    "closeSet": "Model setini kapat",
+    "modelCount_one": "{{count}} model",
+    "modelCount_other": "{{count}} model",
+    "coordination": "Koordinasyon",
+    "messages": {
+      "hiddenModel": "Görme yetkiniz olmayan bir model atlandı.",
+      "missingFile": "Setteki bir dosya/versiyon artık yok.",
+      "derivative": "{{file}}: görüntüleme dönüşümü {{status}}."
+    },
+    "views": "Görünümler",
+    "noViews": "Kayıtlı görünüm yok.",
+    "ruleCount_one": "{{count}} kural",
+    "ruleCount_other": "{{count}} kural",
+    "modelsOff_one": "{{count}} model kapalı",
+    "modelsOff_other": "{{count}} model kapalı",
+    "actions": {
+      "saveView": "+ Görünümü Sete Kaydet"
+    }
+  },
+  "saveView": {
+    "title": "Görünümü Kaydet",
+    "placeholder": "ör. Mekanik — kanallar kırmızı",
+    "hint": "Kamera konumu, kapalı modeller ({{n}}), kesitler ve ölçüler kaydedilir. Sınıf kurallarıyla elemanları gizleyebilir, yalnız gösterebilir veya renklendirebilirsiniz.",
+    "columns": {
+      "classes": "IFC Sınıfları (virgülle)",
+      "action": "İşlem",
+      "colour": "Renk"
+    },
+    "options": {
+      "color": "Renklendir",
+      "hide": "Gizle",
+      "isolate": "Yalnız Bunlar"
+    },
+    "actions": {
+      "addRule": "+ Kural",
+      "preview": "Önizle"
+    }
+  },
+  "bcfExport": {
+    "title": "BCF Olarak Dışa Aktar",
+    "descriptionSelected_one": "Seçili {{count}} sorun yorumları, görünümleri (kamera, seçim, görünürlük, renk, kesit) ve görüntüleriyle bir .bcfzip dosyasına yazılır. Koordinatlar IFC dünya koordinatıdır (metre, Z yukarı).",
+    "descriptionSelected_other": "Seçili {{count}} sorun yorumları, görünümleri (kamera, seçim, görünürlük, renk, kesit) ve görüntüleriyle bir .bcfzip dosyasına yazılır. Koordinatlar IFC dünya koordinatıdır (metre, Z yukarı).",
+    "descriptionList_one": "Listedeki {{count}} sorun yorumları, görünümleri (kamera, seçim, görünürlük, renk, kesit) ve görüntüleriyle bir .bcfzip dosyasına yazılır. Koordinatlar IFC dünya koordinatıdır (metre, Z yukarı).",
+    "descriptionList_other": "Listedeki {{count}} sorun yorumları, görünümleri (kamera, seçim, görünürlük, renk, kesit) ve görüntüleriyle bir .bcfzip dosyasına yazılır. Koordinatlar IFC dünya koordinatıdır (metre, Z yukarı).",
+    "options": {
+      "v21": "BCF 2.1 (En Uyumlu)"
+    },
+    "v21Hint": "Navisworks, Revit eklentileri, BIMcollab ZOOM ve Solibri ile. Görüş açısı 45–60° aralığına çekilir.",
+    "messages": {
+      "downloaded": "Dosya indirildi."
+    },
+    "status": {
+      "preparing": "Hazırlanıyor…"
+    },
+    "actions": {
+      "export": "Dışa Aktar"
+    }
+  },
+  "bcfImport": {
+    "title": "BCF İçe Aktar",
+    "result": "{{created}} yeni, {{updated}} güncellenen, {{unchanged}} değişmeyen sorun{{skipped}}. {{comments}} yorum ve {{viewpoints}} görünüm eklendi.",
+    "resultSkipped_one": "; {{count}} sorunun alanları korundu",
+    "resultSkipped_other": "; {{count}} sorunun alanları korundu",
+    "hint": "BCF 2.0, 2.1 ya da 3.0 dosyası (.bcfzip). Sorunlar GUID'leriyle eşlenir: aynı dosyayı yeniden içe aktarmak kopya oluşturmaz, yalnız yeni yorum ve görünümleri ekler.",
+    "status": {
+      "reading": "Dosya okunuyor…",
+      "importing": "İçe Aktarılıyor…"
+    },
+    "summary_one": "BCF {{version}} · {{count}} sorun: {{states}}",
+    "summary_other": "BCF {{version}} · {{count}} sorun: {{states}}",
+    "summaryWithProject_one": "BCF {{version}} · {{project}} · {{count}} sorun: {{states}}",
+    "summaryWithProject_other": "BCF {{version}} · {{project}} · {{count}} sorun: {{states}}",
+    "stateCount_one": "{{count}} {{state}}",
+    "stateCount_other": "{{count}} {{state}}",
+    "columns": {
+      "title": "Başlık",
+      "status": "Durum",
+      "import": "İçe Aktarma",
+      "commentsViews": "Yorum / Görünüm"
+    },
+    "importTopic": "Bu Sorunu İçe Aktar",
+    "warningCount_one": "{{count}} uyarı",
+    "warningCount_other": "{{count}} uyarı",
+    "commentsOnly": "Yalnız yorumlar",
+    "mapping": {
+      "title": "Eşleme",
+      "status": "Durum: {{value}} ({{n}})",
+      "priority": "Öncelik: {{value}} ({{n}})",
+      "type": "Tür: {{value}} ({{n}})",
+      "person": "Kişi: {{value}} ({{n}})",
+      "model": "Model: {{value}} ({{n}})",
+      "noType": "Türsüz",
+      "unmatched": "Eşleşmeyen",
+      "notLinked": "Bağlanmadı",
+      "hint": "Eşleşmeyen kişiler sorunda atanmamış kalır; dosyadaki e-posta saklanır ve dışa aktarırken geri yazılır. Bağlanmayan modellerin görünümleri modelsiz açılır."
+    },
+    "conflicts_one": "{{count}} sorun hem burada hem dosyada değişmiş (uyuşmazlık):",
+    "conflicts_other": "{{count}} sorun hem burada hem dosyada değişmiş (uyuşmazlık):",
+    "options": {
+      "keep": "Buradaki Değişiklikleri Koru",
+      "overwrite": "Dosyadaki Değerleri Uygula"
+    },
+    "actions": {
+      "import": "İçe Aktar",
+      "importCount": "İçe Aktar ({{n}})"
+    }
+  },
+  "issues": {
+    "title": "Sorunlar",
+    "options": {
+      "allStatuses": "Tüm Durumlar"
+    },
+    "actions": {
+      "newInModel": "Modelde Yeni Sorun",
+      "report": "Rapor",
+      "exportBcfCount": "BCF Olarak Dışa Aktar ({{n}})"
+    },
+    "empty": "Henüz sorun yok. \"+ Yeni\" ile ya da Model → Görüntüleyici'de \"📍 Noktadan Sorun\" ile oluşturun.",
+    "columns": {
+      "number": "No",
+      "title": "Başlık",
+      "status": "Durum",
+      "priority": "Öncelik",
+      "assignee": "Atanan",
+      "due": "Termin",
+      "updated": "Güncelleme"
+    },
+    "selectIssue": "Sorunu Seç"
+  },
+  "issue": {
+    "viewpoint": "Görünüm",
+    "viewpointN": "Görünüm {{n}}",
+    "actions": {
+      "openInModel": "🧊 Modelde Görünümü Aç"
+    },
+    "importedFrom": "BCF {{version}} dosyasından içe aktarıldı",
+    "importedFromFile": "BCF {{version}} dosyasından içe aktarıldı ({{file}})",
+    "assignedInFile": "Dosyada atanan: {{name}}",
+    "editHint": "Durumu oluşturan kişi, atanan kişi veya proje yöneticisi değiştirebilir.",
+    "comments": "Yorumlar",
+    "noComments": "Henüz yorum yok.",
+    "commentPlaceholder": "Yorum yazın…"
+  },
+  "paramChanges": {
+    "title": "Parametre Değişiklikleri",
+    "description": "Elemanların bilgi parametrelerini (özellik setleri) CDE'de değiştirip yeni IFC versiyonu üretir. Geometri değişmez; geometri değişiklikleri Revit'te yapılır.",
+    "options": {
+      "open": "Açık Talepler"
+    },
+    "actions": {
+      "new": "+ Yeni Değişiklik Talebi"
+    },
+    "fileFilter": "Dosya: {{file}}",
+    "selectedIfc": "seçili IFC",
+    "removeFileFilter": "Dosya filtresini kaldır",
+    "empty": "Talep yok. Bir IFC modelinde eleman bilgilerini değiştirmek için “+ Yeni Değişiklik Talebi”.",
+    "columns": {
+      "number": "No",
+      "title": "Başlık",
+      "file": "Dosya",
+      "status": "Durum",
+      "elements": "Eleman",
+      "date": "Tarih"
+    }
+  },
+  "run": {
+    "queued": "Kuyrukta",
+    "running": "Çalışıyor",
+    "done": "Tamamlandı",
+    "failed": "Hata"
+  },
+  "page": {
+    "title": "Koordinasyon",
+    "tabs": {
+      "sets": "Model Setleri",
+      "tests": "Çakışma Testleri",
+      "ids": "Bilgi Gereksinimi Kontrolleri"
+    }
+  },
+  "sets": {
+    "description": "Model seti, birlikte açılan IFC dosyalarıdır (birleşik model). Her dosya için son versiyon veya sabit bir versiyon seçilir; görünümler (kamera, kapalı modeller, sınıf renkleri) sete kaydedilir.",
+    "actions": {
+      "new": "+ Yeni Model Seti",
+      "openInViewer": "Görüntüleyicide Aç"
+    },
+    "columns": {
+      "name": "Ad",
+      "models": "Modeller",
+      "views": "Görünümler",
+      "createdBy": "Oluşturan"
+    },
+    "hiddenModel": "(yetkiniz olmayan model)",
+    "missingFile": "eksik dosya",
+    "pinnedVersion": "V{{version}} (sabit)",
+    "latestVersion": "son (V{{version}})",
+    "deleteTitle": "Model Setini Sil",
+    "deleteConfirm": "\"{{name}}\" silinsin mi?",
+    "empty": "Henüz model seti yok."
+  },
+  "setDialog": {
+    "editTitle": "Model Setini Düzenle",
+    "newTitle": "Yeni Model Seti",
+    "namePlaceholder": "ör. Blok A — tüm disiplinler",
+    "fields": {
+      "ifcFiles": "IFC Dosyaları"
+    },
+    "noIfc": "Projede IFC dosyası yok.",
+    "options": {
+      "latest": "Son Versiyon (V{{version}})",
+      "pinned": "V{{version}} Sabit · {{date}}"
+    }
+  },
+  "tests": {
+    "allModels": "tüm modeller",
+    "allElements": "tüm elemanlar",
+    "description": "Sunucuda, IFC geometrisiyle deterministik çakışma testi: sert (kesişme) veya boşluk (mesafe < tolerans). Tekrar çalıştırıldığında aynı eleman çifti aynı kimliği alır; durumlar korunur, kalkan çakışmalar \"Çözüldü\" olur.",
+    "needSet": "Önce bir model seti oluşturun",
+    "actions": {
+      "new": "+ Yeni Çakışma Testi",
+      "run": "▶ Çalıştır"
+    },
+    "columns": {
+      "test": "Test",
+      "type": "Tür",
+      "lastRun": "Son Çalıştırma",
+      "clashes": "Çakışmalar"
+    },
+    "hard": "Sert",
+    "clearance": "Boşluk",
+    "runStats": "{{seconds}} sn · {{a}}×{{b}} eleman",
+    "notRun": "Çalıştırılmadı",
+    "status": {
+      "running": "Çalışıyor…"
+    },
+    "deleteTitle": "Çakışma Testini Sil",
+    "deleteConfirm": "\"{{name}}\" ve sonuçları silinsin mi?",
+    "empty": "Henüz çakışma testi yok.",
+    "typeTolerance": "{{type}} · {{mm}} mm"
+  },
+  "results": {
+    "statuses": "Durumlar",
+    "groups": "Gruplar ({{n}})",
+    "choose": "Seçin…"
+  },
+  "ids": {
+    "description": "Bilgi gereksinimi kontrolü, modelin istenen bilgileri taşıyıp taşımadığını denetler. IDS (Information Delivery Specification) dosyasını projeye normal bir dosya olarak yükleyin, sonra bir IFC versiyonuna karşı çalıştırın. Desteklenen alt küme: sınıf (entity), öznitelik ve özellik fasetleri; sınıflandırma, malzeme ve partOf fasetleri raporda \"değerlendirilmedi\" olarak belirtilir.",
+    "fields": {
+      "idsFile": "IDS Dosyası",
+      "ifcVersion": "IFC Versiyonu"
+    },
+    "versionLatest": "{{file}} V{{version}} (son)",
+    "actions": {
+      "check": "Kontrol Et",
+      "downloadCsv": "CSV İndir"
+    },
+    "columns": {
+      "status": "Durum",
+      "result": "Sonuç",
+      "date": "Tarih",
+      "spec": "Spesifikasyon",
+      "applicable": "Uygulanabilir",
+      "passed": "Geçen",
+      "failed": "Kalan",
+      "class": "Sınıf",
+      "name": "Ad",
+      "reason": "Neden"
+    },
+    "passedN": "Geçti {{n}}",
+    "failedN": "Kaldı {{n}}",
+    "skippedN": "Atlandı {{n}}",
+    "empty": "Henüz bilgi gereksinimi kontrolü yok.",
+    "status": {
+      "pass": "Geçti",
+      "fail": "Kaldı",
+      "skipped": "Atlandı"
+    },
+    "back": "← Bilgi Gereksinimi Kontrolleri",
+    "specCount": "{{n}} spesifikasyon",
+    "elementsChecked": "{{n}} nesne incelendi",
+    "truncated": "Liste ilk {{n}} elemanla sınırlandı; sayılar tüm elemanları kapsar."
+  },
+  "viewer": {
+    "errors": {
+      "init": "Görüntüleyici başlatılamadı: {{error}}",
+      "view": "Görünüm uygulanamadı: {{error}}",
+      "clash": "Çakışma gösterilemedi: {{error}}",
+      "clashElementMissing": "Çakışan elemanlardan biri modelde bulunamadı (versiyon değişmiş olabilir).",
+      "selectMissing": "İstenen elemanlar açık modellerde bulunamadı.",
+      "compareColours": "Karşılaştırma renkleri uygulanamadı: {{error}}"
+    },
+    "status": {
+      "loadingModel": "Model yükleniyor…",
+      "comparing": "Karşılaştırma hesaplanıyor…",
+      "pickPin": "Sorunun konumu için modelde bir noktaya tıklayın (Esc: vazgeç)"
+    },
+    "models": "Modeller",
+    "selectedCount": "{{n}} seçili",
+    "selectHint": "Bir veya birden fazla seçin",
+    "noModels": "Görüntülenebilir IFC dosyası yok. Dokümanlar'dan IFC yükleyin.",
+    "issues": "Sorunlar",
+    "actions": {
+      "models": "☰ Modeller",
+      "modelsCount": "☰ Modeller ({{n}})",
+      "fit": "⤢ Sığdır",
+      "pinIssue": "📍 Noktadan Sorun",
+      "viewIssue": "+ Görünümden Sorun",
+      "fourD": "🗓 Takvim",
+      "ask": "✦ Modele Sor"
+    },
+    "fourDHint": "İş programına göre renklendir (4D)",
+    "askHint": "Modele soru sorun: liste, sayı, m², rapor",
+    "emptyWide": "Soldan bir veya birden fazla model seçin.",
+    "emptyNarrow": "Modeller düğmesinden bir veya birden fazla model seçin.",
+    "compareHint": "Bu dosyanın iki versiyonunu karşılaştır"
+  },
+  "newIssue": {
+    "title": "Yeni Sorun",
+    "created": "Sorun #{{number}} oluşturuldu.",
+    "types": {
+      "coordination": "Koordinasyon",
+      "design": "Tasarım",
+      "site": "Saha",
+      "quality": "Kalite",
+      "ohs": "İSG",
+      "other": "Diğer"
+    },
+    "viewpoint": "Görünüm",
+    "capturing": "Görüntü alınıyor…",
+    "saved": "Kamera, açık modeller kaydedilir.",
+    "savedWithSelection": "Kamera, açık modeller ve {{n}} seçili eleman kaydedilir.",
+    "pinAdded": "Pin konumu eklendi.",
+    "sectionsSaved": "Kesitler de kaydedilir.",
+    "measurementsSaved": "{{n}} ölçü de kaydedilir."
+  }
+}

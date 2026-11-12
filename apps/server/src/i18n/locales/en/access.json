@@ -1,0 +1,18 @@
+{
+  "entities": {
+    "member": "Member",
+    "folder": "Folder",
+    "areaFolder": "Area folder",
+    "role": "Role",
+    "file": "File",
+    "company": "Company"
+  },
+  "errors": {
+    "roleInUseTemplates": "The role \"{{name}}\" is in use: templates: {{templates}}. Remove the role from these steps first.",
+    "roleInUseRunning_one": "The role \"{{name}}\" is in use: {{count}} running workflow. Remove the role from these steps first.",
+    "roleInUseRunning_other": "The role \"{{name}}\" is in use: {{count}} running workflows. Remove the role from these steps first.",
+    "roleInUseBoth_one": "The role \"{{name}}\" is in use: templates: {{templates}}; {{count}} running workflow. Remove the role from these steps first.",
+    "roleInUseBoth_other": "The role \"{{name}}\" is in use: templates: {{templates}}; {{count}} running workflows. Remove the role from these steps first.",
+    "areaFolderIsRoot": "A company's own area cannot be the root folder; choose a subfolder."
+  }
+}

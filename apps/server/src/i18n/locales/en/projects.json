@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "project": "Project",
+    "userCreateFirst": "User (a system administrator must create the user first)",
+    "role": "Role",
+    "member": "Member",
+    "template": "Template",
+    "namedFolder": "Folder \"{{name}}\""
+  },
+  "errors": {
+    "createAdminOnly": "You must be a system administrator to create a Project.",
+    "deleteAdminOnly": "You must be a system administrator to delete a Project.",
+    "cannotRemoveSelf": "You cannot remove yourself from the Project.",
+    "codeTaken": "Project code \"{{code}}\" is already in use.",
+    "templateRequired": "templateId or template is required.",
+    "invalidFolderName": "Invalid folder name: \"{{name}}\".",
+    "roleNotInTemplate": "Role \"{{key}}\" is not in the Template.",
+    "companyNotFound": "One of the selected companies was not found."
+  },
+  "warnings": {
+    "rolesWithoutCompany": "Roles without a company: {{roles}}. Folder permissions and workflow steps of these roles are skipped; they can be added manually later.",
+    "attributeRuleWithoutCompany": "Step \"{{step}}\" of workflow \"{{workflow}}\" has no company for attribute-based assignment; the rule was skipped.",
+    "stepWithoutCompany": "Step \"{{step}}\" of workflow \"{{workflow}}\" has no company; the step will be assigned to the project administrators.",
+    "copyFolderMissing": "\"{{workflow}}\": copy target folder \"{{folder}}\" is not in the Template; the target folder will be left empty."
+  },
+  "export": {
+    "name": "{{name}} (template)",
+    "description": "Structure of the {{code}} Project; exported on {{date}}. Contains no files or records.",
+    "skippedGrants_one": "{{count}} person-based folder permission was not included in the Template (the Template only has company roles).",
+    "skippedGrants_other": "{{count}} person-based folder permissions were not included in the Template (the Template only has company roles).",
+    "droppedAssignees_one": "{{count}} person- or team-based workflow assignment was not included in the Template.",
+    "droppedAssignees_other": "{{count}} person- or team-based workflow assignments were not included in the Template.",
+    "lostCopyFolders_one": "The copy target folder of {{count}} workflow was not found; the target folder is empty in the Template.",
+    "lostCopyFolders_other": "The copy target folder of {{count}} workflows was not found; the target folder is empty in the Template."
+  }
+}

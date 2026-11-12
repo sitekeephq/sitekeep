@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "schedule": "İş programı",
+    "modelVersion": "Model versiyonu",
+    "model": "Model"
+  },
+  "errors": {
+    "plannerOnly": "4D / 5D kurallarını ve birim fiyatları yalnızca proje yöneticisi (planlama yetkisi) değiştirebilir.",
+    "ruleNeedsCondition": "Kuralda en az bir koşul olmalı (kat, sınıf, özellik veya ad).",
+    "activityNotInSchedule": "\"{{code}}\" kodlu faaliyet bu iş programında yok.",
+    "multipartExpected": "multipart/form-data bekleniyor.",
+    "noFile": "Dosya gönderilmedi.",
+    "notIfc": "{{name}} bir IFC dosyası değil.",
+    "indexUpgradeFailed": "Model indeksi yeni biçime çevrilemedi; dosyayı yeniden yüklemeyi deneyin.",
+    "indexUpgrading": "Model indeksi güncelleniyor (kat ve özellik bilgisi ekleniyor). Biraz sonra tekrar deneyin.",
+    "datasetUnavailable": "Maliyet veri kümesi hazır değil."
+  },
+  "import": {
+    "fields": {
+      "code": "Poz No",
+      "description": "Tanım",
+      "unit": "Birim",
+      "unitPrice": "Birim Fiyat",
+      "category": "Kategori",
+      "currency": "Para Birimi",
+      "pozCode": "Resmi Poz Kodu"
+    },
+    "unsupportedFormat": "Desteklenen biçimler: XLSX, XLS, ODS, CSV.",
+    "unreadable": "Dosya okunamadı: {{reason}}",
+    "noTable": "Dosyada tablo bulunamadı.",
+    "columnFallback": "Sütun {{n}}",
+    "columnRequired": "\"{{column}}\" sütunu seçilmeli.",
+    "unknownUnit": "Satır {{line}}: \"{{unit}}\" birimi tanınmadı (m, m², m³, adet, kg, ton).",
+    "duplicateCode": "Satır {{line}}: \"{{code}}\" iki kez var; sonuncusu alındı."
+  },
+  "warnings": {
+    "oldIndex": "Model indeksi eski biçimde; kat ve özellik bilgisi yok.",
+    "targetNotFound": "\"{{target}}\" bulunamadı; kural uygulanmaz.",
+    "noTarget": "Kuralın hedefi yok.",
+    "noMatches": "Kurala uyan eleman yok."
+  },
+  "groups": {
+    "noStorey": "Kat Yok",
+    "noCategory": "Kategorisiz",
+    "noActivity": "Faaliyete Bağlı Değil"
+  },
+  "suggest": {
+    "noElements": "Modelde {{words}} elemanı yok.",
+    "noElementsOnStorey": "{{storey}} katında {{words}} elemanı yok.",
+    "reasonStorey": "Adındaki \"{{words}}\" → {{classes}}; kat: {{storey}}.",
+    "reasonAllStoreys": "Adındaki \"{{words}}\" → {{classes}}; kat adı yok, tüm katlar.",
+    "reasonBaseSlabStorey": "Adındaki \"{{words}}\" → {{classes}} (temel döşemesi); kat: {{storey}}.",
+    "reasonBaseSlabAllStoreys": "Adındaki \"{{words}}\" → {{classes}} (temel döşemesi); kat adı yok, tüm katlar.",
+    "propertyCode_one": "\"{{key}}\" özelliğinin değerleri {{count}} faaliyetin koduyla eşleşiyor.",
+    "propertyCode_other": "\"{{key}}\" özelliğinin değerleri {{count}} faaliyetin koduyla eşleşiyor.",
+    "propertyWbs_one": "\"{{key}}\" özelliğinin değerleri {{count}} faaliyetin iş kırılımıyla eşleşiyor.",
+    "propertyWbs_other": "\"{{key}}\" özelliğinin değerleri {{count}} faaliyetin iş kırılımıyla eşleşiyor."
+  },
+  "poz": {
+    "reason": {
+      "memory1": "Daha önce aynı sınıf, tip ve malzeme için {{count}} kez onaylandı.",
+      "memory2": "Daha önce aynı tip için {{count}} kez onaylandı.",
+      "memory3": "Daha önce aynı malzeme için {{count}} kez onaylandı.",
+      "memory4": "Daha önce bu sınıf için {{count}} kez onaylandı.",
+      "keywords": "Tanımda eşleşen sözcükler: {{words}}.",
+      "ai": "Yapay zekâ: {{reason}}",
+      "aiPlain": "Yapay zekâ bu pozu seçti."
+    },
+    "unmatched": {
+      "noItem": "Birim fiyat listesinde uygun poz bulunamadı.",
+      "inexact": "Bu grup tek bir kuralla ayrılamıyor (aynı sınıfta tipi veya malzemesi olmayan başka elemanlar var)."
+    },
+    "errors": {
+      "aiInvalid": "Yapay zekâ yanıtı okunamadı; anahtar sözcük önerileri gösteriliyor.",
+      "otherProject": "Bu eşleme başka bir projede öğrenildi; yalnızca sistem yöneticisi silebilir."
+    }
+  }
+}

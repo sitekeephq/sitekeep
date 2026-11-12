@@ -1,0 +1,80 @@
+{
+  "page": {
+    "badges": {
+      "baseline": "Baseline"
+    },
+    "actions": {
+      "import": "Import",
+      "more": "Actions",
+      "compare": "Compare",
+      "summary": "Summary",
+      "sCurve": "S-Curve",
+      "sim4d": "4D Simulation",
+      "cost": "Cost (5D)",
+      "makeBaseline": "Make Baseline"
+    },
+    "costHint": "Unit rates, cost rules, cash flow",
+    "empty": "There is no schedule in this project yet. A project administrator can import one."
+  },
+  "view": {
+    "actions": {
+      "today": "Today"
+    }
+  },
+  "drawer": {
+    "actions": {
+      "showInModel": "Show in Model"
+    }
+  },
+  "import": {
+    "title": "Import Schedule",
+    "description": "MS Project XML (.xml), Primavera P6 (.xer), Excel (.xlsx) or CSV. A new edition of the same schedule becomes a new version of the selected schedule; the first version is treated as the baseline.",
+    "stats": "{{activities}} activities · {{summaries}} WBS summaries · {{dependencies}} dependencies",
+    "mappingHeading": "Column Mapping",
+    "previewHeading": "Preview",
+    "options": {
+      "none": "— none —",
+      "newSchedule": "New Schedule",
+      "newVersion": "{{name}} — new version (v{{version}})",
+      "makeBaseline": "Make This Version the Baseline"
+    },
+    "actions": {
+      "basicFields": "Basic Fields Only",
+      "otherFields": "Other Fields (WBS, baseline, actual, critical, resource…)"
+    },
+    "warnings_one": "{{count}} Warning",
+    "warnings_other": "{{count}} Warnings",
+    "fields": {
+      "target": "Target",
+      "name": "Schedule Name",
+      "dataDate": "Data Date"
+    }
+  },
+  "compare": {
+    "title": "Version Comparison — {{name}} v{{version}}",
+    "fields": {
+      "from": "Compared With"
+    },
+    "empty": "There is no other version to compare with.",
+    "projectFinish": "Project Finish {{days}} days",
+    "slipped_one": "{{count}} slipped",
+    "slipped_other": "{{count}} slipped",
+    "improved_one": "{{count}} brought forward",
+    "improved_other": "{{count}} brought forward",
+    "becameCritical_one": "{{count}} became critical",
+    "becameCritical_other": "{{count}} became critical",
+    "addedRemoved": "{{added}} added · {{removed}} removed",
+    "columns": {
+      "fromFinish": "Previous Finish",
+      "toFinish": "New Finish",
+      "startSlip": "Start Slip",
+      "finishSlip": "Finish Slip"
+    },
+    "critical": "critical",
+    "becameCriticalList": "Became critical:",
+    "noLongerCriticalList": "No longer critical:"
+  },
+  "summary": {
+    "title": "Status Summary — {{name}} v{{version}}"
+  }
+}

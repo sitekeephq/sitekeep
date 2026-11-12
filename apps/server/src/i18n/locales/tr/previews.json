@@ -1,0 +1,30 @@
+{
+  "errors": {
+    "adminOnly": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
+    "notForFile": "Bu dosya için bu önizleme yapılamaz.",
+    "notReady": "Önizleme hazır değil ({{status}}).",
+    "noFile": "Önizleme dosyası yok.",
+    "pdfNotReady": "PDF önizleme hazır değil ({{status}}).",
+    "unsupportedType": "Bu dosya türü tarayıcıda gösterilemez."
+  },
+  "entities": {
+    "preview": "Önizleme",
+    "pdfPreview": "PDF önizleme"
+  },
+  "status": {
+    "none": "yok"
+  },
+  "converter": {
+    "sofficeHint": "Bu sunucuda yerel soffice yok (isteğe bağlı, son çare dönüştürücü). Ofis dosyaları tarayıcıda yine açılır. Birebir PDF için yönetici Yönetim → Office Entegrasyonu'ndan ONLYOFFICE, Collabora ya da Gotenberg bağlayabilir (docs/features/OFIS_ENTEGRASYONU.md).",
+    "dwg2dxfHint": "Sunucuda LibreDWG (dwg2dxf) bulunamadı. Yönetici: LibreDWG kurun ya da CDE_DWG2DXF_PATH ile yolu verin (docs/features/GORUNTULEYICILER.md).",
+    "timeout": "Dönüşüm zaman aşımına uğradı.",
+    "libreofficeFailed": "LibreOffice PDF üretemedi (kod {{code}}). {{detail}}",
+    "dwgFailed": "DWG dönüştürülemedi (kod {{code}}). {{detail}}"
+  },
+  "jobs": {
+    "timeout": "Önizleme hazırlığı zaman aşımına uğradı.",
+    "workerExit": "Önizleme işlemi {{code}} koduyla bitti.",
+    "dxfFirst": "Önce DXF önizlemesi hazırlanmalı.",
+    "nothingToShow": "Bu çizimde gösterilecek nesne yok."
+  }
+}

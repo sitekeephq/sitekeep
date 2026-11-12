@@ -1,0 +1,46 @@
+  0
+SECTION
+  2
+HEADER
+  9
+$ACADVER
+  1
+AC1015
+  9
+$DWGCODEPAGE
+  3
+ANSI_1254
+  0
+ENDSEC
+  0
+SECTION
+  2
+ENTITIES
+  0
+TEXT
+  8
+YAZI
+ 10
+0
+ 20
+0
+ 40
+2.5
+  1
+E2E DXF
+  0
+LINE
+  8
+0
+ 10
+0
+ 20
+0
+ 11
+20
+ 21
+10
+  0
+ENDSEC
+  0
+EOF

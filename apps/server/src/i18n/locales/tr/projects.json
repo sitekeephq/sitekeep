@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "project": "Proje",
+    "userCreateFirst": "Kullanıcı (önce sistem yöneticisi kullanıcıyı oluşturmalı)",
+    "role": "Rol",
+    "member": "Üye",
+    "template": "Şablon",
+    "namedFolder": "\"{{name}}\" klasörü"
+  },
+  "errors": {
+    "createAdminOnly": "Proje oluşturmak için sistem yöneticisi olmalısınız.",
+    "deleteAdminOnly": "Projeyi silmek için sistem yöneticisi olmalısınız.",
+    "cannotRemoveSelf": "Kendinizi projeden çıkaramazsınız.",
+    "codeTaken": "\"{{code}}\" proje kodu zaten kullanılıyor.",
+    "templateRequired": "templateId veya template gerekli.",
+    "invalidFolderName": "Geçersiz klasör adı: \"{{name}}\".",
+    "roleNotInTemplate": "\"{{key}}\" rolü şablonda yok.",
+    "companyNotFound": "Seçilen firmalardan biri bulunamadı."
+  },
+  "warnings": {
+    "rolesWithoutCompany": "Firma atanmamış roller: {{roles}}. Bu rollerin klasör yetkileri ve akış adımları atlanır; sonradan elle eklenebilir.",
+    "attributeRuleWithoutCompany": "\"{{workflow}}\" akışının \"{{step}}\" adımında özniteliğe göre atamanın firması yok; kural atlandı.",
+    "stepWithoutCompany": "\"{{workflow}}\" akışının \"{{step}}\" adımında firma yok; adım proje yöneticilerine atanacak.",
+    "copyFolderMissing": "\"{{workflow}}\": kopya hedef klasörü \"{{folder}}\" şablonda yok; hedef klasör boş bırakılacak."
+  },
+  "export": {
+    "name": "{{name}} (şablon)",
+    "description": "{{code}} projesinin yapısı; {{date}} tarihinde dışa aktarıldı. Dosya ve kayıt içermez.",
+    "skippedGrants_one": "{{count}} kişi bazlı klasör yetkisi şablona alınmadı (şablonda yalnız firma rolleri var).",
+    "skippedGrants_other": "{{count}} kişi bazlı klasör yetkisi şablona alınmadı (şablonda yalnız firma rolleri var).",
+    "droppedAssignees_one": "{{count}} kişi veya ekip bazlı akış ataması şablona alınmadı.",
+    "droppedAssignees_other": "{{count}} kişi veya ekip bazlı akış ataması şablona alınmadı.",
+    "lostCopyFolders_one": "{{count}} akışın kopya hedef klasörü bulunamadı; şablonda hedef klasör boş.",
+    "lostCopyFolders_other": "{{count}} akışın kopya hedef klasörü bulunamadı; şablonda hedef klasör boş."
+  }
+}

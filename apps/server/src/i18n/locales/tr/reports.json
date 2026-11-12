@@ -1,0 +1,842 @@
+{
+  "datasets": {
+    "files": {
+      "label": "Dosyalar",
+      "description": "Görüntüleyebildiğiniz klasörlerdeki dosyalar (her dosya bir satır, güncel versiyon bilgisiyle).",
+      "fields": {
+        "id": "Dosya Kimliği",
+        "name": "Dosya Adı",
+        "extension": "Uzantı",
+        "folder": "Klasör",
+        "folderPath": "Klasör Yolu",
+        "folderState": "ISO 19650 Durumu",
+        "currentVersion": "Güncel Versiyon No",
+        "size": "Boyut (bayt)",
+        "uploader": "Son Yükleyen",
+        "uploaderCompany": "Son Yükleyenin Firması",
+        "uploadedAt": "Son Yükleme Tarihi",
+        "createdBy": "İlk Yükleyen",
+        "createdAt": "İlk Yükleme Tarihi"
+      },
+      "hints": {
+        "extension": "küçük harf, nokta olmadan: pdf, ifc, dwg",
+        "folderPath": "kök klasör hariç, ' / ' ile ayrılmış",
+        "size": "güncel versiyonun boyutu"
+      },
+      "dynamicDescription": "Dosya öznitelikleri, ör. attributes.Durum, attributes.Revizyon, attributes.Disiplin"
+    },
+    "versions": {
+      "label": "Versiyonlar",
+      "description": "Görüntüleyebildiğiniz dosyaların tüm versiyonları (her yükleme bir satır). Yükleme aktivitesi için kullanın.",
+      "fields": {
+        "fileId": "Dosya Kimliği",
+        "file": "Dosya Adı",
+        "extension": "Uzantı",
+        "folderPath": "Klasör Yolu",
+        "folderState": "ISO 19650 Durumu",
+        "version": "Versiyon No",
+        "isLatest": "Güncel Versiyon mu",
+        "uploader": "Yükleyen",
+        "uploaderCompany": "Yükleyenin Firması",
+        "uploadedAt": "Yükleme Tarihi",
+        "size": "Boyut (bayt)",
+        "derivativeStatus": "Model Dönüşüm Durumu"
+      }
+    },
+    "issues": {
+      "label": "Sorunlar",
+      "description": "Projedeki sorunlar (her sorun bir satır).",
+      "fields": {
+        "number": "No",
+        "title": "Başlık",
+        "status": "Durum",
+        "isOpen": "Açık mı",
+        "priority": "Öncelik",
+        "type": "Tip",
+        "assignee": "Atanan Kişi",
+        "assigneeCompany": "Atanan Firma",
+        "createdBy": "Oluşturan",
+        "createdByCompany": "Oluşturanın Firması",
+        "dueDate": "Termin",
+        "createdAt": "Oluşturma Tarihi",
+        "updatedAt": "Güncelleme Tarihi",
+        "overdue": "Termini Geçti mi",
+        "daysOverdue": "Gecikme (gün)"
+      },
+      "hints": {
+        "isOpen": "durum 'closed' değilse true",
+        "assigneeCompany": "atanan firma veya atanan kişinin firması",
+        "dueDate": "YYYY-MM-DD",
+        "overdue": "termin bugünden önce ve sorun kapalı değil",
+        "daysOverdue": "termini geçmişse kaç gün; değilse null"
+      }
+    },
+    "activity": {
+      "label": "Aktivite Kaydı",
+      "description": "Projedeki denetim kaydı: yüklemeler, indirmeler, sorun ve yetki değişiklikleri. Yalnızca proje yöneticileri.",
+      "fields": {
+        "targetType": "Hedef Tipi",
+        "user": "Kullanıcı",
+        "userCompany": "Kullanıcının Firması",
+        "at": "Zaman",
+        "action": "İşlem"
+      },
+      "hints": {
+        "targetType": "file, folder, issue, user, dashboard",
+        "action": "ör. file.uploaded, file.version_added, file.downloaded, file.deleted, issue.created, issue.updated, issue.commented, folder.permissions_set, member.added, report.saved"
+      }
+    },
+    "members": {
+      "label": "Proje Üyeleri",
+      "description": "Proje üyeleri ve firmaları.",
+      "fields": {
+        "name": "Ad",
+        "company": "Firma",
+        "projectAdmin": "Proje Yöneticisi mi"
+      }
+    },
+    "models": {
+      "label": "Modeller (IFC)",
+      "description": "Görüntüleyebildiğiniz IFC versiyonları; her IFC sınıfı ayrı satır (ifcClass, classCount). Sınıf dağılımı için sum(classCount) kullanın; elementCount her satırda tekrar eder.",
+      "fields": {
+        "fileId": "Dosya Kimliği",
+        "file": "Dosya Adı",
+        "folderPath": "Klasör Yolu",
+        "version": "Versiyon No",
+        "isLatest": "Güncel Versiyon mu",
+        "uploadedAt": "Yükleme Tarihi",
+        "uploader": "Yükleyen",
+        "uploaderCompany": "Yükleyenin Firması",
+        "derivativeStatus": "Dönüşüm Durumu",
+        "schema": "IFC Şeması",
+        "elementCount": "Toplam Eleman Sayısı (versiyon)",
+        "ifcClass": "IFC Sınıfı",
+        "classCount": "Bu Sınıftaki Eleman Sayısı"
+      },
+      "hints": {
+        "schema": "IFC2X3, IFC4, IFC4X3",
+        "ifcClass": "ör. IfcWall, IfcSlab, IfcDoor"
+      }
+    },
+    "workCommon": {
+      "fields": {
+        "number": "Numara",
+        "title": "Başlık",
+        "type": "İş Tipi",
+        "status": "Durum",
+        "statusLabel": "Durum Adı",
+        "isOpen": "Açık mı",
+        "fromCompany": "Gönderen Firma",
+        "toCompany": "Alıcı Firma",
+        "toCompanies": "Alıcı Firmalar",
+        "ballInCourt": "Sıradaki Taraf",
+        "assignee": "Atanan Kişi",
+        "assigneeCompany": "Atanan Kişinin Firması",
+        "createdBy": "Oluşturan",
+        "dueDate": "Termin",
+        "overdue": "Termini Geçti mi",
+        "daysOverdue": "Gecikme (gün)",
+        "daysOpen": "Açık Gün",
+        "createdAt": "Oluşturma Tarihi",
+        "sentAt": "Gönderim Tarihi",
+        "answeredAt": "Cevap Tarihi",
+        "closedAt": "Kapanış Tarihi",
+        "replyRequired": "Cevap Gerekli mi",
+        "awaitingReply": "Cevap Bekliyor mu",
+        "deliveryChannel": "Gönderim Kanalı",
+        "deliveryStatus": "Teslim Durumu",
+        "mailSent": "E-posta Gönderildi mi",
+        "letterLanguage": "Yazı Dili",
+        "discipline": "Disiplin"
+      },
+      "hints": {
+        "isOpen": "durumu kapalı değilse true",
+        "toCompany": "ilk alıcı (gereği) firma",
+        "toCompanies": "virgülle ayrılmış",
+        "ballInCourt": "sırası gelen firma(lar); kapalı işlerde boş",
+        "dueDate": "YYYY-MM-DD",
+        "overdue": "açık ve termini bugünden önce",
+        "daysOverdue": "termini geçmişse kaç gün; değilse null",
+        "daysOpen": "gönderimden cevaba / kapanışa ya da bugüne gün",
+        "awaitingReply": "cevap gerekli ve gönderildi/alındı durumunda",
+        "discipline": "ör. 'A - Mimari'",
+        "status": "durum kodu; statusLabel Türkçe adı"
+      }
+    },
+    "works": {
+      "label": "İşler (tümü)",
+      "description": "Görebildiğiniz tüm işler: yazışmalar, bilgi talepleri, teknik onaylar, toplantılar, eylemler, gönderim formları. Her iş bir satır.",
+      "fields": {
+        "category": "Kategori",
+        "parent": "Üst İş"
+      },
+      "hints": {
+        "parent": "paketin / toplantının numarası"
+      }
+    },
+    "correspondence": {
+      "label": "Yazışmalar",
+      "description": "Gelen ve giden yazılar (her yazı bir satır): cevap bekleyenler, termin, firma, gönderim kanalı, dil.",
+      "fields": {
+        "title": "Konu",
+        "direction": "Yön",
+        "counterparty": "Karşı Firma",
+        "letterDate": "Yazı Tarihi"
+      },
+      "hints": {
+        "counterparty": "gelen yazıda gönderen, giden yazıda alıcı firma"
+      }
+    },
+    "rfis": {
+      "label": "Bilgi Talepleri",
+      "description": "Bilgi talepleri (her talep bir satır): sıradaki taraf, açık gün, disiplin, kategori, etki, cevap.",
+      "fields": {
+        "title": "Konu",
+        "answered": "Cevaplandı mı",
+        "rfiCategory": "Kategori",
+        "priority": "Öncelik",
+        "costImpact": "Maliyet Etkisi",
+        "scheduleImpact": "Takvim Etkisi",
+        "submittedAt": "Gönderim Tarihi",
+        "revisionCount": "Gönderim Sayısı"
+      },
+      "hints": {
+        "rfiCategory": "ör. Tasarım Koordinasyonu, Saha Uygulaması",
+        "priority": "Düşük, Normal, Yüksek, Acil",
+        "costImpact": "Yok, Var, Belirsiz",
+        "scheduleImpact": "Yok, Var, Belirsiz"
+      }
+    },
+    "submittals": {
+      "label": "Teknik Onaylar",
+      "description": "Teknik onay kalemleri (her kalem bir satır): revizyon, son sonuç, şartname bölümü, tür, disiplin, paket, sıradaki taraf, gecikme.",
+      "fields": {
+        "sectionCode": "Şartname Bölüm Kodu",
+        "sectionTitle": "Şartname Bölüm Adı",
+        "kind": "Tür",
+        "package": "Paket",
+        "rev": "Revizyon",
+        "outcome": "Sonuç",
+        "outcomeLabel": "Sonuç Adı",
+        "decided": "Karar Verildi mi",
+        "submittedAt": "Gönderim Tarihi",
+        "decidedAt": "Karar Tarihi",
+        "reviewDays": "İnceleme Süresi (gün)"
+      },
+      "hints": {
+        "sectionCode": "ör. 05 12 00",
+        "package": "teknik onay paketinin numarası",
+        "rev": "0 = ilk gönderim",
+        "submittedAt": "son revizyonun gönderimi",
+        "reviewDays": "son revizyon: gönderimden karara ya da bugüne",
+        "outcome": "son kararın kodu; karar yoksa null"
+      }
+    },
+    "meetings": {
+      "label": "Toplantılar",
+      "description": "Toplantılar (her toplantı bir satır): tür, tarih, katılımcı, tutanak maddesi ve eylem sayıları.",
+      "fields": {
+        "kind": "Toplantı Türü",
+        "date": "Toplantı Tarihi",
+        "place": "Yer",
+        "attendeeCount": "Katılımcı Sayısı",
+        "presentCount": "Katılan Sayısı",
+        "minutesItemCount": "Tutanak Maddesi Sayısı",
+        "actionCount": "Eylem Sayısı",
+        "openActionCount": "Açık Eylem Sayısı"
+      },
+      "hints": {
+        "kind": "ör. Koordinasyon, İlerleme, İSG"
+      }
+    },
+    "actions": {
+      "label": "Eylemler",
+      "description": "Toplantı eylemleri (her eylem bir satır): sorumlu kişi ve firma, termin, gecikme, bağlı toplantı.",
+      "fields": {
+        "title": "Eylem",
+        "assignee": "Sorumlu Kişi",
+        "responsibleCompany": "Sorumlu Firma",
+        "meeting": "Toplantı No",
+        "meetingTitle": "Toplantı",
+        "meetingDate": "Toplantı Tarihi"
+      }
+    },
+    "transmittals": {
+      "label": "Gönderim Formları",
+      "description": "Gönderim formları (her form bir satır): amaç, alıcı, gönderim ve alındı tarihleri, ekli dosya sayısı.",
+      "fields": {
+        "purpose": "Amaç",
+        "received": "Alındı mı",
+        "receivedAt": "Alındı Tarihi",
+        "fileCount": "Dosya Sayısı"
+      },
+      "hints": {
+        "received": "en az bir alıcı firma alındı onayı verdi",
+        "receivedAt": "ilk alındı onayı"
+      }
+    },
+    "reviews": {
+      "label": "İncelemeler",
+      "description": "Doküman incelemeleri (her inceleme bir satır): durum, bulunulan adım, adım termini, gecikme, dosya sonuçları, toplam süre, hedef klasörün kapısı.",
+      "fields": {
+        "number": "No",
+        "name": "Ad",
+        "code": "İnceleme Kodu",
+        "workflow": "Akış Şablonu",
+        "status": "Durum",
+        "isOpen": "Sürüyor mu",
+        "currentStep": "Bulunulan Adım",
+        "stepNo": "Adım No",
+        "stepCount": "Adım Sayısı",
+        "stepDueAt": "Adım Termini",
+        "overdue": "Termini Geçti mi",
+        "daysInStep": "Adımda Geçen Gün",
+        "totalDays": "Toplam Süre (gün)",
+        "fileCount": "Dosya Sayısı",
+        "approvedCount": "Onaylanan Dosya",
+        "reviseCount": "Revize İstenen Dosya",
+        "rejectedCount": "Reddedilen Dosya",
+        "targetFolder": "Hedef Klasör",
+        "gated": "Kapılı Klasör mü",
+        "startedBy": "Başlatan",
+        "startedByCompany": "Başlatanın Firması",
+        "startedAt": "Başlangıç",
+        "completedAt": "Bitiş"
+      },
+      "hints": {
+        "currentStep": "sürüyorsa adımın adı",
+        "stepNo": "1'den başlar",
+        "overdue": "sürüyor ve adım termini geçmiş",
+        "totalDays": "başlangıçtan bitişe ya da bugüne",
+        "gated": "hedef klasöre yalnızca onaylı inceleme ile dosya girer"
+      }
+    },
+    "reviewFiles": {
+      "label": "İnceleme Dosyaları",
+      "description": "İncelemelerdeki dosyalar (her inceleme × dosya bir satır): dosya başına son sonuç ve karar tarihi.",
+      "fields": {
+        "review": "İnceleme No",
+        "reviewName": "İnceleme",
+        "reviewStatus": "İnceleme Durumu",
+        "file": "Dosya Adı",
+        "extension": "Uzantı",
+        "folderPath": "Kaynak Klasör",
+        "version": "Versiyon No",
+        "outcome": "Sonuç",
+        "outcomeLabel": "Sonuç Adı",
+        "decided": "Karar Verildi mi",
+        "decidedAt": "Karar Tarihi",
+        "stoppedAtStep": "Durduğu Adım",
+        "copied": "Hedefe Kopyalandı mı"
+      },
+      "hints": {
+        "outcomeLabel": "şablonun etiketi (ör. A - Onaylandı)",
+        "stoppedAtStep": "zincir bu adımda durduysa (1'den başlar)",
+        "outcome": "dosyanın son sonucu; karar yoksa null"
+      }
+    },
+    "workflowSteps": {
+      "label": "Akış Adımları",
+      "description": "İncelemelerin, bilgi taleplerinin, teknik onayların ve formların onay akışlarındaki adımlar (her adım geçişi bir satır): sorumlu, sorumlu firma, başlangıç, bitiş, süre (gün), termin aşımı. 'Kim ne kadar bekletti' için days toplamı/ortalaması.",
+      "fields": {
+        "subjectType": "Kayıt Türü",
+        "subject": "Kayıt",
+        "workflow": "Akış",
+        "stepNo": "Adım No",
+        "stepName": "Adım",
+        "responsible": "Sorumlu",
+        "responsibleCompany": "Sorumlu Firma",
+        "status": "Adım Durumu",
+        "outcome": "Adım Sonucu",
+        "startedAt": "Adım Başlangıcı",
+        "endedAt": "Adım Bitişi",
+        "days": "Süre (gün)",
+        "dueAt": "Adım Termini",
+        "late": "Geç Kaldı mı"
+      },
+      "hints": {
+        "subject": "inceleme adı / iş numarası / form numarası",
+        "stepNo": "1'den başlar",
+        "responsible": "adıma atanan kişi, firma veya ekip (virgülle)",
+        "endedAt": "sürüyorsa null",
+        "days": "bitişe ya da bugüne kadar, ondalıklı",
+        "late": "termini geçmiş (biten veya süren adım)"
+      }
+    },
+    "locations": {
+      "label": "Konumlar",
+      "description": "Konum ağacı (blok, kat, mahal, km; her konum bir satır) ve konuma bağlı form ve sorun sayıları.",
+      "fields": {
+        "name": "Ad",
+        "code": "Kod",
+        "type": "Tip",
+        "path": "Yol",
+        "level": "Seviye",
+        "parent": "Üst Konum",
+        "kmStart": "Başlangıç Km",
+        "kmEnd": "Bitiş Km",
+        "formCount": "Form Sayısı",
+        "openFormCount": "Açık Form Sayısı",
+        "failedItemCount": "Başarısız Madde Sayısı",
+        "issueCount": "Sorun Sayısı",
+        "openIssueCount": "Açık Sorun Sayısı"
+      },
+      "hints": {
+        "type": "ör. Blok, Kat, Mahal, İstasyon",
+        "level": "1 = en üst",
+        "failedItemCount": "bu konumdaki formların toplamı"
+      }
+    },
+    "docComparisons": {
+      "label": "Doküman Karşılaştırmaları",
+      "description": "İki versiyon arasındaki karşılaştırmalar (her karşılaştırma bir satır): değişen sayfa ve satır sayıları, antet değişiklikleri, revizyon uyarıları.",
+      "fields": {
+        "file": "Dosya Adı",
+        "extension": "Uzantı",
+        "folderPath": "Klasör Yolu",
+        "fromVersion": "Eski Versiyon",
+        "toVersion": "Yeni Versiyon",
+        "fromRevision": "Eski Revizyon",
+        "toRevision": "Yeni Revizyon",
+        "status": "Durum",
+        "identical": "Birebir Aynı mı",
+        "contentChanged": "İçerik Değişti mi",
+        "pagesChanged": "Değişen Sayfa",
+        "added": "Eklenen",
+        "removed": "Silinen",
+        "changed": "Değişen",
+        "antetChanges": "Antet Değişikliği",
+        "warningCount": "Uyarı Sayısı",
+        "hasWarnings": "Uyarı Var mı",
+        "warnings": "Uyarılar",
+        "createdBy": "Karşılaştıran",
+        "createdAt": "Karşılaştırma Tarihi"
+      },
+      "hints": {
+        "contentChanged": "antet dışında metin değişikliği",
+        "antetChanges": "değişen antet alanı sayısı",
+        "warningCount": "ör. revizyon güncellenmemiş, revizyon tablosu güncellenmemiş"
+      }
+    },
+    "specRegisters": {
+      "label": "Şartname Teknik Onay Listeleri",
+      "description": "Şartnamelerden çıkarılan teknik onay kalemleri (her kalem bir satır): kaynak dosya, bölüm, tür, disiplin, sayfa.",
+      "fields": {
+        "file": "Şartname Dosyası",
+        "version": "Versiyon No",
+        "sectionCode": "Bölüm Kodu",
+        "sectionTitle": "Bölüm Adı",
+        "description": "Kalem",
+        "kind": "Tür",
+        "discipline": "Disiplin",
+        "page": "Sayfa",
+        "excluded": "Hariç Tutuldu mu",
+        "usedAi": "Yapay Zekâ Kullanıldı mı",
+        "updatedAt": "Güncelleme Tarihi"
+      },
+      "hints": {
+        "description": "kısa açıklama, ör. 'Teknik föy / katalog – Klima santrali'"
+      }
+    }
+  },
+  "values": {
+    "subject": {
+      "review": "Doküman İncelemesi",
+      "rfi": "Bilgi Talebi",
+      "submittal": "Teknik Onay",
+      "form": "Form",
+      "work": "İş"
+    },
+    "stepStatus": {
+      "running": "Sürüyor",
+      "done": "Tamamlandı",
+      "cancelled": "İptal Edildi"
+    },
+    "compareStatus": {
+      "running": "Çalışıyor",
+      "done": "Tamamlandı",
+      "failed": "Hatalı"
+    },
+    "direction": {
+      "gelen": "Gelen",
+      "giden": "Giden"
+    }
+  },
+  "templates": {
+    "issueStatus": {
+      "name": "Sorun Durumu (firma ve öncelik)",
+      "description": "Açık/kapalı sorun sayıları, firmaya göre açık sorunlar ve öncelik dağılımı."
+    },
+    "text": {
+      "openIssuesByCompany": "Firmaya Göre Açık Sorunlar",
+      "highCriticalOpen": "Yüksek / Kritik (açık)",
+      "byPriorityOpen": "Önceliğe Göre (açık)",
+      "issueStatus": "Sorun Durumu",
+      "closedIssue": "Kapalı Sorun",
+      "openIssue": "Açık Sorun",
+      "overdueByCompany": "Firmaya Göre Termini Geçenler",
+      "dueNext7Days": "Önümüzdeki 7 Gün Terminli",
+      "noOverdueIssues": "Termini geçen sorun yok.",
+      "averageDelayDays": "Ortalama Gecikme (gün)",
+      "overdueIssues": "Termini Geçen Sorunlar",
+      "overdueIssue": "Termini Geçen Sorun",
+      "overdueItems": "Termin Aşımları",
+      "longestDelay": "En Uzun Gecikme",
+      "delayDays": "Gecikme (gün)",
+      "priority": "Öncelik",
+      "title": "Başlık",
+      "assignee": "Atanan",
+      "dueDate": "Termin",
+      "company": "Firma",
+      "daysSuffix": " gün",
+      "no": "No",
+      "last12Weeks": "Son 12 hafta, haftalık (hafta başlangıcı Pazartesi)",
+      "uploadActivity": "Doküman Yükleme Aktivitesi",
+      "weeklyUploads": "Haftalık Yükleme Sayısı",
+      "uploadsVersions": "Yükleme (versiyon)",
+      "topUploaders": "En Çok Yükleyenler",
+      "weeklyAverage": "Haftalık Ortalama",
+      "byCompanies": "Firmalara Göre",
+      "totalSize": "Toplam Boyut",
+      "elementsByIfcClass": "IFC Sınıflarına Göre Eleman Sayısı",
+      "noConvertedIfc": "Henüz dönüştürülmüş IFC yok.",
+      "modelElements": "Model Eleman Dağılımı",
+      "modelsCurrentIfc": "Model (güncel IFC)",
+      "totalElements": "Toplam Eleman",
+      "ifcClass": "IFC Sınıfı",
+      "models": "Modeller",
+      "folder": "Klasör",
+      "elements": "Eleman",
+      "file": "Dosya",
+      "schema": "Şema",
+      "openLettersByCompany": "Firma Bazında Açık Yazılar",
+      "monthlyInOut": "Aylık Gelen / Giden Yazı",
+      "noLettersAwaitingReply": "Cevap bekleyen yazı yok.",
+      "lettersAwaitingReply": "Cevap Bekleyen Yazılar",
+      "correspondenceStatus": "Yazışma Durumu",
+      "awaitingReply": "Cevap Bekleyen",
+      "ballInCourt": "Sıradaki Taraf",
+      "overdue": "Termini Geçen",
+      "totalLetters": "Toplam Yazı",
+      "counterparty": "Karşı Firma",
+      "openLetters": "Açık Yazı",
+      "daysOpen": "Açık Gün",
+      "date": "Tarih",
+      "number": "Sayı",
+      "subject": "Konu",
+      "openRfisByBallInCourt": "Sıradaki Tarafa Göre Açık Talepler",
+      "averageResponseDays": "Ortalama Cevap Süresi (gün)",
+      "noOpenRfis": "Açık bilgi talebi yok.",
+      "openRfis": "Açık Bilgi Talepleri",
+      "longestOpenDays": "En Uzun Açık (gün)",
+      "openRfi": "Açık Bilgi Talebi",
+      "rfis": "Bilgi Talepleri",
+      "byDiscipline": "Disipline Göre",
+      "discipline": "Disiplin",
+      "closed": "Kapalı",
+      "numberShort": "Numara",
+      "open": "Açık",
+      "itemsByRevision": "Revizyon Sayısına Göre Kalemler",
+      "averageReviewDays": "Ortalama İnceleme Süresi (gün)",
+      "noOverdueItems": "Termini geçen kalem yok.",
+      "overdueItemsList": "Termini Geçen Kalemler",
+      "submittalRegister": "Teknik Onay Listesi",
+      "submittalItems": "Teknik Onay Kalemi",
+      "outcomeBreakdown": "Sonuç Dağılımı",
+      "byKind": "Türe Göre",
+      "section": "Bölüm",
+      "status": "Durum",
+      "openActionsByCompany": "Sorumlu Firmaya Göre Açık Eylemler",
+      "meetingsActions": "Toplantılar ve Eylemler",
+      "monthlyMeetings": "Aylık Toplantı Sayısı",
+      "overdueAction": "Termini Geçen Eylem",
+      "meetingsLast6Months": "Toplantı (son 6 ay)",
+      "noOpenActions": "Açık eylem yok.",
+      "recentMeetings": "Son Toplantılar",
+      "onTime": "Süresi İçinde",
+      "openActions": "Açık Eylemler",
+      "responsibleCompany": "Sorumlu Firma",
+      "noMeetings": "Toplantı yok.",
+      "openAction": "Açık Eylem",
+      "meeting": "Toplantı",
+      "responsible": "Sorumlu",
+      "attendees": "Katılan",
+      "action": "Eylem",
+      "kind": "Tür",
+      "waitingByCompany": "Firmaya Göre Toplam Bekleme (gün)",
+      "averageStepDays": "Adım Başına Ortalama Süre (gün)",
+      "reviewsByStatus": "Durumlara Göre İncelemeler",
+      "lateSteps": "Geç Kalan Adım (tümü)",
+      "noRunningReviews": "Süren inceleme yok.",
+      "stepOverdue": "Adım Termini Geçen",
+      "runningReviews": "Süren İncelemeler",
+      "runningReview": "Süren İnceleme",
+      "stepDue": "Adım Termini",
+      "daysInStep": "Adımda (gün)",
+      "reviews": "İncelemeler",
+      "review": "İnceleme",
+      "step": "Adım",
+      "noOpenFormsWithFailedItems": "Başarısız maddesi olan açık form yok.",
+      "openFormsWithFailedItems": "Başarısız Maddesi Olan Açık Formlar",
+      "openFormsWithFailures": "Başarısız Maddeli Açık Form",
+      "failedItemsByLocation": "Konuma Göre Başarısız Madde",
+      "weeklyForms": "Haftalık Form Sayısı",
+      "failedItems": "Başarısız Madde",
+      "byTemplate": "Şablona Göre",
+      "openForms": "Açık Form",
+      "failed": "Başarısız",
+      "forms": "Formlar",
+      "template": "Şablon",
+      "location": "Konum",
+      "form": "Form",
+      "sCurve": "S-Eğrisi (kümülatif tamamlanan faaliyet, %)",
+      "lateActivitiesByWbs": "İş Kırılımına Göre Geciken Faaliyetler",
+      "noLateCriticalActivities": "Geciken kritik faaliyet yok.",
+      "lateCriticalActivities": "Geciken Kritik Faaliyetler",
+      "lateCriticalActivity": "Geciken Kritik Faaliyet",
+      "averageCompletion": "Ortalama Tamamlanma",
+      "activityStatuses": "Faaliyet Durumları",
+      "baselineFinish": "Temel Plan Bitişi",
+      "lateActivity": "Geciken Faaliyet",
+      "schedule": "İş Programı",
+      "currentPlan": "Güncel Plan",
+      "actual": "Gerçekleşen",
+      "wbs": "İş Kırılımı",
+      "varianceDays": "Sapma (gün)",
+      "baseline": "Temel Plan",
+      "activity": "Faaliyet",
+      "finish": "Bitiş",
+      "code": "Kod",
+      "costByCategory": "Kategoriye Göre Maliyet",
+      "cashflowCumulative": "Nakit Akışı (kümülatif)",
+      "plannedToDate": "Bugüne Kadar Planlanan",
+      "linesMissingQuantity": "Miktarı Eksik Satır",
+      "noCostLines": "Maliyet satırı yok.",
+      "costByStorey": "Kata Göre Maliyet",
+      "top10Items": "En Büyük 10 Kalem",
+      "totalCost": "Toplam Maliyet",
+      "costLines": "Maliyet Satırı",
+      "cost5d": "Maliyet (5D)",
+      "planned": "Planlanan",
+      "forecast": "Öngörülen",
+      "quantity": "Miktar",
+      "item": "Kalem",
+      "unit": "Birim",
+      "amount": "Tutar",
+      "openClashesByClassPair": "Sınıf Çiftlerine Göre Açık Çakışmalar",
+      "openClashesByCompany": "Atanan Firmaya Göre Açık Çakışmalar",
+      "approvedNotClash": "Onaylanan (çakışma değil)",
+      "openClashesByStorey": "Kata Göre Açık Çakışmalar",
+      "statusByTest": "Teste Göre Durum",
+      "openClashes": "Açık Çakışma",
+      "clashes": "Çakışmalar",
+      "resolved": "Çözülen",
+      "monthlyComparisons": "Aylık Karşılaştırma Sayısı",
+      "docComparisons": "Doküman Karşılaştırmaları",
+      "comparisonsWithWarnings": "Uyarılı Karşılaştırmalar",
+      "noComparisons": "Henüz karşılaştırma yok.",
+      "recentComparisons": "Son Karşılaştırmalar",
+      "titleBlockChanges": "Antet Değişikliği",
+      "revisionWarnings": "Revizyon Uyarısı",
+      "comparisons": "Karşılaştırma",
+      "changedPages": "Değişen Sayfa",
+      "oldRevision": "Eski Rev",
+      "newRevision": "Yeni Rev",
+      "warnings": "Uyarılar",
+      "oldVersion": "Eski V",
+      "newVersion": "Yeni V",
+      "titleBlock": "Antet",
+      "noOverdueWork": "Termini geçen iş yok.",
+      "byBallInCourt": "Sıradaki Tarafa Göre",
+      "overdueWork": "Termini Geçen İşler",
+      "byCategory": "Kategoriye Göre",
+      "openWork": "Açık İşler",
+      "category": "Kategori",
+      "openWorkItems": "Açık İş",
+      "sCurveComment": "S-eğrisi: aylık bitiş sayılarının kümülatif yüzdesi.",
+      "newDashboard": "Yeni panel",
+      "blankComment": "d.<sorgu kimliği> satırları içerir. Grafik: CDE.bar / CDE.line / CDE.pie / CDE.kpi / CDE.table",
+      "addQueryHint": "Gelişmiş bölümünden bir sorgu ekleyin."
+    },
+    "overdue": {
+      "name": "Termin Aşımları",
+      "description": "Termini geçen açık sorunlar, firmaya göre dağılımı ve önümüzdeki 7 günün terminleri."
+    },
+    "uploadActivity": {
+      "name": "Doküman Yükleme Aktivitesi (haftalık)",
+      "description": "Son 12 haftada haftalık yükleme sayısı, firmalara göre dağılım ve en çok yükleyenler."
+    },
+    "modelElements": {
+      "name": "Model Eleman Dağılımı",
+      "description": "Güncel IFC versiyonlarında IFC sınıflarına göre eleman sayıları ve model bazında toplamlar."
+    },
+    "correspondenceStatus": {
+      "name": "Yazışma Durumu",
+      "description": "Açık yazılar, cevap bekleyenler, termini geçenler, firma bazında dağılım ve aylık gelen/giden yazı sayısı."
+    },
+    "rfiLog": {
+      "name": "Bilgi Talepleri",
+      "description": "Açık bilgi talepleri, sıradaki tarafa ve disipline göre dağılım, açık gün sayıları ve ortalama cevap süresi."
+    },
+    "submittalRegister": {
+      "name": "Teknik Onay Listesi",
+      "description": "Teknik onay kalemlerinin sonuç dağılımı, revizyon sayıları, türe göre durum ve termini geçen kalemler."
+    },
+    "meetingsActions": {
+      "name": "Toplantılar ve Eylemler",
+      "description": "Açık eylemler, sorumlu firmaya göre dağılım, termini geçen eylemler ve son toplantılar."
+    },
+    "reviewsSteps": {
+      "name": "İncelemeler (adım süreleri)",
+      "description": "Süren incelemeler, adım termini geçenler, adım başına ortalama süre ve firma bazında bekleme süreleri."
+    },
+    "formsFailures": {
+      "name": "Formlar (başarısız maddeler)",
+      "description": "Form sayıları, konuma ve şablona göre başarısız maddeler, haftalık form sayısı ve başarısız maddesi olan açık formlar."
+    },
+    "scheduleProgress": {
+      "name": "İş Programı (gecikme, kritik yol, S-eğrisi)",
+      "description": "Faaliyet durumları, geciken kritik faaliyetler, iş kırılımına göre gecikmeler ve planlanan / öngörülen / gerçekleşen bitişlerin S-eğrisi."
+    },
+    "cost5d": {
+      "name": "Maliyet (5D)",
+      "description": "Model elemanlarının birim fiyatlarla maliyeti: kategoriye ve kata göre toplam, en büyük kalemler, eksik miktarlar ve planlanan / gerçekleşen nakit akışı (S-eğrisi)."
+    },
+    "clashOverview": {
+      "name": "Çakışmalar",
+      "description": "Açık çakışmalar, IFC sınıf çiftleri, atanan firmalar ve teste göre durum dağılımı."
+    },
+    "docCompare": {
+      "name": "Doküman Karşılaştırmaları",
+      "description": "Versiyon karşılaştırmaları: değişen sayfalar, antet değişiklikleri ve revizyon uyarıları."
+    },
+    "worksOverview": {
+      "name": "Açık İşler (sıradaki taraf)",
+      "description": "Kategoriye göre açık işler, sıradaki tarafa göre dağılım ve termini geçen işler."
+    }
+  },
+  "defaults": {
+    "dashboardName": "Yeni panel"
+  },
+  "entities": {
+    "template": "Şablon",
+    "dashboard": "Panel",
+    "version": "Sürüm",
+    "query": "Sorgu"
+  },
+  "errors": {
+    "htmlTooLarge": "Panel HTML'i en fazla {{kb}} KB olabilir.",
+    "changedMeanwhile": "Panel bu arada değişti; sayfayı yenileyip tekrar deneyin.",
+    "sharingOwnerOnly": "Paylaşım ayarını yalnızca panelin sahibi değiştirebilir.",
+    "editOwnerOrAdmin": "Paneli yalnızca sahibi veya proje yöneticisi değiştirebilir.",
+    "datasetGone": "'{{dataset}}' veri kümesi artık yok veya kullanamıyorsunuz; sorguyu yeniden oluşturun.",
+    "nothingToRepair": "Bu sorgu geçerli; onarılacak bir şey yok.",
+    "aiNotConfigured": "Yapay zekâ yapılandırılmamış.",
+    "aiNoAnswer": "Yapay zekâ yanıt vermedi: {{error}}",
+    "aiRepairFailed": "Yapay zekâ sorguyu onaramadı; Gelişmiş bölümünden elle düzeltin.",
+    "aiInvalidDashboard": "Yapay zekâ geçerli bir panel üretemedi. İsteği farklı ifade edip tekrar deneyin.",
+    "invalidQuery": "Sorgu '{{id}}': {{problems}}",
+    "queryProblem": "{{id}}: {{problems}}"
+  },
+  "messages": {
+    "invalidSavedQuery": "Kayıtlı sorgu güncel veri yapısına uymuyor (alan kaldırılmış veya adı değişmiş olabilir): {{problems}}"
+  },
+  "validation": {
+    "at": "{{where}}: {{problem}}",
+    "unknownField": "'{{dataset}}' veri kümesinde '{{field}}' alanı yok (alanlar: {{fields}}).",
+    "unknownFieldSimilar": "'{{dataset}}' veri kümesinde '{{field}}' alanı yok (benzer alan: '{{similar}}') (alanlar: {{fields}}).",
+    "unknownFieldBrief": "'{{dataset}}' veri kümesinde '{{field}}' alanı yok.",
+    "unknownFieldSimilarBrief": "'{{dataset}}' veri kümesinde '{{field}}' alanı yok (benzer alan: '{{similar}}').",
+    "inNeedsArray": "'in' için value bir dizi olmalı.",
+    "betweenNeedsPair": "'between' için value [alt, üst] olmalı.",
+    "isNullNeedsBoolean": "'isNull' için value true/false olmalı.",
+    "singleValue": "'{{op}}' için value tek bir değer olmalı (dizi için 'in' kullanın).",
+    "valueMissing": "value eksik.",
+    "containsNeedsText": "'contains' yalnızca metin alanlarında kullanılır.",
+    "notOnBoolean": "'{{op}}' evet/hayır alanında kullanılamaz.",
+    "bucketNeedsDate": "bucket yalnızca tarih alanlarında kullanılır ('{{field}}' {{type}}).",
+    "fieldRequired": "'{{op}}' için field gerekli.",
+    "needsNumber": "'{{op}}' yalnızca sayı alanlarında kullanılır ('{{field}}' {{type}}).",
+    "needsNumberOrDate": "'{{op}}' sayı veya tarih alanı ister.",
+    "duplicateOutput": "Çıktı sütunu tekrar ediyor: '{{column}}' (metrics için 'as' verin).",
+    "notAnOutput": "'{{field}}' çıktı sütunu değil (kullanılabilir: {{outputs}}).",
+    "unknownDataset": "'{{dataset}}' diye bir veri kümesi yok (veri kümeleri: {{datasets}}).",
+    "adminOnly": "'{{dataset}}' veri kümesi yalnızca proje yöneticilerine açık."
+  },
+  "examples": {
+    "general": {
+      "openIssuesByCompany": "Firmalara göre açık sorun sayısı ve öncelik dağılımı",
+      "uploadsByCompany": "Son 30 günde hangi firma kaç dosya yükledi? Haftalık göster",
+      "lettersAwaitingReply": "Cevap bekleyen yazılar, firma bazında ve en eski önce",
+      "openRfisByBallInCourt": "Sıradaki tarafa göre açık bilgi talepleri ve açık gün",
+      "reviewWaitingByCompany": "İncelemelerde hangi firma ne kadar bekletti?",
+      "failedFormItemsByLocation": "Konuma göre başarısız form maddeleri"
+    },
+    "documents": {
+      "uploadsByCompany": "Son 30 günde firmalara göre yüklenen dosyalar, haftalık",
+      "filesByState": "ISO 19650 durumlarına göre dosya sayısı ve boyut"
+    },
+    "issues": {
+      "openByCompany": "Firmalara göre açık sorunlar ve öncelik",
+      "overdueTable": "Termini geçen sorunlar tablosu"
+    },
+    "works": {
+      "openByCategory": "Kategoriye ve sıradaki tarafa göre açık işler",
+      "overdueOldestFirst": "Termini geçen işler, en eski önce"
+    },
+    "correspondence": {
+      "awaitingReply": "Cevap bekleyen yazılar, firma bazında",
+      "monthlyInOut": "Son 6 ayda aylık gelen ve giden yazı sayısı",
+      "overdueTable": "Termini geçen yazılar tablosu"
+    },
+    "rfi": {
+      "openByBallInCourt": "Sıradaki tarafa göre açık bilgi talepleri",
+      "byDiscipline": "Disipline göre bilgi talepleri ve ortalama açık gün"
+    },
+    "submittals": {
+      "outcomes": "Teknik onay sonuç dağılımı ve revizyon sayıları",
+      "overdue": "Termini geçen teknik onay kalemleri"
+    },
+    "meetings": {
+      "openActionsByCompany": "Sorumlu firmaya göre açık eylemler",
+      "overdueActions": "Termini geçen eylemler ve toplantıları"
+    },
+    "transmittals": {
+      "byRecipient": "Alıcı firmaya göre gönderim formları ve alındı durumu"
+    },
+    "reviews": {
+      "waitingByCompany": "İncelemelerde hangi firma ne kadar bekletti?",
+      "overdueSteps": "Adım termini geçen süren incelemeler"
+    },
+    "forms": {
+      "failedByLocation": "Konuma göre başarısız madde sayıları",
+      "weeklyByTemplate": "Şablona göre haftalık form sayısı"
+    },
+    "locations": {
+      "openByLocation": "Konumlara göre açık form ve sorun sayıları"
+    },
+    "schedule": {
+      "lateCritical": "Geciken kritik faaliyetler",
+      "completionByWbs": "Üst iş kırılımına göre ortalama tamamlanma"
+    },
+    "coordination": {
+      "byClassPair": "Sınıf çiftlerine göre açık çakışmalar",
+      "byCompany": "Atanan firmaya göre açık çakışmalar"
+    },
+    "doccompare": {
+      "withWarnings": "Revizyon uyarısı olan karşılaştırmalar",
+      "monthly": "Aylık karşılaştırma sayısı"
+    },
+    "spec": {
+      "bySection": "Şartname bölümlerine göre teknik onay kalemleri",
+      "byKindDiscipline": "Türe ve disipline göre kalem sayıları"
+    },
+    "models": {
+      "elementsByClass": "Güncel IFC modellerinde sınıflara göre eleman sayıları"
+    },
+    "project": {
+      "downloadsByUser": "Son 30 günde kim kaç dosya indirdi?",
+      "membersByCompany": "Firmalara göre proje üyeleri"
+    }
+  }
+}

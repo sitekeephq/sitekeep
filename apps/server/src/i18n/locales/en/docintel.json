@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "register": "Register"
+  },
+  "errors": {
+    "pdfTimeout": "Reading the PDF timed out.",
+    "pdfPassword": "The PDF is password-protected.",
+    "pdfInvalid": "Not a valid PDF.",
+    "pdfWorkerExit": "The PDF reader exited with code {{code}}.",
+    "folderIdRequired": "folderId is required.",
+    "multipartExpected": "Expected multipart/form-data.",
+    "tooManyFiles_one": "At most {{count}} file.",
+    "tooManyFiles_other": "At most {{count}} files.",
+    "invalidFileName": "Invalid file name.",
+    "tooBigForAntet": "Title block not read: the file is larger than the {{mb}} MB limit.",
+    "noFile": "No file was sent.",
+    "antetPdfOnly": "Title blocks are read from PDF files only.",
+    "antetNotRead": "The title block of this version has not been read yet.",
+    "aiUnavailable": "AI is not available in this project.",
+    "specPdfOnly": "Specification analysis works on PDF files only.",
+    "registerEditDenied": "Only the creator, someone with edit permission on the folder or a project administrator can change this register.",
+    "duplicateItemIds": "Item numbers are duplicated.",
+    "badFormat": "format must be csv, xlsx or json."
+  },
+  "antet": {
+    "noPages": "The PDF has no pages.",
+    "noText": "No text layer; this may be a scanned PDF (OCR is not available yet).",
+    "notFound": "No title block found; the page looks like plain text."
+  },
+  "revision": {
+    "sameContent": "The content of V{{version}} is identical to V{{previous}}; the same file was uploaded again.",
+    "sameRevisionChanged": "The content changed but the revision did not ({{revision}}); V{{previous}} was also {{previousRevision}}.",
+    "backwards": "The revision went backwards: V{{previous}} {{previousRevision}}, V{{version}} {{revision}}.",
+    "tableMismatch": "The revision in the title block ({{antet}}) does not match the last row of the revision table ({{table}}).",
+    "nameMismatch": "The revision in the file name ({{name}}) does not match the revision in the title block ({{revision}}).",
+    "attributeMismatch": "The revision attribute is {{attribute}} but {{revision}} was read in the document."
+  },
+  "columns": {
+    "no": "No.",
+    "sectionCode": "Section Code",
+    "sectionTitle": "Section Title",
+    "page": "Page",
+    "type": "Type",
+    "typeName": "Type Name",
+    "discipline": "Discipline",
+    "description": "Description",
+    "excerpt": "Specification Text",
+    "confidence": "Confidence",
+    "keywords": "Keywords",
+    "untyped": "Undetermined"
+  },
+  "export": {
+    "fileSuffix": "submittals",
+    "sheet": "Submittals"
+  },
+  "register": {
+    "types": {
+      "mos": "Material approval (data sheet / catalogue)",
+      "num": "Sample",
+      "ucz": "Shop / construction drawing",
+      "yb": "Method statement",
+      "ip": "Schedule",
+      "isg": "Health and safety document",
+      "tr": "Technical report / calculation",
+      "pmr": "Periodic inspection",
+      "ks": "Test report / certificate",
+      "ikof": "Works inspection approval",
+      "bas": "For-information submission",
+      "mkf": "Site material acceptance",
+      "untyped": "Document to be submitted for approval"
+    },
+    "noAmbiguousItems": "No ambiguous items."
+  },
+  "suggest": {
+    "fromAntetLabel": "Title block '{{label}}: {{text}}' → {{field}} {{value}}",
+    "fromAntetDocCode": "Document code '{{code}}' in the title block → {{field}} {{value}}",
+    "fromAntet": "Title block '{{text}}' → {{field}} {{value}}",
+    "fromAntetCode": "Code '{{code}}' in the title block → {{field}} {{value}}",
+    "fromFileName": "File name '{{text}}' → {{field}} {{value}}",
+    "fromFolder": "Folder '{{folder}}' → {{field}} {{value}}",
+    "fromCurrentName": "From the current file name → {{field}} {{value}}",
+    "labelsTurkish": "Title block labels are Turkish → {{field}} {{value}}",
+    "labelsEnglish": "Title block labels are English → {{field}} {{value}}",
+    "singleValue": "Only allowed value → {{field}} {{value}}",
+    "fromAntetText": "Title block '{{label}}: {{text}}' → {{field}}",
+    "noEvidence": "{{field}}: no match found in the title block, file name or folder.",
+    "otherCandidate": "{{text}} (other candidate: {{value}})",
+    "undetermined": "Fields that could not be determined: {{fields}}.",
+    "fromRevisionTableRow": "Revision table row {{rev}} → {{name}} {{value}}",
+    "freeForm": "{{text}} (free-form attribute)",
+    "revisionFromAntet": "Title block '{{raw}}' → {{name}} {{value}}",
+    "revisionFromTable": "Revision table '{{raw}}' → {{name}} {{value}}",
+    "revisionFromFileName": "File name '{{raw}}' → {{name}} {{value}}",
+    "revisionFromAttribute": "Attribute '{{raw}}' → {{name}} {{value}}"
+  },
+  "ai": {
+    "noAmbiguousFields": "No ambiguous fields.",
+    "unreadable": "The AI answer could not be read: {{error}}",
+    "notAllowed": "The AI proposed a value that is not allowed ({{field}}: {{value}}); the suggestion was rejected.",
+    "noChoice": "The AI did not choose values for the ambiguous fields.",
+    "chosen": "Chosen by AI → {{field}} {{value}}",
+    "chosenWithCandidates": "Chosen by AI → {{field}} {{value}} (candidates: {{candidates}})",
+    "nameInvalid": "With the AI suggestion the name does not meet the standard: {{errors}}"
+  }
+}
