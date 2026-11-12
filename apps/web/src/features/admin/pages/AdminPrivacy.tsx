@@ -1,7 +1,7 @@
 /**
  * Yönetim → Gizlilik Merkezi: what leaves the server (nothing by default), every external
  * connection with an on/off switch, the outbound log and "Tüm Dış Bağlantıları Kapat".
- * docs/features/GIZLILIK.md.
+ * docs/features/PRIVACY.md.
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

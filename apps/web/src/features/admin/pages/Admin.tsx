@@ -408,7 +408,7 @@ function NewUserDialog({ companies, onClose, onCreated }: { companies: CompanyDt
   const [companyId, setCompanyId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Kapasite (docs/onprem/kapasite.md §5): warn before the account pushes the server past its tier; never blocks.
+  // Kapasite (docs/onprem/capacity.md §5): warn before the account pushes the server past its tier; never blocks.
   const { data: capacity } = useLoad(() => api.adminCapacity(), []);
   const after = capacity ? usersFinding(capacity.hardware, capacity.counts.registered + 1, i18n.language) : null;
   return (

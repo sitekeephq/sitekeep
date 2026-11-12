@@ -125,7 +125,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
     req.user = bridged !== undefined ? bridged : await authenticate(deps.db, req);
   });
 
-  // Privacy (docs/features/GIZLILIK.md): settings in memory, every outbound call logged with the request's
+  // Privacy (docs/features/PRIVACY.md): settings in memory, every outbound call logged with the request's
   // user, project and route, security headers on every response.
   configureOutbound({ db: deps.db });
   await loadPrivacyState(deps.db);

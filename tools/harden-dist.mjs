@@ -2,7 +2,7 @@
  * Release hardening of the compiled server packages (Dockerfile, on-prem bundle): every .js is
  * minified in place (comments out, whitespace out, local names shortened) and source maps and
  * type declarations are removed. Files stay where they are, because workers, migrations and
- * assets are loaded by path. Readability drops; this is not encryption (docs/onprem/kurulum-paketi.md).
+ * assets are loaded by path. Readability drops; this is not encryption (docs/onprem/installation-bundle.md).
  *
  *   node tools/harden-dist.mjs apps/server/dist packages/shared/dist …
  */

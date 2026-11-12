@@ -2,7 +2,7 @@
  * Office integration (optional plug-ins, set by the system administrator):
  * - editing in the browser through WOPI (ONLYOFFICE Docs or Collabora Online)
  * - server-side office → PDF conversion (ONLYOFFICE, Collabora, Gotenberg; local soffice as a last resort)
- * See docs/features/OFIS_ENTEGRASYONU.md.
+ * See docs/features/OFFICE_INTEGRATION.md.
  */
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "../platform/i18n.js";
 import type { ConvertersDto } from "./viewers.js";

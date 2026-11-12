@@ -1,38 +1,38 @@
-# Docker Compose ile kurulum
+# Installing with Docker Compose
 
-SiteKeep'i Docker olan herhangi bir sunucuya `docker compose` ile kurmak. İnternetsiz kurumlar ve tek dosyalık
-kurulum sihirbazı için: [kurulum paketi](kurulum-paketi.md). İkisi aynı imajı kullanır.
+Installing SiteKeep with `docker compose` on any server that has Docker. For organisations without internet access and for the single-file
+installation wizard: [installation bundle](installation-bundle.md). Both use the same image.
 
-| Ne | Nasıl |
+| What | How |
 |---|---|
-| **SiteKeep Community** | Varsayılan imaj `ghcr.io/sitekeephq/sitekeep`. Lisans gerekmez, kısıtlanmaz (AGPL-3.0). |
-| **SiteKeep Enterprise** | `SITEKEEP_IMAGE=ghcr.io/sitekeephq/sitekeep-enterprise`. İmaja erişim lisansla verilir; modülleri Yönetim → Lisans'tan yüklenen lisans açar (lisanslama.md). |
+| **SiteKeep Community** | Default image `ghcr.io/sitekeephq/sitekeep`. No licence required, no restrictions (AGPL-3.0). |
+| **SiteKeep Enterprise** | `SITEKEEP_IMAGE=ghcr.io/sitekeephq/sitekeep-enterprise`. Access to the image comes with a licence; the modules are enabled by the licence uploaded in Administration → Licence (lisanslama.md). |
 
-İmajlar her sürümde yayın akışıyla yayımlanır ([kurulum-paketi.md](kurulum-paketi.md) §8, yayın planı B-5).
-Depo açılana kadar Community imajı da kapalıdır; o zamana kadar [kaynaktan derleyin](#kaynaktan-derleme).
+The images are published by the release workflow with every release ([installation-bundle.md](installation-bundle.md) §8, release plan B-5).
+Until the repository is opened, the Community image is private too; until then, [build from source](#building-from-source).
 
-## Kurulum
+## Installation
 
-Gerekenler: Docker 24+ ve Compose v2; donanım kullanıcı sayısına göre ([kapasite.md](kapasite.md) §4: deneme kademesi 2 çekirdek, 8 GB; 50 kullanıcıya kadar 4 çekirdek, 16 GB).
+Requirements: Docker 24+ and Compose v2; hardware depends on the number of users ([capacity.md](capacity.md) §4: trial tier 2 cores, 8 GB; up to 50 users 4 cores, 16 GB).
 
 ```bash
-git clone https://github.com/sitekeephq/sitekeep.git && cd sitekeep   # ya da yalnız docker-compose.yml + .env.example
-cp .env.example .env        # ADMIN_EMAIL, ADMIN_PASSWORD, POSTGRES_PASSWORD'ü değiştirin
+git clone https://github.com/sitekeephq/sitekeep.git && cd sitekeep   # or only docker-compose.yml + .env.example
+cp .env.example .env        # change ADMIN_EMAIL, ADMIN_PASSWORD, POSTGRES_PASSWORD
 docker compose up -d
 ```
 
-Uygulama `http://sunucu:8080` adresinde açılır (`CDE_PORT`). İlk açılışta `.env`'deki yönetici hesabı oluşur.
-Veriler iki birimdedir: `pgdata` (veritabanı) ve `cdedata` (dosyalar ve model türevleri).
+The application opens at `http://server:8080` (`CDE_PORT`). On first startup the administrator account from `.env` is created.
+Data lives in two volumes: `pgdata` (database) and `cdedata` (files and model derivatives).
 
 ### HTTPS
 
-Önüne bir ters vekil koyun (Caddy, nginx, IIS ARR), `.env`'de `SECURE_COOKIES=1` ve `CDE_TRUST_PROXY=1` yapın.
-Kurulum paketi Caddy'yi kendisi kurar.
+Put a reverse proxy in front (Caddy, nginx, IIS ARR) and set `SECURE_COOKIES=1` and `CDE_TRUST_PROXY=1` in `.env`.
+The installation bundle installs Caddy itself.
 
-### Ofis servisleri (isteğe bağlı)
+### Office services (optional)
 
-Tarayıcıda düzenleme ve ofis → PDF için profiller: `docker compose --profile onlyoffice up -d`
-(ya da `collabora`, `gotenberg`); `.env`'deki ilgili blok ([Ofis Entegrasyonu](../features/OFIS_ENTEGRASYONU.md)).
+Profiles for editing in the browser and Office → PDF: `docker compose --profile onlyoffice up -d`
+(or `collabora`, `gotenberg`); the matching block in `.env` ([Office Integration](../features/OFFICE_INTEGRATION.md)).
 
 ## Enterprise
 
@@ -43,44 +43,44 @@ SITEKEEP_VERSION=1.0.0
 ```
 
 ```bash
-docker login ghcr.io          # 7Dimensions'ın verdiği okuma erişimiyle
+docker login ghcr.io          # with the read access provided by 7Dimensions
 docker compose up -d
 ```
 
-Lisanssız Enterprise imajı Community gibi çalışır. Yönetim → Lisans'ta kurulum kimliğini alıp lisans isteyin,
-gelen `license.json`'u aynı ekrandan yükleyin; modüller yeniden başlatmadan açılır (sayfayı yenileyin;
-arka plan işleri bir sonraki yeniden başlatmada başlar).
+Without a licence, the Enterprise image runs like Community. In Administration → Licence, copy the installation ID and request a licence,
+then upload the `license.json` you receive on the same screen; the modules are enabled without a restart (refresh the page;
+background jobs start at the next restart).
 
-## Güncelleme
+## Updating
 
 ```bash
 # .env: SITEKEEP_VERSION=1.1.0
 docker compose pull && docker compose up -d
 ```
 
-Veritabanı göçleri açılışta kendiliğinden çalışır. Güncellemeden önce yedek alın.
+Database migrations run automatically at startup. Take a backup before updating.
 
-## Yedek
+## Backup
 
 ```bash
 docker compose exec db pg_dump -U cde cde | gzip > yedek-$(date +%F).sql.gz
 docker run --rm -v sitekeep_cdedata:/data -v "$PWD":/yedek alpine tar -czf /yedek/dosyalar-$(date +%F).tar.gz -C /data .
 ```
 
-Birim adı Compose proje adıyla başlar (klasör adı; `docker volume ls`). Veritabanı ve dosyalar birlikte
-anlamlıdır. Kurulum paketi gece yedeğini ve geri yüklemeyi kendisi yapar ([yedekleme.md](yedekleme.md)).
+The volume name starts with the Compose project name (the folder name; `docker volume ls`). The database and the files are only meaningful
+together. The installation bundle handles the nightly backup and restore itself ([backups.md](backups.md)).
 
-## Kaynaktan derleme
+## Building from source
 
 ```bash
 # .env
-SITEKEEP_EDITION=community          # ya da enterprise
-NODE_AUTH_TOKEN=…                   # read:packages (kapalı paketler: görüntüleyici ve SDK npmjs.com'a çıkana kadar; Enterprise modülleri her zaman)
+SITEKEEP_EDITION=community          # or enterprise
+NODE_AUTH_TOKEN=…                   # read:packages (private packages: viewer and SDK until they are on npmjs.com; Enterprise modules always)
 ```
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ```
 
-`WITH_LIBREDWG=0` DWG önizleme aracının derlenmesini atlar (daha hızlı; DWG önizlemesi olmaz).
-Sürüm boş bırakılırsa bütün modüller lisans kontrolü olmadan açılır (yalnız bizim kurulumlarımız).
+`WITH_LIBREDWG=0` skips building the DWG preview tool (faster; no DWG preview).
+If the edition is left empty, all modules are enabled without a licence check (our own installations only).

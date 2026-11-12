@@ -1,6 +1,6 @@
 /**
  * "+ Yeni" — "Ne yapmak istiyorsunuz?": a typed sentence preselects the record type and suggests
- * a title and a company, with plain keyword rules (no AI, docs/product/SADELESTIRME.md 1. aşama).
+ * a title and a company, with plain keyword rules (no AI, docs/product/SIMPLIFICATION.md 1. aşama).
  *
  *   "Prota'ya B3 kazısı için bilgi talebi aç" → Bilgi Talebi · alıcı Prota · "B3 kazısı"
  *   "CNS'den gelen yazıyı kaydet"             → Gelen Yazı · gönderen CNS

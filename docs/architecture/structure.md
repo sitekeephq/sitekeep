@@ -1,34 +1,34 @@
 # SiteKeep Repository Structure & Architecture Rules
-## 1. Amaç, kapsam ve yetki
-Bu belge SiteKeep repository'sinin yaşayan ve bağlayıcı mimari sözleşmesidir. Amaçları:
-- güncel monorepo yapısını tarif etmek; her dizinin ve dosya türünün sahibini belirlemek;
-- bağımlılık yönlerini açık tutmak; güvenlik, gizlilik ve proje izolasyonunu varsayılan yapmak;
-- yeni kodun doğru yere eklenmesini kolaylaştırmak; backend, frontend, ortak paketler ve MCP arasında tek bir sözleşme kurmak;
-- inceleme ve Definition of Done ölçütlerini standartlaştırmaktır.
-Kapsam:
+## 1. Purpose, scope and authority
+This document is the living, binding architecture contract of the SiteKeep repository. Its goals are to:
+- describe the current monorepo structure and define the owner of every directory and file type;
+- keep dependency directions explicit, and make security, privacy and project isolation the default;
+- make it easy to add new code in the right place, and establish a single contract across backend, frontend, shared packages and MCP;
+- standardise review and Definition of Done criteria.
+Scope:
 - `apps/server`; `apps/web`;
 - `apps/mcp`; `packages/shared`;
-- `packages/cde-tools`; testler;
-- veritabanı migration'ları; kök build ve çalışma düzeni;
-- mimari belgeler.
-Bu belge tarihsel bir taşıma planı değildir. Diskteki mevcut refaktör edilmiş yapı esastır. Eski düz `src/routes`, `src/pages` veya `src/components` yerleşimleri yeni kod için mimari yüzey değildir. Bir çelişkide öncelik sırası:
-1. güvenlik ve veri izolasyonu;
-2. çalışan API sözleşmesi ve migration güvenliği;
-3. bu belge;
-4. feature belgeleri;
-5. yerel uygulama tercihi.
-Bu belgeyi güncelleme sorumluluğu:
-- mimari sınırı değiştiren geliştiriciye; yeni workspace, domain veya public API ekleyen kişiye;
-- code review yapan ekip sahibine aittir.
-Kod yapısı değiştiği halde bu belge değişmiyorsa değişiklik tamamlanmış sayılmaz.
-### 1.1 RFC tarzı kural sözcükleri
-Bu belgede:
-- **MUST / ZORUNLU:** İstisnasız varsayılandır; sapma yazılı mimari kararla gerekçelendirilir; **MUST NOT / YASAK:** Yeni kodda uygulanamaz.
-- **SHOULD / ÖNERİLİR:** Güçlü varsayılandır; sapma incelemede açıklanır; **SHOULD NOT / KAÇINILMALIDIR:** Ancak somut fayda ve düşük risk varsa seçilir.
-- **MAY / OLABİLİR:** Bağlama göre serbest tercihtir.
-“Mevcut kod böyle” tek başına istisna gerekçesi değildir.
-## 2. Monorepo ve çalışma alanları
-Repository npm workspaces kullanan tek bir monorepo'dur. Kök:
+- `packages/cde-tools`; tests;
+- database migrations; root build and runtime setup;
+- architecture documents.
+This document is not a historical migration plan. The current refactored structure on disk is authoritative. The old flat `src/routes`, `src/pages` or `src/components` layouts are not an architectural surface for new code. In case of conflict, the order of precedence is:
+1. security and data isolation;
+2. the working API contract and migration safety;
+3. this document;
+4. feature documents;
+5. local implementation preference.
+Responsibility for updating this document lies with:
+- the developer who changes an architectural boundary, and anyone who adds a new workspace, domain or public API;
+- the owning team member who performs the code review.
+If the code structure changes but this document does not, the change is not considered complete.
+### 1.1 RFC-style rule keywords
+In this document:
+- **MUST:** The default without exception; any deviation is justified by a written architecture decision; **MUST NOT:** Cannot be used in new code.
+- **SHOULD:** A strong default; any deviation is explained in review; **SHOULD NOT:** Chosen only when there is a concrete benefit and low risk.
+- **MAY:** A free choice depending on context.
+"The existing code does it this way" is not, on its own, a reason for an exception.
+## 2. Monorepo and workspaces
+The repository is a single monorepo using npm workspaces. Root:
 ```text
 7d-cde/
 ├── apps/
@@ -38,11 +38,11 @@ Repository npm workspaces kullanan tek bir monorepo'dur. Kök:
 ├── packages/
 │   ├── shared/
 │   ├── cde-tools/
-│   └── sdk/              modüllerin çekirdeğe eriştiği paket (@7dimensions-project/sitekeep-sdk)
-├── docs/                 server/ (bizim canlı), onprem/ (müşteri kurulumu), product/, features/…
-├── deploy/               deploy.sh (canlıya), onprem/ (kurulum paketi, docs/onprem/kurulum-paketi.md)
-├── tools/                harden-dist.mjs (sürüm derlemesini küçültür; Dockerfile)
-├── .github/workflows/    ci.yml, release.yml (v* etiketi → kurulum paketi)
+│   └── sdk/              the package through which modules access the core (@7dimensions-project/sitekeep-sdk)
+├── docs/                 server/ (our production), onprem/ (customer installation), product/, features/…
+├── deploy/               deploy.sh (to production), onprem/ (installation bundle, docs/onprem/installation-bundle.md)
+├── tools/                harden-dist.mjs (shrinks the release build; Dockerfile)
+├── .github/workflows/    ci.yml, release.yml (v* tag → installation bundle)
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.base.json
@@ -50,25 +50,25 @@ Repository npm workspaces kullanan tek bir monorepo'dur. Kök:
 └── docker-compose.yml
 ```
 
-Node.js sürümü kök `package.json` gereği **22 veya üstüdür**:
+The root `package.json` requires Node.js **22 or later**:
 
 ```json
 { "engines": { "node": ">=22" } }
 ```
 
-Paket yöneticisi npm'dir. `package-lock.json` authoritative lock dosyasıdır.
+The package manager is npm. `package-lock.json` is the authoritative lock file.
 
-### 2.1 Workspace sorumlulukları
-| Workspace | Sahiplik |
+### 2.1 Workspace responsibilities
+| Workspace | Ownership |
 |---|---|
-| `@sitekeep/server` | Fastify API, güvenlik, kalıcılık, storage, job ve entegrasyonlar |
-| `@sitekeep/web` | React uygulaması, kullanıcı etkileşimi ve görüntüleyiciler |
-| `@sitekeep/mcp` | stdio MCP taşıma adaptörü ve yerel dosya kabiliyeti |
-| `@sitekeep/shared` | Ortak saf sözleşmeler, sabitler ve domain kuralları |
-| `@sitekeep/cde-tools` | Transport-bağımsız CDE/MCP araç tanımları |
+| `@sitekeep/server` | Fastify API, security, persistence, storage, jobs and integrations |
+| `@sitekeep/web` | React application, user interaction and viewers |
+| `@sitekeep/mcp` | stdio MCP transport adapter and local file capability |
+| `@sitekeep/shared` | Shared pure contracts, constants and domain rules |
+| `@sitekeep/cde-tools` | Transport-independent CDE/MCP tool definitions |
 
-### 2.2 Workspace bağımlılık yönü
-İzin verilen ana yön:
+### 2.2 Workspace dependency direction
+Allowed main directions:
 
 ```text
 apps/web ────────────────> packages/shared
@@ -77,53 +77,53 @@ apps/server ─────────────> packages/shared
 apps/server ─────────────> packages/cde-tools
 apps/mcp ────────────────> packages/cde-tools
 packages/cde-tools ──────> packages/shared
-packages/shared ─────────> harici runtime-bağımsız kütüphaneler
-sitekeep-<id> (modül deposu) → @7dimensions-project/sitekeep-sdk (çekirdeğe yalnız SDK ile; docs/modules/README.md)
-apps/server, apps/web ───> @7dimensions-project/sitekeep-ee-<id> yalnız paket adıyla, çalışırken (app/modules.ts)
+packages/shared ─────────> external runtime-independent libraries
+sitekeep-<id> (module repository) → @7dimensions-project/sitekeep-sdk (reaches the core only through the SDK; docs/modules/README.md)
+apps/server, apps/web ───> @7dimensions-project/sitekeep-ee-<id> only by package name, at runtime (app/modules.ts)
 ```
 
-Yasak yönler:
+Forbidden directions:
 
 ```text
-packages/shared ─X─> herhangi bir apps/*
-packages/cde-tools ─X─> apps/server veya apps/web
-packages/cde-tools ─X─> DB, Drizzle veya storage
-apps/web ─X─> apps/server kaynak dosyaları
-apps/server ─X─> apps/web kaynak dosyaları
-app/package ─X─> başka paketin src içindeki derin yolu
+packages/shared ─X─> any apps/*
+packages/cde-tools ─X─> apps/server or apps/web
+packages/cde-tools ─X─> DB, Drizzle or storage
+apps/web ─X─> apps/server source files
+apps/server ─X─> apps/web source files
+app/package ─X─> a deep path inside another package's src
 ```
 
-Paketler yalnız package public export yüzeyinden import edilir:
+Packages are imported only through the package's public export surface:
 
 ```ts
-// İyi
+// Good
 import type { WorkSummary } from "@sitekeep/shared";
-// Kötü
+// Bad
 import type { WorkSummary } from "../../../packages/shared/src/works/work-summary";
 ```
 
-### 2.2.1 Harici özel paket: `@7dimensions-project/bim-viewer`
+### 2.2.1 External private package: `@7dimensions-project/bim-viewer`
 
-IFC / 3B model motoru bu monorepoda değildir. `apps/web` onu GitHub Packages'tan
-sürümlü bağımlılık olarak alır:
+The IFC / 3D model engine is not in this monorepo. `apps/web` consumes it from GitHub Packages
+as a versioned dependency:
 
-- paket: `@7dimensions-project/bim-viewer`
-- kaynak depo: https://github.com/7Dimensions-Project/7dimensions-bim-viewer
-- kurulum: kök `.npmrc` → `npm.pkg.github.com`; `NODE_AUTH_TOKEN` + `read:packages`
-- pin: `apps/web/package.json` (`--save-exact`; geçerli sürüm oradadır, 08.11.2026'da `0.4.6`)
+- package: `@7dimensions-project/bim-viewer`
+- source repository: https://github.com/7Dimensions-Project/7dimensions-bim-viewer
+- setup: root `.npmrc` → `npm.pkg.github.com`; `NODE_AUTH_TOKEN` + `read:packages`
+- pin: `apps/web/package.json` (`--save-exact`; the current version is recorded there, `0.4.6` as of 08.11.2026)
 
-CDE sarıcıdır: `features/coordination/pages/Viewer.tsx` ve ilgili HUD/araçlar
-`bim-viewer`, `bim-viewer/react`, `bim-viewer/tools` public export'larından gelir.
-Kesit kutusu, federasyon, ölçü, Fragments/That Open motor değişikliği paket
-deposunda yapılır; yayınlanan sürüm CDE'de yükseltilir. Motor `vendor/*.tgz` olarak
-gömmeyin; `apps/web` paketin `src`'sine derin import yapmaz.
+The CDE is the wrapper: `features/coordination/pages/Viewer.tsx` and the related HUD/tools
+come from the `bim-viewer`, `bim-viewer/react` and `bim-viewer/tools` public exports.
+Changes to the section box, federation, measurement and the Fragments/That Open engine are made in the package
+repository; the published version is then upgraded in the CDE. Do not embed the engine as `vendor/*.tgz`;
+`apps/web` does not deep-import from the package's `src`.
 
-### 2.3 Kök script'ler ve kesin sıra
-Kök `package.json` script'leri:
+### 2.3 Root scripts and strict order
+Root `package.json` scripts:
 
 ```text
 dev
-  server dev ve web dev süreçlerini birlikte başlatır
+  starts the server dev and web dev processes together
 build
   shared
   → cde-tools
@@ -138,16 +138,16 @@ test
   → server test
   → web test
 typecheck
-  typecheck script'i olan bütün workspace'leri kontrol eder
+  checks every workspace that has a typecheck script
 e2e
-  production server/web build'ini Chromium ile kritik yol testlerine açar
+  runs the critical-path tests in Chromium against the production server/web build
 scenarios
   shared build
   → cde-tools build
   → server scenarios
 ```
 
-Tam komutlar:
+Exact commands:
 
 ```bash
 npm run dev
@@ -155,39 +155,39 @@ npm run build
 npm test
 npm run typecheck
 npm run e2e
-npm run scenarios -- <argümanlar>
+npm run scenarios -- <arguments>
 ```
 
-Build sırası değiştirilmemelidir. `shared` declaration çıktıları `cde-tools`, server ve web tarafından kullanılır. `cde-tools`, server ve MCP'den önce derlenir. Web en son derlenir. `e2e`, önceden üretilmiş server ve web `dist` çıktılarını kullanır.
+The build order must not be changed. The `shared` declaration outputs are used by `cde-tools`, server and web. `cde-tools` is compiled before server and MCP. Web is compiled last. `e2e` uses the previously produced server and web `dist` outputs.
 
-## 3. Genel mimari ilkeler
-SiteKeep:
-- tek monorepo; modüler monolit backend;
-- feature-first frontend; REST üzerinden konuşan MCP araç paketi;
-- ortak saf domain paketi; uzun işler için kalıcı job kuyruğu
-olarak geliştirilir. Temel akış:
+## 3. General architecture principles
+SiteKeep is developed as:
+- a single monorepo; a modular monolith backend;
+- a feature-first frontend; an MCP tool package that talks over REST;
+- a shared pure domain package; a persistent job queue for long-running work.
+Basic flow:
 
 ```text
 HTTP route / React page / MCP host
         ↓
 service / feature API / tool definition
         ↓
-domain kuralı ve access kararı
+domain rule and access decision
         ↓
-DB / storage / REST / provider adaptörü
+DB / storage / REST / provider adapter
 ```
 
-Zorunlu kurallar:
-- Component page import etmez; Service route import etmez.
-- Shared app import etmez; CDE tools DB'ye erişmez.
-- Paket iç dosyasına deep import yapılmaz; Import cycle oluşturulmaz.
-- Güvenlik kararı frontend veya MCP'ye bırakılmaz; Aynı iş kuralı route, UI ve tool içinde ayrı ayrı kopyalanmaz.
-- Yeni ekran veya kullanıcıya görünen geliştirme, unit, masaüstü e2e ve mobil smoke yazılmadan bitmiş sayılmaz. Kural: [Testler](testler.md).
+Mandatory rules:
+- A component does not import a page; a service does not import a route.
+- Shared does not import app code; CDE tools do not access the DB.
+- No deep imports into a package's internal files; no import cycles.
+- Security decisions are never left to the frontend or MCP; the same business rule is not copied separately into the route, UI and tool.
+- A new screen or user-visible change is not done until unit, desktop e2e and mobile smoke tests are written. Rule: [Tests](tests.md).
 
-## 4. Güncel repository ağacı ve sahiplik
+## 4. Current repository tree and ownership
 
 ### 4.1 `apps/server`
-Güncel üst seviye yapı:
+Current top-level structure:
 
 ```text
 apps/server/
@@ -228,7 +228,7 @@ apps/server/
 │   ├── reports/
 │   ├── schedule/
 │   ├── scripts/
-│   ├── sdk/                # modüllerin çekirdeğe tek giriş noktası
+│   ├── sdk/                # the single entry point from modules into the core
 │   ├── sim/
 │   ├── templates/
 │   ├── today/
@@ -241,15 +241,15 @@ apps/server/
 └── tsconfig.json
 ```
 
-Sahiplik:
-- `src/app/`: Fastify composition root ve dependency sözleşmesi; `src/core/platform/`: HTTP hata modeli, audit, storage, secret, process altyapısı.
-- `src/core/security/`: auth, rol, access ve token scope; `src/db/`: Drizzle bağlantısı ve schema export'ları.
-- `drizzle/`: sıralı SQL migration'ları ve metadata; domain dizinleri: kendi route, service, access ve yardımcıları.
-- `src/jobs/`: queue ve CPU/uzun işlem worker'ları; `src/admin/`: sistem yöneticisi (kullanıcı, firma, `GET /admin/status`).
-- `src/auth/`: oturum, şifre ve Google ile giriş (§7.1). `src/oauth/` bunun karşıtı: CDE'nin OpenCDE OAuth2 sunucusu.
-- `src/integrations/`: üçüncü taraf adaptörleri.
-- `test/`: kategori bazlı backend integration ve davranış testleri.
-- `src/sdk/`: modüllerin çekirdekten kullanabildiği tek yüzey (`bind.ts` onu modüllere açar); `src/app/modules.ts`: kurulu modülleri (`SITEKEEP_MODULES`) paket adıyla yükler. Modüller kendi depolarındadır ve sabit sürümlü paket olarak gelir (`@7dimensions-project/sitekeep-ee-<id>`). Kurallar ve yetenekler: [Modüller](../modules/README.md).
+Ownership:
+- `src/app/`: Fastify composition root and dependency contract; `src/core/platform/`: HTTP error model, audit, storage, secrets, process infrastructure.
+- `src/core/security/`: auth, roles, access and token scopes; `src/db/`: Drizzle connection and schema exports.
+- `drizzle/`: ordered SQL migrations and metadata; domain directories: their own routes, services, access and helpers.
+- `src/jobs/`: queue and CPU/long-running workers; `src/admin/`: system administrator (users, companies, `GET /admin/status`).
+- `src/auth/`: session, password and Google sign-in (§7.1). `src/oauth/` is its counterpart: the CDE's OpenCDE OAuth2 server.
+- `src/integrations/`: third-party adapters.
+- `test/`: category-based backend integration and behaviour tests.
+- `src/sdk/`: the only surface modules can use from the core (`bind.ts` exposes it to modules); `src/app/modules.ts`: loads installed modules (`SITEKEEP_MODULES`) by package name. Modules live in their own repositories and arrive as pinned-version packages (`@7dimensions-project/sitekeep-ee-<id>`). Rules and capabilities: [Modules](../modules/README.md).
 
 ### 4.2 `apps/web`
 
@@ -296,14 +296,14 @@ apps/web/
 └── vite.config.ts
 ```
 
-Sahiplik:
-- `app`: composition, router, provider, layout ve global context; `features`: domain sayfaları, bileşenleri, hook'ları ve domain API'leri.
-- `sdk`: modüllerin web çekirdeğinden kullanabildiği tek yüzey; `app/modules.ts`: kurulu modüller (`virtual:sitekeep-modules`, `sitekeep-modules.ts`) ([Modüller](../modules/README.md)).
-- `shared/api`: transport ve birden çok feature'ın kullandığı API adaptörleri; `shared/ui`: domain bağımsız UI primitive'leri.
-- `shared/lib`: saf ve domain bağımsız frontend yardımcıları; `viewers`: CAD/office ve genel viewer yaşam döngüsü. IFC/3B motor `@7dimensions-project/bim-viewer` (bkz. §2.2.1).
-- `features/admin`: Yönetim (kullanıcı, yapay zekâ, Office, OAuth, Gizlilik, Sistem Durumu, Forma Eşitleme). Sistem Durumu: §4.8. Forma: §4.9.
-- `features/auth`: `/login`. Google düğmesi `GET /auth/methods` `google` bayrağına bağlıdır (§7.1).
-- `pdf`: PDF.js, karşılaştırma ve worker sınırı.
+Ownership:
+- `app`: composition, router, providers, layout and global context; `features`: domain pages, components, hooks and domain APIs.
+- `sdk`: the only surface modules can use from the web core; `app/modules.ts`: installed modules (`virtual:sitekeep-modules`, `sitekeep-modules.ts`) ([Modules](../modules/README.md)).
+- `shared/api`: transport and API adapters used by more than one feature; `shared/ui`: domain-independent UI primitives.
+- `shared/lib`: pure, domain-independent frontend helpers; `viewers`: CAD/office and the general viewer lifecycle. The IFC/3D engine is `@7dimensions-project/bim-viewer` (see §2.2.1).
+- `features/admin`: Administration (users, AI, Office, OAuth, Privacy, System Status, Forma Sync). System Status: §4.8. Forma: §4.9.
+- `features/auth`: `/login`. The Google button depends on the `google` flag from `GET /auth/methods` (§7.1).
+- `pdf`: PDF.js, comparison and the worker boundary.
 
 ### 4.3 `apps/mcp`
 
@@ -316,7 +316,7 @@ apps/mcp/
 └── tsconfig.json
 ```
 
-`index.ts` stdio MCP host'udur. REST taban URL'sini ve bearer token'ı kullanır. Yerel dosya upload/download kabiliyeti yalnız bu hostta açılır. Araç iş mantığı burada kopyalanmaz.
+`index.ts` is the stdio MCP host. It uses the REST base URL and a bearer token. The local file upload/download capability is enabled only in this host. Tool business logic is not duplicated here.
 
 ### 4.4 `packages/shared`
 
@@ -341,14 +341,14 @@ packages/shared/
 └── package.json
 ```
 
-Domain sahiplikleri:
-- `kernel`: permission, naming, attributes ve genel saf temel kurallar; `core`: temel tipler, modül tanımları ve modül state'i.
-- `documents`: doküman zekâsı, karşılaştırma, Docs+ ve OpenCDE sözleşmeleri; `coordination`: coordination, BCF, model query, CAD bounds ve param change.
-- `forms`: form, PDF ve PDF source sözleşmeleri; `workflow`: workflow, roller, assignee ve review chain sözleşmeleri.
-- `works`: work catalog, access, numbering, letters, intake ve özetler; `schedule`: schedule ve sim sözleşmeleri.
-- `contracts`: sözleşme kartı, birim fiyat cetveli, zeyilname, teminat ve hakediş DTO'ları; saf `calculateProgressPaymentTotals` (kümülatif, avans mahsubu, teminat, stopaj, damga, KDV ve tevkifat).
-- `reports`: rapor ve report-frame sözleşmeleri; `viewers`: viewer, markup ve office sözleşmeleri.
-- `platform`: hub, OAuth, privacy, template, locations, terms ve AI preset'leri.
+Domain ownership:
+- `kernel`: permissions, naming, attributes and general pure foundational rules; `core`: base types, module definitions and module state.
+- `documents`: document intelligence, comparison, Docs+ and OpenCDE contracts; `coordination`: coordination, BCF, model query, CAD bounds and param change.
+- `forms`: form, PDF and PDF source contracts; `workflow`: workflow, roles, assignee and review chain contracts.
+- `works`: work catalog, access, numbering, letters, intake and summaries; `schedule`: schedule and sim contracts.
+- `contracts`: contract card, bill of quantities with unit prices, addenda, guarantee and progress payment (hakediş) DTOs; the pure `calculateProgressPaymentTotals` (cumulative totals, advance deduction, retention, withholding tax, stamp duty, VAT and partial VAT withholding).
+- `reports`: report and report-frame contracts; `viewers`: viewer, markup and office contracts.
+- `platform`: hub, OAuth, privacy, templates, locations, terms and AI presets.
 
 ### 4.5 `packages/cde-tools`
 
@@ -380,8 +380,8 @@ packages/cde-tools/
 └── package.json
 ```
 
-### 4.6 Test dizinleri
-Backend kategorileri:
+### 4.6 Test directories
+Backend categories:
 
 ```text
 apps/server/test/
@@ -402,7 +402,7 @@ apps/server/test/
 └── works/
 ```
 
-Frontend kategorileri:
+Frontend categories:
 
 ```text
 apps/web/test/
@@ -414,14 +414,14 @@ apps/web/test/
 └── works/
 ```
 
-Paket testleri:
+Package tests:
 
 ```text
 packages/shared/test/
 packages/cde-tools/test/
 ```
 
-Kök uçtan uca testleri:
+Root end-to-end tests:
 
 ```text
 e2e/
@@ -432,10 +432,10 @@ e2e/
 └── README.md
 ```
 
-`e2e/`, üretim server/web derlemesine karşı çalışan kritik kullanıcı yolculuklarının
-sahibidir. Harness, veri ve veritabanını her koşuda izole eder; kullanım ve genişletme
-kuralları için [E2E test rehberine](../../e2e/README.md) bakın. Yeni ekranda unit, masaüstü
-e2e ve mobil smoke zorunluluğu [Testler](testler.md) belgesindedir.
+`e2e/` owns the critical user journeys that run against the production server/web build.
+The harness isolates data and the database on every run; for usage and extension
+rules see the [E2E test guide](../../e2e/README.md). The requirement for unit, desktop
+e2e and mobile smoke tests on every new screen is in the [Tests](tests.md) document.
 
 ### 4.7 `docs`
 
@@ -450,58 +450,58 @@ docs/
 └── README.md
 ```
 
-`architecture` bağlayıcı teknik kuralları içerir. `features` çalışan özelliklerin davranış belgeleridir (`GOOGLE_GIRIS.md` dahil). `onboarding` kurulum ve geliştirme rehberleridir (yerel Google: `onboarding/GOOGLE_GIRIS.md`). `product` ürün dili ve kapsamıdır. `server` canlı kurulum, erişim ve canlı sonrası işletim notlarıdır (`server.md`, `yedekleme.md`, `izleme.md`, `forma-esitleme.md`); sır içermez. `archive` araştırma, planlama ve tarihli yol haritasıdır; uygulama sözleşmesi değildir.
+`architecture` contains the binding technical rules. `features` holds behaviour documents for working features (including `GOOGLE_SIGN_IN.md`). `onboarding` holds setup and development guides (local Google: `onboarding/GOOGLE_SIGN_IN.md`). `product` covers product language and scope. `server` holds production installation, access and post-launch operations notes (`server.md`, `backups.md`, `monitoring.md`, `forma-esitleme.md`); it contains no secrets. `archive` holds research, planning and dated roadmaps; it is not an implementation contract.
 
-### 4.8 Yedekleme ve Sistem Durumu
+### 4.8 Backups and System Status
 
-Lisanslı üründe izleme Grafana/SSH değildir; CDE **Yönetim → Sistem Durumu**.
-Yedek aynı paketin işidir (`jobs` türü `backup`, henüz yok). Sözleşme ve “bugün /
-gerçeğe geçmek”: [Yedekleme](../onprem/yedekleme.md), [İzleme](../onprem/izleme.md).
+In the licensed product, monitoring is not Grafana/SSH; it is the CDE's **Administration → System Status**.
+Backups are the job of the same package (`jobs` type `backup`, not implemented yet). Contract and "today /
+moving to the real thing": [Backups](../onprem/backups.md), [Monitoring](../onprem/monitoring.md).
 
-- Sunucu: `src/admin/status.ts`, `GET /api/v1/admin/status` (`requireAdmin`).
-  Geliştirmede `STATUS_DEMO=1` örnek sayılar basar; üretimde `0` — o makinenin
-  diski / RAM / `jobs` sayımı.
-- Web: `features/admin/pages/AdminStatus.tsx`; menü `app/navigation.ts`
-  (`sistem-durumu`, `systemAdmin`). Kart ve modal kabuktur; yedek işi, kopya
-  silme, türev temizleme ve 24 saat çizgisi henüz gerçek veriye bağlı değil.
-- Onay kutusu: `shared/ui/Ask.tsx` + `ConfirmDialog` (Chrome `confirm` yok).
-- `backup` iş türü §10 kuyruğuna eklenince Şimdi Yedekle / gece 02:00 bağlanır.
-  Ayrı Dkron paneli yok.
+- Server: `src/admin/status.ts`, `GET /api/v1/admin/status` (`requireAdmin`).
+  In development `STATUS_DEMO=1` prints sample figures; in production `0` shows that machine's
+  disk / RAM / `jobs` counts.
+- Web: `features/admin/pages/AdminStatus.tsx`; menu `app/navigation.ts`
+  (`sistem-durumu`, `systemAdmin`). The cards and modal are a shell; the backup job, copy
+  deletion, derivative cleanup and the 24-hour line are not yet wired to real data.
+- Confirmation dialog: `shared/ui/Ask.tsx` + `ConfirmDialog` (no Chrome `confirm`).
+- Once the `backup` job type is added to the §10 queue, Back Up Now / the nightly 02:00 run will be wired up.
+  There is no separate Dkron panel.
 
-### 4.9 Forma dosya eşitleme
+### 4.9 Forma file sync
 
-Kayıt eşitlemesi (sorun, inceleme) `src/integrations/autodesk/` ve Proje
-Ayarları → Autodesk. **Dosya** motoru (Data Management, imzalı akış) henüz
-yok. Ekibe gösterilen kabuk: **Yönetim → Forma Eşitleme**. Sözleşme ve
-“bugün / gerçeğe geçmek”: [Forma eşitleme](../features/FORMA_ESITLEME.md).
-Tasarım girdisi (sözleşme değil):
-Yedekleme ve Forma Eşitleme §2.
+Record sync (issues, reviews) lives in `src/integrations/autodesk/` and Project
+Settings → Autodesk. The **file** engine (Data Management, signed streaming) does not exist
+yet. The shell shown to the team: **Administration → Forma Sync**. Contract and
+"today / moving to the real thing": [Forma sync](../features/FORMA_SYNC.md).
+Design input (not a contract):
+Backups and Forma Sync §2.
 
-- Sunucu: `src/admin/forma-sync.ts`, `GET /api/v1/admin/forma-sync`
-  (`requireAdmin`). Örnek eşleme ve son tur; `configured` yalnız APS env.
-- Web: `features/admin/pages/AdminFormaSync.tsx` (Yönetim → örnek eşleme ekranı; Şimdi
-  Eşitle / Eşleme Ekle kabuk, ACC’ye dosya inmez). Proje menüsündeki `forma-esitleme`
-  (`adminOnly`) canlı ekrandır: `ProjectFormaSync.tsx` (bağlantı, Getir, Aktarım).
-- Motor `jobs` türü (örn. `forma-sync`) §10’a eklenince aynı ekran bağlanır.
-  forma-mcp ürüne gömülmez.
+- Server: `src/admin/forma-sync.ts`, `GET /api/v1/admin/forma-sync`
+  (`requireAdmin`). Sample mapping and last run; `configured` reflects APS env only.
+- Web: `features/admin/pages/AdminFormaSync.tsx` (Administration → sample mapping screen; Sync
+  Now / Add Mapping are a shell, no files go to ACC). `forma-esitleme` in the project menu
+  (`adminOnly`) is the live screen: `ProjectFormaSync.tsx` (connection, Fetch, Import).
+- Once the engine's `jobs` type (e.g. `forma-sync`) is added to §10, the same screen will be wired up.
+  forma-mcp is not embedded in the product.
 
-## 5. Backend composition ve katmanlar
+## 5. Backend composition and layers
 
 ### 5.1 Composition root
-`apps/server/src/index.ts` process bootstrap sahibidir. Burada:
-- config environment'tan okunur; DB açılır ve migration uygulanır;
-- storage oluşturulur; `JobQueue` oluşturulur;
-- converter ve provider adaptörleri oluşturulur; `buildApp` çağrılır;
-- queue ve scheduler'lar başlatılır; shutdown sinyalleri kapatılır.
-`apps/server/src/app/build-app.ts` HTTP composition root'udur. Burada:
-- Fastify oluşturulur; cookie ve multipart kaydedilir;
-- auth hook'u kurulur; privacy/outbound context kurulur;
-- security header'ları eklenir; `/api/v1` route'ları kaydedilir;
-- WOPI, OAuth, OpenCDE Documents ve MCP özel yüzeyleri kaydedilir; gerekirse web build'i sunulur.
-`apps/server/src/app/deps.ts` dependency sözleşmesidir. `AppDeps` testlerin ve bootstrap'ın sağladığı bağımlılıkları tanımlar. `ResolvedDeps` `buildApp` default'ları uyguladıktan sonraki türdür. Domain kodu global singleton aramak yerine dependency almalıdır.
+`apps/server/src/index.ts` owns process bootstrap. Here:
+- config is read from the environment; the DB is opened and migrations are applied;
+- storage is created; the `JobQueue` is created;
+- converter and provider adapters are created; `buildApp` is called;
+- the queue and schedulers are started; shutdown signals are handled.
+`apps/server/src/app/build-app.ts` is the HTTP composition root. Here:
+- Fastify is created; cookie and multipart are registered;
+- the auth hook is installed; the privacy/outbound context is set up;
+- security headers are added; `/api/v1` routes are registered;
+- the WOPI, OAuth, OpenCDE Documents and MCP special surfaces are registered; the web build is served if needed.
+`apps/server/src/app/deps.ts` is the dependency contract. `AppDeps` defines the dependencies supplied by tests and bootstrap. `ResolvedDeps` is the type after `buildApp` applies the defaults. Domain code must receive dependencies instead of looking up global singletons.
 
-### 5.2 Domain route yerleşimi
-Yeni route domainin yanında bulunur:
+### 5.2 Domain route placement
+A new route lives next to its domain:
 
 ```text
 src/projects/routes.ts
@@ -510,7 +510,7 @@ src/locations/routes.ts
 src/modules/documents/routes.ts
 ```
 
-Büyük route yüzeyi orchestrator + parçalar olarak ayrılır:
+A large route surface is split into an orchestrator + parts:
 
 ```text
 src/modules/forms/routes.ts
@@ -533,46 +533,46 @@ src/works/routes/
 ```
 
 Orchestrator:
-- alt route kayıt sırasını belirler; ortak prefix ve ortak dependency'yi geçirir;
-- domain işi veya büyük sorgu içermez.
-Alt route:
-- params/query/body doğrular; access helper çağırır;
-- service/use-case çağırır; HTTP response üretir.
+- sets the registration order of sub-routes; passes the shared prefix and shared dependencies;
+- contains no domain work or large queries.
+Sub-route:
+- validates params/query/body; calls the access helper;
+- calls the service/use case; produces the HTTP response.
 
-### 5.3 Dosya türü sahipliği
-`routes.ts` veya `routes/*.ts`:
-- HTTP method, URL, header, status; Zod boundary validation;
-- multipart ve stream; service çağrısı.
+### 5.3 File type ownership
+`routes.ts` or `routes/*.ts`:
+- HTTP method, URL, headers, status; Zod boundary validation;
+- multipart and streams; service calls.
 `schema.ts`, `*-schemas.ts`, `template-schemas.ts`:
-- runtime request veya config validation; şemadan türeyen tipler.
+- runtime request or config validation; types derived from schemas.
 `service.ts`:
-- use-case orchestration; domain durum geçişi;
-- transaction kararı; job enqueue ve adaptör koordinasyonu.
+- use-case orchestration; domain state transitions;
+- transaction decisions; job enqueueing and adapter coordination.
 `access.ts`, `*-access.ts`, `policy.ts`:
-- görünürlük ve izin kararı; proje/klasör/rol kapsamı;
-- deny-by-default guard'ları.
+- visibility and permission decisions; project/folder/role scope;
+- deny-by-default guards.
 `dto.ts`:
-- stabil dış response şekli; DB veya provider modelinden güvenli mapping.
+- stable external response shape; safe mapping from DB or provider models.
 `public.ts`:
-- büyük modülün dışarı açtığı dar kayıt yüzeyi; iç route parçalarını saklayan facade.
-`helpers.ts` veya `*-helpers.ts`:
-- yalnız aynı domain içinde anlamlı, isimlendirilmiş tekrar; iş kuralını belirsiz “utils” klasörüne saklamaz.
-`repository.ts` **opsiyoneldir**. Yalnız şu durumlarda değerlidir:
-- karmaşık sorgu birden çok use-case'te tekrar kullanılıyorsa; sorgu için test double gerçek fayda sağlıyorsa;
-- query composition domain anlamı taşıyorsa.
-Her tablo için repository oluşturulmaz. Okunabilir, tek kullanımlı Drizzle sorgusu service veya açık domain helper içinde kalabilir.
+- the narrow registration surface a large module exposes; a facade that hides internal route parts.
+`helpers.ts` or `*-helpers.ts`:
+- named repetition that is meaningful only within the same domain; business rules are not hidden in a vague "utils" folder.
+`repository.ts` is **optional**. It is only worthwhile when:
+- a complex query is reused across several use cases; a test double for the query brings a real benefit;
+- the query composition carries domain meaning.
+A repository is not created for every table. A readable, single-use Drizzle query may stay in the service or in an explicit domain helper.
 
-### 5.4 Bağımlılık kuralları
-İzin verilen:
+### 5.4 Dependency rules
+Allowed:
 
 ```text
 route → schema/access/service
 service → access/domain/db/storage/job/provider
-worker → saf worker input/output ve altyapı
-domain helper → shared saf tipleri
+worker → pure worker input/output and infrastructure
+domain helper → shared pure types
 ```
 
-Yasak:
+Forbidden:
 
 ```text
 service → route
@@ -580,56 +580,55 @@ access → route
 DB schema → Fastify request
 worker → Fastify request/reply
 domain → web component
-route A → route B'nin handler'ı
+route A → route B's handler
 ```
 
-Başka domainle işbirliği route üzerinden değil:
-- service/public fonksiyon; ortak saf contract;
-- job/event; REST adaptörü
-ile yapılır.
+Collaboration with another domain happens not through routes but through:
+- service/public functions; shared pure contracts;
+- jobs/events; REST adapters.
 
-## 6. Veritabanı ve migration kuralları
+## 6. Database and migration rules
 
-### 6.1 DB yüzeyi
+### 6.1 DB surface
 `apps/server/src/db/index.ts`:
-- PostgreSQL veya PGlite açar; migration uygular;
-- typed `Db` verir; close yaşam döngüsünü sahiplenir.
-`memory://` yalnız test/geliştirme içindir. Üretimde PostgreSQL önerilir.
+- opens PostgreSQL or PGlite; applies migrations;
+- provides the typed `Db`; owns the close lifecycle.
+`memory://` is for test/development only. PostgreSQL is recommended in production.
 
 ### 6.2 Schema
-Ana export `apps/server/src/db/schema.ts` içindedir. Feature tabloları `schema-*.ts` dosyalarında ayrılır. Yeni tablo:
-- primary key taşır; proje kaynağıysa `projectId` taşır;
-- foreign key davranışını açık seçer; filtre/sıralama ihtiyacına göre index taşır;
-- timestamp anlamlarını açık adlandırır; sorgulanacak temel alanı gelişigüzel JSON'a gömmez.
-DB satırı API DTO'su değildir. Secret, hash, storage key ve dahili kolonlar response'a sızdırılmaz.
+The main export is in `apps/server/src/db/schema.ts`. Feature tables are split into `schema-*.ts` files. A new table:
+- has a primary key; has a `projectId` if it is a project resource;
+- chooses foreign key behaviour explicitly; has indexes that match filtering/sorting needs;
+- names timestamp meanings explicitly; does not bury a core queryable field in arbitrary JSON.
+A DB row is not an API DTO. Secrets, hashes, storage keys and internal columns must not leak into responses.
 
-### 6.3 Proje kapsamı
-Her project-owned sorgu proje kapsamlıdır. İyi:
+### 6.3 Project scope
+Every project-owned query is project-scoped. Good:
 
 ```ts
 where(and(eq(records.projectId, projectId), eq(records.id, recordId)))
 ```
 
-Kötü:
+Bad:
 
 ```ts
 where(eq(records.id, recordId))
 ```
 
-İstemciden gelen `projectId`, `userId`, `companyId` veya role ID güvenilir değildir. Kimlik server auth context'inden alınır. URL'deki proje üyeliği `projectAccess` benzeri merkezi guard ile doğrulanır.
+A `projectId`, `userId`, `companyId` or role ID coming from the client is not trusted. Identity is taken from the server auth context. Project membership in the URL is verified by a central guard such as `projectAccess`.
 
-### 6.4 Transaction
-Transaction zorunludur:
-- birden çok yazım birlikte başarılı olmalıysa; numara/sıra ayırma yarışı varsa;
-- state ve audit kaydı atomik olmalıysa; workflow adımı ile kaynak durumu birlikte değişiyorsa.
-Transaction içinde yapılmaz:
-- LLM çağrısı; SMTP;
-- dış HTTP; büyük dosya dönüşümü;
-- worker sonucu bekleme.
-Önce tutarlı DB durumu yazılır. Sonra job veya güvenli post-transaction etki başlatılır.
+### 6.4 Transactions
+A transaction is mandatory when:
+- several writes must succeed together; there is a race when allocating numbers/sequences;
+- state and the audit record must be atomic; a workflow step and the resource state change together.
+The following are not done inside a transaction:
+- LLM calls; SMTP;
+- external HTTP; large file conversion;
+- waiting for a worker result.
+First the consistent DB state is written. Then the job or a safe post-transaction effect is started.
 
-### 6.5 Migration
-Migration'lar `apps/server/drizzle/` altındadır. Config:
+### 6.5 Migrations
+Migrations live under `apps/server/drizzle/`. Config:
 
 ```text
 apps/server/drizzle.config.ts
@@ -637,96 +636,96 @@ schema: ./src/db/schema*.ts
 out: ./drizzle
 ```
 
-Komut:
+Command:
 
 ```bash
 npm run db:generate -w @sitekeep/server
 ```
 
-Kurallar:
-- schema değişikliği migration olmadan tamamlanmaz; sıra numarası çakışmaz;
-- mevcut üretim verisi var kabul edilir; rename/drop için expand–migrate–contract düşünülür;
-- backfill bounded ve tekrar çalıştırılabilir olur; generated snapshot elle rastgele düzenlenmez;
-- migration hem PostgreSQL hem desteklenen PGlite davranışıyla uyumlu olmalıdır.
+Rules:
+- a schema change is not complete without a migration; sequence numbers do not collide;
+- assume existing production data; consider expand–migrate–contract for rename/drop;
+- backfills are bounded and re-runnable; the generated snapshot is not edited by hand arbitrarily;
+- a migration must be compatible with both PostgreSQL and supported PGlite behaviour.
 
-## 7. Auth, izolasyon ve token scope
-Varsayılan politika deny-by-default'tur. `buildApp` içindeki `/api/v1` hook'u açıkça `public` olmayan route için auth ister. `apps/server/src/core/security/access.ts`:
-- project membership; token proje sınırı;
-- folder tree; effective permission;
-- action guard'ları
-için merkezi yüzeydir. `apps/server/src/core/security/token-scope.ts` HTTP yöntemi ve route semantiğine göre read/write enforcement yapar. Kurallar:
-- browser session yazma yetkili kabul edilse bile domain access ayrıca kontrol edilir; API token `read`/`write` scope'una uyar;
-- API token `projectIds` sınırını aşamaz; OAuth token granted scope'u aşamaz;
-- sistem admin bypass'ı merkezi ve görünürdür; üye olmayan kullanıcıya kaynak varlığı sızdırmamak için gerektiğinde 404 dönülür;
-- frontend'de buton gizlemek authorization değildir.
-Her endpoint şu soruları cevaplar:
-1. Çağıran kim?
-2. Token türü ve scope'u ne?
-3. Hangi projeye erişiyor?
-4. Kaynak gerçekten o projeye mi ait?
-5. Klasör/rol/iş akışı izni yeterli mi?
-6. İşlem audit gerektiriyor mu?
-7. Veri dışarı çıkıyor mu?
+## 7. Auth, isolation and token scope
+The default policy is deny-by-default. The `/api/v1` hook in `buildApp` requires auth for any route that is not explicitly `public`. `apps/server/src/core/security/access.ts` is the central surface for:
+- project membership; token project boundaries;
+- the folder tree; effective permissions;
+- action guards.
+`apps/server/src/core/security/token-scope.ts` enforces read/write according to the HTTP method and route semantics. Rules:
+- even if a browser session is treated as write-capable, domain access is still checked separately; an API token respects its `read`/`write` scope;
+- an API token cannot exceed its `projectIds` boundary; an OAuth token cannot exceed its granted scope;
+- the system admin bypass is central and visible; when needed, 404 is returned so that a resource's existence does not leak to non-members;
+- hiding a button in the frontend is not authorization.
+Every endpoint answers these questions:
+1. Who is the caller?
+2. What is the token type and scope?
+3. Which project is being accessed?
+4. Does the resource really belong to that project?
+5. Is the folder/role/workflow permission sufficient?
+6. Does the operation require an audit record?
+7. Is data leaving the system?
 
-### 7.1 Google ile giriş
+### 7.1 Sign in with Google
 
-CDE oturumu. OpenCDE OAuth2 sunucusu (§11.2) değildir. Sözleşme ve hatalar:
-[Google ile giriş](../features/GOOGLE_GIRIS.md). Yerel üç satır:
-[Yerel Google ile giriş](../onboarding/GOOGLE_GIRIS.md).
+This is the CDE session. It is not the OpenCDE OAuth2 server (§11.2). Contract and errors:
+[Sign in with Google](../features/GOOGLE_SIGN_IN.md). The three local lines:
+[Local Google sign-in](../onboarding/GOOGLE_SIGN_IN.md).
 
-- Üç env birden: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-  `GOOGLE_CALLBACK_URL`. Biri boşsa `googleAuth` yoktur; düğme yok.
-- `GET /auth/methods` `{ password: true, google: boolean }`. Web yalnız
-  `google: true` iken **Google ile devam et** çizer.
-- Google doğrulanmış e-posta verir. CDE `users.email` (küçük harf) ile
-  bakar. Kayıt yoksa `auth.google` izinli alanı (`domainAllowlistEnabled`
-  + `domains`) eşleşirse yönetici olmayan kullanıcı açılır. `disabled`
-  veya alan uyuşmazsa `account_not_allowed`. Ayar: Yönetim → Kullanıcılar.
-- Dış çağrı `outboundFetch(..., { connection: "google" })`, amaç
-  `giris:google`. `state` httpOnly çerez; uyuşmazsa callback oturum açmaz.
-- Callback tarayıcı origin'idir (`localhost:5173` / `sitekeep.ornek.com`),
-  API portu değil. Sır source control'a girmez (§12).
+- All three env variables together: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+  `GOOGLE_CALLBACK_URL`. If any is empty there is no `googleAuth`; no button.
+- `GET /auth/methods` returns `{ password: true, google: boolean }`. The web app draws
+  **Continue with Google** only when `google: true`.
+- Google provides a verified email. The CDE looks it up in `users.email` (lower case).
+  If there is no record and the `auth.google` allowed domain (`domainAllowlistEnabled`
+  + `domains`) matches, a non-admin user is created. If the user is `disabled`
+  or the domain does not match: `account_not_allowed`. Setting: Administration → Users.
+- The external call is `outboundFetch(..., { connection: "google" })`, purpose
+  `giris:google`. `state` is an httpOnly cookie; if it does not match, the callback does not sign in.
+- The callback is the browser origin (`localhost:5173` / `sitekeep.ornek.com`),
+  not the API port. Secrets never go into source control (§12).
 
-## 8. Hata, audit, privacy ve outbound
+## 8. Errors, audit, privacy and outbound
 
-### 8.1 Hata modeli
-`apps/server/src/core/platform/http.ts` authoritative HTTP hata yüzeyidir. Beklenen hata `HttpError` ve stabil code ile ifade edilir. Zod hatası `validation` olarak 400 döner. Unique ihlali kontrollü 409'a çevrilir. Beklenmeyen hata:
-- error ring'e kaydedilir; server loguna yazılır;
-- istemciye yalnız `internal` ve güvenli mesaj döner.
-Stack trace, SQL, filesystem yolu, token veya provider body istemciye dönmez. Hata yutulmaz:
+### 8.1 Error model
+`apps/server/src/core/platform/http.ts` is the authoritative HTTP error surface. Expected errors are expressed with `HttpError` and a stable code. A Zod error returns 400 as `validation`. A unique violation is converted into a controlled 409. An unexpected error:
+- is recorded in the error ring; is written to the server log;
+- returns only `internal` and a safe message to the client.
+Stack traces, SQL, filesystem paths, tokens or provider bodies are never returned to the client. Errors are not swallowed:
 
 ```ts
-// Kötü
+// Bad
 catch { return null; }
 ```
 
 ### 8.2 Audit
-`apps/server/src/core/platform/audit.ts` iş audit'inin ortak yüzeyidir. Audit:
-- kullanıcı; proje;
-- stabil action; target type/id;
-- minimum güvenli metadata
-içerir. Belge içeriği, secret ve token audit'e yazılmaz.
+`apps/server/src/core/platform/audit.ts` is the shared surface for business audit. An audit record contains:
+- the user; the project;
+- a stable action; target type/id;
+- minimal safe metadata.
+Document content, secrets and tokens are never written to the audit.
 
-### 8.3 Privacy ve outbound
-`apps/server/src/privacy/`:
-- privacy ayarları; redaction;
-- outbound kayıtları; security header'ları
-için sahibidir. Dış HTTP veya AI çağrısı:
-- outbound policy'den geçer; kullanıcı/proje/feature context'i taşır;
-- timeout kullanır; hassas içeriği loglamaz;
-- response'u güvenilir kabul etmez.
-`buildApp` URL loglarında WOPI/OAuth token, code, verifier ve conversion ticket'larını redakte eder.
+### 8.3 Privacy and outbound
+`apps/server/src/privacy/` owns:
+- privacy settings; redaction;
+- outbound records; security headers.
+An external HTTP or AI call:
+- goes through the outbound policy; carries the user/project/feature context;
+- uses a timeout; does not log sensitive content;
+- does not treat the response as trusted.
+`buildApp` redacts WOPI/OAuth tokens, codes, verifiers and conversion tickets in URL logs.
 
-## 9. Storage, upload ve streaming
-`apps/server/src/core/platform/storage.ts` storage sözleşmesi ve local adaptör sahibidir. Kurallar:
-- kullanıcı dosya adı storage path olmaz; storage key server tarafından üretilir;
-- path traversal engellenir; boyut ve dosya sayısı multipart limitleriyle sınırlanır;
-- MIME ve uzantı tek başına güvenilir kabul edilmez; checksum ve versiyon metadata'sı korunur;
-- büyük dosya belleğe tamamen alınmadan stream edilir; download response'unda güvenli content type/disposition kullanılır;
-- geçici dosya `finally` ile temizlenir; archive extraction zip-slip ve decompression bomb riskini sınırlar.
+## 9. Storage, upload and streaming
+`apps/server/src/core/platform/storage.ts` owns the storage contract and the local adapter. Rules:
+- a user file name never becomes a storage path; the storage key is generated by the server;
+- path traversal is blocked; size and file count are bounded by multipart limits;
+- MIME type and extension alone are not trusted; checksum and version metadata are preserved;
+- large files are streamed without loading them fully into memory; download responses use a safe content type/disposition;
+- temporary files are cleaned up in `finally`; archive extraction limits zip-slip and decompression bomb risks.
 
-## 10. Jobs ve worker'lar
-`apps/server/src/jobs/queue.ts` kalıcı job queue sahibidir. Mevcut worker alanları:
+## 10. Jobs and workers
+`apps/server/src/jobs/queue.ts` owns the persistent job queue. Current worker areas:
 
 ```text
 jobs/ifc-worker.ts
@@ -737,75 +736,75 @@ jobs/param-change-worker.ts
 jobs/version-index.ts
 ```
 
-Job payload:
-- küçük; JSON serializable;
-- ID ve sürüm referanslı; secret içermeyen;
-- mümkünse versiyonlanabilir
-olur. Worker:
-- idempotent veya duplicate-safe olur; queued/running/done/failed durumlarını doğru yazar;
-- timeout ve kaynak sınırı uygular; stale kaynak durumunu kontrol eder;
-- kullanıcıya görünür kalıcı hata üretir; request/reply nesnesi almaz.
-CPU ağırlıklı parser/dönüştürücü worker thread/process sınırında tutulabilir. Route uzun işi doğrudan çalıştırmaz; job enqueue eder ve uygun yerde 202 döner.
-`backup` türü henüz kayıtlı değildir; sözleşmesi [Yedekleme](../onprem/yedekleme.md).
-Zamanlayıcı Autodesk / hatırlatma ile aynı sınıfta kalır (ayrı Dkron yok).
+A job payload is:
+- small; JSON-serialisable;
+- based on ID and version references; free of secrets;
+- versionable where possible.
+A worker:
+- is idempotent or duplicate-safe; writes the queued/running/done/failed states correctly;
+- enforces timeouts and resource limits; checks for stale resource state;
+- produces a persistent error visible to the user; does not receive request/reply objects.
+CPU-heavy parsers/converters may be kept behind a worker thread/process boundary. A route does not run long work directly; it enqueues a job and returns 202 where appropriate.
+The `backup` type is not registered yet; its contract is in [Backups](../onprem/backups.md).
+The scheduler stays in the same class as the Autodesk / reminder schedulers (no separate Dkron).
 
-## 11. Entegrasyon yüzeyleri
+## 11. Integration surfaces
 
 ### 11.1 Autodesk
-`apps/server/src/integrations/autodesk/`:
-- OAuth/PKCE; provider client;
-- route; projection;
-- sync scheduler; provider adaptörleri
-için sahibidir. Provider DTO doğrudan iç domain DTO'su yapılmaz. Token'lar encrypted-at-rest yaklaşımına uyar.
-Bugün yalnız **kayıt** (sorun, inceleme, form). Klasör/dosya eşitleme §4.9
-örnek ekrandır; Data Management henüz yok.
+`apps/server/src/integrations/autodesk/` owns:
+- OAuth/PKCE; the provider client;
+- routes; projection;
+- the sync scheduler; provider adapters.
+A provider DTO is never used directly as an internal domain DTO. Tokens follow the encrypted-at-rest approach.
+Today only **records** are synced (issues, reviews, forms). Folder/file sync (§4.9) is
+a sample screen; Data Management does not exist yet.
 
-### 11.2 OpenCDE ve OAuth
-`apps/server/src/opencde/` OpenCDE Documents/pages yüzeyidir. `apps/server/src/oauth/` OAuth2 server, foundation discovery, consent ve token lifecycle sahibidir. Bu yüzeylerin bir bölümü `/api/v1` dışında standart gereği yayınlanır. Standart path ve payload'lar uygulama içi kolaylık için keyfî değiştirilemez. Bu, kullanıcının Google ile CDE'ye girmesi (§7.1) değildir.
+### 11.2 OpenCDE and OAuth
+`apps/server/src/opencde/` is the OpenCDE Documents/pages surface. `apps/server/src/oauth/` owns the OAuth2 server, foundation discovery, consent and the token lifecycle. Part of these surfaces is published outside `/api/v1`, as the standard requires. Standard paths and payloads cannot be changed arbitrarily for in-app convenience. This is not the user signing in to the CDE with Google (§7.1).
 
-### 11.3 WOPI ve office
-`apps/server/src/office/`:
-- WOPI host; discovery/proof;
-- editor/converter ayarları; office service
-için sahibidir. WOPI token'ları query/log/redirection sınırlarında redakte edilir. Proof verification production'da güvenli default ile çalışır.
+### 11.3 WOPI and office
+`apps/server/src/office/` owns:
+- the WOPI host; discovery/proof;
+- editor/converter settings; the office service.
+WOPI tokens are redacted at query/log/redirection boundaries. Proof verification runs with a safe default in production.
 
 ### 11.4 Hosted MCP
-`apps/server/src/integrations/mcp/routes.ts` hosted MCP transport sahibidir. Araç tanımları `@sitekeep/cde-tools` üzerinden alınır. Hosted MCP local filesystem erişimini açmaz.
+`apps/server/src/integrations/mcp/routes.ts` owns the hosted MCP transport. Tool definitions come from `@sitekeep/cde-tools`. Hosted MCP does not open local filesystem access.
 
 ### 11.5 AI
-`apps/server/src/ai/`:
-- provider seçimi; prompt oluşturma;
-- tool schema/routing; Ask bridge;
-- task orchestration
-için sahibidir. Kurallar:
-- provider transport ile domain prompt ayrı tutulur; prompt içine secret konmaz;
-- tool çağrısı backend authorization'ı atlamaz; Ask kendi DB yolunu açmaz; mevcut güvenli araç/REST yüzeyini kullanır;
-- model çıktısı `unknown` kabul edilip doğrulanır; timeout ve output limit zorunludur;
-- dış AI için privacy/outbound izni zorunludur; provider anahtarı loglanmaz veya response'a dönmez;
-- model kararı tek başına yıkıcı işlem başlatmaz.
+`apps/server/src/ai/` owns:
+- provider selection; prompt construction;
+- tool schemas/routing; the Ask bridge;
+- task orchestration.
+Rules:
+- provider transport and domain prompts are kept separate; no secrets are put into prompts;
+- tool calls do not bypass backend authorization; Ask does not open its own DB path; it uses the existing secure tool/REST surface;
+- model output is treated as `unknown` and validated; timeouts and output limits are mandatory;
+- external AI requires privacy/outbound permission; provider keys are never logged or returned in responses;
+- a model decision alone never starts a destructive operation.
 
-## 12. Config ve secret'lar
-Process environment yalnız bootstrap ve ilgili adapter config sınırında okunmalıdır. Yeni domain service doğrudan `process.env` okumamalıdır. Config:
-- başlangıçta parse edilir; boolean/string/number açık dönüştürülür;
-- kritik eksikte fail-fast davranır; testte explicit fixture ile sağlanır.
-Secret:
-- source control'a girmez; `.env.example` yalnız isim ve güvenli örnek içerir;
-- URL, error, audit ve loglarda redakte edilir; default production secret verilmez;
-- encryption key DB/storage ile birlikte yedeklenir ama ayrı korunur; plain token yalnız oluşturma anında gösterilir.
-Google girişi adları (değer yok): `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-`GOOGLE_CALLBACK_URL`. Üçü bootstrap'te `googleAuthFromEnv` ile okunur.
+## 12. Config and secrets
+The process environment should be read only at bootstrap and at the relevant adapter config boundary. A new domain service should not read `process.env` directly. Config is:
+- parsed at startup; booleans/strings/numbers are converted explicitly;
+- fail-fast when something critical is missing; supplied through explicit fixtures in tests.
+Secrets:
+- never go into source control; `.env.example` contains only names and safe examples;
+- are redacted in URLs, errors, audit and logs; no default production secret is provided;
+- the encryption key is backed up together with the DB/storage but protected separately; a plain token is shown only at creation time.
+Google sign-in names (no values): `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+`GOOGLE_CALLBACK_URL`. All three are read at bootstrap by `googleAuthFromEnv`.
 
-## 13. Frontend sınırları
+## 13. Frontend boundaries
 
 ### 13.1 `app`
-`apps/web/src/main.tsx`:
-- React root; QueryProvider;
+`apps/web/src/main.tsx` owns the composition of:
+- the React root; QueryProvider;
 - BrowserRouter; AuthProvider;
-- global CSS
-composition sahibidir. `apps/web/src/app/App.tsx` auth bootstrap sonucu ile route yüzeyini bağlar. `apps/web/src/app/routes/AppRoutes.tsx` authoritative route ağacıdır. `app/layout` shell ve project shell'i sahiplenir. `app/context` auth, project ve embedded context'lerini sahiplenir. Feature iş mantığı `app` içine konmaz.
+- global CSS.
+`apps/web/src/app/App.tsx` connects the result of auth bootstrap to the route surface. `apps/web/src/app/routes/AppRoutes.tsx` is the authoritative route tree. `app/layout` owns the shell and the project shell. `app/context` owns the auth, project and embedded contexts. Feature business logic is not put into `app`.
 
 ### 13.2 Feature
-Bir feature şunları sahiplenebilir:
+A feature may own:
 
 ```text
 features/<domain>/
@@ -813,107 +812,106 @@ features/<domain>/
 ├── components/
 ├── api.ts
 ├── hooks/
-└── saf domain frontend yardımcıları
+└── pure domain frontend helpers
 ```
 
-Her alt klasörü oluşturmak zorunlu değildir. Page:
-- route parametresini okur; query/mutation hook'larını bağlar;
-- loading/error/empty/success durumlarını düzenler; feature component'lerini compose eder.
-Component:
-- page import etmez; route ağacını bilmez;
-- mümkünse props/callback ile davranır; ham endpoint string'i içermez.
-Hook:
-- tekrar kullanılan state/effect veya query davranışını kapsüller; render üretmez;
-- authorization kararı vermez.
-Feature API:
-- domain endpoint'lerini adlandırır; request/response DTO'larını kullanır;
-- transport ayrıntısını `shared/api/client.ts` üzerinden yürütür.
+Creating every subfolder is not mandatory. A page:
+- reads route parameters; wires query/mutation hooks;
+- arranges loading/error/empty/success states; composes feature components.
+A component:
+- does not import pages; does not know the route tree;
+- behaves through props/callbacks where possible; contains no raw endpoint strings.
+A hook:
+- encapsulates reused state/effect or query behaviour; does not render;
+- does not make authorization decisions.
+A feature API:
+- names the domain endpoints; uses request/response DTOs;
+- handles transport details through `shared/api/client.ts`.
 
 ### 13.3 Shared
-`shared/ui`:
+`shared/ui` is for domain-independent UI such as:
 - Dialog; LoadingIndicator;
 - Icon; FilterBar;
-- genel input/list/card primitive'leri
-gibi domain bağımsız UI içindir. Domain etiketi veya iş akışı bileşeni yalnız iki yerde kullanılıyor diye shared yapılmaz. `shared/lib` saf, küçük ve domain bağımsız yardımcılar içindir. `utils.ts` çöplüğü oluşturulmaz.
+- general input/list/card primitives.
+A domain label or workflow component is not made shared just because it is used in two places. `shared/lib` is for pure, small, domain-independent helpers. No `utils.ts` dumping ground is created.
 
-### 13.4 Viewer ve PDF
-IFC / 3B motor `@7dimensions-project/bim-viewer` paketindedir (§2.2.1). `apps/web`
-sarıcı, proje bağlamı, model listesi ve CDE araçlarını sahiplenir. `viewers` CAD/office
-ve genel viewer yaşam döngüsünü sahiplenir. `pdf` PDF.js ve PDF karşılaştırma
-worker'larını sahiplenir. Kurallar:
-- viewer route'ları lazy load edilir; Three.js, IFC, CAD, office ve PDF bağımlılıkları ana bundle'a zorla alınmaz;
-- worker URL/kopyalama düzeni `apps/web/scripts/copy-worker.mjs` ile uyumlu kalır; unmount'ta renderer, scene, controls, worker, object URL ve event listener temizlenir;
-- büyük model ve sayfalar progressive yüklenir; viewer hatası tüm uygulamayı çökertmez;
-- motor davranışı (kesit, federasyon, Fragments) pakette değişir; CDE yalnız pinlenen sürümü yükseltir.
+### 13.4 Viewer and PDF
+The IFC / 3D engine lives in the `@7dimensions-project/bim-viewer` package (§2.2.1). `apps/web`
+owns the wrapper, the project context, the model list and the CDE tools. `viewers` owns CAD/office
+and the general viewer lifecycle. `pdf` owns PDF.js and the PDF comparison
+workers. Rules:
+- viewer routes are lazy-loaded; Three.js, IFC, CAD, office and PDF dependencies are not forced into the main bundle;
+- the worker URL/copy layout stays compatible with `apps/web/scripts/copy-worker.mjs`; on unmount, the renderer, scene, controls, workers, object URLs and event listeners are cleaned up;
+- large models and pages load progressively; a viewer error does not crash the whole application;
+- engine behaviour (sections, federation, Fragments) changes in the package; the CDE only upgrades the pinned version.
 
-## 14. Frontend veri ve state
-State sınıfları:
+## 14. Frontend data and state
+State classes:
 1. server state;
 2. URL state;
 3. form draft state;
-4. geçici UI state.
-Server state için TanStack Query varsayılandır. Global defaults `app/providers/QueryProvider.tsx` içindedir. Kurallar:
-- aynı server verisi birden çok local state'e kopyalanmaz; query key proje ve resource ID'yi içerir;
-- route değişiminde eski proje verisi gösterilmez; mutation sonrası hedefli invalidation yapılır;
-- optimistic update yalnız rollback tanımlıysa yapılır; double submit engellenir;
-- stale response yarışı AbortSignal veya query lifecycle ile önlenir; URL'de paylaşılması gereken filtre/sekme/ID local state'e saklanmaz;
-- form draft gereksiz global context'e konmaz.
-Her veri görünümü:
-- ilk loading; background refresh;
+4. transient UI state.
+TanStack Query is the default for server state. Global defaults are in `app/providers/QueryProvider.tsx`. Rules:
+- the same server data is not copied into several local states; the query key includes the project and resource ID;
+- old project data is not shown after a route change; targeted invalidation is done after a mutation;
+- optimistic updates are done only if a rollback is defined; double submits are prevented;
+- stale response races are prevented with AbortSignal or the query lifecycle; filters/tabs/IDs that must be shareable in the URL are not stored in local state;
+- form drafts are not put into an unnecessary global context.
+Every data view distinguishes these states:
+- initial loading; background refresh;
 - empty; error;
-- unauthorized/not found; success
-durumlarını ayırır.
+- unauthorized/not found; success.
 
-## 15. Frontend transport ve domain API
-`apps/web/src/shared/api/client.ts` yalnız:
-- `/api/v1` prefix; credentials;
-- JSON serialize/parse; `ApiError`;
-- 401 olayı; AbortSignal
-sahibidir. Component içinde ham `fetch` kullanılmaz. Feature domain API örneği:
+## 15. Frontend transport and domain API
+`apps/web/src/shared/api/client.ts` owns only:
+- the `/api/v1` prefix; credentials;
+- JSON serialise/parse; `ApiError`;
+- the 401 event; AbortSignal.
+Raw `fetch` is not used inside components. Feature domain API example:
 
 ```ts
-// İyi: features/forms/api.ts
+// Good: features/forms/api.ts
 export const getForm = (projectId: string, formId: string, signal?: AbortSignal) =>
   get<FormDto>(`/projects/${projectId}/forms/${formId}`, { signal });
 ```
 
-Kötü:
+Bad:
 
 ```ts
-// Component içinde
+// Inside a component
 fetch(`/api/v1/projects/${pid}/forms/${id}`);
 ```
 
-Upload, download ve stream farklı response türleri olarak açık yönetilir. Backend error code korunur; UI mesajı status string eşleştirmesine indirgenmez.
+Upload, download and stream are handled explicitly as different response types. The backend error code is preserved; UI messages are not reduced to matching status strings.
 
-## 16. Routing, layout ve context
-Route tanımı `app/routes/AppRoutes.tsx` altında merkezidir. Navigation metadata `app/navigation/` altında tutulur. Layout:
-- top-level shell; project shell;
-- outlet; navigation;
-- global notification
-sorumluluğunu taşır. Context yalnız geniş alt ağacın gerçekten paylaştığı stabil değere ayrılır. Context'e:
-- bütün server state; her dialog state'i;
-- feature'a özel form draft'ı
-konmaz. Route guard UX sağlar; backend access kontrolünün yerine geçmez. Legacy URL redirect yalnız `app/routes/LegacyProjectRedirect.tsx` gibi açık adaptörde tutulur.
+## 16. Routing, layout and context
+Route definitions are central, under `app/routes/AppRoutes.tsx`. Navigation metadata is kept under `app/navigation/`. Layout is responsible for:
+- the top-level shell; the project shell;
+- the outlet; navigation;
+- global notifications.
+Context is reserved for stable values that a wide subtree genuinely shares. The following are not put into context:
+- all server state; every dialog state;
+- feature-specific form drafts.
+A route guard provides UX; it does not replace backend access control. Legacy URL redirects are kept only in an explicit adapter such as `app/routes/LegacyProjectRedirect.tsx`.
 
-## 17. React, UX ve effects
-`useEffect` yalnız React dışı sistemle senkronizasyon içindir:
-- event listener; timer;
-- viewer; DOM API;
-- subscription.
-Render sırasında türetilebilen değer effect ile state'e kopyalanmaz. Effect:
-- cleanup yapar; bağımlılıkları doğru belirtir;
-- async yarışı iptal eder; lint suppression varsa nedenini açıklar.
+## 17. React, UX and effects
+`useEffect` is only for synchronising with systems outside React:
+- event listeners; timers;
+- viewers; DOM APIs;
+- subscriptions.
+A value that can be derived during render is not copied into state with an effect. An effect:
+- cleans up; declares its dependencies correctly;
+- cancels async races; explains the reason for any lint suppression.
 Optimistic UX:
-- kullanıcının niyetini hemen gösterebilir; geçici ID ve rollback tanımlar;
-- conflict durumunu görünür yapar; server sonucunu authoritative kabul eder.
+- may show the user's intent immediately; defines a temporary ID and rollback;
+- makes conflicts visible; treats the server result as authoritative.
 Error UI:
-- kullanıcıya ne olduğunu söyler; güvenliyse retry sunar;
-- teknik iç hata sızdırmaz.
+- tells the user what happened; offers retry when safe;
+- does not leak internal technical errors.
 Empty UI:
-- gerçekten boş durum ile filtre sonucu boş durumunu ayırır; yetkili kullanıcıya uygun next action sunar.
+- distinguishes a genuinely empty state from an empty filter result; offers an appropriate next action to authorised users.
 
-## 18. CSS, tasarım, erişilebilirlik ve responsive
+## 18. CSS, design, accessibility and responsive layout
 Global foundation:
 
 ```text
@@ -922,87 +920,87 @@ src/styles.css
 src/viewers/viewers.css
 ```
 
-Kurallar:
-- renk, spacing ve typography token'ları tekrar kullanılır; domain durumu yalnız renkle anlatılmaz;
-- inline style yalnız gerçek dinamik geometri için kullanılır; yeni sayfa rastgele yeni görsel dil oluşturmaz;
-- desktop ve dar ekran birlikte tasarlanır; geniş tablo için overflow/sticky/phone stratejisi tanımlanır;
-- layout shift azaltılır.
-Erişilebilirlik:
-- her input label veya accessible name taşır; button davranışı `div` üzerine kurulmaz;
-- klavye erişimi sağlanır; dialog focus trap ve focus return uygular;
-- loading `role="status"` veya eşdeğer anlam taşır; form hatası alanla ilişkilendirilir;
-- kontrast yeterlidir; canvas/viewer için metinsel alternatif veya açıklama değerlendirilir;
-- reduced motion tercihi gereksiz animasyonda dikkate alınır.
-Performans:
-- route/viewer lazy loading; listelerde pagination/virtualization;
-- aramada debounce; object URL/worker cleanup;
-- ölçülmüş memoization; bundle büyümesini izleme
-uygulanır.
+Rules:
+- colour, spacing and typography tokens are reused; domain state is not conveyed by colour alone;
+- inline styles are used only for genuinely dynamic geometry; a new page does not invent a new visual language;
+- desktop and narrow screens are designed together; an overflow/sticky/phone strategy is defined for wide tables;
+- layout shift is minimised.
+Accessibility:
+- every input has a label or accessible name; button behaviour is not built on a `div`;
+- keyboard access is provided; dialogs implement a focus trap and focus return;
+- loading carries `role="status"` or equivalent semantics; form errors are associated with their field;
+- contrast is sufficient; a textual alternative or description is considered for canvas/viewers;
+- the reduced motion preference is respected for unnecessary animation.
+Performance:
+- route/viewer lazy loading; pagination/virtualisation in lists;
+- debounce in search; object URL/worker cleanup;
+- measured memoisation; monitoring bundle growth
+are applied.
 
-## 19. Frontend import sözleşmesi
-Web `moduleResolution: Bundler` kullanır. Yerel frontend importlarında mevcut convention gereği uzantı yazılmaz:
+## 19. Frontend import contract
+The web app uses `moduleResolution: Bundler`. Following the existing convention, local frontend imports have no extension:
 
 ```ts
 import { Dialog } from "../../../shared/ui/Dialog";
 ```
 
-Shared package yalnız root public API'den alınır:
+The shared package is imported only from the root public API:
 
 ```ts
 import type { UserDto } from "@sitekeep/shared";
 ```
 
-Kurallar:
-- component → page importu yasaktır; shared → feature importu yasaktır;
-- feature → başka feature'ın derin component yolu kaçınılmalıdır; type için `import type` kullanılır;
-- cycle oluşturulmaz; app composition feature'ı import edebilir;
-- feature app layout'unu import etmez.
+Rules:
+- component → page imports are forbidden; shared → feature imports are forbidden;
+- feature → another feature's deep component path should be avoided; `import type` is used for types;
+- no cycles are created; app composition may import features;
+- a feature does not import the app layout.
 
-## 20. `packages/shared` kuralları
-Tek public package entry:
+## 20. `packages/shared` rules
+Single public package entry:
 
 ```text
 packages/shared/src/index.ts
 ```
 
-Package `exports` yalnız `"."` yayınlar. Uygulamalar leaf deep import yapmaz. Paket içinde ise modüller doğrudan leaf import eder; root barrel'a geri dönmez:
+The package `exports` publishes only `"."`. Applications do not deep-import leaves. Inside the package, however, modules import leaves directly and do not go back through the root barrel:
 
 ```ts
-// Paket içinde iyi
+// Good inside the package
 import type { PermissionLevel } from "../kernel/permissions.js";
-// Paket içinde kötü
+// Bad inside the package
 import type { PermissionLevel } from "../index.js";
 ```
 
-Bu kural cycle riskini azaltır. Shared'a eklenebilir:
-- iki veya daha çok workspace'in kullandığı DTO; stabil enum/union;
-- ortak sabit; saf permission/naming/workflow kuralı;
-- runtime-bağımsız parser/formatter.
-Eklenmez:
-- DB row; Drizzle;
+This rule reduces the risk of cycles. What may be added to shared:
+- DTOs used by two or more workspaces; stable enums/unions;
+- shared constants; pure permission/naming/workflow rules;
+- runtime-independent parsers/formatters.
+What is not added:
+- DB rows; Drizzle;
 - Fastify; React;
 - filesystem; environment;
-- fetch client; provider SDK;
-- secret.
-Yeni contract tarifi:
-1. Doğru domain leaf dosyasını seç.
-2. Saf tipi/kuralı oraya ekle.
-3. Leaf içindeki importları leaf path ile yap.
-4. Public olacaksa root `index.ts` export'una ekle.
-5. Package testini ekle.
-6. `shared` build et.
-7. Tüketicileri root import'a geçir.
-Cycle oluşursa:
-- iki modülün ortak primitive'ini daha aşağıdaki domain dosyasına çıkar; type-only import kullan;
-- root barrel'ı paket içinde kullanma; uygulamaya özel tipi shared'a taşıyarak cycle gizleme.
+- fetch clients; provider SDKs;
+- secrets.
+Recipe for a new contract:
+1. Choose the right domain leaf file.
+2. Add the pure type/rule there.
+3. Make imports inside the leaf use leaf paths.
+4. If it is to be public, add it to the root `index.ts` exports.
+5. Add a package test.
+6. Build `shared`.
+7. Switch consumers to the root import.
+If a cycle appears:
+- move the shared primitive of the two modules into a lower-level domain file; use type-only imports;
+- do not use the root barrel inside the package; do not hide a cycle by moving an app-specific type into shared.
 
-## 21. `packages/cde-tools` kuralları
+## 21. `packages/cde-tools` rules
 
 ### 21.1 Core
-`core/types.ts`:
+`core/types.ts` owns the contracts:
 - `CdeCall`; `CdeToolDef`;
-- `CdeToolsOptions`
-sözleşmelerini sahiplenir. `CdeCall` yalnız REST çağrısıdır:
+- `CdeToolsOptions`.
+`CdeCall` is only a REST call:
 
 ```ts
 type CdeCall = <T = unknown>(
@@ -1012,13 +1010,13 @@ type CdeCall = <T = unknown>(
 ) => Promise<T>;
 ```
 
-DB, Drizzle, server service veya storage erişimi eklenmez. `core/define.ts` tool-adder tipini tanımlar. `core/register.ts` definition'ları MCP SDK'ya kaydeder, output limit ve audit callback uygular. `core/result.ts` HTTP sonucunu araç sonucuna dönüştürür.
+No DB, Drizzle, server service or storage access is added. `core/define.ts` defines the tool-adder type. `core/register.ts` registers definitions with the MCP SDK and applies the output limit and audit callback. `core/result.ts` converts the HTTP result into a tool result.
 
 ### 21.2 Format
-`format/` model bağlamına uygun, kısa ve stabil metin formatlarını sahiplenir. Domain kuralları format dosyalarına saklanmaz.
+`format/` owns short, stable text formats suited to the model context. Domain rules are not hidden in format files.
 
-### 21.3 Tools ve modules
-Genel tool grupları `tools/*.ts` altındadır. Yoğun domain grupları:
+### 21.3 Tools and modules
+General tool groups live under `tools/*.ts`. Dense domain groups:
 
 ```text
 tools/modules/documents.ts
@@ -1030,221 +1028,218 @@ tools/modules/works.ts
 tools/modules/works-write.ts
 ```
 
-Yeni tool:
-- Zod shape ile input doğrular; `CdeCall` ile mevcut REST endpoint'ini çağırır;
-- küçük ve kararlı çıktı verir; doğru flag'leri taşır;
-- package root registry'sine kaydedilir; test edilir.
+A new tool:
+- validates input with a Zod shape; calls the existing REST endpoint through `CdeCall`;
+- returns small, stable output; carries the correct flags;
+- is registered in the package root registry; is tested.
 
 ### 21.4 Gating
-Flag anlamları:
-- `write`: state değiştirir; read-only bağlantıda kaydedilmez; `local`: local filesystem gerekir; hosted MCP'de kaydedilmez.
-- `dev`: yalnız dev tools etkinse kaydedilir; `destructive`: silme/geri döndürülemez etkiyi MCP annotation'a taşır.
-Kurallar:
-- write tool kullanıcı onayı beklentisini description'da açık eder; destructive tool hem `write` hem `destructive` olarak işaretlenir;
-- dev tool production varsayılanında kapalıdır; dev tool read-only bağlantıda açılmaz;
-- local tool hosted MCP'de açılmaz; read-only bilgisi yalnız açıklama değildir, registration gating ile uygulanır.
-Tool adı ve vocabulary mevcut `cde_*` dilini izler. REST kaynak adları ve `@sitekeep/shared` terimleriyle çelişen eş anlamlılar türetilmez.
+Flag meanings:
+- `write`: changes state; not registered on a read-only connection; `local`: requires the local filesystem; not registered in hosted MCP.
+- `dev`: registered only when dev tools are enabled; `destructive`: carries a deletion/irreversible effect into the MCP annotation.
+Rules:
+- a write tool states the expectation of user confirmation in its description; a destructive tool is marked both `write` and `destructive`;
+- dev tools are off by default in production; dev tools are not enabled on a read-only connection;
+- local tools are not enabled in hosted MCP; read-only is not just a description, it is enforced through registration gating.
+Tool names and vocabulary follow the existing `cde_*` language. No synonyms that conflict with REST resource names or `@sitekeep/shared` terms are invented.
 
-## 22. TypeScript ve kod kalitesi
-Kök config:
+## 22. TypeScript and code quality
+Root config:
 - `strict`; `noUncheckedIndexedAccess`;
 - `forceConsistentCasingInFileNames`; NodeNext.
-Web ayrıca bundler resolution ve isolated modules kullanır. Kurallar:
-- güvenilmeyen veri `unknown` olur; `any` yalnız kaçınılmaz üçüncü taraf sınırında, dar alanda ve gerekçeli olabilir;
-- assertion runtime validation yerine geçmez; non-null assertion yalnız kanıtlanmış invariant'ta kullanılır;
-- public fonksiyon input/output'u açıktır; birimli sayı adı birim taşır: `timeoutMs`, `sizeBytes`;
-- impossible state discriminated union ile modellenir; DB tipi ve DTO tipi ayrı düşünülür.
-Fonksiyon:
-- fiille adlandırılır; tek ana niyet taşır;
-- uzun positional parametre yerine command/options object alır; input'u gizlice mutate etmez;
-- guard clause ile okunur kalır; `process`, `handleData`, `doThing` gibi belirsiz isimlerden kaçınır.
-Yorum:
-- kodun ne yaptığını tekrar etmez; güvenlik, standart veya şaşırtıcı kararın nedenini açıklar;
-- tarihçe anlatmaz; tarihçe Git'tedir; TODO issue/koşul taşır.
+The web app additionally uses bundler resolution and isolated modules. Rules:
+- untrusted data is `unknown`; `any` is allowed only at an unavoidable third-party boundary, in a narrow area and with a justification;
+- an assertion does not replace runtime validation; non-null assertions are used only for a proven invariant;
+- public function inputs/outputs are explicit; a number with a unit carries the unit in its name: `timeoutMs`, `sizeBytes`;
+- impossible states are modelled with discriminated unions; DB types and DTO types are considered separately.
+A function:
+- is named with a verb; has a single main intent;
+- takes a command/options object instead of long positional parameters; does not secretly mutate its input;
+- stays readable with guard clauses; avoids vague names such as `process`, `handleData`, `doThing`.
+Comments:
+- do not repeat what the code does; explain the reason for a security, standard or surprising decision;
+- do not tell history; history is in Git; a TODO carries an issue/condition.
 Duplication:
-- aynı iş kuralıysa ortaklaştırılır; yalnız şeklen benziyor ama farklı sebeple değişiyorsa erken birleştirilmez;
-- üç satırı azaltmak için belirsiz abstraction kurulmaz.
+- if it is the same business rule, it is shared; if it only looks similar but changes for different reasons, it is not merged prematurely;
+- no vague abstraction is built to save three lines.
 Dead code:
-- yorum içine alınmış eski implementasyon tutulmaz; kullanılmayan export/import silinir;
-- geçici debug log merge edilmez; compatibility shim'in kaldırma koşulu yazılır.
+- no commented-out old implementations are kept; unused exports/imports are deleted;
+- temporary debug logs are not merged; a compatibility shim states its removal condition.
 
-### 22.1 Barrel kuralları
-Barrel yalnız kararlı public API içindir. Feature içi her şeyi export eden barrel oluşturulmaz. Barrel:
-- cycle saklamaz; side effect taşımaz;
-- internal sembolü yanlışlıkla public yapmaz.
+### 22.1 Barrel rules
+Barrels are only for a stable public API. No barrel that exports everything inside a feature is created. A barrel:
+- does not hide cycles; has no side effects;
+- does not accidentally make an internal symbol public.
 
-### 22.2 Dosya boyutu
-Keyfî sert satır limiti yoktur. Dosya boyutu sorumluluk sinyalidir.
-- **800 satır üstü:** code review'da sorumluluk ayrımı açıkça incelenir; **1000 satır üstü:** yazılı gerekçe gerekir veya dosya anlamlı sınırdan bölünür.
-Sırf limit için anlamsız mikro dosyalar oluşturulmaz. Route orchestrator, page composition ve generated dosya bağlamı dikkate alınır.
+### 22.2 File size
+There is no arbitrary hard line limit. File size is a signal about responsibility.
+- **Over 800 lines:** the separation of responsibilities is explicitly examined in code review; **over 1000 lines:** a written justification is required or the file is split at a meaningful boundary.
+Meaningless micro-files are not created just to meet a limit. The context of route orchestrators, page composition and generated files is taken into account.
 
-### 22.3 Generated dosyalar
+### 22.3 Generated files
 Generated:
-- lockfile; Drizzle metadata/snapshot;
-- build output; worker kopyaları
-elle “temizlenmez”. Kaynak generator veya schema değiştirilir. `dist/`, coverage ve local data source control'a eklenmez.
+- lockfiles; Drizzle metadata/snapshots;
+- build output; worker copies
+are not "cleaned up" by hand. The source generator or schema is changed instead. `dist/`, coverage and local data are not added to source control.
 
-### 22.4 NodeNext importları
-Server, MCP, shared ve cde-tools yerel ESM importları `.js` uzantısı kullanır:
+### 22.4 NodeNext imports
+Local ESM imports in server, MCP, shared and cde-tools use the `.js` extension:
 
 ```ts
 import { projectAccess } from "../core/security/access.js";
 ```
 
-Kaynak dosya `.ts` olsa da emitted ESM için `.js` zorunludur. Web yerel importlarında bundler convention gereği uzantı kullanılmaz.
+Even though the source file is `.ts`, `.js` is required for the emitted ESM. Local web imports use no extension, following the bundler convention.
 
-## 23. API kuralları
-Uygulama REST API'si varsayılan olarak `/api/v1` altındadır. İstisnalar yalnız protokol gereğidir:
+## 23. API rules
+The application REST API lives under `/api/v1` by default. Exceptions exist only where a protocol requires them:
 - WOPI; OAuth2/Foundation;
 - OpenCDE Documents; hosted MCP;
-- statik web.
-Kurallar:
-- URL resource adı çoğul ve tutarlıdır; project-owned resource URL'de proje bağlamını taşır;
-- GET yan etkisizdir; POST create/command;
-- PATCH kısmi update; DELETE silme;
-- create uygun yerde 201; async iş uygun yerde 202 + job bilgisi döner.
+- the static web app.
+Rules:
+- URL resource names are plural and consistent; a project-owned resource URL carries the project context;
+- GET has no side effects; POST is create/command;
+- PATCH is a partial update; DELETE deletes;
+- create returns 201 where appropriate; async work returns 202 + job information where appropriate.
 
 ### 23.1 Boundary validation
-Params, query ve body Zod ile boundary'de doğrulanır. UUID, enum, uzunluk, tarih, limit ve sort alanları allowlist olur. TypeScript tipi runtime validation değildir. File metadata da güvenilmeyen input'tur.
+Params, query and body are validated with Zod at the boundary. UUID, enum, length, date, limit and sort fields are allowlisted. A TypeScript type is not runtime validation. File metadata is also untrusted input.
 
-### 23.2 DTO uyumluluğu
-- Response alanı kaldırmak breaking change'dir; Alan rename geçişsiz yapılmaz.
-- Enum'a değer eklemek exhaustive frontend'i etkiler; Tarih JSON'da ISO string olur.
-- Internal DB kolonları DTO'ya otomatik spread edilmez; Shared contract değişirse server, web ve tools birlikte değerlendirilir.
+### 23.2 DTO compatibility
+- Removing a response field is a breaking change; a field is not renamed without a transition.
+- Adding a value to an enum affects exhaustive frontend code; dates are ISO strings in JSON.
+- Internal DB columns are not automatically spread into a DTO; if a shared contract changes, server, web and tools are assessed together.
 
 ### 23.3 Pagination
-Liste endpoint'i:
-- bounded limit; stabil sort;
-- cursor veya açık page metadata; filtre allowlist
-taşır. Sınırsız tablo dump edilmez.
+A list endpoint has:
+- a bounded limit; a stable sort;
+- a cursor or explicit page metadata; a filter allowlist.
+Unbounded tables are never dumped.
 
 ### 23.4 Idempotency
-Retry edilebilecek create/command:
-- idempotency key; unique business key;
-- duplicate-safe state transition
-yollarından biriyle korunur. GET retry-safe olmalıdır. Yıkıcı işlem körlemesine retry edilmez.
+A create/command that may be retried is protected by one of:
+- an idempotency key; a unique business key;
+- a duplicate-safe state transition.
+GET must be retry-safe. Destructive operations are not retried blindly.
 
-### 23.5 Dosya streaming
-- büyük dosya buffer olarak response'a yığılmaz; content length biliniyorsa yazılır;
-- range ihtiyacı viewer davranışına göre korunur; filename header'a güvenli encode edilir;
-- aborted client stream'i kaynakları kapatır.
+### 23.5 File streaming
+- large files are not accumulated in a buffer for the response; content length is written if known;
+- range support is preserved according to viewer behaviour; the filename is safely encoded in the header;
+- an aborted client stream closes its resources.
 
 ### 23.6 Error response
-Kararlı şekil:
+Stable shape:
 
 ```json
 {
   "error": "stable_code",
-  "message": "Kullanıcıya güvenli mesaj.",
+  "message": "A message that is safe to show the user.",
   "details": {}
 }
 ```
 
-`details` yalnız güvenli validation/domain ayrıntısıdır. Ham provider, SQL veya stack error dönmez.
+`details` contains only safe validation/domain details. Raw provider, SQL or stack errors are never returned.
 
-## 24. Güvenlik ve gizlilik kontrol listesi
-Her değişiklikte:
-- [ ] Varsayılan deny uygulanıyor.
-- [ ] Auth olmayan route açıkça public.
-- [ ] Her project query `projectId` ile scoped.
-- [ ] Client user/company/project ID'sine güvenilmiyor.
-- [ ] Token read/write ve project scope korunuyor.
-- [ ] OAuth scope korunuyor.
-- [ ] Kaynak başka projeden ID ile çekilemiyor.
-- [ ] Secret response/log/audit'e girmiyor.
-- [ ] URL query secret'ları redakte ediliyor.
-- [ ] AI/outbound privacy kontrolünden geçiyor.
-- [ ] Dış URL'de SSRF/redirect/timeout değerlendirildi.
-- [ ] Upload boyutu, sayı, path ve archive sınırları var.
-- [ ] HTML/Markdown güvenli render ediliyor.
-- [ ] GET state değiştirmiyor.
-- [ ] Hassas write audit ediliyor.
+## 24. Security and privacy checklist
+For every change:
+- [ ] Default deny is applied.
+- [ ] Routes without auth are explicitly public.
+- [ ] Every project query is scoped by `projectId`.
+- [ ] Client-supplied user/company/project IDs are not trusted.
+- [ ] Token read/write and project scope are respected.
+- [ ] OAuth scope is respected.
+- [ ] A resource cannot be fetched by ID from another project.
+- [ ] Secrets do not enter responses/logs/audit.
+- [ ] Secrets in URL queries are redacted.
+- [ ] AI/outbound calls pass the privacy check.
+- [ ] SSRF/redirect/timeout have been assessed for external URLs.
+- [ ] Upload size, count, path and archive limits exist.
+- [ ] HTML/Markdown is rendered safely.
+- [ ] GET does not change state.
+- [ ] Sensitive writes are audited.
 
-## 25. Test mimarisi
+## 25. Test architecture
 
-### 25.1 Shared unit test
-`packages/shared/test/`:
-- naming; permission;
-- workflow; contract;
-- saf mapper/formatter; privacy;
-- model query
-testlerinin yeridir.
+### 25.1 Shared unit tests
+`packages/shared/test/` is the place for tests of:
+- naming; permissions;
+- workflow; contracts;
+- pure mappers/formatters; privacy;
+- model query.
 
-### 25.2 CDE tools test
-`packages/cde-tools/test/cde-tools.test.ts`:
-- tool inventory; registration;
-- readOnly/local/dev/destructive gating; REST çağrı şekli;
-- output formatting/error mapping
-testlerini kapsar.
+### 25.2 CDE tools tests
+`packages/cde-tools/test/cde-tools.test.ts` covers tests of:
+- the tool inventory; registration;
+- readOnly/local/dev/destructive gating; the REST call shape;
+- output formatting/error mapping.
 
-### 25.3 Server test
-`apps/server/test/<kategori>/` Fastify + PGlite ağırlıklı integration test sahibidir. Feature değişikliğinde değerlendirilir:
-- başarılı yol; Zod validation;
-- unauthenticated; yanlış proje / yetkisiz;
-- read-only token; önemli conflict/not-found;
+### 25.3 Server tests
+`apps/server/test/<category>/` owns integration tests, mostly Fastify + PGlite. For a feature change, the following are considered:
+- the success path; Zod validation;
+- unauthenticated; wrong project / unauthorised;
+- read-only token; important conflict/not-found cases;
 - DB state; audit;
 - job enqueue; secret redaction.
-Test helper başka feature kategorisine rastgele taşınmaz. Ortak binary/XML fixture `apps/server/test/fixtures/` altında tutulur. Fixture:
-- minimum; sentetik veya lisansı uygun;
-- secret içermeyen; deterministik
-olur.
+Test helpers are not moved arbitrarily into another feature category. Shared binary/XML fixtures are kept under `apps/server/test/fixtures/`. A fixture is:
+- minimal; synthetic or suitably licensed;
+- free of secrets; deterministic.
 
-### 25.4 Web test
-`apps/web/test/<kategori>/`:
-- route/navigation; saf feature davranışı;
-- phone/responsive kararları; viewer geometri/yardımcıları;
-- API option mapping
-testlerini sahiplenir. Kritik UI akışı değişiyorsa loading/error/empty ve kullanıcı davranışı test edilir.
+### 25.4 Web tests
+`apps/web/test/<category>/` owns tests of:
+- routes/navigation; pure feature behaviour;
+- phone/responsive decisions; viewer geometry/helpers;
+- API option mapping.
+If a critical UI flow changes, loading/error/empty states and user behaviour are tested.
 
-### 25.5 Kök E2E smoke test
-`e2e/specs/`, production server/web derlemesine karşı Chromium ile kritik kullanıcı
-yolculuklarını doğrular. Yeni ekran, yeni rota ve kullanıcıya görünen geliştirme
-unit, masaüstü e2e ve mobil smoke olmadan kapanmaz. Kapsam [Testler](testler.md)
-belgesindedir. E2E her saf kural permütasyonu için kullanılmaz; bu varyasyonlar
-shared/server/web testlerinin sorumluluğudur.
+### 25.5 Root E2E smoke tests
+`e2e/specs/` verifies critical user journeys in Chromium against the production server/web
+build. A new screen, new route or user-visible change is not closed
+without unit, desktop e2e and mobile smoke tests. The scope is in the [Tests](tests.md)
+document. E2E is not used for every permutation of a pure rule; those variations
+are the responsibility of shared/server/web tests.
 
-Kurallar:
-- prerequisite'ler izole API ile kurulabilir; test edilen davranış ve görünür sonuç UI üzerinden doğrulanır;
-- canlı, paylaşılan, production veya müşteri verisi hiçbir zaman kullanılmaz;
-- testler sıra bağımsız, minimum ve deterministik veri kurar;
-- dış entegrasyonlar contract/mock ile doğrulanır veya açıkça ayrılmış özel integration ortamında çalışır;
-- selector ve fixture ayrıntıları [E2E test rehberinde](../../e2e/README.md) tutulur.
+Rules:
+- prerequisites may be set up through an isolated API; the behaviour under test and the visible result are verified through the UI;
+- live, shared, production or customer data is never used;
+- tests are order-independent and set up minimal, deterministic data;
+- external integrations are verified with contracts/mocks or run in an explicitly separate dedicated integration environment;
+- selector and fixture details are kept in the [E2E test guide](../../e2e/README.md).
 
-### 25.6 Test veri güvenliği
-Test:
-- canlı production DB'ye bağlanmaz; production URL/token kullanmaz;
-- gerçek müşteri verisi içermez; gerçek SMTP/AI/Autodesk/OpenCDE çağrısı yapmaz;
-- her test kendi verisini kurar; test sırasına bağımlı olmaz;
-- saat/rastgelelik gerekirse kontrol edilir.
-907 test sayısı doğrulanmış bir dönemsel baseline olarak anılabilir. Bu sayı invariant veya kalite hedefi değildir. Yeni testler sayıyı değiştirebilir; önemli olan davranış kapsamı ve tüm suite'in geçmesidir.
+### 25.6 Test data safety
+A test:
+- does not connect to the live production DB; does not use production URLs/tokens;
+- contains no real customer data; makes no real SMTP/AI/Autodesk/OpenCDE calls;
+- sets up its own data; does not depend on test order;
+- controls time/randomness when needed.
+A count of 907 tests may be cited as a verified baseline for a given period. This number is not an invariant or a quality target. New tests may change it; what matters is behaviour coverage and the whole suite passing.
 
-### 25.7 Değişiklik başına zorunlu test
-| Değişiklik | Minimum test |
+### 25.7 Required tests per change
+| Change | Minimum test |
 |---|---|
-| Saf shared kural | shared unit test |
+| Pure shared rule | shared unit test |
 | API endpoint | server integration test |
-| Access değişikliği | allowed + denied + cross-project |
-| Migration | yeni schema ile okuma/yazma ve upgrade varsayımı |
+| Access change | allowed + denied + cross-project |
+| Migration | read/write with the new schema and the upgrade assumption |
 | Job | enqueue + success + failure/idempotency |
 | MCP tool | registration/gating + REST call |
-| Frontend saf logic | web unit test |
-| Yeni route veya kullanıcıya görünen akış | unit + masaüstü e2e + `mobile-` spec + smoke rotası ([Testler](testler.md)) |
+| Pure frontend logic | web unit test |
+| New route or user-visible flow | unit + desktop e2e + `mobile-` spec + smoke route ([Tests](tests.md)) |
 
-## 26. Komutlar ve Definition of Done
-Kurulum:
+## 26. Commands and Definition of Done
+Setup:
 
 ```bash
 node --version
-export NODE_AUTH_TOKEN="<read:packages yetkili GitHub token>"
+export NODE_AUTH_TOKEN="<GitHub token with read:packages>"
 npm ci
 ```
 
-Node çıktısı 22 veya üstü olmalıdır. `.npmrc`, özel
-`@7dimensions-project/bim-viewer` paketini GitHub Packages üzerinden indirir
-(§2.2.1); `NODE_AUTH_TOKEN` bu nedenle `read:packages` yetkili olmalı ve hiçbir
-zaman dosyaya ya da commit'e gerçek değeriyle yazılmamalıdır.
+The Node output must be 22 or later. `.npmrc` downloads the private
+`@7dimensions-project/bim-viewer` package from GitHub Packages
+(§2.2.1); `NODE_AUTH_TOKEN` must therefore have `read:packages` permission, and its real
+value must never be written to a file or a commit.
 
-Hedefli kontroller:
+Targeted checks:
 
 ```bash
 npm run typecheck
@@ -1252,10 +1247,10 @@ npm test -w @sitekeep/shared
 npm test -w @sitekeep/cde-tools
 npm test -w @sitekeep/server
 npm test -w @sitekeep/web
-npm run e2e -- e2e/specs/<alan>.spec.ts
+npm run e2e -- e2e/specs/<area>.spec.ts
 ```
 
-Tam kapı:
+Full gate:
 
 ```bash
 npm run build
@@ -1265,47 +1260,47 @@ npm run e2e:install
 npm run e2e
 ```
 
-`npm run e2e:install` Chromium'u bir kez kurar; CI işletim sistemi bağımlılıklarını da
-`npx playwright install --with-deps chromium` ile kurar.
+`npm run e2e:install` installs Chromium once; CI also installs the operating system dependencies
+with `npx playwright install --with-deps chromium`.
 
-Scenario gerektiğinde:
+When a scenario is needed:
 
 ```bash
-npm run scenarios -- <senaryo>
+npm run scenarios -- <scenario>
 ```
 
 Definition of Done:
-- [ ] Kod güncel domain/feature dizininde.
-- [ ] Yasak bağımlılık yönü yok.
-- [ ] Runtime boundary validation var.
-- [ ] Proje ve token scope kontrol edildi.
-- [ ] Transaction sınırı değerlendirildi.
-- [ ] Error code ve güvenli mesaj tanımlı.
-- [ ] Audit/privacy/outbound etkisi değerlendirildi.
-- [ ] Upload/storage güvenliği değerlendirildi.
-- [ ] Gerekli migration var.
-- [ ] Gerekli unit/integration test var.
-- [ ] Yeni ekran veya görünen akış için unit, masaüstü e2e ve mobil smoke var ([Testler](testler.md)).
-- [ ] UI loading/error/empty durumu var.
-- [ ] Accessibility ve responsive davranış kontrol edildi.
-- [ ] Typecheck/test/build ve gerekiyorsa E2E uygun kapsamda geçti.
-- [ ] Dokümanlar güncel.
-- [ ] Dead code, debug log ve secret yok.
+- [ ] The code is in the current domain/feature directory.
+- [ ] No forbidden dependency direction.
+- [ ] Runtime boundary validation exists.
+- [ ] Project and token scope have been checked.
+- [ ] The transaction boundary has been assessed.
+- [ ] An error code and a safe message are defined.
+- [ ] The audit/privacy/outbound impact has been assessed.
+- [ ] Upload/storage security has been assessed.
+- [ ] The required migration exists.
+- [ ] The required unit/integration tests exist.
+- [ ] Unit, desktop e2e and mobile smoke tests exist for a new screen or visible flow ([Tests](tests.md)).
+- [ ] The UI has loading/error/empty states.
+- [ ] Accessibility and responsive behaviour have been checked.
+- [ ] Typecheck/test/build and, if needed, E2E have passed at the appropriate scope.
+- [ ] Documentation is up to date.
+- [ ] No dead code, debug logs or secrets.
 
-## 27. Adım adım tarifler
+## 27. Step-by-step recipes
 
-### 27.1 Yeni backend endpoint veya domain
-1. Domain sahibini belirle.
-2. Route'u `apps/server/src/<domain>/routes.ts` altında ekle.
-3. Büyükse `routes/` alt parçaları ve ince orchestrator kullan.
-4. Zod schema'yı domain schema dosyasına koy.
-5. Access guard'ı mevcut merkezi helper'a bağla.
-6. Use-case'i `service.ts` veya isimlendirilmiş domain dosyasına koy.
-7. Tekrar yoksa repository oluşturma.
-8. DB gerekiyorsa `src/db/schema-<domain>.ts` ve migration ekle.
-9. Route'u `apps/server/src/app/build-app.ts` içinde kaydet.
-10. `apps/server/test/<kategori>/` altında test ekle.
-İyi:
+### 27.1 New backend endpoint or domain
+1. Determine the domain owner.
+2. Add the route under `apps/server/src/<domain>/routes.ts`.
+3. If it is large, use `routes/` sub-parts and a thin orchestrator.
+4. Put the Zod schema in the domain schema file.
+5. Wire the access guard to the existing central helper.
+6. Put the use case in `service.ts` or a named domain file.
+7. Do not create a repository unless there is repetition.
+8. If a DB is needed, add `src/db/schema-<domain>.ts` and a migration.
+9. Register the route in `apps/server/src/app/build-app.ts`.
+10. Add tests under `apps/server/test/<category>/`.
+Good:
 
 ```text
 coordination/routes/issues.ts
@@ -1313,234 +1308,233 @@ coordination/clash-access.ts
 coordination/service.ts
 ```
 
-Kötü:
+Bad:
 
 ```text
 src/routes/new-thing.ts
 src/services/new-thing.ts
 ```
 
-### 27.2 Yeni frontend page veya feature
-1. Domaini `apps/web/src/features/<feature>/` altında seç.
-2. Route entry page'i `pages/` altına koy.
-3. UI parçalarını feature `components/` altına koy.
-4. Domain API'yi feature `api.ts` içine koy.
-5. Transport için `shared/api/client.ts` kullan.
-6. Query key'e `projectId` ve resource ID ekle.
-7. Route'u `app/routes/AppRoutes.tsx` içine ekle.
-8. Navigation gerekiyorsa `app/navigation/` güncelle.
-9. Loading/error/empty ve responsive durumu ekle.
-10. `apps/web/test/<kategori>/` testi ekle.
-11. Unit, masaüstü e2e, `mobile-<feature>.spec.ts` ve `mobile-smoke` rotasını [Testler](testler.md) kuralına göre yaz ve çalıştır.
-İyi:
+### 27.2 New frontend page or feature
+1. Choose the domain under `apps/web/src/features/<feature>/`.
+2. Put the route entry page under `pages/`.
+3. Put UI parts under the feature's `components/`.
+4. Put the domain API in the feature's `api.ts`.
+5. Use `shared/api/client.ts` for transport.
+6. Add `projectId` and the resource ID to the query key.
+7. Add the route to `app/routes/AppRoutes.tsx`.
+8. Update `app/navigation/` if navigation is needed.
+9. Add loading/error/empty and responsive states.
+10. Add an `apps/web/test/<category>/` test.
+11. Write and run unit, desktop e2e, `mobile-<feature>.spec.ts` and the `mobile-smoke` route according to the [Tests](tests.md) rule.
+Good:
 
 ```text
 features/reports/pages/Reports.tsx
 features/reports/components/ReportFrame.tsx
 ```
 
-Kötü:
+Bad:
 
 ```text
 src/pages/Reports.tsx
 src/components/ReportFrame.tsx
 ```
 
-### 27.3 Yeni shared contract
-1. Gerçekten iki workspace tarafından kullanıldığını doğrula.
-2. `packages/shared/src/<domain>/<name>.ts` ekle veya güncelle.
-3. Runtime bağımlılığı olmadığını doğrula.
-4. Paket içi importları leaf path ile yap.
-5. Public ise `packages/shared/src/index.ts` export'una ekle.
-6. `packages/shared/test/` altında test ekle.
-7. Shared build et.
-8. Tüketicilerde yalnız `@sitekeep/shared` root import kullan.
-İyi:
+### 27.3 New shared contract
+1. Verify that it is really used by two workspaces.
+2. Add or update `packages/shared/src/<domain>/<name>.ts`.
+3. Verify that it has no runtime dependency.
+4. Make in-package imports use leaf paths.
+5. If it is public, add it to the `packages/shared/src/index.ts` exports.
+6. Add a test under `packages/shared/test/`.
+7. Build shared.
+8. Use only the `@sitekeep/shared` root import in consumers.
+Good:
 
 ```ts
 export type ReviewStatus = "draft" | "active" | "closed";
 ```
 
-Kötü:
+Bad:
 
 ```ts
 export type ReviewRow = typeof reviewTable.$inferSelect;
 ```
 
 ### 27.4 DB schema migration
-1. Tablo sahibini belirle.
-2. `apps/server/src/db/schema-<domain>.ts` güncelle.
-3. Gerekirse `schema.ts` export'unu ekle.
-4. Proje FK/index/unique davranışını tasarla.
-5. `npm run db:generate -w @sitekeep/server` çalıştır.
-6. Yeni `apps/server/drizzle/<nnnn>_*.sql` dosyasını incele.
-7. Data migration/backfill'i bounded tasarla.
-8. PGlite integration testi ekle.
-9. PostgreSQL uyumluluğunu gözden geçir.
-10. Breaking drop/rename'i aşamalı yap.
-İyi: nullable ekle → backfill → constraint → eski alanı sonra kaldır. Kötü: dolu üretim tablosunda tek adımda rename/drop.
+1. Determine the table owner.
+2. Update `apps/server/src/db/schema-<domain>.ts`.
+3. Add the `schema.ts` export if needed.
+4. Design the project FK/index/unique behaviour.
+5. Run `npm run db:generate -w @sitekeep/server`.
+6. Review the new `apps/server/drizzle/<nnnn>_*.sql` file.
+7. Design the data migration/backfill to be bounded.
+8. Add a PGlite integration test.
+9. Review PostgreSQL compatibility.
+10. Make breaking drops/renames in stages.
+Good: add nullable → backfill → constraint → remove the old field later. Bad: a single-step rename/drop on a populated production table.
 
-### 27.5 Yeni job
-1. Job kind ve küçük payload sözleşmesini tanımla.
-2. Queue dispatch'i `apps/server/src/jobs/queue.ts` ile bağla.
-3. Handler/worker'ı `apps/server/src/jobs/<name>-worker.ts` altında ekle.
-4. Payload'ı runtime doğrula.
-5. Idempotency anahtarını belirle.
-6. Timeout, retry ve kalıcı hata davranışını belirle.
-7. Route/service yalnız enqueue etsin.
-8. Success/failure/duplicate testi ekle.
-9. Temp ve worker kaynak cleanup'ını doğrula.
-İyi: `{ projectId, fileVersionId }`. Kötü: bütün binary dosyayı job JSON payload'ına koymak.
+### 27.5 New job
+1. Define the job kind and a small payload contract.
+2. Wire the queue dispatch through `apps/server/src/jobs/queue.ts`.
+3. Add the handler/worker under `apps/server/src/jobs/<name>-worker.ts`.
+4. Validate the payload at runtime.
+5. Define the idempotency key.
+6. Define the timeout, retry and persistent error behaviour.
+7. Have the route/service only enqueue.
+8. Add success/failure/duplicate tests.
+9. Verify temp and worker resource cleanup.
+Good: `{ projectId, fileVersionId }`. Bad: putting the whole binary file into the job JSON payload.
 
-### 27.6 Yeni MCP tool
-1. Mevcut `/api/v1` endpoint'ini seç; yoksa önce güvenli endpoint ekle.
-2. Tool'u `packages/cde-tools/src/tools/` veya `tools/modules/` altına ekle.
-3. Zod input shape tanımla.
-4. Yalnız `CdeCall` kullan.
-5. `write`, `local`, `dev`, `destructive` flag'lerini doğru seç.
-6. Çıktıyı `format/` helper'ıyla bounded yap.
-7. `packages/cde-tools/src/index.ts` registration'a ekle.
-8. Gating ve REST call testi ekle.
-9. Stdio ve hosted MCP farkını doğrula.
-İyi: tool → REST → server access/audit. Kötü: tool → Drizzle → tablo.
+### 27.6 New MCP tool
+1. Choose the existing `/api/v1` endpoint; if there is none, add a secure endpoint first.
+2. Add the tool under `packages/cde-tools/src/tools/` or `tools/modules/`.
+3. Define the Zod input shape.
+4. Use only `CdeCall`.
+5. Choose the `write`, `local`, `dev`, `destructive` flags correctly.
+6. Bound the output with a `format/` helper.
+7. Add it to the `packages/cde-tools/src/index.ts` registration.
+8. Add gating and REST call tests.
+9. Verify the difference between stdio and hosted MCP.
+Good: tool → REST → server access/audit. Bad: tool → Drizzle → table.
 
-### 27.7 Yeni integration
-1. Provider sınırını `apps/server/src/integrations/<provider>/` altında aç.
-2. Client, auth, mapper/adapters ve route sorumluluklarını ayır.
-3. Config'i bootstrap/deps üzerinden geçir.
-4. Secret redaction ve encrypted storage tasarla.
-5. Timeout, retry ve rate limit belirle.
-6. Provider response'unu Zod ile doğrula.
-7. Privacy/outbound kaydını bağla.
-8. Provider modelini iç DTO'ya map et.
-9. Gerçek ağa çıkmayan integration testi ekle.
-10. Scheduler varsa shutdown cleanup ekle.
-İyi: `integrations/autodesk/client.ts` + `adapters.ts`. Kötü: route içinde token refresh + fetch + DB + mapping.
+### 27.7 New integration
+1. Open the provider boundary under `apps/server/src/integrations/<provider>/`.
+2. Separate client, auth, mapper/adapters and route responsibilities.
+3. Pass config through bootstrap/deps.
+4. Design secret redaction and encrypted storage.
+5. Define timeout, retry and rate limit.
+6. Validate the provider response with Zod.
+7. Wire up the privacy/outbound record.
+8. Map the provider model to an internal DTO.
+9. Add an integration test that does not go out to the real network.
+10. If there is a scheduler, add shutdown cleanup.
+Good: `integrations/autodesk/client.ts` + `adapters.ts`. Bad: token refresh + fetch + DB + mapping inside a route.
 
 ### 27.8 Report extension
-1. Contract gerekiyorsa `packages/shared/src/reports/` güncelle.
-2. Server dataset'i `apps/server/src/reports/datasets*.ts` içine ekle.
-3. Template/render akışını `reports/templates*.ts` veya engine'e bağla.
-4. Route'u `reports/routes.ts` üzerinden yayınla.
-5. Proje scope ve privacy kontrolünü ekle.
-6. UI'yi `apps/web/src/features/reports/` altında ekle.
-7. Server `test/reports/` ve gerekirse web testi ekle.
-Kötü: report component'inin SQL alan adlarını bilmesi.
+1. Update `packages/shared/src/reports/` if a contract is needed.
+2. Add the server dataset to `apps/server/src/reports/datasets*.ts`.
+3. Wire the template/render flow to `reports/templates*.ts` or the engine.
+4. Publish the route through `reports/routes.ts`.
+5. Add project scope and privacy checks.
+6. Add the UI under `apps/web/src/features/reports/`.
+7. Add a server `test/reports/` test and, if needed, a web test.
+Bad: a report component knowing SQL field names.
 
 ### 27.9 Form extension
-1. Shared contract'ı `packages/shared/src/forms/` altında değerlendir.
-2. DB alanını `schema-forms.ts` ve migration'a ekle.
-3. Service'i `apps/server/src/modules/forms/` altında güncelle.
-4. İlgili route parçasını `modules/forms/routes/` altında değiştir.
-5. PDF etkisini `pdf-*` akışlarında kontrol et.
-6. UI'yi `apps/web/src/features/forms/` altında ekle.
-7. `apps/server/test/forms/` ve web saf logic testini ekle.
-Kötü: yeni form alanını yalnız frontend state'ine eklemek.
+1. Assess the shared contract under `packages/shared/src/forms/`.
+2. Add the DB field to `schema-forms.ts` and a migration.
+3. Update the service under `apps/server/src/modules/forms/`.
+4. Change the relevant route part under `modules/forms/routes/`.
+5. Check the PDF impact in the `pdf-*` flows.
+6. Add the UI under `apps/web/src/features/forms/`.
+7. Add `apps/server/test/forms/` and web pure logic tests.
+Bad: adding a new form field only to frontend state.
 
 ### 27.10 Workflow extension
-1. Saf contract/state kuralını `packages/shared/src/workflow/` altında değerlendir.
-2. Server lifecycle kararını `apps/server/src/workflow/` altında ekle.
-3. Access'i `review-access.ts` benzeri açık helper'da tut.
-4. Transaction'ı review lifecycle/finalization service'inde kur.
-5. Route'u `workflow/routes/` parçasına ekle.
-6. Reminder/notification etkisini değerlendir.
-7. UI'yi ilgili `features/reviews` veya domain feature altında ekle.
-8. `apps/server/test/workflow/` allowed/denied/transition testleri ekle.
-Kötü: status string'ini route ve frontend'de ayrı kurallarla değiştirmek.
+1. Assess the pure contract/state rule under `packages/shared/src/workflow/`.
+2. Add the server lifecycle decision under `apps/server/src/workflow/`.
+3. Keep access in an explicit helper such as `review-access.ts`.
+4. Set up the transaction in the review lifecycle/finalisation service.
+5. Add the route to a `workflow/routes/` part.
+6. Assess the reminder/notification impact.
+7. Add the UI under the relevant `features/reviews` or domain feature.
+8. Add allowed/denied/transition tests under `apps/server/test/workflow/`.
+Bad: changing the status string with separate rules in the route and the frontend.
 
-## 28. Mimari kararlar ve belge bakımı
-Uzun ömürlü, geri çevirmesi pahalı karar için kısa ADR yazılmalıdır. ADR gerektiren örnekler:
-- yeni workspace; microservice ayrımı;
-- auth modelinin değişmesi; DB/storage/queue teknolojisi;
-- API versionlama; shared public export stratejisi;
-- viewer motoru değişimi.
-ADR yeri oluşturulursa:
+## 28. Architecture decisions and document maintenance
+A short ADR should be written for a long-lived decision that is expensive to reverse. Examples that require an ADR:
+- a new workspace; splitting out a microservice;
+- a change to the auth model; DB/storage/queue technology;
+- API versioning; the shared public export strategy;
+- changing the viewer engine.
+If an ADR location is created:
 
 ```text
 docs/architecture/adr/
-  0001-<karar>.md
+  0001-<decision>.md
 ```
 
-ADR:
-- bağlam; karar;
-- alternatifler; olumlu/olumsuz sonuçlar;
-- durum
-içerir. Bu belge güncellenirken:
-1. Path'ler diskten doğrulanır.
-2. Package script'leri `package.json` ile karşılaştırılır.
-3. Eski hedef/refactor dili kaldırılır.
-4. Relative Markdown link'leri taranır.
-5. Çelişen feature belgesi güncellenir veya açıkça ikincil ilan edilir.
-6. Satır sayısı tek başına kalite ölçüsü yapılmaz.
-İlgili mevcut belgeler:
-- [Dokümantasyon dizini](../README.md)
-- [Yedekleme](../onprem/yedekleme.md)
-- [İzleme](../onprem/izleme.md)
-- [Forma eşitleme](../features/FORMA_ESITLEME.md)
-- [Gizlilik](../features/GIZLILIK.md)
-- [Google ile giriş](../features/GOOGLE_GIRIS.md)
-- [Yerel Google ile giriş](../onboarding/GOOGLE_GIRIS.md)
+An ADR contains:
+- context; decision;
+- alternatives; positive/negative consequences;
+- status.
+When this document is updated:
+1. Paths are verified against the disk.
+2. Package scripts are compared with `package.json`.
+3. Old target/refactor language is removed.
+4. Relative Markdown links are checked.
+5. A conflicting feature document is updated or explicitly declared secondary.
+6. Line count alone is not used as a measure of quality.
+Related existing documents:
+- [Documentation index](../README.md)
+- [Backups](../onprem/backups.md)
+- [Monitoring](../onprem/monitoring.md)
+- [Forma sync](../features/FORMA_SYNC.md)
+- [Privacy](../features/PRIVACY.md)
+- [Sign in with Google](../features/GOOGLE_SIGN_IN.md)
+- [Local Google sign-in](../onboarding/GOOGLE_SIGN_IN.md)
 - [OpenCDE](../features/OPENCDE.md)
-- [Geliştirici MCP](../onboarding/GELISTIRICI_MCP.md)
-- [Görüntüleyiciler](../features/GORUNTULEYICILER.md)
+- [Developer MCP](../onboarding/DEVELOPER_MCP.md)
+- [Viewers](../features/VIEWERS.md)
 
-## 29. development-workflow.md — Git süreci
-Branch, commit, rebase, Pull Request, zorunlu review ve merge sürecinin bağlayıcı kaynağı:
+## 29. development-workflow.md — Git process
+The binding source for the branch, commit, rebase, Pull Request, mandatory review and merge process:
 
-Git komutları bu belgede tekrarlanmaz. Mimari açıdan:
-- mimari değişiklik review edilebilir kapsamda olmalı; mekanik taşıma ile davranış değişikliği mümkünse ayrılmalı;
-- migration, güvenlik ve uyumluluk etkisi PR açıklamasında yazılmalıdır.
+Git commands are not repeated in this document. From an architecture perspective:
+- an architectural change should be of reviewable scope; mechanical moves should be separated from behaviour changes where possible;
+- the migration, security and compatibility impact must be described in the PR description.
 
-## 30. Anti-pattern kontrol listesi
-- [ ] Flat `src/routes`, `src/pages` veya `src/components` altında yeni kod.
-- [ ] Component'in page import etmesi.
-- [ ] Service'in route import etmesi.
-- [ ] Shared'ın app import etmesi.
-- [ ] CDE tool'un DB'ye erişmesi.
-- [ ] Başka paketin `src/` yoluna deep import.
-- [ ] Import cycle.
-- [ ] God route: validation + SQL + domain + provider.
-- [ ] God component: routing + fetch + viewer + bütün dialog'lar.
-- [ ] Component içinde ham `fetch`.
-- [ ] Her tablo için zorunlu repository.
-- [ ] Project query'de eksik `projectId`.
-- [ ] Client'tan gelen user/company ID'ye güvenmek.
-- [ ] Authorization'ı yalnız buton gizleyerek yapmak.
-- [ ] Transaction içinde dış HTTP/AI/SMTP.
-- [ ] Request içinde uzun CPU işi.
-- [ ] Sınırsız liste endpoint'i.
-- [ ] Runtime validation yerine `as`.
-- [ ] Kontrolsüz `any`.
-- [ ] Hata yutmak.
-- [ ] Ham internal error döndürmek.
-- [ ] Token/secret/body loglamak.
-- [ ] User filename'i filesystem path yapmak.
-- [ ] Read-only MCP'de write tool kaydetmek.
-- [ ] Hosted MCP'de local tool açmak.
-- [ ] Server state'i birden çok local state'e kopyalamak.
-- [ ] Cleanup'sız viewer/worker/object URL.
-- [ ] Loading/error/empty durumunu atlamak.
-- [ ] Yalnız renkle durum anlatmak.
-- [ ] Root barrel'ı package içinde import etmek.
-- [ ] Generated dosyayı elle kaynak gibi düzenlemek.
-- [ ] 1000+ satır dosyayı gerekçesiz büyütmek.
-- [ ] Testte production DB, token veya müşteri verisi kullanmak.
-- [ ] Tarihsel migration planını yaşayan mimari kuralı gibi tutmak.
+## 30. Anti-pattern checklist
+- [ ] New code under flat `src/routes`, `src/pages` or `src/components`.
+- [ ] A component importing a page.
+- [ ] A service importing a route.
+- [ ] Shared importing app code.
+- [ ] A CDE tool accessing the DB.
+- [ ] A deep import into another package's `src/` path.
+- [ ] An import cycle.
+- [ ] A god route: validation + SQL + domain + provider.
+- [ ] A god component: routing + fetch + viewer + every dialog.
+- [ ] Raw `fetch` inside a component.
+- [ ] A mandatory repository for every table.
+- [ ] A missing `projectId` in a project query.
+- [ ] Trusting a user/company ID from the client.
+- [ ] Doing authorization only by hiding buttons.
+- [ ] External HTTP/AI/SMTP inside a transaction.
+- [ ] Long CPU work inside a request.
+- [ ] An unbounded list endpoint.
+- [ ] `as` instead of runtime validation.
+- [ ] Uncontrolled `any`.
+- [ ] Swallowing errors.
+- [ ] Returning raw internal errors.
+- [ ] Logging tokens/secrets/bodies.
+- [ ] Using a user filename as a filesystem path.
+- [ ] Registering a write tool in read-only MCP.
+- [ ] Enabling a local tool in hosted MCP.
+- [ ] Copying server state into several local states.
+- [ ] Viewer/worker/object URL without cleanup.
+- [ ] Skipping loading/error/empty states.
+- [ ] Conveying state through colour alone.
+- [ ] Importing the root barrel inside the package.
+- [ ] Editing a generated file by hand as if it were source.
+- [ ] Growing a 1000+ line file without justification.
+- [ ] Using a production DB, tokens or customer data in tests.
+- [ ] Keeping a historical migration plan as if it were a living architecture rule.
 
-## 31. Son karar ilkesi
-Yeni koddan önce şu sorular cevaplanmalıdır:
-1. Hangi domain bu kodun sahibidir?
-2. Hangi katmanda çalışmalıdır?
-3. Hangi yönde import yapabilir?
-4. Proje ve token izolasyonu nerede uygulanır?
-5. Dış input nerede doğrulanır?
-6. DB transaction gerekiyor mu?
-7. İş job/worker'a ayrılmalı mı?
-8. Veri dışarı çıkıyor mu?
-9. Hangi test davranışı kanıtlar?
-10. Bu belge veya feature belgesi güncellenmeli mi?
-Cevap net değilse yeni klasör veya abstraction eklemeden önce sınır netleştirilir. En iyi mimari en çok katmanı olan değil:
-- sahipliği görünür; yanlış bağımlılığı zor;
-- güvenliği varsayılan; değişiklik etkisi sınırlı;
-- test edilmesi kolay
-olan mimaridir.
+## 31. Final decision principle
+Before writing new code, these questions must be answered:
+1. Which domain owns this code?
+2. Which layer should it run in?
+3. In which direction may it import?
+4. Where are project and token isolation enforced?
+5. Where is external input validated?
+6. Is a DB transaction needed?
+7. Should the work be split out into a job/worker?
+8. Is data leaving the system?
+9. Which test proves the behaviour?
+10. Should this document or a feature document be updated?
+If the answer is not clear, the boundary is clarified before adding a new folder or abstraction. The best architecture is not the one with the most layers, but the one where:
+- ownership is visible; wrong dependencies are hard;
+- security is the default; the impact of a change is limited;
+- testing is easy.

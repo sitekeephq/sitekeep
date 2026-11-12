@@ -1,5 +1,5 @@
 /**
- * Yönetim → Sistem Durumu → Kapasite (docs/onprem/kapasite.md §8). System administrators only.
+ * Yönetim → Sistem Durumu → Kapasite (docs/onprem/capacity.md §8). System administrators only.
  *
  *   GET  /admin/capacity                    card: hardware, counts, findings, last / running test
  *   GET  /admin/capacity/runs               history, newest first (without samples)

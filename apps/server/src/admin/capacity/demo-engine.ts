@@ -1,7 +1,7 @@
 /**
  * Sample engine: plays a believable quick check / load test for the server's real hardware without
  * sending a single request. Every run it produces is labelled demo ("örnek veri") on the screen and
- * in the report. docs/onprem/kapasite.md §6.5.
+ * in the report. docs/onprem/capacity.md §6.5.
  */
 import {
   CAPACITY_LIMITS,

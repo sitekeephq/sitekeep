@@ -104,12 +104,11 @@ and to a lifetime. Administrators can switch the endpoint off.
 
 ## Documentation
 
-Most documentation is in Turkish for now; English versions are on the way.
-
-- [Docker Compose installation](docs/onprem/docker-compose.md) and [installation bundle](docs/onprem/kurulum-paketi.md)
-- [Backups](docs/onprem/yedekleme.md), [monitoring](docs/onprem/izleme.md), [capacity](docs/onprem/kapasite.md)
-- [Repository structure](docs/architecture/structure.md) and [tests](docs/architecture/testler.md)
+- [Docker Compose installation](docs/onprem/docker-compose.md) and [installation bundle](docs/onprem/installation-bundle.md)
+- [Backups](docs/onprem/backups.md), [monitoring](docs/onprem/monitoring.md), [capacity](docs/onprem/capacity.md)
+- [Repository structure](docs/architecture/structure.md) and [tests](docs/architecture/tests.md)
 - [Modules and the SDK](docs/modules/README.md)
+- Features: [OpenCDE](docs/features/OPENCDE.md), [BCF](docs/features/BCF.md), [viewers](docs/features/VIEWERS.md), [privacy](docs/features/PRIVACY.md), [reports](docs/features/REPORTS.md), [office integration](docs/features/OFFICE_INTEGRATION.md), [AI providers](docs/features/AI_PROVIDERS.md)
 - [All documents](docs/README.md)
 
 ## Contributing and security

@@ -117,7 +117,7 @@ npx playwright show-report
 
 A new screen is not done until unit tests, a desktop spec, a `mobile-*.spec.ts` journey, and a
 `mobile-smoke.spec.ts` route entry exist and pass. The binding rule is
-[docs/architecture/testler.md](../docs/architecture/testler.md).
+[docs/architecture/tests.md](../docs/architecture/tests.md).
 
 ## Adding a spec
 

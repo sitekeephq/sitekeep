@@ -1,5 +1,5 @@
 /**
- * Openings measured from IFC geometry (docs/features/METRAJ.md "Boşluklar"): every IfcOpeningElement
+ * Openings measured from IFC geometry (docs/features/QUANTITIES.md "Boşluklar"): every IfcOpeningElement
  * voiding a host (IfcRelVoidsElement) is read as extruded solids (profile area, profile bounding box,
  * extrusion height; metres). Exporters orient openings differently: Revit often draws a wall opening's
  * profile in plan and extrudes it upwards, others draw it on the wall face and extrude it through the

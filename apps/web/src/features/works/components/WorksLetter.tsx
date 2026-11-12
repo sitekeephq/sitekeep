@@ -1,7 +1,7 @@
 /**
  * "Yazı" section of correspondence works: official letter data (languages, recipient, texts,
  * translations), PDF preview, e-mail (.eml / SMTP), archive / cancel / reopen / delete.
- * Ported from the Odoo module sevend_yazismalar (docs/features/YAZISMALAR.md).
+ * Ported from the Odoo module sevend_yazismalar (docs/features/CORRESPONDENCE.md).
  */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

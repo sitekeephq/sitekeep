@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the on-prem installation bundle (docs/onprem/kurulum-paketi.md):
+# Builds the on-prem installation bundle (docs/onprem/installation-bundle.md):
 #
 #   NODE_AUTH_TOKEN=… deploy/onprem/build-bundle.sh [--edition enterprise|community] [--version 1.0.0] [--platform linux/amd64] [--out dist-bundle]
 #

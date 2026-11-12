@@ -1,5 +1,5 @@
 /**
- * Yönetim → Sistem Durumu (docs/onprem/izleme.md): canlılık, kaynak, kuyruk, yedek özeti.
+ * Yönetim → Sistem Durumu (docs/onprem/monitoring.md): canlılık, kaynak, kuyruk, yedek özeti.
  * Kartlar örnek listeleri modalda açar; yedek işi henüz kuyruğa bağlı değil.
  */
 import { useEffect, useState } from "react";

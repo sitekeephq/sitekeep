@@ -1,5 +1,5 @@
 /**
- * The simple project screen (docs/product/SADELESTIRME.md, 1. aşama): module switches, saved views,
+ * The simple project screen (docs/product/SIMPLIFICATION.md, 1. aşama): module switches, saved views,
  * project "Bugün" and user preferences.
  */
 import { hasAi, hasField, hasManage } from "../helpers/modules.js"; // these steps use Field (forms)

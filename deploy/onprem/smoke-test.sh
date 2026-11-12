@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# On-prem bundle smoke test (docs/onprem/kurulum-paketi.md): an empty Linux "server" (docker:dind)
+# On-prem bundle smoke test (docs/onprem/installation-bundle.md): an empty Linux "server" (docker:dind)
 # gets the bundle and goes through what a customer's IT does.
 #
 #   deploy/onprem/smoke-test.sh <bundle .tar.gz>

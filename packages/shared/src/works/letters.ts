@@ -3,7 +3,7 @@
  * body texts with translations, labels for the PDF and e-mail templates. Stored in
  * works.data.letter (validated by the server). Base texts are Turkish (the work title is the
  * Turkish subject); an empty translated field falls back to the Turkish text.
- * Ported from the Odoo module sevend_yazismalar (see docs/features/YAZISMALAR.md).
+ * Ported from the Odoo module sevend_yazismalar (see docs/features/CORRESPONDENCE.md).
  */
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "../platform/i18n.js";
 

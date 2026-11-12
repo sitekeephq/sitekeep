@@ -4,7 +4,7 @@
  * A channel takes a work that is ready to go out and reports how far delivery got. Today every
  * channel is manual or in-app: nothing leaves the server. A real KEP (Kayıtlı Elektronik Posta)
  * provider or an SMTP channel implements the same interface later and registers itself in
- * DELIVERY_CHANNELS; the routes and the UI do not change. See docs/features/ISLER.md.
+ * DELIVERY_CHANNELS; the routes and the UI do not change. See docs/features/WORKS.md.
  */
 import type { DeliveryChannelDto, DeliveryStatus } from "@sitekeep/shared";
 import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";

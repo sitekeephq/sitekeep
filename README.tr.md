@@ -16,8 +16,8 @@ Marka dosyaları ve kullanım kuralları: [docs/brand/README.md](docs/brand/READ
 Yerel sunucuda (on-premise) çalışan, ISO 19650 uyumlu **Ortak Veri Ortamı**. Autodesk Forma'nın (eski ACC)
 Docs ve Issues tarafının açık formatlı karşılığı; 3B/BIM tarafı [That Open Company](https://thatopen.com) üzerine kurulu.
 
-- **Geliştirici başlangıcı:** [depo yapısı](docs/architecture/structure.md), [demo veri](docs/onboarding/DEMO_VERI.md) ve [MCP geliştirme rehberi](docs/onboarding/GELISTIRICI_MCP.md)
-- Gizlilik: sunucu dışarıya kendiliğinden veri göndermez; her dış bağlantı Yönetim → Gizlilik Merkezi'nde görünür, kaydı tutulur ve tek düğmeyle kapatılır: [docs/features/GIZLILIK.md](docs/features/GIZLILIK.md)
+- **Geliştirici başlangıcı:** [depo yapısı](docs/architecture/structure.md), [demo veri](docs/onboarding/DEMO_DATA.md) ve [MCP geliştirme rehberi](docs/onboarding/DEVELOPER_MCP.md)
+- Gizlilik: sunucu dışarıya kendiliğinden veri göndermez; her dış bağlantı Yönetim → Gizlilik Merkezi'nde görünür, kaydı tutulur ve tek düğmeyle kapatılır: [docs/features/PRIVACY.md](docs/features/PRIVACY.md)
 
 ## Neler var (faz 1)
 
@@ -69,7 +69,7 @@ cp apps/server/.env.development.example apps/server/.env.development   # yöneti
 npm run dev -w @sitekeep/server      # API  → http://127.0.0.1:8787
 npm run dev -w @sitekeep/web         # Arayüz → http://localhost:5173 (API'ye proxy)
 node --env-file=apps/server/.env.development apps/server/scripts/seed-demo.mjs   # örnek ZAVM projesi
-node --env-file=apps/server/.env.development apps/server/scripts/import-demo.mjs # Forma yapılı demo projeler (docs/onboarding/DEMO_VERI.md)
+node --env-file=apps/server/.env.development apps/server/scripts/import-demo.mjs # Forma yapılı demo projeler (docs/onboarding/DEMO_DATA.md)
 npm test                           # paylaşılan çekirdek + API testleri
 ```
 
@@ -187,7 +187,7 @@ denetim kaydına yazılır. Yerel dosya araçları (`cde_file_upload`, `cde_file
 Yönetim → **Yapay zekâ ve MCP** ekranında hazır örnekler (Claude Desktop dahil) kopyalanabilir.
 
 Geliştirici MCP'si (Claude Code / Desktop ile hızlı test, örnek veri, senaryolar, "Yapay Zekâya Gönder" kuyruğu):
-[docs/onboarding/GELISTIRICI_MCP.md](docs/onboarding/GELISTIRICI_MCP.md). Senaryoları MCP'siz çalıştırmak için `npm run scenarios`.
+[docs/onboarding/DEVELOPER_MCP.md](docs/onboarding/DEVELOPER_MCP.md). Senaryoları MCP'siz çalıştırmak için `npm run scenarios`.
 
 Token'lar:
 
@@ -248,7 +248,7 @@ Proje başlığındaki **Sor** kutusu (veya Ctrl+K) Türkçe soruları projenin 
 yalnız okuma araçlarını (MCP ile aynı `cde_*` okuma araçları + dosya arama ve proje özeti) **kullanıcının kendi
 yetkisiyle**, salt okuma ve tek proje kapsamında çalıştırır; cevapta dosya / klasör / sorun / inceleme / model / iş (bilgi
 talebi, teknik onay, toplantı) / form bağlantıları verir. Cevaplarda arayüzün Türkçe terimlerini kullanır
-([docs/product/TERIMLER.md](docs/product/TERIMLER.md)). Yazma araçları asistana hiç sunulmaz.
+([docs/product/TERMINOLOGY.md](docs/product/TERMINOLOGY.md)). Yazma araçları asistana hiç sunulmaz.
 
 Küçük yerel modeller için istem kısa tutulur: Türkçe anahtar kelime yönlendiricisi (`routeTools`) soruya göre yalnız ilgili
 araç grubunu sunar ("bilgi talebi/RFI", "teknik onay/şartname", "toplantı/tutanak/eylem", "iş/görev/termin", "form/blok/kat",

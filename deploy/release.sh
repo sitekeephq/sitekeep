@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Manual release (docs/onprem/surum-cikarma.md): builds the SiteKeep Community and SiteKeep Enterprise
+# Manual release (docs/onprem/releasing.md): builds the SiteKeep Community and SiteKeep Enterprise
 # bundles of one version and puts everything to upload (Odoo site, customer portal) in one folder.
 #
 #   deploy/release.sh --version 1.0.0 [--out ~/SiteKeep-surumler] [--platform linux/amd64]

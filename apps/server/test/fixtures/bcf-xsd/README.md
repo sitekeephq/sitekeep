@@ -1,19 +1,19 @@
-# BCF-XML şemaları ve örnek dosyalar (buildingSMART)
+# BCF-XML schemas and sample files (buildingSMART)
 
-Bu klasördeki `.xsd` dosyaları ve `../bcf-samples/` içindeki `.bcf` dosyaları buildingSMART International'ın
-[BCF-XML](https://github.com/buildingSMART/BCF-XML) deposundan **değiştirilmeden** kopyalandı (11.10.2026).
+The `.xsd` files in this folder and the `.bcf` files in `../bcf-samples/` were copied **unmodified** from buildingSMART International's
+[BCF-XML](https://github.com/buildingSMART/BCF-XML) repository (11.10.2026).
 
-| Klasör | Kaynak |
+| Folder | Source |
 |---|---|
-| `2.1/` | `release_2_1` dalı, `Schemas/` (markup, visinfo, version, project) |
-| `3.0/` | `release_3_0` dalı, `Schemas/` (tamamı) |
-| `../bcf-samples/v21-*.bcf` | `release_3_0` dalı, `Test Cases/v2.1/…` (One part visible, user assignment) |
-| `../bcf-samples/v30-*.bcf` | `release_3_0` dalı, `Test Cases/v3.0/…` (Orthogonal camera, Related topics) |
+| `2.1/` | `release_2_1` branch, `Schemas/` (markup, visinfo, version, project) |
+| `3.0/` | `release_3_0` branch, `Schemas/` (all) |
+| `../bcf-samples/v21-*.bcf` | `release_3_0` branch, `Test Cases/v2.1/…` (One part visible, user assignment) |
+| `../bcf-samples/v30-*.bcf` | `release_3_0` branch, `Test Cases/v3.0/…` (Orthogonal camera, Related topics) |
 
-Lisans: © buildingSMART International Ltd., Creative Commons Attribution-NoDerivatives 4.0 International
-(CC BY-ND 4.0), bkz. `LICENSE-buildingSMART.txt` (deponun `release_3_0/LICENSE` dosyası). `release_2_1` dalında
-ayrı bir lisans dosyası yok; depo lisansı esas alındı. Dosyalar yalnız testlerde, birebir kopya olarak kullanılır.
+Licence: © buildingSMART International Ltd., Creative Commons Attribution-NoDerivatives 4.0 International
+(CC BY-ND 4.0), see `LICENSE-buildingSMART.txt` (the repository's `release_3_0/LICENSE` file). The `release_2_1` branch has
+no separate licence file; the repository licence applies. The files are used only in tests, as verbatim copies.
 
-Testler (`apps/server/test/bcf.test.ts`) dışa aktarılan XML'i bu şemalara karşı denetler. Denetleyici
-`apps/server/test/xsd-lite.ts`: BCF şemalarının kullandığı XSD alt kümesini (sequence, choice, öznitelik,
-desen, uzunluk, sayı sınırları, sayım) uygular; tanımadığı bir XSD yapısında hata verir.
+The tests (`apps/server/test/bcf.test.ts`) validate the exported XML against these schemas. The validator is
+`apps/server/test/xsd-lite.ts`: it implements the XSD subset used by the BCF schemas (sequence, choice, attributes,
+patterns, lengths, numeric bounds, enumerations) and raises an error on any XSD construct it does not recognise.

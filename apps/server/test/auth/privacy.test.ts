@@ -1,5 +1,5 @@
 /**
- * Privacy phase 1 (docs/features/GIZLILIK.md): security headers, the outbound registry and its log, the
+ * Privacy phase 1 (docs/features/PRIVACY.md): security headers, the outbound registry and its log, the
  * Gizlilik Merkezi API, the kill switch and AI data minimisation. No real network: fetch is mocked.
  */
 import { hasAi } from "../helpers/modules.js"; // AI steps run when the AI module is installed

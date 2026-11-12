@@ -327,7 +327,7 @@ export class Converters {
       const [minMajor, minMinor] = DWG2DXF_MIN_VERSION;
       if (major < minMajor || (major === minMajor && minor < minMinor)) {
         (this.opts.warn ?? console.warn)(
-          `LibreDWG dwg2dxf ${m[0]} (${bin}) eski: 0.14 veya üstü gerekli; 0.13 MTEXT değerlerini satırlara bölüyor (sunucu onarıyor, docs/features/GORUNTULEYICILER.md).`, // i18n-ok: log line
+          `LibreDWG dwg2dxf ${m[0]} (${bin}) eski: 0.14 veya üstü gerekli; 0.13 MTEXT değerlerini satırlara bölüyor (sunucu onarıyor, docs/features/VIEWERS.md).`, // i18n-ok: log line
         );
       }
     } catch {

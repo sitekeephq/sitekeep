@@ -1,6 +1,6 @@
 import { test, expect, runState } from "../support/fixtures";
 
-/** Yönetim → Sistem Durumu → Kapasite (docs/onprem/kapasite.md), sample test engine. */
+/** Yönetim → Sistem Durumu → Kapasite (docs/onprem/capacity.md), sample test engine. */
 test("capacity card runs a quick check and a load test with live charts and a report", async ({ page }) => {
   const { project } = await runState();
   await page.goto(`/projects/${project.id}/sistem-durumu`);

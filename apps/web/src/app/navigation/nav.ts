@@ -1,7 +1,7 @@
 /**
  * The project menu, the "İşler" views, the Model tabs and the settings tabs, kept apart from the
  * components so the Title Case check (test/app/ui-terms.test.ts) and the route table test
- * (test/app/routes.test.ts) can read them without rendering anything. docs/product/SADELESTIRME.md, 1. aşama.
+ * (test/app/routes.test.ts) can read them without rendering anything. docs/product/SIMPLIFICATION.md, 1. aşama.
  *
  * Names are translation keys of the "shell" namespace (docs/architecture/i18n.md): render them with
  * `t(item.labelKey)` from `useTranslation("shell")`.
@@ -113,7 +113,7 @@ export const MODEL_TABS: { key: "viewer" | "coordination" | "schedule" | "params
   { key: "viewer", to: "viewer", labelKey: "nav.modelTabs.viewer" },
   { key: "coordination", to: "coordination", labelKey: "nav.modelTabs.coordination", module: "coordination" },
   { key: "schedule", to: "schedule", labelKey: "nav.modelTabs.schedule", module: "schedule", webModule: "planning" },
-  // Değişiklik Talebi (docs/features/PARAMETRE_DEGISIKLIGI.md): new requests need the Koordinasyon module.
+  // Değişiklik Talebi (docs/features/PARAMETER_CHANGE.md): new requests need the Koordinasyon module.
   { key: "params", to: "param-changes", labelKey: "nav.modelTabs.params", module: "coordination", webModule: "coordinate" },
 ];
 

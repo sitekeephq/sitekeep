@@ -1,4 +1,4 @@
-/** API client for Yönetim → Gizlilik Merkezi (docs/features/GIZLILIK.md). */
+/** API client for Yönetim → Gizlilik Merkezi (docs/features/PRIVACY.md). */
 import type { OutboundLogPageDto, PrivacyConnectionDto, PrivacySettingsDto, PrivacySummaryDto } from "@sitekeep/shared";
 import { request } from "./client";
 

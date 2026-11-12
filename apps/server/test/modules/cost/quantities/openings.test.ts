@@ -1,4 +1,4 @@
-/** Openings deducted from IFC geometry (docs/features/METRAJ.md "Boşluklar"): worker output and inventory numbers. */
+/** Openings deducted from IFC geometry (docs/features/QUANTITIES.md "Boşluklar"): worker output and inventory numbers. */
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";

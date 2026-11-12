@@ -1,69 +1,69 @@
-# SiteKeep marka dosyaları
+# SiteKeep brand files
 
-Ürün adı her yerde **SiteKeep** yazılır: büyük S, büyük K, boşluksuz. Alan adı, paket ve komut adlarında küçük harf kullanılır: `sitekeep.org`, `@sitekeep/sdk`, `sitekeep`.
+The product name is always written **SiteKeep**: capital S, capital K, no space. Domain, package and command names use lower case: `sitekeep.org`, `@sitekeep/sdk`, `sitekeep`.
 
-![Önizleme](preview.png)
+![Preview](preview.png)
 
-## Simge
+## Mark
 
-Simge, ISO 19650 ortak veri ortamının dört durumunu üst üste koyar. Alttan üste:
+The mark stacks the four states of the ISO 19650 common data environment. From bottom to top:
 
-| Katman | Durum | Renk |
+| Layer | State | Colour |
 |---|---|---|
-| 1 | Çalışılıyor (WIP) | gri `#9AA5B1` |
-| 2 | Paylaşıldı (Shared) | amber `#F2A33A` |
-| 3 | Yayımlandı (Published) | yeşil `#3B9A6B` |
-| 4 | Arşiv (Archive) | lacivert `#2E5A8A` / `#1F3A5F` |
+| 1 | Work in Progress (WIP) | grey `#9AA5B1` |
+| 2 | Shared | amber `#F2A33A` |
+| 3 | Published | green `#3B9A6B` |
+| 4 | Archived | navy `#2E5A8A` / `#1F3A5F` |
 
-En üstteki arşiv katmanındaki anahtar deliği "veriler sizde, güvende" anlamını taşır.
+The keyhole in the top archive layer stands for "your data stays with you, safe".
 
-## Dosyalar
+## Files
 
-SVG'ler uygulamanın statik klasöründedir: [apps/web/public/brand](../../apps/web/public/brand); uygulama
-onları `/brand/<dosya>` adresinden sunar (sekme simgesi `/brand/sitekeep-favicon.svg`). Arayüzdeki simge
-ve yazı [BrandMark.tsx](../../apps/web/src/shared/ui/BrandMark.tsx) ile çizilir (aynı şekiller; 48 px'in
-altında favicon çizimi).
+The SVGs are in the application's static folder: [apps/web/public/brand](../../apps/web/public/brand); the application
+serves them from `/brand/<file>` (tab icon `/brand/sitekeep-favicon.svg`). The mark and wordmark in the interface
+are drawn by [BrandMark.tsx](../../apps/web/src/shared/ui/BrandMark.tsx) (same shapes; the favicon drawing below
+48 px).
 
-| Dosya | Kullanım |
+| File | Use |
 |---|---|
-| `sitekeep-logo-horizontal.svg` / `-dark.svg` | Ana logo: web sitesi başlığı, uygulama üst çubuğu, belgeler |
-| `sitekeep-logo-stacked.svg` / `-dark.svg` | Kare alanlar: giriş ekranı, sosyal medya profili |
-| `sitekeep-logo-mono-navy.svg`, `-black.svg`, `-white.svg` | Tek renk baskı, kaşe, belge antedi |
-| `sitekeep-mark.svg` / `-dark.svg` | Yalnız simge (48 px ve üstü) |
-| `sitekeep-favicon.svg` | 16–32 px: tarayıcı sekmesi. Sade sürüm: üç katman, anahtar deliği yok |
+| `sitekeep-logo-horizontal.svg` / `-dark.svg` | Main logo: website header, application top bar, documents |
+| `sitekeep-logo-stacked.svg` / `-dark.svg` | Square areas: sign-in screen, social media profile |
+| `sitekeep-logo-mono-navy.svg`, `-black.svg`, `-white.svg` | Single-colour print, stamp, document letterhead |
+| `sitekeep-mark.svg` / `-dark.svg` | Mark only (48 px and above) |
+| `sitekeep-favicon.svg` | 16–32 px: browser tab. Simplified version: three layers, no keyhole |
 
-`-dark` dosyaları koyu zemin (`#14243A`) içerir.
+The `-dark` files include a dark background (`#14243A`).
 
-## Renkler
+## Colours
 
-| Ad | Açık zemin | Koyu zemin |
+| Name | Light background | Dark background |
 |---|---|---|
-| "Site" yazısı | `#1F3A5F` | `#FFFFFF` |
-| "Keep" yazısı | `#D9861C` | `#F2A33A` |
-| Koyu zemin | — | `#14243A` |
+| "Site" text | `#1F3A5F` | `#FFFFFF` |
+| "Keep" text | `#D9861C` | `#F2A33A` |
+| Dark background | — | `#14243A` |
 
-## Yazı tipi
+## Typeface
 
-Yazı, Liberation Sans Bold'dan (SIL Open Font License 1.1, `apps/server/assets/fonts/`) çizgiye dönüştürülmüştür; SVG'ler yazı tipi yüklü olmadan da aynı görünür. Bu ilk sürümdür; marka tescilinden önce özel bir yazı tipiyle yenilenebilir.
+The text is converted to outlines from Liberation Sans Bold (SIL Open Font License 1.1, `apps/server/assets/fonts/`); the SVGs look the same without the font installed. This is the first version; it may be replaced with a custom typeface before the trademark is registered.
 
-## Sürüm adları
+## Edition names
 
-**SiteKeep Community** (modülsüz çekirdek) ve **SiteKeep Enterprise** (modüllerle). Uygulama hangisi
-olduğunu kurulu modüllerden çıkarır (MIMARI.md → Sürümler).
+**SiteKeep Community** (core without modules) and **SiteKeep Enterprise** (with modules). The application determines
+which one it is from the installed modules (MIMARI.md → Editions).
 
-## Yeniden üretme
+## Regenerating
 
-SVG'ler [make_brand.py](make_brand.py) ile Liberation Sans'tan üretilir; uygulamanın kullandığı klasöre yazar:
+The SVGs are generated from Liberation Sans with [make_brand.py](make_brand.py); it writes to the folder the application uses:
 
 ```bash
 pip install fonttools
 python docs/brand/make_brand.py . apps/web/public/brand
 ```
 
-Önizleme (`preview.png`) elle güncellenir.
+The preview (`preview.png`) is updated by hand.
 
-## Kurallar
+## Rules
 
-- Logoyu döndürme, gerdirme, renklerini değiştirme ya da gölge ekleme.
-- Logonun çevresinde simge yüksekliğinin en az dörtte biri kadar boşluk bırak.
-- Simge 48 px'in altında kullanılacaksa `sitekeep-favicon.svg` kullan.
+- Do not rotate or stretch the logo, change its colours or add shadows.
+- Leave clear space around the logo of at least a quarter of the mark's height.
+- Below 48 px, use `sitekeep-favicon.svg`.

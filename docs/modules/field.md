@@ -1,70 +1,70 @@
-# Field modülü
+# Field module
 
-SiteKeep Field: form şablonları (PDF'ten şablon dahil), formlar, onay akışı ve form PDF'leri.
-Ürün açıklaması: SiteKeep sürümler ve modüller §2.
-Özellik belgesi: [Form PDF](../features/FORM_PDF.md).
+SiteKeep Field: form templates (including templates from PDF), forms, approval workflow and form PDFs.
+Product description: SiteKeep editions and modules §2.
+Feature document: [Form PDF](../features/FORM_PDF.md).
 
 | | |
 |---|---|
-| Depo | [7Dimensions-Project/sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (kapalı); yerel klon `~/Desktop/7dimensions/sitekeep-field` |
-| Paket | `@7dimensions-project/sitekeep-ee-field` (GitHub Packages) |
-| Bu depodaki sürüm | `0.3.2` (`apps/server/package.json`, `apps/web/package.json`) |
-| Kullandığı SDK | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
-| Kimlik | `field` (`SITEKEEP_MODULES`) |
+| Repository | [7Dimensions-Project/sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (private); local clone `~/Desktop/7dimensions/sitekeep-field` |
+| Package | `@7dimensions-project/sitekeep-ee-field` (GitHub Packages) |
+| Version in this repository | `0.3.2` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| ID | `field` (`SITEKEEP_MODULES`) |
 
-Cost'tan farklı olarak üç adım tek seferde yapıldı (altyapı hazırdı). Taşınmadan önceki geçmiş bu
-depodadır (`apps/server/src/modules/forms`, `apps/web/src/features/forms`).
+Unlike Cost, the three steps were done in one go (the infrastructure was ready). The history before the move is in this
+repository (`apps/server/src/modules/forms`, `apps/web/src/features/forms`).
 
-## Sınır
+## Boundary
 
-Konumlar (konum ağacı, konum bağları) çekirdekte kalır: sorunlar ve dosyalar da konuma bağlanır.
-Bir formun konumu çekirdeğin `location_links` kaydıdır (`kind = "form"`).
+Locations (location tree, location links) stay in the core: issues and files are also linked to locations.
+A form's location is a `location_links` record in the core (`kind = "form"`).
 
-Yapay zekâ özellikleri (form şablonu taslağı, iş akışı taslağı, PDF alan adlandırma) Field'ın
-rotalarını HTTP ile çağırır; ortak oldukları API sözleşmeleri çekirdekte durur:
-`apps/server/src/contracts/forms.ts` (şablon, akış ve adlandırma şemaları; Field SDK'dan alır).
+The AI features (form template draft, workflow draft, PDF field naming) call Field's
+routes over HTTP; the API contracts they share stay in the core:
+`apps/server/src/contracts/forms.ts` (template, workflow and naming schemas; Field takes them from the SDK).
 
-## Pakette ne var
+## What is in the package
 
-| Yer (depoda) | İçerik |
+| Location (in the repository) | Contents |
 |---|---|
-| `server/index.ts` | Modül: migration'lar, rotalar, Görevlerim kaynağı, geliştirici araçları için `tables`; yüklenirken yetenekleri ve "forms" rapor veri kümesini kaydeder |
-| `server/routes/`, `service.ts`, `flow.ts`, `library.ts` | Şablonlar, formlar, ekler, sorunlar, akış, şablon kütüphanesi |
-| `server/pdf*.ts` | PDF alan bulma, PDF'e yazma, sayfa düzeni (worker), PDF dışa aktarma |
+| `server/index.ts` | Module: migrations, routes, My Tasks source, `tables` for developer tools; registers the capabilities and the "forms" report dataset when loaded |
+| `server/routes/`, `service.ts`, `flow.ts`, `library.ts` | Templates, forms, attachments, issues, workflow, template library |
+| `server/pdf*.ts` | PDF field detection, writing to PDF, page layout (worker), PDF export |
 | `server/capabilities.ts` | `field.forms`, `field.externalForms` |
 | `server/schema-tables.ts` | `form_templates`, `form_pdf_sources`, `form_template_versions`, `forms`, `form_attachments`, `form_issue_links` |
-| `web/` | Formlar sayfası, form doldurma, PDF şablon sayfası, "+ Yeni" form diyaloğu, çevrimdışı taslaklar |
-| `migrations/0000_forms` | Kendi günlüğü `drizzle.__drizzle_migrations_field`; çekirdeğin 0012, 0020, 0021'inden idempotent |
+| `web/` | Forms page, form filling, PDF template page, "+ New" form dialog, offline drafts |
+| `migrations/0000_forms` | Own journal `drizzle.__drizzle_migrations_field`; idempotent, from the core's 0012, 0020, 0021 |
 
-Henüz çekirdekte: web API istemcisinin form çağrıları (`api.formTemplates`, `api.forms` …),
-ortak tipler (`packages/shared`), yukarıdaki sözleşmeler. Metinler modüldedir (`locales/`).
+Still in the core: the web API client's form calls (`api.formTemplates`, `api.forms` …),
+shared types (`packages/shared`), the contracts above. Strings are in the module (`locales/`).
 
-## Çekirdeğe bağlandığı yerler
+## Where it connects to the core
 
-| Çekirdek | Nasıl |
+| Core | How |
 |---|---|
-| Rotalar, Görevlerim (form adımları) | `ServerModule.routes`, `taskSources` |
-| "Bugün": taslak formlarım; hub etiketleri | `field.forms` (`drafts`, `list`, `link`) |
-| Konumlar: forma konum bağlama, etiketler | `field.forms` (`list`) |
-| Raporlar: `forms` veri kümesi | modül yüklenirken kaydedilir |
-| Raporlar: iş akışı adımlarında form etiketi, konumlara göre form sayıları | `field.forms` (`list`) |
-| Autodesk formları (Forma Eşitleme) | `field.externalForms` (`upsert`); Field yoksa formlar atlanır |
-| Geliştirici araçları (demo veri, sıfırlama, tarih kaydırma, betikler) | `ServerModule.tables` → `moduleTable("field", …)` |
-| Menü, sayfalar, İşler'deki "Formlar" görünümü, eski adresler | `WebModule.projectNav`, `projectRoutes`; `HubView.webModule`, `LEGACY_URLS.module` |
-| "+ Yeni" → Form | `field.newFormDialog` |
-| PDF fontları | SDK `pdfFontBytes()` |
+| Routes, My Tasks (form steps) | `ServerModule.routes`, `taskSources` |
+| "Today": my draft forms; hub labels | `field.forms` (`drafts`, `list`, `link`) |
+| Locations: linking a location to a form, labels | `field.forms` (`list`) |
+| Reports: `forms` dataset | registered while the module loads |
+| Reports: form label in workflow steps, form counts by location | `field.forms` (`list`) |
+| Autodesk forms (Forma Sync) | `field.externalForms` (`upsert`); without Field, forms are skipped |
+| Developer tools (demo data, reset, date shifting, scripts) | `ServerModule.tables` → `moduleTable("field", …)` |
+| Menu, pages, the "Forms" view in Works, legacy addresses | `WebModule.projectNav`, `projectRoutes`; `HubView.webModule`, `LEGACY_URLS.module` |
+| "+ New" → Form | `field.newFormDialog` |
+| PDF fonts | SDK `pdfFontBytes()` |
 
-## Testler
+## Tests
 
-| Yer | Ne |
+| Location | What |
 |---|---|
-| `sitekeep-field`: `npm test` | Sınır kontrolü, PDF alan kimliği birim testi (SDK yerine test kopyaları) |
-| `apps/server/test/modules/field/` | Formlar API'si, PDF şablonları, alan bulma, PDF'e yazma, akış |
-| Çapraz testler (yapay zekâ, MCP, raporlar, hub, geliştirici araçları) | Form adımları `hasField` ile (`test/helpers/modules.ts`) |
-| `e2e/specs/` | form senaryoları |
+| `sitekeep-field`: `npm test` | Boundary check, PDF field ID unit test (test copies instead of the SDK) |
+| `apps/server/test/modules/field/` | Forms API, PDF templates, field detection, writing to PDF, workflow |
+| Cross-cutting tests (AI, MCP, reports, hub, developer tools) | Form steps with `hasField` (`test/helpers/modules.ts`) |
+| `e2e/specs/` | form scenarios |
 
-## Çekirdekte kalanlar
+## What stays in the core
 
-Açık iş yok (10.11.2026). Aşağıdakiler bilerek çekirdekte duruyor ya da başka modüllerle paylaşılıyor:
+No open work (10.11.2026). The following stay in the core on purpose or are shared with other modules:
 
-- Form API istemcisi pakettedir (`web/api.ts`, `formsApi`); çekirdeğin `api.ts`'inde yalnız İşler "+ Yeni → Form" için `formTemplates` kalır. Form yapay zekâ özellikleri Field kurulu değilken listelenmez ve kuyruğa alınmaz (AI modülü, `product`). Yalnız Field'ın kullandığı form yardımcıları (değer doğrulama, puanlama, form numarası, şablon benzerliği, akış satırları) pakettedir (`shared/forms.ts`, `shared/form-pdf.ts`); form şablonu ve form DTO'ları çekirdeğin form PDF'i, rapor ve AI tarafları da kullandığından çekirdekte. Metinler modülde (`locales/`).
+- The form API client is in the package (`web/api.ts`, `formsApi`); the core's `api.ts` keeps only `formTemplates` for Works "+ New → Form". Form AI features are not listed and not queued while Field is not installed (AI module, `product`). Form helpers used only by Field (value validation, scoring, form number, template similarity, workflow rows) are in the package (`shared/forms.ts`, `shared/form-pdf.ts`); the form template and form DTOs are in the core because the core's form PDF, reports and AI parts also use them. Strings are in the module (`locales/`).

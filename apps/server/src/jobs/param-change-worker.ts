@@ -1,6 +1,6 @@
 /**
  * Worker thread: applies parameter changes (property set values) to an IFC file with web-ifc and
- * writes the result as a new file (docs/features/PARAMETRE_DEGISIKLIGI.md).
+ * writes the result as a new file (docs/features/PARAMETER_CHANGE.md).
  *
  * Only property sets change: IfcPropertySingleValue / IfcPropertyEnumeratedValue values, new
  * properties, new property sets (IfcPropertySet + IfcRelDefinesByProperties, IFC2X3 and IFC4).

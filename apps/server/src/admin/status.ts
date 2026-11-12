@@ -1,6 +1,6 @@
 /**
  * Yönetim → Sistem Durumu. Public /health stays shallow; this payload is administrators only.
- * docs/onprem/izleme.md
+ * docs/onprem/monitoring.md
  */
 import { statfs } from "node:fs/promises";
 import { readFileSync } from "node:fs";

@@ -1,5 +1,5 @@
 /**
- * "Bırak, kaydet" (docs/product/SADELESTIRME.md 2. aşama): a dropped PDF, e-mail (.eml / .msg) or .docx
+ * "Bırak, kaydet" (docs/product/SIMPLIFICATION.md 2. aşama): a dropped PDF, e-mail (.eml / .msg) or .docx
  * becomes a record draft. The server reads the text with plain rules first (Sayı, Tarih, Konu,
  * İlgi, KEP header, e-mail From/Subject/Date); an optional AI pass only fills gaps. The user sees
  * a prefilled form with the original file attached and confirms with "Kaydet".

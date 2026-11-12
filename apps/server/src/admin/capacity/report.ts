@@ -1,6 +1,6 @@
 /**
  * Kapasite raporu: a self-contained HTML page (print → PDF) and the JSON the administrator sends to
- * 7D by hand. Numbers only: no project, file or person names (docs/onprem/kapasite.md §6.4).
+ * 7D by hand. Numbers only: no project, file or person names (docs/onprem/capacity.md §6.4).
  */
 import {
   CAPACITY_CONCURRENCY,

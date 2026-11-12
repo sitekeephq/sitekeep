@@ -1,7 +1,7 @@
 /**
  * A capacity test engine measures; CapacityRuns (runs.ts) owns the run record, one-at-a-time and
  * cancelling. Engines: DemoEngine (sample data, today). QuickCheckEngine and LoadTestEngine
- * (docs/onprem/kapasite.md §4, §12) plug in behind the same interface.
+ * (docs/onprem/capacity.md §4, §12) plug in behind the same interface.
  */
 import type { CapacityCheck, CapacityHardware, CapacityRunDto, CapacityRunMode, CapacitySample, CapacityStep } from "@sitekeep/shared";
 import type { Msg } from "../../i18n/index.js";

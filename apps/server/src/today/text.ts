@@ -1,5 +1,5 @@
 /**
- * "Günün Özeti" without side effects (docs/product/SADELESTIRME.md, 2. aşama):
+ * "Günün Özeti" without side effects (docs/product/SIMPLIFICATION.md, 2. aşama):
  *
  *   compactInput   the ONLY thing a model sees: counts plus at most 15 short lines (number, title,
  *                  type, due, why it is here, who waits) taken from the Bugün data. Never documents.

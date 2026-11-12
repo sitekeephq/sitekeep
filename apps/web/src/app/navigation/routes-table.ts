@@ -1,5 +1,5 @@
 /**
- * Where every project URL lives in the five-item menu (docs/product/SADELESTIRME.md, 1. aşama).
+ * Where every project URL lives in the five-item menu (docs/product/SIMPLIFICATION.md, 1. aşama).
  *
  * Old addresses keep working: most of them now render inside their new place (İşler hub, Model
  * tabs, Dokümanlar), the rest redirect (`legacyRedirect`). Notification, e-mail and MCP links

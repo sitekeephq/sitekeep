@@ -1,5 +1,5 @@
 // Finds user-visible texts in apps/web/src that use an English term with a Turkish name in
-// docs/product/TERIMLER.md ("Review'lar" → "İncelemeler", "Issue" → "Sorun"…).
+// docs/product/TERMINOLOGY.md ("Review'lar" → "İncelemeler", "Issue" → "Sorun"…).
 //
 // Only texts are checked: JSX text, string literals and template-literal parts. Identifier-like
 // strings ("review", "/issues", "&markup=", CSS classes), object keys, imports, types and comments
@@ -229,7 +229,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
   const { files, problems } = findEnglishUiTerms(path.resolve(process.argv[2] ?? WEB_SRC));
   problems.push(...findEnglishTermsInLocale());
   if (problems.length) {
-    console.error(`İngilizce arayüz terimi bulundu (${problems.length}). Türkçe karşılıkları için docs/product/TERIMLER.md:`);
+    console.error(`İngilizce arayüz terimi bulundu (${problems.length}). Türkçe karşılıkları için docs/product/TERMINOLOGY.md:`);
     for (const p of problems) console.error(`  ${p}`);
     process.exit(1);
   }

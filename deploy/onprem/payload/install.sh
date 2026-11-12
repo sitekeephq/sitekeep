@@ -7,7 +7,7 @@
 # Ne yapar: ön kontrol (Docker, işlemci, bellek, disk, port) → sorular → paketteki imajları
 # yükler (internet gerekmez) → şifreleri ve anahtarları üretir → PostgreSQL + SiteKeep + HTTPS
 # vekilini başlatır → sağlığı bekler → gece yedeğini zamanlar → yönetim komutunu kurar (sitekeep).
-# Ayrıntı: README.md, docs/onprem/kurulum-paketi.md.
+# Ayrıntı: README.md, docs/onprem/installation-bundle.md.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -103,7 +103,7 @@ case "$ARCH" in x86_64) ARCH=amd64 ;; aarch64|arm64) ARCH=arm64 ;; esac
 [ "$ARCH" = "$BUNDLE_ARCH" ] || die "Bu paket $BUNDLE_ARCH içindir; sunucu $ARCH."
 
 ask CDE_USERS "Tahmini kullanıcı sayısı" "$CDE_USERS"
-# Kapasite kademeleri (docs/onprem/kapasite.md §4): kullanıcı → vCPU, RAM (GB), veri diski (GB).
+# Kapasite kademeleri (docs/onprem/capacity.md §4): kullanıcı → vCPU, RAM (GB), veri diski (GB).
 need_cpu=2; need_ram=8; need_disk=100; tier="Deneme"
 if [ "$CDE_USERS" -gt 200 ]; then need_cpu=16; need_ram=64; need_disk=2000; tier="Büyük"
 elif [ "$CDE_USERS" -gt 50 ]; then need_cpu=8; need_ram=32; need_disk=1000; tier="Orta"
@@ -225,7 +225,7 @@ CDE_DEFAULT_LANGUAGE=$CDE_LANGUAGE
 TZ=${TZ:-$(cat /etc/timezone 2>/dev/null || echo Europe/Istanbul)}
 ADMIN_EMAIL=$ADMIN_EMAIL
 ADMIN_PASSWORD=$ADMIN_PASSWORD
-# İsteğe bağlı entegrasyonlar (docs/features/FORMA_ESITLEME.md, docs/features/GOOGLE_GIRIS.md):
+# İsteğe bağlı entegrasyonlar (docs/features/FORMA_SYNC.md, docs/features/GOOGLE_SIGN_IN.md):
 # AUTODESK_CLIENT_ID=
 # AUTODESK_CLIENT_SECRET=
 # AUTODESK_CALLBACK_URL=$PUBLIC_URL/api/v1/integrations/autodesk/callback

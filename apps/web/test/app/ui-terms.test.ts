@@ -27,7 +27,7 @@ const scan = findEnglishUiTerms as (dir?: string) => Result;
 type ChoiceLabel = { where: string; text: string; continued: boolean };
 const choiceLabels = findChoiceLabels as (dir?: string) => ChoiceLabel[];
 
-describe("Turkish UI terms (docs/product/TERIMLER.md)", () => {
+describe("Turkish UI terms (docs/product/TERMINOLOGY.md)", () => {
   it("apps/web/src shows no English terms such as Review, Issue, Submittal, Transmittal, Markup, Clash", () => {
     const { files, problems } = scan();
     expect(files).toBeGreaterThan(50);
@@ -73,9 +73,9 @@ function notTitleCase(entries: [where: string, text: string][]): string[] {
   return entries.filter(([, t]) => !isTitleCaseTr(t)).map(([w, t]) => `${w}: ${t}`);
 }
 
-describe("Her Kelime Büyük Harf İle Başlasın (docs/product/TERIMLER.md)", () => {
+describe("Her Kelime Büyük Harf İle Başlasın (docs/product/TERMINOLOGY.md)", () => {
   it("menu items, İşler views and sections, Model tabs and settings tabs are Title Case", () => {
-    // Five menu items (docs/product/SADELESTIRME.md); "Model" holds the Görüntüleyici tab.
+    // Five menu items (docs/product/SIMPLIFICATION.md); "Model" holds the Görüntüleyici tab.
     expect(NAV_ITEMS.map((i) => tr(i.labelKey))).toEqual(["Bugün", "İşler", "Dokümanlar", "Model", "Raporlar"]);
     expect(MODEL_TABS.map((t) => tr(t.labelKey))).toEqual(["Görüntüleyici", "Koordinasyon", "İş Programı", "Parametre Değişiklikleri"]);
     expect(

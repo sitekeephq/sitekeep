@@ -1,5 +1,5 @@
 /**
- * Module switches per project (docs/product/SADELESTIRME.md, 1. aşama): a project administrator turns
+ * Module switches per project (docs/product/SIMPLIFICATION.md, 1. aşama): a project administrator turns
  * modules off in Proje Ayarları → Modüller. An off module disappears from the menu, the İşler
  * views, "+ Yeni", the Model tabs, the "Sor" assistant's tools and the report builder. Its data is
  * kept: existing records still open and the API serves them, only new records are refused.

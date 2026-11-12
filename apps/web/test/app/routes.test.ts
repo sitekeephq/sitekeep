@@ -1,5 +1,5 @@
 /**
- * Route table of the five-item menu (docs/product/SADELESTIRME.md, 1. aşama): every old address (the 17-item
+ * Route table of the five-item menu (docs/product/SIMPLIFICATION.md, 1. aşama): every old address (the 17-item
  * menu, notification / e-mail / MCP links) is routed and lands in its new place.
  */
 import fs from "node:fs";

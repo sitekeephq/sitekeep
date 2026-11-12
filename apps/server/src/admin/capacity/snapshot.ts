@@ -1,6 +1,6 @@
 /**
  * What the capacity card compares with the table: the machine (as the container sees it) and the
- * user counts. docs/onprem/kapasite.md §0, §2.
+ * user counts. docs/onprem/capacity.md §0, §2.
  */
 import { readFile } from "node:fs/promises";
 import os from "node:os";

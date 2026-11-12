@@ -1,140 +1,140 @@
-# BCF içe ve dışa aktarma (.bcfzip)
+# BCF import and export (.bcfzip)
 
-Tarih: 11.10.2026. OpenCDE planının ilk adımı (bkz. `docs/archive/research/OPENCDE_ARASTIRMA.md` §3, §7). Sorunlar BCF dosyası olarak
-dışa aktarılır ve içe alınır. BCF API 3.0 aynı eşleme katmanını kullanacak.
+Date: 11.10.2026. First step of the OpenCDE plan (see `docs/archive/research/OPENCDE_ARASTIRMA.md` §3, §7). Issues are
+exported and imported as BCF files. BCF API 3.0 will use the same mapping layer.
 
-## Nerede
+## Where
 
-- **İşler → Sorunlar**: "BCF İçe Aktar" ve "BCF Olarak Dışa Aktar" düğmeleri. Tablodan satır seçilirse yalnız seçili
-  sorunlar, seçim yoksa listedeki (filtredeki) sorunlar aktarılır.
-- **Sorun ayrıntısı**: "BCF Olarak Dışa Aktar" (tek sorun). Birden fazla görünümü olan sorunda görünümler küçük resim
-  olarak listelenir. Her biri Model Görüntüleyicide açılır (`?issue=…&vp=<GUID>`).
-- **MCP**: `cde_bcf_export` (okuma) ve `cde_bcf_import` (yazma; önce önizleme, sonra `commit: true`).
+- **Works → Issues**: "Import BCF" and "Export as BCF" buttons. If rows are selected in the table, only the selected
+  issues are exported; with no selection, the issues in the list (filter) are exported.
+- **Issue detail**: "Export as BCF" (single issue). For an issue with more than one viewpoint, the viewpoints are
+  listed as thumbnails. Each one opens in the Model Viewer (`?issue=…&vp=<GUID>`).
+- **MCP**: `cde_bcf_export` (read) and `cde_bcf_import` (write; preview first, then `commit: true`).
 
-## Desteklenen sürümler
+## Supported versions
 
-| Sürüm | Dışa aktarma | İçe aktarma |
+| Version | Export | Import |
 |---|---|---|
-| BCF 2.1 | Varsayılan. En uyumlu seçenek: Navisworks, Revit eklentileri, BIMcollab ZOOM, Solibri | Evet |
-| BCF 3.0 | Seçilebilir. `extensions.xml` ile | Evet |
-| BCF 2.0 | Hayır | Evet (2.1 gibi okunur) |
+| BCF 2.1 | Default. The most compatible option: Navisworks, Revit add-ins, BIMcollab ZOOM, Solibri | Yes |
+| BCF 3.0 | Optional. With `extensions.xml` | Yes |
+| BCF 2.0 | No | Yes (read as 2.1) |
 
-Dosya düzeni buildingSMART BCF-XML'e uyar: `bcf.version`, `project.bcfp`, `extensions.xml` (3.0),
-`<sorun GUID>/markup.bcf`, `<sorun GUID>/viewpoint.bcfv` ve `snapshot.png|jpg` (ilk görünüm),
-`<sorun GUID>/<görünüm GUID>.bcfv` ve `.png|jpg` (diğer görünümler).
+The file layout follows buildingSMART BCF-XML: `bcf.version`, `project.bcfp`, `extensions.xml` (3.0),
+`<sorun GUID>/markup.bcf`, `<sorun GUID>/viewpoint.bcfv` and `snapshot.png|jpg` (first viewpoint),
+`<sorun GUID>/<görünüm GUID>.bcfv` and `.png|jpg` (other viewpoints). (`sorun` = issue, `görünüm` = viewpoint.)
 
-## Alan eşlemesi
+## Field mapping
 
-| SiteKeep | BCF | Not |
+| SiteKeep | BCF | Note |
 |---|---|---|
-| `issues.guid` | Topic `Guid` | Burada açılan sorunda `id` ile aynı. İçe alınan sorunda dosyadaki GUID (küçük harf) |
+| `issues.guid` | Topic `Guid` | Same as `id` for an issue created here. For an imported issue, the GUID from the file (lower case) |
 | `number` | `ServerAssignedId` (3.0) | |
-| `title`, `description` | `Title`, `Description` | Başlık en çok 300, açıklama 10 000 karakter |
-| `status` | `TopicStatus` | Dışa: Open, In Progress, Resolved (İncelemede), Closed. İçe: önerilen eşleme, sihirbazda değiştirilebilir |
-| `type` | `TopicType` | Boşsa "Issue" yazılır |
+| `title`, `description` | `Title`, `Description` | Title at most 300, description at most 10 000 characters |
+| `status` | `TopicStatus` | Export: Open, In Progress, Resolved (In Review), Closed. Import: suggested mapping, can be changed in the wizard |
+| `type` | `TopicType` | "Issue" is written if empty |
 | `priority` | `Priority` | Low, Normal, High, Critical |
 | `labels`, `stage`, `referenceLinks` | `Labels`, `Stage`, `ReferenceLinks` | |
-| `assigneeUserId` | `AssignedTo` (e-posta) | Eşleşmeyen e-posta saklanır, dışa aktarırken geri yazılır |
-| `createdBy`, `createdAt` | `CreationAuthor`, `CreationDate` | Eşleşmeyen yazar: içe aktaran kişi + dosyadaki e-posta saklanır |
+| `assigneeUserId` | `AssignedTo` (email) | An unmatched email is stored and written back on export |
+| `createdBy`, `createdAt` | `CreationAuthor`, `CreationDate` | Unmatched author: the importing person + the email from the file is stored |
 | `updatedAt`, `modifiedBy` | `ModifiedDate`, `ModifiedAuthor` | |
-| `dueDate` (gün) | `DueDate` | Dışa: gün öğlen UTC. İçe: dosyadaki gün |
-| görünümün modelleri | Header `File` | `Reference` = model versiyon kimliği, `IfcProject` = IfcProject GlobalId |
-| `issue_comments` | `Comment` | GUID, yazar, tarih, görünüm bağı (`Viewpoint Guid`) |
-| `issues.viewpoint` + `issue_viewpoints` | `Viewpoints` | İlki birincil görünüm. Görünümler değişmez, GUID ile eklenir |
-| `issue_related_topics` | `RelatedTopic` | GUID ile tutulur, ilgili sorun henüz olmayabilir |
-| `importedFrom` | — | Kaynak, sürüm, dosya adı, eşleşmeyen değerler, belge bağlantıları |
+| `dueDate` (day) | `DueDate` | Export: the day at noon UTC. Import: the day in the file |
+| the viewpoint's models | Header `File` | `Reference` = model version ID, `IfcProject` = IfcProject GlobalId |
+| `issue_comments` | `Comment` | GUID, author, date, viewpoint link (`Viewpoint Guid`) |
+| `issues.viewpoint` + `issue_viewpoints` | `Viewpoints` | The first is the primary viewpoint. Viewpoints are immutable and added by GUID |
+| `issue_related_topics` | `RelatedTopic` | Stored by GUID; the related issue may not exist yet |
+| `importedFrom` | — | Source, version, file name, unmatched values, document references |
 
-### Görünüm (VisualizationInfo)
+### Viewpoint (VisualizationInfo)
 
-| SiteKeep (sahne) | BCF (IFC dünyası) |
+| SiteKeep (scene) | BCF (IFC world) |
 |---|---|
 | `camera.position`, `target − position` | `CameraViewPoint`, `CameraDirection` |
-| `camera.up` | `CameraUpVector` (eski görünümlerde yuvarlanmasız yukarı hesaplanır) |
+| `camera.up` | `CameraUpVector` (for older viewpoints, an up vector without roll is calculated) |
 | `camera.fov`, `camera.aspect` | `FieldOfView`, `AspectRatio` (3.0) |
-| `camera.viewToWorldScale` | Ortografik `ViewToWorldScale` |
+| `camera.viewToWorldScale` | Orthographic `ViewToWorldScale` |
 | `selection` | `Selection` (IfcGuid) |
 | `visibility` | `Visibility` (`DefaultVisibility` + `Exceptions`, `ViewSetupHints`) |
 | `coloring` | `Coloring` (`RRGGBB` / `AARRGGBB`) |
-| `sections.planes` | `ClippingPlanes` (yön ters çevrilir: BCF gizlenen yarıyı gösterir) |
-| `sections.box` | 6 kesit düzlemi. İçe aktarmada eksenlere dik 6 düzlem yeniden kutu olur |
-| `measurements`, sorun noktası (pin) | `Lines` (nokta = başı ve sonu aynı çizgi) |
+| `sections.planes` | `ClippingPlanes` (direction is reversed: BCF shows the hidden half) |
+| `sections.box` | 6 clipping planes. On import, 6 axis-aligned planes become a box again |
+| `measurements`, issue point (pin) | `Lines` (point = a line with the same start and end) |
 | `snapshot` | `snapshot.png` / `.jpg` |
 
-## Koordinatlar
+## Coordinates
 
-- BCF: IFC dünya koordinatı, metre, Z yukarı.
-- Görüntüleyici: three.js, Y yukarı. Fragments modeli içe alırken web-ifc `COORDINATE_TO_ORIGIN` ile kaydırır.
-- Dönüşüm: sahne = (x, z, −y) + kaydırma. Ters yön: IFC = (X, −Z, Y) − kaydırma. Yönler yalnız döner.
-- Kaydırma ilk modelinkidir (model setinde ilk hizalanan model). Yeni görünümler bunu `sceneOffset` olarak saklar.
-- Eski görünümlerde kaydırma sunucuda modelin görüntüleyici dosyasından okunur ve önbelleğe alınır. Okunamazsa uyarı
-  verilir.
-- İçe alınan görünüm `sceneOffset: [0, 0, 0]` ile saklanır. Görüntüleyici açarken kendi kaydırmasına taşır.
-- IfcMapConversion (harita koordinatı) uygulanmaz. BCF de uygulamaz.
-- BCF'de hedef noktası yok. İçe alınan kamerada yörünge merkezi bakış yönünde 10 m ileridedir.
+- BCF: IFC world coordinates, metres, Z up.
+- Viewer: three.js, Y up. When the Fragments model is imported, web-ifc shifts it with `COORDINATE_TO_ORIGIN`.
+- Transformation: scene = (x, z, −y) + offset. Reverse: IFC = (X, −Z, Y) − offset. Directions are only rotated.
+- The offset is that of the first model (the first aligned model in the model set). New viewpoints store it as `sceneOffset`.
+- For older viewpoints, the offset is read on the server from the model's viewer file and cached. If it cannot be read, a
+  warning is shown.
+- An imported viewpoint is stored with `sceneOffset: [0, 0, 0]`. The viewer moves it to its own offset when opening it.
+- IfcMapConversion (map coordinates) is not applied. BCF does not apply it either.
+- BCF has no target point. In an imported camera, the orbit centre is 10 m ahead in the view direction.
 
-Dönüşüm `packages/shared/src/bcf.ts` içinde tek yerde. Sunucu, web ve MCP aynı kodu kullanır.
+The transformation lives in one place, `packages/shared/src/bcf.ts`. The server, the web app and MCP use the same code.
 
-## İçe aktarma
+## Import
 
-1. Dosya seçilir. Sunucu önizleme döner: her sorun için **Yeni**, **Güncellenecek**, **Değişiklik Yok** ya da
-   **Uyuşmazlık**.
-2. Eşleme: durumlar, türler, öncelikler, kişiler (e-posta → proje üyesi ya da "Eşleşmeyen"), modeller (dosya adı,
-   IfcProject GUID ya da versiyon kimliği ile önerilir).
-3. İçe aktar. Sonuç: yeni, güncellenen, değişmeyen, korunan sorun sayısı; eklenen yorum ve görünüm sayısı.
+1. Select the file. The server returns a preview: each issue is **New**, **To Be Updated**, **No Change** or
+   **Conflict**.
+2. Mapping: statuses, types, priorities, people (email → project member or "Unmatched"), models (suggested by file name,
+   IfcProject GUID or version ID).
+3. Import. Result: the number of new, updated, unchanged and kept issues; the number of comments and viewpoints added.
 
-Kurallar:
+Rules:
 
-- Eşleme GUID iledir. Aynı dosya ikinci kez kopya oluşturmaz.
-- Yorumlar ve görünümler yalnız eklenir (GUID ile). Silinmez, üzerine yazılmaz.
-- Dosya son içe aktarmadan beri değiştiyse ve sorun burada değişmediyse alanlar güncellenir.
-- İki tarafta da değiştiyse **uyuşmazlık**: varsayılan olarak buradaki değerler korunur. Sihirbazda "Dosyadaki
-  Değerleri Uygula" seçilebilir.
-- Var olan sorunun alanlarını yalnız oluşturan, atanan ya da proje yöneticisi değiştirir. Diğer üyelerin içe
-  aktarması yalnız yeni yorum ve görünüm ekler.
-- Sorunlar modülü kapalıysa içe aktarma reddedilir (403). Dışa aktarma okuma olduğu için çalışır.
-- Salt okuma erişim anahtarı dışa aktarır ve önizleme yapar, içe aktaramaz.
+- Matching is by GUID. Importing the same file a second time does not create copies.
+- Comments and viewpoints are only added (by GUID). They are never deleted or overwritten.
+- If the file has changed since the last import and the issue has not changed here, the fields are updated.
+- If both sides have changed, it is a **conflict**: by default the values here are kept. "Apply Values from the File"
+  can be chosen in the wizard.
+- Only the creator, the assignee or a project administrator can change the fields of an existing issue. An import by
+  other members only adds new comments and viewpoints.
+- If the Issues module is disabled, import is refused (403). Export still works because it is a read operation.
+- A read-only access key can export and preview, but cannot import.
 
-## Güvenlik ve sınırlar
+## Security and limits
 
-| Sınır | Değer |
+| Limit | Value |
 |---|---|
-| .bcfzip boyutu | 100 MB |
-| ZIP içindeki dosya sayısı | 5 000 |
-| Açılmış tek dosya / toplam | 20 MB / 300 MB |
-| Sıkıştırma oranı (1 MB üstü dosyada) | en çok 200 |
-| Bir dosyada sorun | 2 000 (dışa aktarmada da) |
-| XML dosyası | 8 MB |
-| Görüntü | 5 MB, en çok 8000 piksel kenar |
+| .bcfzip size | 100 MB |
+| Number of files in the ZIP | 5 000 |
+| Single extracted file / total | 20 MB / 300 MB |
+| Compression ratio (for files over 1 MB) | at most 200 |
+| Issues per file | 2 000 (also on export) |
+| XML file | 8 MB |
+| Image | 5 MB, at most 8000 pixels per side |
 
-- ZIP yalnız bellekte açılır. Mutlak yol, `..`, ters bölü, sembolik bağlantı içeren dosya adı reddedilir (zip-slip).
-- XML'de DOCTYPE ya da ENTITY bildirimi reddedilir (XXE, entity bombası).
-- Görüntü türü dosya adından değil içerikten anlaşılır. PNG parçaları CRC ile denetlenir, görüntü verisi açılır.
-  PNG ve JPEG yalnız gerekli parçalarıyla yeniden yazılır: metin, Exif, XMP, yorum atılır.
-- Bitmap'ler ve BIM parçacıkları (BimSnippet) desteklenmez, uyarı verilir.
-- Kamera yuvarlanması (roll) görüntüleyicide uygulanamaz. Dik bakışta yukarı yön korunur.
-- BCF 2.1 görüş açısını 45–60° ile sınırlar. Dışarıdaki değer bu aralığa çekilir ve uyarı verilir.
+- The ZIP is only extracted in memory. File names containing an absolute path, `..`, a backslash or a symbolic link are rejected (zip-slip).
+- DOCTYPE or ENTITY declarations in XML are rejected (XXE, entity bomb).
+- The image type is detected from the content, not the file name. PNG chunks are checked with CRC and the image data is decompressed.
+  PNG and JPEG are rewritten with only the required chunks: text, Exif, XMP and comments are dropped.
+- Bitmaps and BIM snippets (BimSnippet) are not supported; a warning is shown.
+- Camera roll cannot be applied in the viewer. For a straight-down view, the up direction is kept.
+- BCF 2.1 limits the field of view to 45–60°. Values outside are clamped to this range and a warning is shown.
 
-## Uç noktalar
+## Endpoints
 
-| Yöntem | Yol | Not |
+| Method | Path | Note |
 |---|---|---|
-| GET | `/api/v1/projects/:pid/bcf/export?version=2.1&ids=…&status=…&snapshots=0` | .bcfzip indirir |
-| POST | `/api/v1/projects/:pid/bcf/export` | JSON: dosya adı, indirme bağlantısı, küçükse base64 |
-| POST | `/api/v1/projects/:pid/bcf/import/preview` | multipart `file` ya da JSON `{fileName, data}` |
-| POST | `/api/v1/projects/:pid/bcf/import` | aynı + `mapping` |
-| GET | `/api/v1/projects/:pid/issues/:iid/viewpoints` | sorunun tüm görünümleri |
+| GET | `/api/v1/projects/:pid/bcf/export?version=2.1&ids=…&status=…&snapshots=0` | Downloads a .bcfzip |
+| POST | `/api/v1/projects/:pid/bcf/export` | JSON: file name, download link, base64 if small |
+| POST | `/api/v1/projects/:pid/bcf/import/preview` | multipart `file` or JSON `{fileName, data}` |
+| POST | `/api/v1/projects/:pid/bcf/import` | same + `mapping` |
+| GET | `/api/v1/projects/:pid/issues/:iid/viewpoints` | all viewpoints of the issue |
 
-Şema: `0029_bcfzip` (issues: `guid`, `labels`, `stage`, `reference_links`, `modified_by`, `imported_from`;
-issue_comments: `guid`, `viewpoint_guid`, `modified_at`, `modified_by`, `imported_author`; yeni tablolar
+Schema: `0029_bcfzip` (issues: `guid`, `labels`, `stage`, `reference_links`, `modified_by`, `imported_from`;
+issue_comments: `guid`, `viewpoint_guid`, `modified_at`, `modified_by`, `imported_author`; new tables
 `issue_viewpoints`, `issue_related_topics`).
 
-## Test edilenler
+## What is tested
 
-- Otomatik testler (`apps/server/test/coordination/bcf.test.ts`, `packages/shared/test/bcf.test.ts`):
-  - Dışa aktarılan 2.1 ve 3.0 XML'i resmî buildingSMART XSD'lerine karşı denetlenir (`test/fixtures/bcf-xsd`).
-  - buildingSMART test dosyaları (2.1: "One part visible", "user assignment"; 3.0: "Orthogonal camera",
-    "Related topics") içe alınır.
-  - Elle yazılmış 2.1 ve 3.0 dosyaları, yeniden içe aktarma, uyuşmazlık, gidiş-dönüş, zararlı ZIP'ler, yetkiler,
-    modül kapalı.
-- Navisworks, BIMcollab ZOOM, Solibri ve Revit eklentileriyle elle deneme **henüz yapılmadı**. İlk müşteri
-  dosyasıyla denenmeli.
+- Automated tests (`apps/server/test/coordination/bcf.test.ts`, `packages/shared/test/bcf.test.ts`):
+  - Exported 2.1 and 3.0 XML is validated against the official buildingSMART XSDs (`test/fixtures/bcf-xsd`).
+  - buildingSMART test files (2.1: "One part visible", "user assignment"; 3.0: "Orthogonal camera",
+    "Related topics") are imported.
+  - Hand-written 2.1 and 3.0 files, re-import, conflict, round trip, malicious ZIPs, permissions,
+    module disabled.
+- Manual trials with Navisworks, BIMcollab ZOOM, Solibri and Revit add-ins **have not been done yet**. They should be
+  tried with the first customer file.

@@ -1,5 +1,5 @@
 /**
- * "Günün Özeti" on the project Bugün page (docs/product/SADELESTIRME.md, 2. aşama):
+ * "Günün Özeti" on the project Bugün page (docs/product/SIMPLIFICATION.md, 2. aşama):
  *
  *   - the deterministic summary is built on every request (no AI, shown at once);
  *   - the AI summary is written in the background by the configured model and cached per user +

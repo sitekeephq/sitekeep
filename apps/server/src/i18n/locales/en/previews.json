@@ -15,8 +15,8 @@
     "none": "none"
   },
   "converter": {
-    "sofficeHint": "There is no local soffice on this server (optional, last-resort converter). Office files still open in the browser. For an exact PDF, an administrator can connect ONLYOFFICE, Collabora or Gotenberg under Administration → Office Integration (docs/features/OFIS_ENTEGRASYONU.md).",
-    "dwg2dxfHint": "LibreDWG (dwg2dxf) was not found on the server. Administrator: install LibreDWG or give its path with CDE_DWG2DXF_PATH (docs/features/GORUNTULEYICILER.md).",
+    "sofficeHint": "There is no local soffice on this server (optional, last-resort converter). Office files still open in the browser. For an exact PDF, an administrator can connect ONLYOFFICE, Collabora or Gotenberg under Administration → Office Integration (docs/features/OFFICE_INTEGRATION.md).",
+    "dwg2dxfHint": "LibreDWG (dwg2dxf) was not found on the server. Administrator: install LibreDWG or give its path with CDE_DWG2DXF_PATH (docs/features/VIEWERS.md).",
     "timeout": "The conversion timed out.",
     "libreofficeFailed": "LibreOffice could not produce a PDF (code {{code}}). {{detail}}",
     "dwgFailed": "The DWG could not be converted (code {{code}}). {{detail}}"

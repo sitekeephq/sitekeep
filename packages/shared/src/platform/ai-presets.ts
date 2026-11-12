@@ -2,7 +2,7 @@
  * AI provider presets (Yönetim → Yapay Zekâ) and their capabilities. They build on the two provider
  * kinds the server speaks: OpenAI-compatible chat completions and the Anthropic Messages API.
  * Model ids are defaults only and stay editable; prices are never stored (only a relative hint).
- * Sources: docs/features/YAPAY_ZEKA_SAGLAYICILAR.md.
+ * Sources: docs/features/AI_PROVIDERS.md.
  */
 
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "./i18n.js";

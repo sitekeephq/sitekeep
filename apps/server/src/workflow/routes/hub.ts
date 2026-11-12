@@ -1,5 +1,5 @@
 /**
- * The simple project screen (docs/product/SADELESTIRME.md, 1. aşama):
+ * The simple project screen (docs/product/SIMPLIFICATION.md, 1. aşama):
  *
  *   GET    /projects/:pid/today                  project "Bugün": my items, overdue, upcoming, recent changes,
  *                                                "Günün Özeti" (?ai=0: do not start an AI summary run)

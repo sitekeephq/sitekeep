@@ -450,7 +450,7 @@ async function karsilastirma(sc: Sc) {
   });
 }
 
-/** The 15 persona tasks of docs/product/SADELESTIRME.md as API-level checks. */
+/** The 15 persona tasks of docs/product/SIMPLIFICATION.md as API-level checks. */
 async function gorunum(sc: Sc) {
   const saha = await sc.as(sc.a.contractor.userId);
   const doc = saha;

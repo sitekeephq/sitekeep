@@ -1,5 +1,5 @@
 /**
- * Yönetim → Sistem Durumu → Kapasite (docs/onprem/kapasite.md): the server against the sizing
+ * Yönetim → Sistem Durumu → Kapasite (docs/onprem/capacity.md): the server against the sizing
  * table, Canlı Test Et with live charts, Kapasite Rehberi and the reports. While the sample engine
  * runs the tests, every run says "örnek veri".
  */

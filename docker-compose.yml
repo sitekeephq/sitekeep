@@ -6,7 +6,7 @@
 # Yönetim → Lisans). Build from source instead: docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 # Data: the "pgdata" volume (database) and "cdedata" volume (files and model derivatives).
 #
-# Optional office services (profiles; see docs/features/OFIS_ENTEGRASYONU.md):
+# Optional office services (profiles; see docs/features/OFFICE_INTEGRATION.md):
 #   docker compose --profile onlyoffice up -d   ONLYOFFICE Docs: browser editing (WOPI) + office → PDF
 #   docker compose --profile collabora up -d    Collabora Online: browser editing (WOPI) + office → PDF
 #   docker compose --profile gotenberg up -d    Gotenberg: office → PDF only

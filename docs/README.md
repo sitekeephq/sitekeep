@@ -1,73 +1,73 @@
-# Dokümantasyon
+# Documentation
 
-Yaşayan belgeler aşağıdadır. `archive/` altındakiler araştırma ve tarihli notlardır;
-kod veya canlı sunucu sözleşmesi değildir.
+The living documents are listed below. Those under `archive/` are research and dated notes;
+they are not a contract for the code or the live server.
 
-Geliştirmeye başlarken [depo yapısı ve mimari kurallarını](architecture/structure.md),
-[unit, e2e ve smoke zorunluluğunu](architecture/testler.md),
-[demo veri rehberini](onboarding/DEMO_VERI.md),
-[geliştirici MCP rehberini](onboarding/GELISTIRICI_MCP.md) ve
-[yerel Google ile girişi](onboarding/GOOGLE_GIRIS.md) okuyun. Ürün dili için
-[Konsept](product/KONSEPT.md) ve [Terimler](product/TERIMLER.md).
+When you start developing, read the [repository structure and architecture rules](architecture/structure.md),
+the [unit, e2e and smoke requirement](architecture/tests.md),
+the [demo data guide](onboarding/DEMO_DATA.md),
+the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
+[local Google sign-in](onboarding/GOOGLE_SIGN_IN.md). For the product language, see
+[Concept](product/CONCEPT.md) and [Terminology](product/TERMINOLOGY.md).
 
-## Mimari
+## Architecture
 
-- [Depo yapısı](architecture/structure.md)
-- [Modüller](modules/README.md): çekirdek ile ücretli modüller arasındaki sınır, SDK, yetenekler; [Cost](modules/cost.md), [Field](modules/field.md), [Coordinate](modules/coordinate.md), [Planning](modules/planning.md), [AI](modules/ai.md), [Manage](modules/manage.md), [Connect](modules/connect.md)
-- [Testler: unit, e2e ve smoke](architecture/testler.md)
+- [Repository structure](architecture/structure.md)
+- [Modules](modules/README.md): the boundary between the core and paid modules, the SDK, capabilities; [Cost](modules/cost.md), [Field](modules/field.md), [Coordinate](modules/coordinate.md), [Planning](modules/planning.md), [AI](modules/ai.md), [Manage](modules/manage.md), [Connect](modules/connect.md)
+- [Tests: unit, e2e and smoke](architecture/tests.md)
 
-## Müşteri kurulumu (on-prem, lisanslı ürün)
+## Customer installation (on-prem, licensed product)
 
-- [Kurulum paketi ve dağıtım (Linux)](onprem/kurulum-paketi.md)
-- [Docker Compose ile kurulum](onprem/docker-compose.md)
-- [Sürüm çıkarma (elle)](onprem/surum-cikarma.md)
-- [Yedekleme](onprem/yedekleme.md)
-- [İzleme (Yönetim ekranı)](onprem/izleme.md)
-- [Kapasite ve yük testi (Yönetim ekranı)](onprem/kapasite.md)
+- [Installation bundle and distribution (Linux)](onprem/installation-bundle.md)
+- [Installation with Docker Compose](onprem/docker-compose.md)
+- [Releasing (manual)](onprem/releasing.md)
+- [Backups](onprem/backups.md)
+- [Monitoring (Administration screen)](onprem/monitoring.md)
+- [Capacity and load testing (Administration screen)](onprem/capacity.md)
 
-## Başlangıç ve geliştirme
+## Getting started and development
 
-- [Demo Veri](onboarding/DEMO_VERI.md)
-- [Geliştirici MCP](onboarding/GELISTIRICI_MCP.md)
-- [Yerel Google ile giriş](onboarding/GOOGLE_GIRIS.md)
+- [Demo Data](onboarding/DEMO_DATA.md)
+- [Developer MCP](onboarding/DEVELOPER_MCP.md)
+- [Local Google sign-in](onboarding/GOOGLE_SIGN_IN.md)
 
-## Ürün
+## Product
 
-- [Konsept](product/KONSEPT.md)
-- [Sadeleştirme](product/SADELESTIRME.md)
-- [Terimler](product/TERIMLER.md)
-- [Marka (SiteKeep logosu ve kuralları)](brand/README.md)
-- [Tema](product/TEMA.md)
+- [Concept](product/CONCEPT.md)
+- [Simplification](product/SIMPLIFICATION.md)
+- [Terminology](product/TERMINOLOGY.md)
+- [Brand (SiteKeep logo and rules)](brand/README.md)
+- [Theme](product/THEME.md)
 
-## Özellikler
+## Features
 
 - [OpenCDE](features/OPENCDE.md)
-- [Forma eşitleme (Autodesk)](features/FORMA_ESITLEME.md)
+- [Forma sync (Autodesk)](features/FORMA_SYNC.md)
 - [BCF](features/BCF.md)
-- [Gizlilik](features/GIZLILIK.md)
-- [Google ile giriş](features/GOOGLE_GIRIS.md)
-- [Parametre Değişikliği](features/PARAMETRE_DEGISIKLIGI.md)
-- [Ofis Entegrasyonu](features/OFIS_ENTEGRASYONU.md)
-- [Görüntüleyiciler](features/GORUNTULEYICILER.md)
+- [Privacy](features/PRIVACY.md)
+- [Google sign-in](features/GOOGLE_SIGN_IN.md)
+- [Parameter Change](features/PARAMETER_CHANGE.md)
+- [Office Integration](features/OFFICE_INTEGRATION.md)
+- [Viewers](features/VIEWERS.md)
 - [4D / 5D](features/4D_5D.md)
-- [Metraj Envanteri](features/METRAJ.md)
-- [Poz Öner](features/POZ_ONERI.md)
-- [2B Metraj](features/2B_METRAJ.md)
-- [Metraj Onayı ve Hakedişe Aktarma](features/METRAJ_ONAYI.md)
-- [Yapay Zekâ Sağlayıcıları](features/YAPAY_ZEKA_SAGLAYICILAR.md)
-- [Yazışmalar](features/YAZISMALAR.md)
-- [İşler](features/ISLER.md)
-- [Raporlar](features/RAPORLAR.md)
+- [Quantity Inventory](features/QUANTITIES.md)
+- [Unit Price Item (poz) Suggestions](features/POZ_SUGGEST.md)
+- [2D Take-off](features/2D_TAKEOFF.md)
+- [Quantity Approval and Transfer to Progress Payment (hakediş)](features/QUANTITY_APPROVAL.md)
+- [AI Providers](features/AI_PROVIDERS.md)
+- [Correspondence](features/CORRESPONDENCE.md)
+- [Works](features/WORKS.md)
+- [Reports](features/REPORTS.md)
 - [Form PDF](features/FORM_PDF.md)
-- [Doküman Karşılaştırma](features/DOKUMAN_KARSILASTIRMA.md)
+- [Document Comparison](features/DOCUMENT_COMPARISON.md)
 
-## İnceleme notları
+## Review notes
 
-Tarihli durum ve plan notları (karar girdisi; uygulama sözleşmesi değil). Özet: Kalan işler.
+Dated status and planning notes (input for decisions; not an implementation contract). Summary: Remaining work.
 
-Aynı adlı eski sürümler `archive/planning/` altındadır.
+Older versions with the same names are under `archive/planning/`.
 
-## Arşiv
+## Archive
 
-Karar girdisi; uygulama sözleşmesi değil. Dizin: archive/README.md.
+Input for decisions; not an implementation contract. Index: archive/README.md.
 

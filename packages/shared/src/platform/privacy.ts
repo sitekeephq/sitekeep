@@ -1,6 +1,6 @@
 /**
  * Gizlilik Merkezi (Yönetim): what leaves the server, which connections exist, the outbound log
- * and the "Tüm Dış Bağlantıları Kapat" switch. docs/features/GIZLILIK.md.
+ * and the "Tüm Dış Bağlantıları Kapat" switch. docs/features/PRIVACY.md.
  */
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "./i18n.js";
 

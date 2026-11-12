@@ -1,52 +1,52 @@
-# Cost modülü
+# Cost module
 
-SiteKeep Cost: sözleşme ve hakediş, IFC metraj envanteri ve metraj onayı, 2B metraj, 5D maliyet ve
-Poz Öner. Ürün açıklaması: SiteKeep sürümler ve modüller §2.
-Özellik belgeleri: [Metraj](../features/METRAJ.md), [Metraj Onayı](../features/METRAJ_ONAYI.md),
-[2B Metraj](../features/2B_METRAJ.md), [Poz Öner](../features/POZ_ONERI.md), [4D / 5D](../features/4D_5D.md).
+SiteKeep Cost: contracts and progress payments (hakediş), IFC quantity take-off (metraj) inventory and quantity approval, 2D take-off, 5D cost and
+Suggest Items. Product description: SiteKeep editions and modules §2.
+Feature documents: [Quantity take-off](../features/QUANTITIES.md), [Quantity Approval](../features/QUANTITY_APPROVAL.md),
+[2D Take-off](../features/2D_TAKEOFF.md), [Suggest Items](../features/POZ_SUGGEST.md), [4D / 5D](../features/4D_5D.md).
 
 | | |
 |---|---|
-| Depo | [7Dimensions-Project/sitekeep-cost](https://github.com/7Dimensions-Project/sitekeep-cost) (kapalı); yerel klon `~/Desktop/7dimensions/sitekeep-cost` |
-| Paket | `@7dimensions-project/sitekeep-ee-cost` (GitHub Packages) |
-| Bu depodaki sürüm | `0.6.1` (`apps/server/package.json`, `apps/web/package.json`) |
-| Kullandığı SDK | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
-| Kimlik | `cost` (`SITEKEEP_MODULES`) |
+| Repository | [7Dimensions-Project/sitekeep-cost](https://github.com/7Dimensions-Project/sitekeep-cost) (private); local clone `~/Desktop/7dimensions/sitekeep-cost` |
+| Package | `@7dimensions-project/sitekeep-ee-cost` (GitHub Packages) |
+| Version in this repository | `0.6.1` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| ID | `cost` (`SITEKEEP_MODULES`) |
 
-Ayrılış: #24 (SDK sınırı), #26 (kendi paketi, migration günlüğü, Community derlemesi), ardından
-`sitekeep-cost` deposu. Taşınmadan önceki geçmiş bu depodadır.
+Extraction: #24 (SDK boundary), #26 (own package, migration journal, Community build), then
+the `sitekeep-cost` repository. The history before the move is in this repository.
 
-## Sınır
+## Boundary
 
-5D maliyet (birim fiyat, maliyet kuralı, Poz Öner, maliyet sonuçları) önceden `sim/` altında
-Planning'in parçasıydı. Hakediş ve metraj tabloları `cost_items`'a bağlı olduğu için Cost'a alındı.
-Planning'de 4D (bağlantı kuralları, 4D durumu) kalır. İki tarafın ortak kural motoru çekirdekte:
+5D cost (unit price, cost rule, Suggest Items, cost results) used to be part of Planning under `sim/`.
+It moved to Cost because the progress payment and take-off tables are linked to `cost_items`.
+4D (link rules, 4D status) stays in Planning. The rule engine shared by both sides is in the core:
 `apps/server/src/model/rule-match.ts`.
 
-5D rotaları önceki gibi İş Programı modül anahtarına (`schedule`) bağlıdır.
+As before, the 5D routes depend on the Schedule module switch (`schedule`).
 
-## Pakette ne var
+## What is in the package
 
-| Yer (depoda) | Yayımlanan | İçerik |
+| Location (in the repository) | Published | Contents |
 |---|---|---|
-| `server/index.ts` | `dist/server/index.js` (`./server`) | Modül tanımı: migration'lar, rotalar, hatırlatmalar, Görevlerim kaynağı, rapor veri kümeleri |
-| `server/contracts/` | `dist/server/contracts/` | Sözleşme, kalem, zeyilname, teminat, hakediş, onay akışı, hakediş PDF / Excel |
-| `server/quantities/` | `dist/server/quantities/` | Metraj envanteri, 2B metraj, metraj onayı |
-| `server/fived/` | `dist/server/fived/` | Birim fiyat, maliyet kuralı, içe aktarma, Poz Öner, maliyet ve nakit akışı |
-| `server/schema/` | `dist/server/schema/` | 13 tablo: `contracts`, `contract_items`, `contract_variations`, `contract_guarantee_reminders`, `progress_payments`, `progress_payment_lines`, `takeoff_items`, `takeoff_scales`, `quantity_approvals`, `quantity_bindings`, `cost_items`, `cost_rules`, `poz_mappings` |
-| `web/` | `dist/web/index.js` (`./web`, tek dosya) | Sayfalar, menü, yetenekler |
-| `migrations/` | `migrations/` | Kendi Drizzle günlüğü |
+| `server/index.ts` | `dist/server/index.js` (`./server`) | Module definition: migrations, routes, reminders, My Tasks source, report datasets |
+| `server/contracts/` | `dist/server/contracts/` | Contract, item, variation, guarantee, progress payment, approval workflow, progress payment PDF / Excel |
+| `server/quantities/` | `dist/server/quantities/` | Take-off inventory, 2D take-off, quantity approval |
+| `server/fived/` | `dist/server/fived/` | Unit price, cost rule, import, Suggest Items, cost and cash flow |
+| `server/schema/` | `dist/server/schema/` | 13 tables: `contracts`, `contract_items`, `contract_variations`, `contract_guarantee_reminders`, `progress_payments`, `progress_payment_lines`, `takeoff_items`, `takeoff_scales`, `quantity_approvals`, `quantity_bindings`, `cost_items`, `cost_rules`, `poz_mappings` |
+| `web/` | `dist/web/index.js` (`./web`, single file) | Pages, menu, capabilities |
+| `migrations/` | `migrations/` | Own Drizzle journal |
 
-Yayımlanan kod küçültülmüştür, kaynak ve source map içermez. `./internal/*` yalnız bu deponun
-Cost testleri içindir (`dist/server/*`), API değildir.
+The published code is minified and contains no source or source maps. `./internal/*` is only for this repository's
+Cost tests (`dist/server/*`) and is not an API.
 
-Metinler pakettedir (`locales/server`, `locales/web`: `contracts`, `quantities` ve 5D'nin `sim` anahtarları). Ortak tiplerden yalnız Cost'un kullandıkları pakettedir (`shared/`: sözleşme ve hakediş, metraj envanteri, metraj onayı, Poz Öner, 2B metraj hesapları (`takeoff`), boşluk düşümü (`openings`), 5D maliyet kuralları ve özeti (`sim`); `./shared/*`). Sözleşme, hakediş ve maliyet miktarı etiketleri de pakettedir (Türkçe `*_LABELS_TR`, İngilizce `locales/shared/en/labels.json`). Çekirdekte kalanlar çekirdeğin de kullandıklarıdır: 2B metraj DTO'ları ve çizgi/alan hesabı, `OpeningSolid`, kural eşleme, maliyet satırı ve nakit akışı DTO'ları (`cost` yeteneği, rapor veri kümeleri); modül bunlara `@7dimensions-project/sitekeep-sdk/shared` ile erişir.
+Strings are in the package (`locales/server`, `locales/web`: `contracts`, `quantities` and the 5D `sim` keys). Of the shared types, only those Cost uses are in the package (`shared/`: contracts and progress payments, take-off inventory, quantity approval, Suggest Items, 2D take-off calculations (`takeoff`), opening deductions (`openings`), 5D cost rules and summary (`sim`); `./shared/*`). Contract, progress payment and cost quantity labels are in the package too (Turkish `*_LABELS_TR`, English `locales/shared/en/labels.json`). What stays in the core is what the core also uses: 2D take-off DTOs and line/area calculation, `OpeningSolid`, rule matching, cost row and cash flow DTOs (`cost` capability, report datasets); the module accesses them through `@7dimensions-project/sitekeep-sdk/shared`.
 
-## Migration'lar
+## Migrations
 
-| Cost | Önceki çekirdek adı |
+| Cost | Previous core name |
 |---|---|
-| `0000_fived` | `0025_sim_4d_5d` içindeki `cost_items`, `cost_rules` (+ rapor tetikleyicileri) |
+| `0000_fived` | `cost_items`, `cost_rules` in `0025_sim_4d_5d` (+ report triggers) |
 | `0001_contracts_payment` | `0042_contracts_payment` |
 | `0002_contracts_payment_extras` | `0043_…` |
 | `0003_contracts_payment_workflow` | `0044_…` |
@@ -54,48 +54,48 @@ Metinler pakettedir (`locales/server`, `locales/web`: `contracts`, `quantities` 
 | `0005_takeoff` | `0046_…` |
 | `0006_quantity_approvals` | `0047_…` |
 
-Günlük tablosu `drizzle.__drizzle_migrations_cost`; çekirdeğinkilerden sonra çalışır (`db/index.ts`).
-Hepsi idempotenttir (`IF NOT EXISTS`, `duplicate_object` yakalama, `CREATE OR REPLACE TRIGGER`).
-Mevcut kurulumlarda (canlı, `v1.0.0-rc1`) tablolar zaten var: Cost günlüğü ilk açılışta yedi kaydı
-yazar, veritabanında değişiklik olmaz (`apps/server/test/modules/cost/migrations.test.ts`). Çekirdeğin
-`0025`'i değiştirilmedi; Community kurulumunda boş `cost_items` / `cost_rules` oluşur, temiz açık
-kaynak deposunda çekirdek günlüğü sıfırdan başlarken çıkarılır.
+The journal table is `drizzle.__drizzle_migrations_cost`; it runs after the core's (`db/index.ts`).
+All are idempotent (`IF NOT EXISTS`, catching `duplicate_object`, `CREATE OR REPLACE TRIGGER`).
+In existing installs (production, `v1.0.0-rc1`) the tables already exist: on first startup the Cost journal writes seven
+entries and the database does not change (`apps/server/test/modules/cost/migrations.test.ts`). The core's
+`0025` was not changed; a Community install gets empty `cost_items` / `cost_rules`, and they are removed when the core
+journal starts from scratch in the clean open-source repository.
 
-`contract_variations.work_id` → Manage'in `works` tablosu: yabancı anahtar yalnız `works` varsa
-eklenir (`0001`), kod tarafı bunu `manage.workExists` yeteneğiyle denetler.
+`contract_variations.work_id` → Manage's `works` table: the foreign key is added only if `works` exists
+(`0001`); the code checks this with the `manage.workExists` capability.
 
-## Çekirdeğe bağlandığı yerler
+## Where it connects to the core
 
-| Çekirdek | Nasıl |
+| Core | How |
 |---|---|
-| Yükleme | `SITEKEEP_MODULES` → `app/modules.ts` (sunucu), `virtual:sitekeep-modules` (web) |
-| Migration'lar | `ServerModule.migrations` → `db/index.ts` |
-| Rotalar | `ServerModule.routes` → `build-app.ts` |
-| Hatırlatmalar (hakediş adımı, teminat vadesi) | `ServerModule.reminders` → `workflow/reminders.ts` |
-| Görevlerim (hakediş onayı) | `ServerModule.taskSources` → `workflow/routes/notifications.ts` |
-| Raporlar (`sozlesmeler`, `hakedisler`, `model_costs`, `cost_cashflow`) | Modül yüklenirken `reportDatasets.register`; "Maliyet (5D)" şablonu veri kümeleri varsa görünür |
-| Hakediş PDF fontları | SDK `pdfFontBytes()` (çekirdeğin `assets/fonts`'u) |
-| Proje menüsü, sayfalar | `WebModule.projectNav`, `projectRoutes` |
-| 4D paneli, İş Programı | `cost` yeteneği |
-| Programlar, faaliyetler, planlamacı yetkisi (5D) | `planning.schedules` (Planning yoksa maliyet faaliyetlere bağlanmaz) |
-| PDF / DWG görüntüleyici | `cost.takeoff` yeteneği |
-| Zeyilnameye iş bağlama | `manage.workExists` yeteneği (Manage sağlar) |
-| Yapay zekâ araçları (`cde_cost_summary`, `cde_quantity_inventory`) | HTTP rotaları üzerinden; import yok |
+| Loading | `SITEKEEP_MODULES` → `app/modules.ts` (server), `virtual:sitekeep-modules` (web) |
+| Migrations | `ServerModule.migrations` → `db/index.ts` |
+| Routes | `ServerModule.routes` → `build-app.ts` |
+| Reminders (progress payment step, guarantee due date) | `ServerModule.reminders` → `workflow/reminders.ts` |
+| My Tasks (progress payment approval) | `ServerModule.taskSources` → `workflow/routes/notifications.ts` |
+| Reports (`sozlesmeler`, `hakedisler`, `model_costs`, `cost_cashflow`) | `reportDatasets.register` while the module loads; the "Cost (5D)" template appears if the datasets exist |
+| Progress payment PDF fonts | SDK `pdfFontBytes()` (the core's `assets/fonts`) |
+| Project menu, pages | `WebModule.projectNav`, `projectRoutes` |
+| 4D panel, Schedule | `cost` capability |
+| Schedules, activities, planner permission (5D) | `planning.schedules` (without Planning, cost is not linked to activities) |
+| PDF / DWG viewer | `cost.takeoff` capability |
+| Linking a work item to a variation | `manage.workExists` capability (provided by Manage) |
+| AI tools (`cde_cost_summary`, `cde_quantity_inventory`) | Through HTTP routes; no import |
 
-## Testler
+## Tests
 
-| Yer | Ne |
+| Location | What |
 |---|---|
-| `sitekeep-cost`: `npm test` | Sınır kontrolü (`scripts/check-boundary.mjs`), saf yardımcıların birim testleri (SDK yerine test kopyaları) |
-| `apps/server/test/modules/cost/` | Uygulamayı kurarak: sözleşme / hakediş / onay akışı API'si, metraj ve 2B metraj, metraj onayı, Poz Öner, 5D hesap ve içe aktarma, migration'lar |
-| `apps/server/test/simulation/sim-api.test.ts` | 4D + 5D senaryosu; 5D adımları Cost kuruluyken koşar |
-| `e2e/specs/` | `contracts*`, `quantities*`, `quantity-approvals`, `takeoff`, `poz-suggest` ve mobil karşılıkları |
+| `sitekeep-cost`: `npm test` | Boundary check (`scripts/check-boundary.mjs`), unit tests of pure helpers (test copies instead of the SDK) |
+| `apps/server/test/modules/cost/` | With the app set up: contract / progress payment / approval workflow API, take-off and 2D take-off, quantity approval, Suggest Items, 5D calculation and import, migrations |
+| `apps/server/test/simulation/sim-api.test.ts` | 4D + 5D scenario; 5D steps run when Cost is installed |
+| `e2e/specs/` | `contracts*`, `quantities*`, `quantity-approvals`, `takeoff`, `poz-suggest` and their mobile counterparts |
 
-Davranış testleri burada durur çünkü yayımlanan paketi gerçek çekirdekle çalıştırır. Cost'ta değişiklik
-→ `sitekeep-cost`'ta `npm pack`, burada tarball'ı kurup testler (depo README'si), sonra yayın ve sürüm
-yükseltme ([Modül sürümü yükseltme](README.md#modül-sürümü-yükseltme)).
+The behaviour tests live here because they run the published package against the real core. A change in Cost
+→ `npm pack` in `sitekeep-cost`, install the tarball here and run the tests (repository README), then release and
+upgrade the version ([Upgrading a module version](README.md#upgrading-a-module-version)).
 
-## Sonra
+## Later
 
-- Cost'a özel ortak tipleri pakete almak (çekirdeğin yetenek tipleri ayrıştırılınca).
-- Davranış testlerini modül deposunun CI'ında da koşmak (çekirdeğin yayımlanmış imajına karşı).
+- Move Cost-specific shared types into the package (once the core's capability types are separated).
+- Run the behaviour tests in the module repository's CI as well (against the core's published image).

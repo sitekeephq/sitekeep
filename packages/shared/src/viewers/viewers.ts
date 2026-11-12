@@ -30,7 +30,7 @@ export type ViewerKind =
  * - dxf: DXF of a DWG (LibreDWG dwg2dxf); for a DXF only its text and encoding are read. Both are
  *   checked (Civil 3D objects, failed conversions) and repaired (values broken over lines)
  * - scene: the drawing's prebuilt 2D scene ("2B sahne"): dxf-viewer's scene built once on the
- *   server, so the browser shows large drawings without parsing the DXF (docs/features/GORUNTULEYICILER.md)
+ *   server, so the browser shows large drawings without parsing the DXF (docs/features/VIEWERS.md)
  * - text: plain text only (search and the "Sor" assistant); office text and speaker notes are
  *   read from the XML parts, no converter needed
  */

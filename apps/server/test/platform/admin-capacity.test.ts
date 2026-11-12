@@ -1,4 +1,4 @@
-/** Yönetim → Sistem Durumu → Kapasite (docs/onprem/kapasite.md): card, sample test engine, report. */
+/** Yönetim → Sistem Durumu → Kapasite (docs/onprem/capacity.md): card, sample test engine, report. */
 import { mkdtempSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";

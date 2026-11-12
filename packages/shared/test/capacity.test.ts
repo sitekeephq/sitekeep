@@ -56,10 +56,10 @@ describe("capacity tiers", () => {
     expect(hardwareTier(machine(2, 4))).toBeNull();
   });
 
-  it("matches the table in docs/onprem/kapasite.md", () => {
-    const doc = readFileSync(path.join(here, "../../../docs/onprem/kapasite.md"), "utf8");
+  it("matches the table in docs/onprem/capacity.md", () => {
+    const doc = readFileSync(path.join(here, "../../../docs/onprem/capacity.md"), "utf8");
     for (const t of CAPACITY_TIERS.filter((x) => x.vcpu !== null)) {
-      const label = capacityTierLabel(t.id);
+      const label = capacityTierLabel(t.id, "en");
       const row = doc.split("\n").find((line) => line.startsWith(`| ${label} |`));
       expect(row, label).toBeTruthy();
       const cells = row!.split("|").map((c) => c.trim());

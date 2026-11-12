@@ -1,5 +1,5 @@
 /**
- * Kapasite (Yönetim → Sistem Durumu → Kapasite, docs/onprem/kapasite.md): the sizing table, the
+ * Kapasite (Yönetim → Sistem Durumu → Kapasite, docs/onprem/capacity.md): the sizing table, the
  * rules that compare a server with it, and the capacity-test DTOs. The screen, the warnings, the
  * report and the docs table all read CAPACITY_TIERS; change a number here only.
  */

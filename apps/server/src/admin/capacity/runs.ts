@@ -1,7 +1,7 @@
 /**
  * Capacity test runs: one at a time per installation, cancellable, the last RUN_HISTORY kept.
  * Runs live in memory for now (a restart forgets them); the capacity_runs table replaces the
- * Map without changing the API (docs/onprem/kapasite.md §12).
+ * Map without changing the API (docs/onprem/capacity.md §12).
  */
 import { randomUUID } from "node:crypto";
 import type { CapacityFinding, CapacityHardware, CapacityRunDto, CapacityRunMode } from "@sitekeep/shared";

@@ -2,7 +2,7 @@
  * Loading path of the CAD viewer.
  *
  * The server builds dxf-viewer's scene of every drawing once ("2B sahne", preview kind "scene",
- * see apps/server/src/previews/scene-worker.ts and docs/features/GORUNTULEYICILER.md). When it is ready the
+ * see apps/server/src/previews/scene-worker.ts and docs/features/VIEWERS.md). When it is ready the
  * viewer loads it through dxf-viewer's own `workerFactory` option: a stand-in worker answers the
  * DxfWorker message protocol (LOAD → PROGRESS … → LOAD reply, DESTROY) with the downloaded scene,
  * so nothing is parsed in the browser and the viewer ends up with exactly the scene object it

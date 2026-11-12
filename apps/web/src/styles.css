@@ -1741,7 +1741,7 @@ ins.diff-new { background: var(--diff-new-soft); text-decoration: none; }
 .flow-fields { display: flex; flex-wrap: wrap; align-items: center; margin-top: 6px; }
 .form-item.step-own { padding-left: 8px; border-left: 3px solid var(--primary); }
 
-/* ---- Simple project screen (docs/product/SADELESTIRME.md) ------------------------------------------- */
+/* ---- Simple project screen (docs/product/SIMPLIFICATION.md) ------------------------------------------- */
 button.has-filters { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 
 /* One filter row: search, "Filtreler" popover, removable chips, the view's own buttons. */

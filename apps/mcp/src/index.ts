@@ -10,7 +10,7 @@
  *   CDE_READ_ONLY=1  disables write tools
  *   CDE_DEV_TOOLS=1  adds the developer tools (cde_dev_*); the CDE server must also run with
  *                    CDE_DEV_TOOLS=1 and the token must be a system administrator's write token
- *   Local development server: CDE_URL=http://127.0.0.1:8787 (docs/onboarding/GELISTIRICI_MCP.md)
+ *   Local development server: CDE_URL=http://127.0.0.1:8787 (docs/onboarding/DEVELOPER_MCP.md)
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";

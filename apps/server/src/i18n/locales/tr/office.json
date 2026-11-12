@@ -52,7 +52,7 @@
     }
   },
   "service": {
-    "converterHint": "Ofis dosyalarını PDF'e çevirecek bir dönüştürücü yok (isteğe bağlı; dosyalar tarayıcıda yine açılır). Birebir PDF için yönetici: Yönetim → Office Entegrasyonu'ndan ONLYOFFICE, Collabora ya da Gotenberg bağlayın (sunucuda LibreOffice soffice varsa yedek olarak kullanılır). Bkz. docs/features/OFIS_ENTEGRASYONU.md.",
+    "converterHint": "Ofis dosyalarını PDF'e çevirecek bir dönüştürücü yok (isteğe bağlı; dosyalar tarayıcıda yine açılır). Birebir PDF için yönetici: Yönetim → Office Entegrasyonu'ndan ONLYOFFICE, Collabora ya da Gotenberg bağlayın (sunucuda LibreOffice soffice varsa yedek olarak kullanılır). Bkz. docs/features/OFFICE_INTEGRATION.md.",
     "converterOff": "Ofis → PDF dönüştürme kapalı (Yönetim → Office Entegrasyonu).",
     "converterUrlMissing": "{{converter}} adresi girilmemiş (Yönetim → Office Entegrasyonu).",
     "onlyofficeNeedsWopiBase": "ONLYOFFICE dönüştürme için 'CDE'nin editörden görünen adresi' ayarlanmalı (ONLYOFFICE dosyayı oradan indirir).",

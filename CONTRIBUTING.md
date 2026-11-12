@@ -7,9 +7,10 @@ construction projects, licensed under the [AGPL-3.0](LICENSE).
 
 - Look for an existing issue, or open one to discuss larger changes before writing code.
 - Security problems are never reported in public issues: see [SECURITY.md](SECURITY.md).
-- Contributions are accepted under a Contributor License Agreement (CLA). The CLA lets 7Dimensions OÜ
-  offer SiteKeep Enterprise alongside the open Community edition. The CLA bot asks you to sign it on your
-  first pull request.
+- Contributions are accepted under the [SiteKeep Contributor License Agreement](CLA.md). You keep the
+  copyright in your work; the CLA lets 7Dimensions OÜ offer SiteKeep Enterprise alongside the open
+  Community edition, which stays AGPL-3.0. On your first pull request the CLA check asks you to accept it
+  with a one-line comment.
 
 ## Set up
 
@@ -28,7 +29,7 @@ The repository layout, dependency rules and module boundary are described in
 
 1. Branch from `main`.
 2. Keep the change focused; one topic per pull request.
-3. Add or update tests with the code (see [docs/architecture/testler.md](docs/architecture/testler.md)):
+3. Add or update tests with the code (see [docs/architecture/tests.md](docs/architecture/tests.md)):
    unit tests for logic, end-to-end tests for screens.
 4. User-facing text goes into the translation files, never into code
    ([docs/architecture/i18n.md](docs/architecture/i18n.md)). English and Turkish are both required.

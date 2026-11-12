@@ -1,60 +1,63 @@
-# PDF'ten Form Şablonu ve Anlatılan Onay Akışı
+# Form Template from PDF and Described Approval Workflow
 
-Müşterinin kullandığı resmî kâğıt form PDF olarak yüklenir. Sistem alanları bulur.
-Kullanıcı akışı düz Türkçe anlatır. Sonuç, onay akışı bağlı normal bir form şablonudur.
-Doldurulan form, yüklenen PDF'in kendi düzeninde çıkar.
+The official paper form the customer uses is uploaded as a PDF. The system finds the fields.
+The user describes the workflow in plain Turkish. The result is a normal form template with an approval workflow attached.
+The filled-in form is output in the uploaded PDF's own layout.
 
-## Nasıl çalışır
+## How it works
 
-1. **Formlar → Şablonlar → PDF'ten Şablon Oluştur.** PDF seçilir (en fazla 30 MB, ilk 20 sayfa).
-2. Sunucu PDF'i saklar ve alanları arar. Sonuç bir taslaktır; henüz kaydedilmez.
-3. **Alanlar** ekranında PDF sayfaları ve alan kutuları görünür. Yanda alan listesi vardır.
-   - Kutuya tıklayınca listede, listede tıklayınca sayfada seçilir.
-   - Kutu sürüklenerek taşınır, sağ alt tutamaçla boyutlandırılır.
-   - **Alan Çiz** ile sayfada sürükleyerek yeni alan eklenir.
-   - Listede ad, tip, zorunluluk ve bölüm değiştirilir. Tablolarda sayfadaki satır sayısı girilir.
-   - Silmek için **Sil** ya da Delete tuşu. Ok tuşları kutuyu 1 pt (Shift ile 10 pt) kaydırır.
-   - **Geri Al** (Ctrl+Z) son değişiklikleri geri alır.
-4. **Yapay Zekâ ile Adlandır** isteğe bağlıdır. Modele yalnız kısa alan listesi gider, PDF gitmez.
-   Model ad, tip ve bölüm önerir; kutuların yeri değişmez.
-5. **Kaydet.** Şablon normal, sürümlü bir form şablonudur. Her sürüm kaynak PDF'i saklar.
-   Bir form kullandıktan sonra yapılan değişiklik yeni sürüm açar; eski formlar eski sürümle kalır.
-6. **Onay Akışı** sekmesinde akış anlatılır veya elle kurulur, sonra kaydedilir.
+1. **Forms → Templates → Create Template from PDF.** Choose a PDF (at most 30 MB, first 20 pages).
+2. The server stores the PDF and searches for fields. The result is a draft; it is not saved yet.
+3. The **Fields** screen shows the PDF pages and the field boxes, with the field list alongside.
+   - Clicking a box selects it in the list; clicking in the list selects it on the page.
+   - A box is moved by dragging and resized with the bottom-right handle.
+   - **Draw Field** adds a new field by dragging on the page.
+   - Name, type, required flag and section are changed in the list. For tables, the number of rows on the page is entered.
+   - To delete, use **Delete** or the Delete key. Arrow keys move the box by 1 pt (10 pt with Shift).
+   - **Undo** (Ctrl+Z) undoes the latest changes.
+4. **Name with AI** is optional. Only a short field list is sent to the model, not the PDF.
+   The model suggests the name, type and section; the box positions do not change.
+5. **Save.** The template is a normal, versioned form template. Each version keeps the source PDF.
+   A change made after a form has used the template opens a new version; older forms stay with the older version.
+6. On the **Approval Workflow** tab, the workflow is described or set up manually, then saved.
 
-## Alan bulma düzeyleri
+## Field detection levels
 
-| Düzey | Ne zaman | Nasıl |
+| Level | When | How |
 |---|---|---|
-| Doldurulabilir PDF (AcroForm) | PDF'te form alanları var | Alanlar aynen okunur: ad, tip, seçenekler, sayfa ve kutu. En güvenilir düzey. |
-| Metin Katmanlı PDF | Alan yok ama metin seçilebiliyor | Etiketler ve boşluklar kurallarla bulunur. Yapay zekâ kapalıyken de çalışır. |
-| Taranmış PDF | Metin katmanı yok | Alan bulunamaz. Açık bir mesaj çıkar; alanlar sayfada elle çizilir. |
+| Fillable PDF (AcroForm) | The PDF has form fields | Fields are read as they are: name, type, options, page and box. The most reliable level. |
+| PDF with a text layer | No fields, but the text is selectable | Labels and blanks are found by rules. Also works when AI is turned off. |
+| Scanned PDF | No text layer | No fields can be found. A clear message is shown; fields are drawn on the page manually. |
 
-Metin katmanında aranan işaretler:
+Markers searched for in the text layer:
 
-- `Proje Adı: ..........` ve `Tarih: ______` gibi noktalı veya alt çizgili boşluklar.
-- Etiketin yanındaki çizgi (`Döküm Yeri: ________` çizgi olarak çizilmişse).
-- Altında etiket olan imza çizgileri (`Hazırlayan İmza`, `Kontrol Eden İmza`).
-- İçinde veya üstünde etiket olan kutular (`Açıklama`, `Kaşe`).
-- Onay kutuları: `☐ Evet ☐ Hayır` tek bir Evet/Hayır maddesi olur; başka etiketler seçim olur.
-- Kutusuz `Evet Hayır` yazıları.
-- Tablo ızgaraları: başlığı dolu, satırları boş ızgara tekrarlı tablo olur.
-  Etiket–değer ızgarası (solda etiket, sağda boş hücre) ayrı alanlar olur.
-- Sonu `:` ile biten etiket ve sağında boşluk.
-- Tip etiketten çıkar: tarih, imza/kaşe, fotoğraf/kroki, km, birimli sayı (`(m³)`, `(mm)`), açıklama (çok satırlı).
-- Bölümler: büyük harfli veya daha büyük yazılı kısa satırlar.
+- Dotted or underscored blanks such as `Proje Adı: ..........` (Project Name) and `Tarih: ______` (Date).
+- A line next to a label (when `Döküm Yeri: ________` (Pouring Location) is drawn as a line).
+- Signature lines with a label underneath (`Hazırlayan İmza` (Prepared By Signature), `Kontrol Eden İmza` (Checked By Signature)).
+- Boxes with a label inside or above (`Açıklama` (Notes), `Kaşe` (Stamp)).
+- Checkboxes: `☐ Evet ☐ Hayır` (Yes / No) becomes a single Yes/No item; other labels become a choice.
+- `Evet Hayır` text without boxes.
+- Table grids: a grid with a filled header and empty rows becomes a repeating table.
+  A label–value grid (label on the left, empty cell on the right) becomes separate fields.
+- A label ending in `:` with a blank to its right.
+- The type is derived from the label: date, signature/stamp, photo/sketch, km, number with a unit (`(m³)`, `(mm)`), notes (multi-line).
+- Sections: short lines in capitals or in a larger font.
 
-Taranmış PDF için görüntü modeli (ör. Ollama üzerinde Qwen2.5-VL) veya OCR gerekir.
-Sunucuda `VisionFieldDetector` arayüzü hazırdır (`apps/server/src/forms/pdf-detect.ts`).
-Bir model bağlanınca sayfa görüntülerini alır, aynı biçimde aday alanlar döndürür.
+Scanned PDFs need a vision model (e.g. Qwen2.5-VL on Ollama) or OCR.
+The `VisionFieldDetector` interface is ready on the server (`apps/server/src/forms/pdf-detect.ts`).
+When a model is connected, it receives the page images and returns candidate fields in the same format.
 
-## Akışı anlatmak
+## Describing the workflow
 
-Örnek anlatım:
+Example description:
 
 > Formu şantiye şefi doldurur, kalite kontrol mühendisi kontrol eder; ret olursa yükleniciye geri döner;
 > onaylanınca müşavire bilgi gider; 3 gün içinde cevap verilmeli; imza alanlarını onaylayan kişi doldurur.
 
-Çıkan adımlar:
+(The site manager (şantiye şefi) fills in the form, the quality control engineer checks it; if rejected, it goes back to the
+contractor; once approved, the consultant is informed; a reply is due within 3 days; the approver fills in the signature fields.)
+
+Resulting steps:
 
 ```
 1. Şantiye Şefi doldurur
@@ -63,73 +66,79 @@ Onaylanınca bilgi: Müşavir
 Durum: onaylanınca Kapalı; iade veya retle doldurana dönerse Taslak
 ```
 
-Başka örnekler:
+(1. Site Manager fills in. 2. Quality Control Engineer checks (Approve → closes; Reject → back to step 1) · 3 days ·
+Fills in: Checked By Signature. Informed on approval: Consultant. Status: Closed on approval; Draft if returned or
+rejected back to the filler.)
+
+Other examples:
 
 - "Formu formen doldurur, şantiye şefi kontrol eder, proje müdürü onaylar; müdür reddederse şantiye şefine döner."
-  Üç adım çıkar; 3. adımın reti 2. adıma döner.
-- "Teknik ofis doldurur, müşavir görür." Müşavir adımında yalnız "Görüldü" cevabı olur.
+  (The foreman fills in, the site manager checks, the project manager approves; if the manager rejects, it goes back
+  to the site manager.) Three steps result; the rejection in step 3 returns to step 2.
+- "Teknik ofis doldurur, müşavir görür." (The technical office fills in, the consultant sees it.) The consultant step
+  has only the "Noted" reply.
 
-Kurallar:
+Rules:
 
-- Model yalnız küçük bir JSON üretir. Gerisi kuralla yapılır ve zod ile doğrulanır.
-- Geçersiz cevap bir kez hata listesiyle düzelttirilir. Yine olmazsa açık bir hata mesajı döner.
-- Adlar projedeki rol, firma ve kişilerle eşleştirilir. Eşleşmeyen ad "Projede Olmayan Roller" kutusunda çıkar.
-  **Rol Oluştur** rolü açar; **Eşleştir** mevcut rol, firma veya kişiye bağlar. Eşleşmeden kaydedilmez.
-- "Proje yöneticisi" yerleşik rol olur. "Formu dolduran" akışı başlatan kişidir.
-- Kaydedilen akış normal bir onay akışı şablonudur (tür: Form Onayı). Elle kurmak için aynı ekran kullanılır.
-- Yapay zekâ kapalıysa **Elle Kur** ile adımlar, atananlar, cevaplar, dönüş adımı, süre ve alanlar seçilir.
+- The model only produces a small JSON. The rest is done by rules and validated with zod.
+- An invalid answer is sent back once with the error list for correction. If it still fails, a clear error message is returned.
+- Names are matched against the project's roles, companies and people. An unmatched name appears in the "Roles Not in the Project" box.
+  **Create Role** creates the role; **Match** links it to an existing role, company or person. It cannot be saved until matched.
+- "Proje yöneticisi" (project administrator) becomes the built-in role. "Formu dolduran" (the form filler) is the person who starts the workflow.
+- The saved workflow is a normal approval workflow template (type: Form Approval). The same screen is used for manual setup.
+- If AI is turned off, **Set Up Manually** lets you choose the steps, assignees, replies, return step, duration and fields.
 
-## Alan yetkisi (sunucuda)
+## Field permissions (on the server)
 
-- Bir adıma verilen alanı yalnız o adımın atananı, yalnız o adımda doldurur.
-- Dolduran kişi bu alanları değiştiremez; değer veya ek göndermeye çalışırsa 403 alır.
-- Bu alanlar doldurandan zorunlu istenmez. Adımda onay verilmeden önce doldurulmaları gerekir.
-- Atanan kişi alanları `PATCH /forms/:id/step-values` ile kaydeder; başka alana dokunamaz.
-- Formu yalnız akışta "dolduran" olarak seçilenler açabilir (boşsa herkes).
-- Ret, adımda seçilen önceki adıma döner (yeni tur) ya da doldurana taslak olarak döner.
+- A field given to a step is filled only by that step's assignee, and only at that step.
+- The filler cannot change these fields; trying to send a value or attachment returns 403.
+- These fields are not required from the filler. They must be filled before the step is approved.
+- The assignee saves the fields with `PATCH /forms/:id/step-values`; they cannot touch other fields.
+- Only those chosen as "filler" in the workflow can open the form (everyone, if empty).
+- A rejection returns to the earlier step chosen in the step (new round) or returns to the filler as a draft.
 
-## Çıktı (PDF)
+## Output (PDF)
 
-- Kaynak PDF'i olan şablonlarda çıktı, yüklenen PDF'in üzerine yazılır.
-- Doldurulabilir PDF'te onay kutuları ve seçenek düğmeleri PDF'in kendi işaretiyle işaretlenir.
-  Metinler PDF düzleştirildikten sonra kutuya yazılır (Liberation Sans; Türkçe harfler tam).
-- Diğer PDF'lerde metin kutuya sığacak boyutta yazılır, uzun metin satıra bölünür.
-- İşaret kutularına tik çizilir, imza görseli kutuya oturur, tarih gg.aa.yyyy olur.
-- Tablo satırları ızgaraya yazılır. Sığmayan satırlar ek sayfada "devam" başlığıyla çıkar.
-- Fotoğraflar ek sayfalarda toplanır.
-- "Onay Damgası" (adım, kişi, tarih, sonuç) sayfanın boş kenar boşluğuna konur. Yer yoksa ek sayfaya.
-- Form numarası, yer varsa 1. sayfanın üst boşluğuna yazılır.
-- Kaynak PDF'i olmayan şablonlar eski genel çıktıyı kullanır.
+- For templates with a source PDF, the output is written onto the uploaded PDF.
+- In a fillable PDF, checkboxes and radio buttons are ticked with the PDF's own mark.
+  Text is written into the box after the PDF is flattened (Liberation Sans; full Turkish character support).
+- In other PDFs, text is written at a size that fits the box; long text wraps onto new lines.
+- Checkboxes get a tick drawn in them, the signature image fits into its box, and dates use the format dd.mm.yyyy.
+- Table rows are written into the grid. Rows that do not fit go onto an extra page with a "continued" heading.
+- Photos are collected on extra pages.
+- The approval stamp (step, person, date, result) is placed in the page's empty margin. If there is no room, on an extra page.
+- The form number is written in the top margin of page 1 if there is room.
+- Templates without a source PDF use the older generic output.
 
-## Doldurma
+## Filling in
 
-- Formu Doldur ekranı aynıdır; telefonda ve çevrimdışı çalışır.
-- **PDF Görünümü** değerleri formun kendi PDF'i üzerinde gösterir. PDF tarayıcıda saklanır, çevrimdışı da açılır.
-- Bir alana dokununca form görünümünde o maddeye gidilir.
-- Onay adımındaki kişi kendi alanlarını (ör. imza) doldurur, sonra cevap verir. Bu adım için bağlantı gerekir.
+- The Fill Form screen is the same; it works on a phone and offline.
+- **PDF View** shows the values on the form's own PDF. The PDF is stored in the browser and also opens offline.
+- Tapping a field goes to that item in the form view.
+- The person at an approval step fills in their own fields (e.g. signature), then replies. This step needs a connection.
 
-## Uç noktalar
+## Endpoints
 
-| Yöntem | Yol | Açıklama |
+| Method | Path | Description |
 |---|---|---|
-| POST | `/projects/:pid/form-templates/pdf` | PDF yükle, alanları bul (taslak döner) |
-| GET | `/projects/:pid/form-pdf-sources/:sid` · `/file` | Kaynak PDF bilgisi · dosyası |
-| POST | `/projects/:pid/form-templates/name-fields` | Alanları yerel modelle adlandır |
-| POST | `/projects/:pid/form-templates/flow/generate` | Anlatımdan akış taslağı |
-| GET · PUT · DELETE | `/projects/:pid/form-templates/:tid/flow` | Şablonun akışı |
-| PATCH | `/projects/:pid/forms/:fid/step-values` | Adım sahibinin alanları |
-| POST | `/projects/:pid/forms/:fid/review` | `code` ile özel cevap (ör. `RET`) |
+| POST | `/projects/:pid/form-templates/pdf` | Upload a PDF, find the fields (returns a draft) |
+| GET | `/projects/:pid/form-pdf-sources/:sid` · `/file` | Source PDF information · file |
+| POST | `/projects/:pid/form-templates/name-fields` | Name the fields with the local model |
+| POST | `/projects/:pid/form-templates/flow/generate` | Workflow draft from a description |
+| GET · PUT · DELETE | `/projects/:pid/form-templates/:tid/flow` | The template's workflow |
+| PATCH | `/projects/:pid/forms/:fid/step-values` | The step owner's fields |
+| POST | `/projects/:pid/forms/:fid/review` | Custom reply with `code` (e.g. `RET`) |
 
-MCP: `cde_form_templates_list` şablonun kaynağını (PDF) ve akış adımlarını verir.
-`cde_form_template_from_description` anlatımdan şablon ve akış oluşturur (yazma anahtarı, proje yöneticisi).
+MCP: `cde_form_templates_list` returns the template's source (PDF) and workflow steps.
+`cde_form_template_from_description` creates a template and workflow from a description (write key, project administrator).
 
-## Sınırlar
+## Limits
 
-- Taranmış PDF'te otomatik alan bulma yok (görüntü modeli kurulu değil).
-- Döndürülmüş sayfalar ve sayfa başına ayrı kırpma kutuları denenmedi.
-- Şifreli (parola korumalı) PDF kabul edilmez.
-- Kurallar sık görülen düzenleri bulur; karışık formlarda kutuları kontrol edip düzeltmek gerekir.
-- Bir tablonun birleştirilmiş hücreleri tek sütun gibi okunabilir.
-- Mevcut şablonun PDF'ini değiştirmek için yeni PDF şablonu açılır (alanlar eşlenmez).
-- Yerel 8B model işlemcide yavaştır; akış ve adlandırma birkaç dakika sürebilir.
-- Onay adımındaki imza ve alanlar çevrimdışı kaydedilmez.
+- No automatic field detection on scanned PDFs (no vision model installed).
+- Rotated pages and per-page crop boxes have not been tested.
+- Encrypted (password-protected) PDFs are not accepted.
+- The rules find common layouts; for complex forms, the boxes need to be checked and corrected.
+- Merged cells in a table may be read as a single column.
+- To change the PDF of an existing template, a new PDF template is created (fields are not mapped).
+- A local 8B model is slow on a CPU; workflow generation and naming can take a few minutes.
+- Signatures and fields at an approval step are not saved offline.

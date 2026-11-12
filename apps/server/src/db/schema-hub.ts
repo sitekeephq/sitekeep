@@ -1,5 +1,5 @@
 /**
- * The simple project screen (docs/product/SADELESTIRME.md): saved views of the İşler hub and the cached
+ * The simple project screen (docs/product/SIMPLIFICATION.md): saved views of the İşler hub and the cached
  * "Günün Özeti" (AI summary of the project Bugün page) per user.
  */
 import { sql } from "drizzle-orm";

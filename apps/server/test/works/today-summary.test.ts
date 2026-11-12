@@ -1,5 +1,5 @@
 /**
- * "Günün Özeti" (docs/product/SADELESTIRME.md, 2. aşama): deterministic summary, the invented-number guard,
+ * "Günün Özeti" (docs/product/SIMPLIFICATION.md, 2. aşama): deterministic summary, the invented-number guard,
  * cache and stamp, AI off / mocked provider / task queue, and per-user scoping.
  */
 import { hasAi, hasManage } from "../helpers/modules.js"; // AI steps run when the AI module is installed

@@ -1,7 +1,7 @@
 // i18n-ok-file: Turkish term list and instruction for language-model prompts (model-facing text)
 /**
  * The Turkish words the CDE shows instead of the usual English construction-software terms
- * (full list with notes: docs/product/TERIMLER.md). Language-model prompts use this list so generated
+ * (full list with notes: docs/product/TERMINOLOGY.md). Language-model prompts use this list so generated
  * texts (Sor answers, report titles, summaries) speak the same language as the UI.
  */
 export const UI_TERMS_TR: readonly (readonly [en: string, tr: string])[] = [

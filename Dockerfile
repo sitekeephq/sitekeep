@@ -32,7 +32,7 @@ COPY packages packages
 COPY apps apps
 COPY tools/harden-dist.mjs tools/
 # Release hardening: compiled server code ships minified, without comments, source maps or type
-# declarations; developer seed / load scripts stay out of the image (docs/onprem/kurulum-paketi.md).
+# declarations; developer seed / load scripts stay out of the image (docs/onprem/installation-bundle.md).
 # Modules (docs/modules/README.md) are published packages installed by npm ci: the server loads
 # them by package name at run time, the web build bundles them. SITEKEEP_MODULES unset = all of them.
 RUN npm run build -w @sitekeep/shared \
@@ -48,7 +48,7 @@ RUN npm run build -w @sitekeep/shared \
 # (again after prune: npm restores missing optional packages from its cache)
 
 # LibreDWG (GPL-3.0) dwg2dxf for DWG previews, built from the GNU release (0.14+: 0.13 writes MTEXT
-# values broken over lines; the server repairs them, see docs/features/GORUNTULEYICILER.md). The server runs it
+# values broken over lines; the server repairs them, see docs/features/VIEWERS.md). The server runs it
 # as a separate process (never linked). Skip with --build-arg WITH_LIBREDWG=0.
 FROM debian:bookworm-slim AS libredwg
 ARG WITH_LIBREDWG=1
@@ -76,7 +76,7 @@ LABEL org.opencontainers.image.title="SiteKeep" \
 WORKDIR /app
 # No LibreOffice here: office files open in the browser viewers; editing (WOPI) and office → PDF
 # conversion come from optional services (ONLYOFFICE Docs, Collabora Online or Gotenberg, see
-# docker-compose.yml profiles and docs/features/OFIS_ENTEGRASYONU.md).
+# docker-compose.yml profiles and docs/features/OFFICE_INTEGRATION.md).
 COPY --from=libredwg /opt/libredwg/bin/ /usr/local/bin/
 ENV NODE_ENV=production \
     PORT=8080 \

@@ -15,8 +15,8 @@
     "none": "yok"
   },
   "converter": {
-    "sofficeHint": "Bu sunucuda yerel soffice yok (isteğe bağlı, son çare dönüştürücü). Ofis dosyaları tarayıcıda yine açılır. Birebir PDF için yönetici Yönetim → Office Entegrasyonu'ndan ONLYOFFICE, Collabora ya da Gotenberg bağlayabilir (docs/features/OFIS_ENTEGRASYONU.md).",
-    "dwg2dxfHint": "Sunucuda LibreDWG (dwg2dxf) bulunamadı. Yönetici: LibreDWG kurun ya da CDE_DWG2DXF_PATH ile yolu verin (docs/features/GORUNTULEYICILER.md).",
+    "sofficeHint": "Bu sunucuda yerel soffice yok (isteğe bağlı, son çare dönüştürücü). Ofis dosyaları tarayıcıda yine açılır. Birebir PDF için yönetici Yönetim → Office Entegrasyonu'ndan ONLYOFFICE, Collabora ya da Gotenberg bağlayabilir (docs/features/OFFICE_INTEGRATION.md).",
+    "dwg2dxfHint": "Sunucuda LibreDWG (dwg2dxf) bulunamadı. Yönetici: LibreDWG kurun ya da CDE_DWG2DXF_PATH ile yolu verin (docs/features/VIEWERS.md).",
     "timeout": "Dönüşüm zaman aşımına uğradı.",
     "libreofficeFailed": "LibreOffice PDF üretemedi (kod {{code}}). {{detail}}",
     "dwgFailed": "DWG dönüştürülemedi (kod {{code}}). {{detail}}"

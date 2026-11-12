@@ -40,14 +40,14 @@ import { editionName } from "./app/module-ids.js";
  *   CDE_SOFFICE_PATH   LibreOffice soffice, last-resort office → PDF converter (default: install paths, then PATH)
  *   CDE_DWG2DXF_PATH   LibreDWG dwg2dxf for DWG previews (default: install paths, then PATH)
  *   CDE_CONVERT_TIMEOUT_MS  max time of one conversion (default 180000)
- *   Office integration defaults (the admin page overrides them; docs/features/OFIS_ENTEGRASYONU.md):
+ *   Office integration defaults (the admin page overrides them; docs/features/OFFICE_INTEGRATION.md):
  *   CDE_OFFICE_EDITOR  onlyoffice | collabora      CDE_OFFICE_EDITOR_URL, CDE_OFFICE_EDITOR_PUBLIC_URL
  *   CDE_OFFICE_CONVERTER  auto | onlyoffice | collabora | gotenberg | local | none
  *   CDE_OFFICE_CONVERTER_URL   CDE_OFFICE_JWT_SECRET (ONLYOFFICE)   CDE_GOTENBERG_AUTH (user:password)
  *   CDE_WOPI_BASE_URL  CDE address as the editor/converter reaches it (e.g. http://app:8080)
  *   CDE_WOPI_VERIFY_PROOF  "0" turns off X-WOPI-Proof checks
  *   CDE_DEV_TOOLS      "1" turns on the developer tools (cde_dev_* over MCP, /api/v1/dev/*) for system
- *                      administrators' write tokens; ignored when NODE_ENV=production (docs/onboarding/GELISTIRICI_MCP.md)
+ *                      administrators' write tokens; ignored when NODE_ENV=production (docs/onboarding/DEVELOPER_MCP.md)
  *   CDE_WEB_URL        web app address used in developer tool links (default http://localhost:5173)
  *   OpenCDE Foundation API and OAuth2 server (docs/features/OPENCDE.md):
  *   CDE_PUBLIC_URL     public HTTPS root, e.g. https://cde.firma.local (absolute URLs; else the request host)

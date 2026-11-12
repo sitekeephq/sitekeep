@@ -52,7 +52,7 @@
     }
   },
   "service": {
-    "converterHint": "There is no converter to turn office files into PDF (optional; files still open in the browser). For an exact PDF, an administrator can connect ONLYOFFICE, Collabora or Gotenberg in Administration → Office Integration (LibreOffice soffice on the server is used as a fallback if present). See docs/features/OFIS_ENTEGRASYONU.md.",
+    "converterHint": "There is no converter to turn office files into PDF (optional; files still open in the browser). For an exact PDF, an administrator can connect ONLYOFFICE, Collabora or Gotenberg in Administration → Office Integration (LibreOffice soffice on the server is used as a fallback if present). See docs/features/OFFICE_INTEGRATION.md.",
     "converterOff": "Office → PDF conversion is off (Administration → Office Integration).",
     "converterUrlMissing": "No {{converter}} address entered (Administration → Office Integration).",
     "onlyofficeNeedsWopiBase": "ONLYOFFICE conversion needs the 'CDE address as seen by the editor' (ONLYOFFICE downloads the file from there).",

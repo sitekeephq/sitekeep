@@ -1,86 +1,86 @@
-# SiteKeep — Kurulum (Linux)
+# SiteKeep — Installation (Linux)
 
-Bu paket SiteKeep'i şirket sunucusuna kurar. İçinde gereken her şey var (uygulama, PostgreSQL,
-HTTPS vekili); kurulum sırasında internet gerekmez.
+This package installs SiteKeep on a company server. It contains everything needed (the application, PostgreSQL,
+an HTTPS proxy); no internet access is required during installation.
 
-## Gerekenler
+## Requirements
 
-- 64 bit Linux (Ubuntu 22.04/24.04, Debian 12, RHEL/Rocky/Alma 9 önerilir)
-- Docker Engine 24+ ve Compose eklentisi (`docker compose`)
-- Yönetici (root / sudo) yetkisi
-- Donanım, kullanıcı sayısına göre:
+- 64-bit Linux (Ubuntu 22.04/24.04, Debian 12, RHEL/Rocky/Alma 9 recommended)
+- Docker Engine 24+ and the Compose plugin (`docker compose`)
+- Administrator (root / sudo) privileges
+- Hardware, by number of users:
 
-| Kullanıcı | vCPU | RAM | Veri diski |
+| Users | vCPU | RAM | Data disk |
 |---|---|---|---|
 | ≤ 10 | 2 | 8 GB | 100 GB |
 | ≤ 50 | 4 | 16 GB | 500 GB |
 | ≤ 200 | 8 | 32 GB | 1–2 TB |
 | ≤ 500 | 16 | 64 GB | 2–4 TB |
 
-Disk, kullanıcı sayısıyla değil yüklenen model ve çizim hacmiyle büyür
-(yaklaşık: yüklenen dosyalar × 1,6).
+Disk usage grows with the volume of uploaded models and drawings, not with the number of users
+(roughly: uploaded files × 1.6).
 
-## Kurulum
+## Installation
 
 ```bash
-tar -xzf sitekeep-<sürüm>-linux-amd64.tar.gz
-cd sitekeep-<sürüm>-linux-amd64
-sha256sum -c SHA256SUMS        # paket bütünlüğü
+tar -xzf sitekeep-<version>-linux-amd64.tar.gz
+cd sitekeep-<version>-linux-amd64
+sha256sum -c SHA256SUMS        # package integrity
 sudo ./install.sh
 ```
 
-Sihirbaz sırasıyla sorar: tahmini kullanıcı sayısı, sunucu adresi, HTTPS türü, ilk yöneticinin
-e-postası ve şifresi, dil, gece yedeğinin saati. Sonunda adresi ve (üretildiyse) yönetici
-şifresini bir kez gösterir.
+The wizard asks, in order: the estimated number of users, the server address, the HTTPS type, the first administrator's
+email and password, the language, and the time of the nightly backup. At the end it shows the address and (if one was generated) the administrator
+password once.
 
-Sorusuz kurulum: `cp cevap.env.example cevap.env`, düzenleyin, `sudo ./install.sh --answers cevap.env`.
+Unattended installation: `cp cevap.env.example cevap.env`, edit it, then `sudo ./install.sh --answers cevap.env`.
 
-### HTTPS türleri
+### HTTPS types
 
-| Tür | Ne zaman |
+| Type | When |
 |---|---|
-| `internal` (varsayılan) | iç ağ. Sertifikayı kurulum üretir; `/opt/sitekeep/config/sitekeep-kok-sertifika.crt` kök sertifikasını istemcilere (GPO ile) dağıtın, tarayıcı uyarısı kalkar. |
-| `files` | kurumun kendi sertifikası (PEM; zincir dahil sertifika + özel anahtar). |
-| `auto` | herkese açık alan adı ve internet: Let's Encrypt sertifikası otomatik alınır ve yenilenir (80 ve 443 dışarıdan açık olmalı). |
-| `off` | yalnız HTTP. Önerilmez. |
+| `internal` (default) | internal network. The installer generates the certificate; distribute the root certificate `/opt/sitekeep/config/sitekeep-kok-sertifika.crt` to clients (via GPO) and the browser warning goes away. |
+| `files` | the organisation's own certificate (PEM; certificate including chain + private key). |
+| `auto` | public domain name and internet: a Let's Encrypt certificate is obtained and renewed automatically (ports 80 and 443 must be reachable from outside). |
+| `off` | HTTP only. Not recommended. |
 
-## Nerede ne var
+## Where things are
 
-| Yol | İçerik |
+| Path | Contents |
 |---|---|
-| `/opt/sitekeep/` | yönetim dosyaları (`compose.yml`, `.env`, `bin/sitekeep`) |
-| `/opt/sitekeep/config/app.env` | uygulama ayarları; sırlar içerir, yalnız root okur |
-| `/var/lib/sitekeep/pgdata` | veritabanı |
-| `/var/lib/sitekeep/app` | yüklenen dosyalar ve model türevleri |
-| `/var/lib/sitekeep/backups` | yedekler |
+| `/opt/sitekeep/` | management files (`compose.yml`, `.env`, `bin/sitekeep`) |
+| `/opt/sitekeep/config/app.env` | application settings; contains secrets, readable by root only |
+| `/var/lib/sitekeep/pgdata` | database |
+| `/var/lib/sitekeep/app` | uploaded files and model derivatives |
+| `/var/lib/sitekeep/backups` | backups |
 
-Veri dizini ayrı bir diske konabilir: kurulumdan önce `CDE_DATA=/data/sitekeep` verin.
+The data directory can be placed on a separate disk: set `CDE_DATA=/data/sitekeep` before installing.
 
-## Yönetim
+## Administration
 
 ```bash
-sitekeep status                    # servisler, sağlık, son yedek, disk
-sitekeep logs app                  # günlükler
-sudo sitekeep backup               # şimdi yedekle
-sitekeep backups                   # yedek listesi
+sitekeep status                    # services, health, last backup, disk
+sitekeep logs app                  # logs
+sudo sitekeep backup               # back up now
+sitekeep backups                   # list backups
 sudo sitekeep restore 20270115-023000
-sudo sitekeep upgrade /yol/sitekeep-<yeni sürüm>-linux-amd64
+sudo sitekeep upgrade /path/sitekeep-<new version>-linux-amd64
 sudo sitekeep stop | start | restart
-sudo sitekeep uninstall            # veriler kalır; --purge ile silinir
+sudo sitekeep uninstall            # data is kept; deleted with --purge
 ```
 
-**Yedek** her gece kurulumda seçilen saatte alınır: veritabanı (doğrulanmış döküm), dosyalar
-(önceki yedeğe göre artımlı) ve ayarlar. Son 14 yedek saklanır. Yedek dizinini düzenli olarak
-**sunucu dışına** (NAS, yedek sunucusu) kopyalayın; aynı diskteki yedek disk arızasına karşı korumaz.
+A **backup** is taken every night at the time chosen during installation: the database (verified dump), the files
+(incremental against the previous backup) and the settings. The last 14 backups are kept. Copy the backup directory regularly
+**off the server** (NAS, backup server); a backup on the same disk does not protect against disk failure.
 
-**Güncelleme** önce yedek alır, yeni sürümü başlatır; 3 dakikada sağlıklı açılmazsa eski sürüme
-ve güncelleme öncesi veritabanına kendiliğinden döner.
+An **upgrade** first takes a backup, then starts the new version; if it does not come up healthy within 3 minutes, it automatically
+rolls back to the old version and the pre-upgrade database.
 
-## Sorun giderme
+## Troubleshooting
 
-| Belirti | Bakın |
+| Symptom | Check |
 |---|---|
-| Kurulum "Port 443 kullanımda" diyor | aynı sunucuda başka web sunucusu var; `CDE_HTTPS_PORT=8443` gibi başka port verin |
-| Tarayıcı sertifika uyarısı | `internal` türünde kök sertifikayı istemcilere dağıtın |
-| Sayfa açılmıyor | `sitekeep status`, `sitekeep logs proxy`, güvenlik duvarında 443 |
-| Destek için | `sitekeep status` çıktısı ve `sitekeep logs app` son satırları |
+| Installation says "Port 443 kullanımda" (port 443 in use) | another web server runs on the same server; set a different port, e.g. `CDE_HTTPS_PORT=8443` |
+| Browser certificate warning | with the `internal` type, distribute the root certificate to clients |
+| Page does not open | `sitekeep status`, `sitekeep logs proxy`, port 443 in the firewall |
+| For support | the output of `sitekeep status` and the last lines of `sitekeep logs app` |

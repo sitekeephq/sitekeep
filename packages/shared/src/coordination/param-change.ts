@@ -2,7 +2,7 @@
  * "Değişiklik Talebi" (parameter change request): change element information (property set values)
  * of an IFC model and produce a new version. Step 1 applies it in the CDE (web-ifc); step 2 (later)
  * hands the same request to the authoring team (Revit via AEC Pilot) and only verifies the result.
- * See docs/features/PARAMETRE_DEGISIKLIGI.md.
+ * See docs/features/PARAMETER_CHANGE.md.
  */
 export const PARAM_CHANGE_STATUSES = [
   "draft",

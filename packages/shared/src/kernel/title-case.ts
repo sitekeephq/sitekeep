@@ -2,7 +2,7 @@
 /**
  * "Her Kelime Büyük Harf İle Başlasın": names and labels (menu items, titles, tabs, buttons,
  * column headers, type and status names) are written in Title Case with Turkish casing rules.
- * Sentences (help texts, messages, placeholders) stay in sentence case. See docs/product/TERIMLER.md.
+ * Sentences (help texts, messages, placeholders) stay in sentence case. See docs/product/TERMINOLOGY.md.
  *
  * Labels are written title-cased in the source; this helper serves the seed upgrade of stored
  * default labels and the checks that keep the label tables in Title Case.

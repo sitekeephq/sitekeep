@@ -1,73 +1,73 @@
-# Planning modülü
+# Planning module
 
-SiteKeep Planning: İş Programı (Primavera P6 XER, MS Project XML, Excel / CSV içe aktarma, sürümler,
-karşılaştırma, Gantt, S-eğrisi) ve 4D (bağlantı kuralları, faaliyet bağları, 4D durumu, görüntüleyicinin
-4D paneli). Ürün açıklaması: SiteKeep sürümler ve modüller §2.
-Özellik belgesi: [4D / 5D](../features/4D_5D.md).
+SiteKeep Planning: Schedule (iş programı; Primavera P6 XER, MS Project XML, Excel / CSV import, versions,
+comparison, Gantt, S-curve) and 4D (link rules, activity links, 4D status, the viewer's
+4D panel). Product description: SiteKeep editions and modules §2.
+Feature document: [4D / 5D](../features/4D_5D.md).
 
 | | |
 |---|---|
-| Depo | [7Dimensions-Project/sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (kapalı); yerel klon `~/Desktop/7dimensions/sitekeep-planning` |
-| Paket | `@7dimensions-project/sitekeep-ee-planning` (GitHub Packages) |
-| Bu depodaki sürüm | `0.3.0` (`apps/server/package.json`, `apps/web/package.json`) |
-| Kullandığı SDK | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
-| Kimlik | `planning` (`SITEKEEP_MODULES`) |
+| Repository | [7Dimensions-Project/sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private); local clone `~/Desktop/7dimensions/sitekeep-planning` |
+| Package | `@7dimensions-project/sitekeep-ee-planning` (GitHub Packages) |
+| Version in this repository | `0.3.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| ID | `planning` (`SITEKEEP_MODULES`) |
 
-Taşınmadan önceki geçmiş bu depodadır (`apps/server/src/{schedule,sim}`,
+The history before the move is in this repository (`apps/server/src/{schedule,sim}`,
 `apps/web/src/features/{schedule,sim}`).
 
-## Sınır
+## Boundary
 
-5D maliyet Cost'tadır ([cost.md](cost.md)); Cost programlara `planning.schedules` yeteneğiyle erişir.
-SDK 0.4.0 ile eski geçici exportlar (`loadActivities`, `scheduleFor`, `refDate`, `canPlan`,
-`elementActivities`, `scheduleApi` …) kaldırıldı; bu yüzden Cost `0.2.0` ile birlikte gelir.
+5D cost is in Cost ([cost.md](cost.md)); Cost accesses schedules through the `planning.schedules` capability.
+SDK 0.4.0 removed the old temporary exports (`loadActivities`, `scheduleFor`, `refDate`, `canPlan`,
+`elementActivities`, `scheduleApi` …); this is why it ships together with Cost `0.2.0`.
 
-Çekirdeğe alınan ortak parçalar:
+Shared parts moved into the core:
 
-| Çekirdek | Ne |
+| Core | What |
 |---|---|
-| `apps/server/src/core/formats/{xml,zip,text,dates}.ts` | XML okuyucu (BCF de kullanır), ZIP, metin çözme, tarih yardımcıları |
-| `apps/server/src/i18n` `Translate`, `defaultTranslate` | Ayrıştırıcıların uyarı dili |
-| `apps/server/src/model/versions.ts` | Görünür IFC sürümleri, ayrıntılı indeks (4D ve 5D ortak) |
-| `apps/server/src/model/rule-match.ts`, web `shared/ui/RuleMatchEditor.tsx` | Kural motoru ve düzenleyicisi (Cost ile ortak) |
-| `apps/web/src/sim.css` | 4D / 5D panel stilleri (`main.tsx` yükler) |
+| `apps/server/src/core/formats/{xml,zip,text,dates}.ts` | XML reader (also used by BCF), ZIP, text decoding, date helpers |
+| `apps/server/src/i18n` `Translate`, `defaultTranslate` | Language of the parsers' warnings |
+| `apps/server/src/model/versions.ts` | Visible IFC versions, detailed index (shared by 4D and 5D) |
+| `apps/server/src/model/rule-match.ts`, web `shared/ui/RuleMatchEditor.tsx` | Rule engine and its editor (shared with Cost) |
+| `apps/web/src/sim.css` | 4D / 5D panel styles (loaded by `main.tsx`) |
 
-## Pakette ne var
+## What is in the package
 
-| Yer (depoda) | İçerik |
+| Location (in the repository) | Contents |
 |---|---|
-| `server/index.ts` | Modül: migration'lar, rotalar, `tables`; yüklenirken `planning.schedules` yeteneğini ve `schedule_activities` veri kümesini kaydeder |
-| `server/schedule/` | İçe aktarma (XER, MSPDI, Excel / CSV ve formüller), programlar, faaliyetler, sürüm karşılaştırma, rotalar |
-| `server/routes.ts`, `service.ts`, `fourd.ts`, `suggest.ts` | 4D: bağlantı kuralları, öneriler, 4D durumu |
+| `server/index.ts` | Module: migrations, routes, `tables`; registers the `planning.schedules` capability and the `schedule_activities` dataset when loaded |
+| `server/schedule/` | Import (XER, MSPDI, Excel / CSV and formulas), schedules, activities, version comparison, routes |
+| `server/routes.ts`, `service.ts`, `fourd.ts`, `suggest.ts` | 4D: link rules, suggestions, 4D status |
 | `server/schema-tables.ts` | `schedules`, `schedule_activities`, `schedule_dependencies`, `activity_links`, `schedule_link_rules` |
-| `web/` | İş Programı sayfası (Gantt, faaliyet çekmecesi, içe aktarma), 4D paneli, bağlantı kuralları diyaloğu, API istemcisi |
-| `migrations/0000_planning` | Kendi günlüğü `drizzle.__drizzle_migrations_planning`; çekirdeğin önceki migration'larından idempotent |
+| `web/` | Schedule page (Gantt, activity drawer, import), 4D panel, link rules dialog, API client |
+| `migrations/0000_planning` | Own journal `drizzle.__drizzle_migrations_planning`; idempotent, from the core's earlier migrations |
 
-## Çekirdeğe bağlandığı yerler
+## Where it connects to the core
 
-| Çekirdek | Nasıl |
+| Core | How |
 |---|---|
-| Rotalar | `ServerModule.routes` |
-| "Bugün": program etiketleri | `planning.schedules.labels` |
-| Cost: 5D faaliyetleri, nakit akışı, planlamacı yetkisi | `planning.schedules` |
-| Raporlar: `schedule_activities` | modül yüklenirken kaydedilir |
-| Görüntüleyici: 4D paneli (`?takvim=1`) | `planning.fourD`; yoksa 4D düğmesi görünmez |
-| Menü, sayfa, Model sekmesi, eski adresler | `projectNav` (Planlama grubunun başında), `projectRoutes`; `MODEL_TABS.webModule`, `LEGACY_URLS.module` |
-| Geliştirici araçları (demo programı, sıfırlama, tarih kaydırma) | `moduleTable("planning", …)` |
+| Routes | `ServerModule.routes` |
+| "Today": schedule labels | `planning.schedules.labels` |
+| Cost: 5D activities, cash flow, planner permission | `planning.schedules` |
+| Reports: `schedule_activities` | registered while the module loads |
+| Viewer: 4D panel (`?takvim=1`) | `planning.fourD`; otherwise the 4D button is hidden |
+| Menu, page, Model tab, legacy addresses | `projectNav` (at the top of the Planning group), `projectRoutes`; `MODEL_TABS.webModule`, `LEGACY_URLS.module` |
+| Developer tools (demo schedule, reset, date shifting) | `moduleTable("planning", …)` |
 
-Proje modül anahtarı (`schedule`, proje ayarları) değişmedi: Planning kuruluyken bir projede İş
-Programı kapatılabilir.
+The project module switch (`schedule`, project settings) did not change: while Planning is installed, Schedule can be
+turned off in a project.
 
-## Testler
+## Tests
 
-| Yer | Ne |
+| Location | What |
 |---|---|
-| `sitekeep-planning`: `npm test` | Sınır kontrolü, Excel formül değerlendiricisi birim testi |
-| `apps/server/test/modules/planning/` | İçe aktarma ve program API'si, 4D motoru, 4D + 5D HTTP senaryosu (5D adımları Cost kuruluysa) |
-| `e2e/specs/` | iş programı ve 4D senaryoları |
+| `sitekeep-planning`: `npm test` | Boundary check, Excel formula evaluator unit test |
+| `apps/server/test/modules/planning/` | Import and schedule API, 4D engine, 4D + 5D HTTP scenario (5D steps if Cost is installed) |
+| `e2e/specs/` | schedule and 4D scenarios |
 
-## Çekirdekte kalanlar
+## What stays in the core
 
-Açık iş yok (10.11.2026). Aşağıdakiler bilerek çekirdekte duruyor ya da başka modüllerle paylaşılıyor:
+No open work (10.11.2026). The following stay in the core on purpose or are shared with other modules:
 
-- İş programı DTO'ları, faaliyet durumu etiketleri ve 4D bağlama kuralları pakettedir (`shared/schedule.ts`, `shared/sim.ts`); çekirdeğin de kullandığı faaliyet tarihleri, tarih yardımcıları, kural eşleme ve nakit akışı tipleri çekirdekte. Metinler modülde (`locales/`); Cost'un da kullandığı `schedule` / `sim` anahtarları çekirdekte.
+- Schedule DTOs, activity status labels and 4D link rules are in the package (`shared/schedule.ts`, `shared/sim.ts`); activity dates, date helpers, rule matching and cash flow types, also used by the core, are in the core. Strings are in the module (`locales/`); the `schedule` / `sim` keys also used by Cost are in the core.

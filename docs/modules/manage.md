@@ -1,83 +1,83 @@
-# Manage modülü
+# Manage module
 
-SiteKeep Manage: proje yönetimi kategorileri. Bunlar RFI (bilgi talebi), teknik onay (submittal ve
-paketleri), toplantı ve tutanak, eylemler, resmi yazışmalar ve şartname kütüğüdür. Ürün açıklaması:
-SiteKeep sürümler ve modüller §2, §3.2.
+SiteKeep Manage: project management categories. These are RFIs (bilgi talebi), submittals (teknik onay) and their
+packages, meetings and minutes (tutanak), actions, formal correspondence (yazışma) and the specification register. Product description:
+SiteKeep editions and modules §2, §3.2.
 
 | | |
 |---|---|
-| Depo | [7Dimensions-Project/sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (kapalı); yerel klon `~/Desktop/7dimensions/sitekeep-manage` |
-| Paket | `@7dimensions-project/sitekeep-ee-manage` (GitHub Packages) |
-| Bu depodaki sürüm | `0.3.1` (`apps/server/package.json`, `apps/web/package.json`) |
-| Kullandığı SDK | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
-| Kimlik | `manage` (`SITEKEEP_MODULES`) |
+| Repository | [7Dimensions-Project/sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (private); local clone `~/Desktop/7dimensions/sitekeep-manage` |
+| Package | `@7dimensions-project/sitekeep-ee-manage` (GitHub Packages) |
+| Version in this repository | `0.3.1` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| ID | `manage` (`SITEKEEP_MODULES`) |
 
-## Sınır: İşler motoru çekirdekte
+## Boundary: the Works engine is in the core
 
-"İşler" (iş tipleri, kayıtlar, numaralandırma, bağlar, olaylar, iş akışı, ekler, mektup ve gönderim
-altyapısı, alındı kaydı) çekirdektedir. Nedenleri:
+"Works" (İşler: work types, records, numbering, links, events, workflow, attachments, letter and transmittal
+infrastructure, receipt record) is in the core. The reasons:
 
-- **Transmittal (gönderim formu)** ISO 19650'nin bilgi gönderimidir ve Community'dedir (ürün belgesi §6, ISO-6). Bir iş kategorisi olarak bu motoru kullanır.
-- İncelemeden otomatik transmittal (`works/transmittal-listener.ts`) ve iş akışı şablonlu genel işler de bu motoru kullanır.
-- Mektup verisi (konu, alıcı, imzacı, PDF, e-posta, KEP) transmittal kapağı ve gönderim kanallarıyla ortaktır.
+- **Transmittal** is ISO 19650's information transmittal and is in Community (product document §6, ISO-6). As a work category it uses this engine.
+- The automatic transmittal from a review (`works/transmittal-listener.ts`) and general work items with workflow templates also use this engine.
+- Letter data (subject, recipient, signatory, PDF, email, KEP) is shared with the transmittal cover and the sending channels.
 
-Manage bu motorun üstüne kendi kategorilerini ve onlara özgü araçları ekler. Kurulu değilken
-`correspondence`, `rfi`, `submittals`, `meetings` ve `spec` proje anahtarları **her projede kapalıdır**
-(`apps/server/src/projects/modules.ts` `PRODUCT_SWITCHES`). Saklı ayar korunur; Manage yeniden
-kurulunca eski hâline döner. Kapalı anahtarlar mevcut mekanizmayla her yerde geçerlidir. Yeni kayıt
-`403 module_disabled` alır. Menüdeki İşler bölümleri, "+ Yeni" seçenekleri, Sor araçları, rapor
-kataloğu ve Modüller sekmesi bu kategorileri göstermez. Mevcut kayıtlar açılabilir ve okunabilir.
+Manage adds its own categories and the tools specific to them on top of this engine. When it is not installed,
+the `correspondence`, `rfi`, `submittals`, `meetings` and `spec` project switches are **off in every project**
+(`apps/server/src/projects/modules.ts` `PRODUCT_SWITCHES`). The stored setting is kept; when Manage is
+reinstalled, it returns to its previous state. The switches that are off apply everywhere through the existing mechanism. A new record
+gets `403 module_disabled`. The Works sections in the menu, the "+ New" options, the Ask tools, the report
+catalogue and the Modules tab do not show these categories. Existing records can be opened and read.
 
-Çekirdeğe alınan parçalar:
+Parts moved into the core:
 
-| Çekirdek | Ne |
+| Core | What |
 |---|---|
-| `works/detail.ts` | İş akışlı işlerin detay ekleri (`buildDetail`), görünür işler, iş akışı durumu |
-| `works/meeting-data.ts` | Toplantı verisinin okunması (detay ve raporlar) |
-| `works/routes/work-flow.ts` | `submit`, `respond`, `revise`, `cancel` ve otomatik transmittal dinleyicisi |
-| `works/letter-translate.ts` | Mektup çevirisi (yapay zekâ kapısı üzerinden) |
-| `contracts/works.ts` | Eylem, RFI taslağı ve "Bırak, kaydet" yapay zekâ şemaları (AI modülü de doğrular) |
-| `reports/datasets-works.ts` | `correspondence`, `rfis`, `submittals`, `meetings`, `actions` veri kümeleri; yalnız Manage kuruluyken kaydedilir |
-| web `BuildPanel` | İş detayındaki iş akışı paneli |
+| `works/detail.ts` | Detail attachments of work items with workflow (`buildDetail`), visible work items, workflow status |
+| `works/meeting-data.ts` | Reading meeting data (detail and reports) |
+| `works/routes/work-flow.ts` | `submit`, `respond`, `revise`, `cancel` and the automatic transmittal listener |
+| `works/letter-translate.ts` | Letter translation (through the AI gate) |
+| `contracts/works.ts` | AI schemas for actions, RFI draft and "Drop and save" (the AI module also validates them) |
+| `reports/datasets-works.ts` | `correspondence`, `rfis`, `submittals`, `meetings`, `actions` datasets; registered only when Manage is installed |
+| web `BuildPanel` | The workflow panel in the work detail |
 
-## Pakette ne var
+## What is in the package
 
-| Yer (depoda) | İçerik |
+| Location (in the repository) | Contents |
 |---|---|
-| `server/index.ts` | Modül: rotalar |
-| `server/routes/build-works.ts` | Teknik onay paketi kalemleri, toplantı (gündem, tutanak, sonraki toplantı, PDF), teknik onay kütüğü ve RFI günlüğü (Excel), şartname kütüğünden içe aktarma, numaralandırma ön ayarı, yapay zekâ ile eylem önerisi ve RFI taslağı |
-| `server/routes/intake.ts`, `intake*.ts` | "Bırak, kaydet": PDF / e-posta / Office dosyasından kayıt taslağı, isteğe bağlı yapay zekâ geçişi |
-| `server/build.ts`, `meetings.ts`, `build-ai.ts` | Kütükler, toplantılar, yapay zekâ taslakları |
-| `web/` | Paket kalemleri, toplantı kutusu, kütük görünümleri, içe aktarma, RFI taslağı, "Bırak, kaydet" (`manage.ui`) |
+| `server/index.ts` | Module: routes |
+| `server/routes/build-works.ts` | Submittal package items, meetings (agenda, minutes, next meeting, PDF), submittal register and RFI log (Excel), import from the specification register, numbering preset, AI action suggestion and RFI draft |
+| `server/routes/intake.ts`, `intake*.ts` | "Drop and save": record draft from a PDF / email / Office file, optional AI pass |
+| `server/build.ts`, `meetings.ts`, `build-ai.ts` | Registers, meetings, AI drafts |
+| `web/` | Package items, meeting box, register views, import, RFI draft, "Drop and save" (`manage.ui`) |
 
-Kendi tablosu ve migration'ı yoktur; kayıtlar çekirdeğin `works` tablolarındadır.
+It has no tables or migrations of its own; the records are in the core's `works` tables.
 
-## Çekirdeğe bağlandığı yerler
+## Where it connects to the core
 
-| Çekirdek | Nasıl |
+| Core | How |
 |---|---|
-| Rotalar | `ServerModule.routes` |
-| Proje anahtarları | `PRODUCT_SWITCHES.manage` (kurulu değilse kapalı) |
-| Rapor veri kümeleri | Çekirdekte, `moduleInstalled("manage")` ile |
-| İş detayı: paket kalemleri, toplantı | web `manage.ui` (`PackageItems`, `MeetingBox`) |
-| İşler: kütük ve günlük görünümleri | `manage.ui.RegisterView` |
-| Şartname analizi: kütüğü içe aktar | `manage.ui.ImportDialog` |
-| Yeni iş: RFI taslağı; "+ Yeni": dosyadan kayıt, İşler'e dosya bırakma | `manage.ui.RfiDraftBox`, `FileRecordDialog`, `FileDropZone` |
-| Proje Ayarları → Modüller | Manage anahtarları yalnız kuruluyken görünür |
-| `manage.workExists`, `manage.workLabels` | Çekirdeğin İşler motoru sağlar (Cost, Coordinate kullanır) |
+| Routes | `ServerModule.routes` |
+| Project switches | `PRODUCT_SWITCHES.manage` (off if not installed) |
+| Report datasets | In the core, with `moduleInstalled("manage")` |
+| Work detail: package items, meeting | web `manage.ui` (`PackageItems`, `MeetingBox`) |
+| Works: register and log views | `manage.ui.RegisterView` |
+| Specification analysis: import the register | `manage.ui.ImportDialog` |
+| New work item: RFI draft; "+ New": record from file, dropping a file onto Works | `manage.ui.RfiDraftBox`, `FileRecordDialog`, `FileDropZone` |
+| Project Settings → Modules | Manage switches are visible only when installed |
+| `manage.workExists`, `manage.workLabels` | Provided by the core's Works engine (used by Cost, Coordinate) |
 
-## Testler
+## Tests
 
-| Yer | Ne |
+| Location | What |
 |---|---|
-| `sitekeep-manage`: `npm test` | Sınır kontrolü, dosyadan kayıtta eşleştirme |
-| `apps/server/test/modules/manage/` | Kütükler, toplantılar, iş akışı adımları, "Bırak, kaydet", resmi yazışmalar |
-| Çapraz testler | RFI / yazışma / toplantı oluşturan adımlar `hasManage` ile |
+| `sitekeep-manage`: `npm test` | Boundary check, matching for record from file |
+| `apps/server/test/modules/manage/` | Registers, meetings, workflow steps, "Drop and save", formal correspondence |
+| Cross-cutting tests | Steps that create RFIs / correspondence / meetings run with `hasManage` |
 
-## Çekirdekte kalanlar
+## What stays in the core
 
-Açık iş yok (10.11.2026). Aşağıdakiler bilerek çekirdekte duruyor ya da başka modüllerle paylaşılıyor:
+No open work (10.11.2026). The following stay in the core on purpose or are shared with other modules:
 
-- Teknik onay listesi içe aktarma, Bırak-kaydet yardımcıları ve toplantı aksiyonu ayrımı pakettedir (`shared/`); İşler motorunun DTO'ları (iş tipleri, alanlar, cevap seçenekleri, RFI/teknik onay satırları) çekirdekte. Metinler modülde (`locales/`); İşler motorunun `works` anahtarları çekirdekte.
-- Manage'siz kurulumda İşler motoru transmittal üzerinden denenir (`test/works/works.test.ts`: gönderim formu, incelemeden otomatik transmittal, taslak görünürlüğü, numaralandırma, liste filtreleri). Alındı zinciri, KEP ve "Bugün" gelen kutusu senaryoları yazışmayla kurulduğundan yalnız Manage kuruluyken çalışır.
-- Şartname analizi (`docintel/spec.ts`) çekirdekte; `spec` anahtarı Manage'siz kapalı olduğundan sayfası görünmez.
+- Submittal list import, Drop and save helpers and meeting action extraction are in the package (`shared/`); the Works engine DTOs (work types, fields, response options, RFI/submittal rows) are in the core. Strings are in the module (`locales/`); the Works engine's `works` keys are in the core.
+- In an install without Manage, the Works engine is tested through transmittals (`test/works/works.test.ts`: transmittal form, automatic transmittal from a review, draft visibility, numbering, list filters). The receipt chain, KEP and "Today" inbox scenarios are set up with correspondence, so they only run when Manage is installed.
+- Specification analysis (`docintel/spec.ts`) is in the core; since the `spec` switch is off without Manage, its page is hidden.

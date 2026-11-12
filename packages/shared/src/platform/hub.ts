@@ -1,5 +1,5 @@
 /**
- * The simple project screen (docs/product/SADELESTIRME.md, 1. aşama): the "İşler" hub views, the user's
+ * The simple project screen (docs/product/SIMPLIFICATION.md, 1. aşama): the "İşler" hub views, the user's
  * saved views and the project "Bugün" page.
  */
 import type { MyTaskDto } from "../workflow/workflow.js";
@@ -132,7 +132,7 @@ export interface ProjectTodayDto {
   generatedAt: string;
 }
 
-// ---- "Günün Özeti" (docs/product/SADELESTIRME.md, 2. aşama) -----------------------------------------
+// ---- "Günün Özeti" (docs/product/SIMPLIFICATION.md, 2. aşama) -----------------------------------------
 
 /** The AI summary is regenerated at most this often (and only when the Bugün data changed). */
 export const TODAY_SUMMARY_MIN_INTERVAL_MS = 15 * 60_000;

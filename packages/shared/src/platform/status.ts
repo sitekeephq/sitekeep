@@ -1,4 +1,4 @@
-/** GET /admin/status — Yönetim → Sistem Durumu (docs/onprem/izleme.md). */
+/** GET /admin/status — Yönetim → Sistem Durumu (docs/onprem/monitoring.md). */
 
 export type StatusLevel = "ok" | "warn" | "danger";
 

@@ -1,279 +1,279 @@
-# SiteKeep — OpenCDE ve OAuth2
+# SiteKeep — OpenCDE and OAuth2
 
-Bu belge OpenCDE uyumluluğunun canlı kısmını anlatır. Araştırma ve tam plan `docs/archive/research/OPENCDE_ARASTIRMA.md` içinde.
+This document describes the live part of OpenCDE compliance. The research and the full plan are in `docs/archive/research/OPENCDE_ARASTIRMA.md`.
 
-## 0. Durum
+## 0. Status
 
-| Parça | Durum | Not |
+| Part | Status | Note |
 |---|---|---|
-| Foundation API 1.1 + yerleşik OAuth2 | ✓ Canlı | §1 |
-| Documents API 1.0 | ✓ Canlı | §1, §3a. Doküman yükleme, seçme, indirme, versiyon sorgusu |
-| BCF dosyası (.bcfzip 2.1 / 3.0) içe / dışa aktarma | ✓ Canlı | `docs/features/BCF.md`. Dosya alışverişi, API değil |
-| BCF API 3.0 (canlı bağlantı, ör. Solibri BCF Live) | Bekliyor | §6. `CDE_OPENCDE_APIS=bcf` bayrağı kapalı kalmalı |
+| Foundation API 1.1 + built-in OAuth2 | ✓ Live | §1 |
+| Documents API 1.0 | ✓ Live | §1, §3a. Document upload, selection, download, version query |
+| BCF file (.bcfzip 2.1 / 3.0) import / export | ✓ Live | `docs/features/BCF.md`. File exchange, not an API |
+| BCF API 3.0 (live connection, e.g. Solibri BCF Live) | Pending | §6. The `CDE_OPENCDE_APIS=bcf` flag must stay off |
 
-## 1. Neler canlı
+## 1. What is live
 
-**OpenCDE Foundation API 1.1** (kök adreste, `/api/v1` dışında):
+**OpenCDE Foundation API 1.1** (at the root address, outside `/api/v1`):
 
-| Uç | Ne yapar |
+| Endpoint | What it does |
 |---|---|
-| `GET /foundation/versions` | Sunulan OpenCDE API'lerini listeler: `foundation 1.1` ve `documents 1.0`. |
-| `GET /foundation/1.1/auth` | OAuth2 adreslerini verir. Akış yalnız `authorization_code_grant`. `http_basic_supported: false`. Dinamik istemci kaydı yok. |
-| `GET /foundation/1.1/current-user` | Erişim anahtarının sahibini verir: `id` = e-posta, `name`. Anahtar yoksa `401`. |
+| `GET /foundation/versions` | Lists the OpenCDE APIs offered: `foundation 1.1` and `documents 1.0`. |
+| `GET /foundation/1.1/auth` | Returns the OAuth2 addresses. Flow is `authorization_code_grant` only. `http_basic_supported: false`. No dynamic client registration. |
+| `GET /foundation/1.1/current-user` | Returns the owner of the access token: `id` = email, `name`. Without a token, `401`. |
 
-- Yanıtlar JSON. Hatalar `{ "message": "…" }` biçiminde (spesifikasyondaki `error.json`).
-- Mutlak adresler `CDE_PUBLIC_URL`'den üretilir. Değişken yoksa isteğin geldiği adres kullanılır.
-- `api_base_url` her API için tam adrestir, ör. `https://cde.firma.local/foundation/1.1`.
-- Tarayıcı istemcileri için CORS başlıkları var (`*`, çerez yok).
-- Bilinmeyen sürüm (`/foundation/1.0/auth`) JSON `404` döner.
-- Liste veriye dayalı (`apps/server/src/oauth/foundation.ts`, `OPENCDE_APIS`). Documents 1.0 her zaman duyurulur.
-  BCF 3.0 kaydı hazır ama bayrak açılmadan duyurulmaz: `CDE_OPENCDE_APIS=bcf`. **BCF API canlıya çıkmadan bayrağı açmayın.**
+- Responses are JSON. Errors have the form `{ "message": "…" }` (`error.json` in the specification).
+- Absolute addresses are built from `CDE_PUBLIC_URL`. If the variable is not set, the address the request came to is used.
+- `api_base_url` is the full address of each API, e.g. `https://cde.company.local/foundation/1.1`.
+- CORS headers are set for browser clients (`*`, no cookies).
+- An unknown version (`/foundation/1.0/auth`) returns a JSON `404`.
+- The list is data-driven (`apps/server/src/oauth/foundation.ts`, `OPENCDE_APIS`). Documents 1.0 is always announced.
+  The BCF 3.0 entry is ready but is not announced until the flag is on: `CDE_OPENCDE_APIS=bcf`. **Do not turn the flag on before the BCF API goes live.**
 
-**OpenCDE Documents API 1.0** (`api_base_url` = `<kök>/documents/1.0`, spesifikasyon:
-https://github.com/buildingSMART/documents-API). Alan adları `swagger.yaml` ile birebir aynı.
+**OpenCDE Documents API 1.0** (`api_base_url` = `<root>/documents/1.0`, specification:
+https://github.com/buildingSMART/documents-API). Field names match `swagger.yaml` exactly.
 
-| Uç (base'e göre) | Spesifikasyondaki karşılığı | Ne yapar |
+| Endpoint (relative to base) | Counterpart in the specification | What it does |
 |---|---|---|
-| `POST /upload-documents` | `/upload-documents` | `callback`, `files[]` (`file_name`, `session_file_id`, isteğe bağlı `document_id`) alır; `upload_ui_url`, `expires_in`, `max_size_in_bytes` döner. |
-| `POST /upload-sessions/{id}` | `upload_documents_url` | Dosya boyutlarını alır; `documents_to_upload[]` (`upload_file_parts`, `upload_completion`, `upload_cancellation`) döner. |
-| `PUT` (ya da `POST`) `/upload-sessions/{id}/files/{fid}/parts/{n}` | `upload_file_parts[].url` | Bir parça. 16 MB'lik parçalar, `content_range_start/end` dahil sınırlar, herhangi bir sırayla. |
-| `POST /upload-sessions/{id}/files/{fid}/completion` | `upload_completion` | Parçaları birleştirir, normal yükleme servisiyle kaydeder, `DocumentVersion` döner. Tekrar çağrılırsa aynı sonucu verir. |
-| `POST /upload-sessions/{id}/files/{fid}/cancellation` | `upload_cancellation` | Parçaları siler, `204`. |
-| `POST /select-documents` | `/select-documents` | `callback`, isteğe bağlı `server_context`, `supported_file_extensions`; `select_documents_url`, `expires_in` döner. |
-| `GET /selections/{id}` | `selected_documents_url` | `server_context` ve seçilen `documents[]` (`DocumentVersion`). |
-| `GET /documents/{document_id}/versions` | `document_versions` | Bütün versiyonlar, yeniden eskiye. |
-| `GET /documents/{document_id}/versions/{n}` | `document_version` | Tek versiyon. |
-| `GET /documents/{document_id}/versions/{n}/metadata` | `document_version_metadata` | `metadata[]` (`name`, `value[]`, `data_type`): proje, klasör, versiyon, yükleyen, tarih, boyut, SHA-256, açıklama, öznitelikler. |
-| `GET /documents/{document_id}/versions/{n}/download` | `document_version_download` | Dosyanın kendisi (`200`, yönlendirme yok). İndirme yetkisi gerekir. |
-| `POST /document-versions` | `/document-versions` | `document_ids[]` → en son versiyonlar. `ETag` + `If-None-Match` → `304`. |
+| `POST /upload-documents` | `/upload-documents` | Takes `callback`, `files[]` (`file_name`, `session_file_id`, optional `document_id`); returns `upload_ui_url`, `expires_in`, `max_size_in_bytes`. |
+| `POST /upload-sessions/{id}` | `upload_documents_url` | Takes file sizes; returns `documents_to_upload[]` (`upload_file_parts`, `upload_completion`, `upload_cancellation`). |
+| `PUT` (or `POST`) `/upload-sessions/{id}/files/{fid}/parts/{n}` | `upload_file_parts[].url` | One part. 16 MB parts, `content_range_start/end` bounds inclusive, in any order. |
+| `POST /upload-sessions/{id}/files/{fid}/completion` | `upload_completion` | Joins the parts, saves through the normal upload service, returns `DocumentVersion`. Calling it again gives the same result. |
+| `POST /upload-sessions/{id}/files/{fid}/cancellation` | `upload_cancellation` | Deletes the parts, `204`. |
+| `POST /select-documents` | `/select-documents` | Takes `callback`, optional `server_context`, `supported_file_extensions`; returns `select_documents_url`, `expires_in`. |
+| `GET /selections/{id}` | `selected_documents_url` | `server_context` and the selected `documents[]` (`DocumentVersion`). |
+| `GET /documents/{document_id}/versions` | `document_versions` | All versions, newest first. |
+| `GET /documents/{document_id}/versions/{n}` | `document_version` | A single version. |
+| `GET /documents/{document_id}/versions/{n}/metadata` | `document_version_metadata` | `metadata[]` (`name`, `value[]`, `data_type`): project, folder, version, uploader, date, size, SHA-256, description, attributes. |
+| `GET /documents/{document_id}/versions/{n}/download` | `document_version_download` | The file itself (`200`, no redirect). Requires download permission. |
+| `POST /document-versions` | `/document-versions` | `document_ids[]` → latest versions. `ETag` + `If-None-Match` → `304`. |
 
-- `document_id` = CDE'deki dosya kimliği, `version_index` = versiyon numarası, `version_number` = `v3`,
-  `title` = uzantısız dosya adı (doküman kodu), `document_details` = dosyanın CDE'deki sayfası.
-- `server_context` opak bir değerdir: son çalışılan proje ve klasör. İstemci sonraki oturumda geri gönderirse sayfa orada açılır.
-  Kullanıcının artık göremediği bir proje ise yok sayılır.
-- `include_authorization: true`: parçalar aynı sunucuya gider, Bearer anahtarı gerekir. Dış depolama yok, hiçbir dış çağrı yapılmaz.
-- `multipart_form_data` gönderilmez (parça gövdesi düz ikilidir). `additional_headers` yalnız `Content-Length` içerir.
-- Hatalar `{ "error", "message" }`. Süresi dolan oturum `410`, başkasının oturumu `404`, eksik izin `403`, Bearer yoksa `401`.
-- CORS: her uçta `*` (çerez kabul edilmez; tarayıcı oturumuyla bu uçlar çağrılamaz).
+- `document_id` = the file ID in the CDE, `version_index` = version number, `version_number` = `v3`,
+  `title` = file name without extension (document code), `document_details` = the file's page in the CDE.
+- `server_context` is an opaque value: the last project and folder worked in. If the client sends it back in the next session, the page opens there.
+  It is ignored if the user can no longer see that project.
+- `include_authorization: true`: the parts go to the same server and need the Bearer token. No external storage; no external calls are made.
+- `multipart_form_data` is not sent (the part body is plain binary). `additional_headers` contains only `Content-Length`.
+- Errors are `{ "error", "message" }`. Expired session `410`, someone else's session `404`, missing permission `403`, no Bearer `401`.
+- CORS: `*` on every endpoint (cookies are not accepted; these endpoints cannot be called with a browser session).
 
-**CDE sayfaları** (uygulamanın tarayıcıda açtığı adresler, `apps/web/src/features/integrations/pages/OpenCdeDocuments.tsx`):
+**CDE pages** (addresses the application opens in the browser, `apps/web/src/features/integrations/pages/OpenCdeDocuments.tsx`):
 
-- `/opencde/upload?key=…` → **Dış Uygulamadan Yükleme**: isteyen uygulama (OAuth uygulama adı), gelen dosyalar, proje ve
-  yalnız yazma yetkisi olan klasörler, dosya başına "CDE'deki Adı" (isimlendirme standardına göre anında denetlenir),
-  **Revizyon**, **Durum / Uygunluk** (S0–S4, A, B), **Açıklama**, klasöre bağlı proje öznitelikleri. **İptal** ya da
-  **Yüklemeyi Başlat**. Sunucu her şeyi yeniden denetler; hata dosya satırında gösterilir.
-- `/opencde/select?key=…` → **Dış Uygulama İçin Belge Seç**: proje, klasör ağacı, ada göre arama, çoklu seçim, istenen
-  uzantılar (ör. yalnız `.ifc`) için filtre. **İptal** ya da **Seçimi Gönder**.
-- Giriş yapılmamışsa önce giriş sayfası gelir, sonra aynı sayfa açılır.
-- Revizyon ve Durum / Uygunluk dosyanın `Revizyon` ve `Uygunluk` özniteliklerine yazılır. Projede bu adlarla öznitelik
-  tanımlıysa sabit alan gizlenir ve projenin tanımı (liste, zorunluluk) kullanılır. Açıklama versiyon açıklamasıdır.
+- `/opencde/upload?key=…` → **Upload from an External Application**: the requesting application (OAuth application name), incoming files, project and
+  only the folders with write permission, a "Name in the CDE" per file (checked instantly against the naming standard),
+  **Revision**, **Status / Suitability** (S0–S4, A, B), **Description**, project attributes tied to the folder. **Cancel** or
+  **Start Upload**. The server checks everything again; errors are shown on the file row.
+- `/opencde/select?key=…` → **Select Documents for an External Application**: project, folder tree, search by name, multiple selection, filter for the requested
+  extensions (e.g. only `.ifc`). **Cancel** or **Send Selection**.
+- If the user is not signed in, the sign-in page comes first, then the same page opens.
+- Revision and Status / Suitability are written to the file's `Revizyon` and `Uygunluk` attributes. If the project defines attributes with these names,
+  the fixed field is hidden and the project's definition (list, required) is used. Description is the version description.
 
-**Yerleşik OAuth2 yetkilendirme sunucusu:**
+**Built-in OAuth2 authorization server:**
 
-| Uç | Ne yapar |
+| Endpoint | What it does |
 |---|---|
-| `GET /oauth2/authorize` | Yetkilendirme kodu akışı. PKCE (S256). Oturum yoksa giriş sayfası, sonra onay sayfası. |
-| `POST /oauth2/token` | `authorization_code` ve `refresh_token`. Refresh token her kullanımda yenilenir. |
-| `POST /oauth2/revoke` | RFC 7009 iptali. Refresh token verilirse bütün aile iptal edilir. |
+| `GET /oauth2/authorize` | Authorization code flow. PKCE (S256). Without a session, the sign-in page, then the consent page. |
+| `POST /oauth2/token` | `authorization_code` and `refresh_token`. The refresh token is rotated on every use. |
+| `POST /oauth2/revoke` | RFC 7009 revocation. If a refresh token is given, the whole family is revoked. |
 
-- Implicit akış, şifreyle giriş (ROPC) ve client credentials **yok**.
-- Parametreler form gövdesinde ya da query string'de olabilir (bSI örneği query kullanıyor).
-- `redirect_uri` ve `redirect_url` adlarının ikisi de kabul edilir.
-- Token isteğinde `redirect_uri` isteğe bağlı (bSI örneği göndermiyor). Gönderilirse birebir eşleşmeli.
-- İstemci kimliği: HTTP Basic ya da `client_secret_post`. İkisi birlikte kullanılamaz.
-- PKCE açık istemcilerde zorunlu, gizli istemcilerde isteğe bağlı. Yalnız `S256`.
-- PKCE kullanmayan gizli istemci `state` göndermek zorunda.
-- Yetkilendirme kodu tek kullanımlık, en çok 60 saniye geçerli. İstemciye, yönlendirme adresine ve PKCE değerine bağlı.
-- Erişim anahtarı (access token) 1 saat, refresh token 30 gün geçerli.
-- Yanıt: `access_token`, `token_type: "Bearer"`, `expires_in`, `refresh_token`, `scope`.
+- Implicit flow, password sign-in (ROPC) and client credentials are **not supported**.
+- Parameters may be in the form body or in the query string (the bSI example uses the query).
+- Both `redirect_uri` and `redirect_url` are accepted.
+- In the token request `redirect_uri` is optional (the bSI example does not send it). If sent, it must match exactly.
+- Client authentication: HTTP Basic or `client_secret_post`. The two cannot be used together.
+- PKCE is required for public clients and optional for confidential clients. Only `S256`.
+- A confidential client that does not use PKCE must send `state`.
+- The authorization code is single-use and valid for at most 60 seconds. It is bound to the client, the redirect address and the PKCE value.
+- The access token is valid for 1 hour, the refresh token for 30 days.
+- Response: `access_token`, `token_type: "Bearer"`, `expires_in`, `refresh_token`, `scope`.
 
-**Web arayüzü:**
+**Web interface:**
 
-- Onay sayfası `/oauth/consent`: "<Uygulama> hesabınıza erişmek istiyor", izinler, **Onayla** / **Reddet**.
-  Başka bir sitenin çerçevesi içinde açılmaz.
-- Onay kullanıcı + uygulama başına hatırlanır. Aynı izinler için sayfa bir daha gösterilmez (`prompt=consent` hariç).
-- **Hesabım → Bağlı Uygulamalar**: uygulama, izinler, son kullanım, **Erişimi Kaldır**.
-- **Yönetim → OAuth Uygulamaları**: kayıt, düzenleme, devre dışı bırakma, gizli anahtar yenileme, silme, bağlantı bilgileri.
+- Consent page `/oauth/consent`: "<Application> wants to access your account", permissions, **Approve** / **Deny**.
+  It does not open inside another site's frame.
+- Consent is remembered per user + application. The page is not shown again for the same permissions (except with `prompt=consent`).
+- **My Account → Connected Applications**: application, permissions, last use, **Remove Access**.
+- **Administration → OAuth Applications**: registration, editing, disabling, secret rotation, deletion, connection details.
 
-## 2. İzinler (scope)
+## 2. Permissions (scope)
 
-| Scope | Anlamı |
+| Scope | Meaning |
 |---|---|
-| `read` | Mevcut `/api/v1`, salt okuma (API erişim anahtarındaki "Salt Okuma" ile aynı). |
-| `write` | Mevcut `/api/v1`, okuma + yazma. |
-| `bcf` | OpenCDE BCF API (geldiğinde). |
-| `documents` | OpenCDE Documents API'nin tamamı: yükleme (yeni doküman, yeni versiyon), belge seçme, versiyonlar, metadata, indirme, versiyon sorgusu. Onay sayfasında "OpenCDE Dokümanları". AEC Pilot bunu ister. |
-| `documents:read` | Yalnız seçme, versiyonlar, metadata, indirme, versiyon sorgusu; yükleme `403`. Onay sayfasında "OpenCDE Doküman Okuma". Salt okuyan araçlar (görüntüleyiciler) için. |
+| `read` | The existing `/api/v1`, read-only (same as "Read Only" on an API access token). |
+| `write` | The existing `/api/v1`, read + write. |
+| `bcf` | OpenCDE BCF API (when it arrives). |
+| `documents` | The whole OpenCDE Documents API: upload (new document, new version), document selection, versions, metadata, download, version query. Shown as "OpenCDE Documents" on the consent page. AEC Pilot requests this. |
+| `documents:read` | Only selection, versions, metadata, download, version query; upload returns `403`. Shown as "OpenCDE Documents (read)" on the consent page. For read-only tools (viewers). |
 
-- İstemci `scope` göndermezse kayıtlı bütün izinleri ister.
-- Yalnız `bcf`/`documents`/`documents:read` alan bir anahtar `/api/v1`'e erişemez (`403`). `current-user` çalışır.
-- `read`/`write` Documents API'ye erişim vermez. Kişisel API erişim anahtarları (Hesabım) Documents API'yi de kullanabilir:
-  "Salt Okuma" seçer ve indirir, "Okuma + Yazma" yükler de. Anahtar her zaman kullanıcının kendi klasör yetkileriyle çalışır.
-- Bilinmeyen scope adları (ör. `openid`) yok sayılır. Kayıtlı olmayan bilinen bir scope `invalid_scope` döner.
+- If the client sends no `scope`, it requests all registered permissions.
+- A token that has only `bcf`/`documents`/`documents:read` cannot access `/api/v1` (`403`). `current-user` works.
+- `read`/`write` do not grant access to the Documents API. Personal API access tokens (My Account) can also use the Documents API:
+  "Read Only" selects and downloads, "Read + Write" also uploads. A token always works with the user's own folder permissions.
+- Unknown scope names (e.g. `openid`) are ignored. A known scope that is not registered returns `invalid_scope`.
 
-## 3. Uygulama nasıl kaydedilir (Solibri örneği)
+## 3. How to register an application (Solibri example)
 
-1. **Yönetim → OAuth Uygulamaları → + Uygulama**.
-2. Ad: `Solibri Office`. Açıklama onay sayfasında görünür.
-3. Tür: masaüstü uygulaması için **Açık İstemci** (PKCE zorunlu). Solibri gizli anahtar isterse **Gizli İstemci** seçin.
-4. Yönlendirme adresi: Solibri'nin verdiği adres. Masaüstü uygulamaları genelde `http://127.0.0.1/…` ya da
-   `http://localhost/…` kullanır. Bu adresler her portla eşleşir (RFC 8252). Diğer adresler birebir eşleşmeli ve https olmalı.
-5. İzinler: `BCF Sorunları` + `Okuma` (gerekirse `Yazma`).
-6. **Kaydet**. Gizli istemcide gizli anahtar **bir kez** gösterilir. Kopyalayın.
-7. Satırdaki **Bağlantı Bilgileri** düğmesi Solibri'nin özel bağlantı (private connection) formunun istediklerini gösterir:
-   sunucu adresi (Foundation URL), yetkilendirme adresi, token adresi, `client_id`, yönlendirme adresi. Hepsi kopyalanabilir.
-8. Solibri'de sunucu adresi olarak kök adresi girin (ör. `https://cde.firma.local`). Gerisini `/foundation/versions` ve
-   `/foundation/1.1/auth` üzerinden bulur.
+1. **Administration → OAuth Applications → + Application**.
+2. Name: `Solibri Office`. The description appears on the consent page.
+3. Type: **Public Client** for a desktop application (PKCE required). If Solibri asks for a secret, choose **Confidential Client**.
+4. Redirect address: the address Solibri provides. Desktop applications usually use `http://127.0.0.1/…` or
+   `http://localhost/…`. These addresses match any port (RFC 8252). Other addresses must match exactly and must be https.
+5. Permissions: `BCF Issues` + `Read` (`Write` if needed).
+6. **Save**. For a confidential client the secret is shown **once**. Copy it.
+7. The **Connection Details** button on the row shows what Solibri's private connection form asks for:
+   server address (Foundation URL), authorization address, token address, `client_id`, redirect address. All can be copied.
+8. In Solibri, enter the root address as the server address (e.g. `https://cde.company.local`). It finds the rest through `/foundation/versions` and
+   `/foundation/1.1/auth`.
 
-Not: Solibri BCF Live için BCF API 3.0 gerekir. Bu sürümde Foundation, OAuth ve Documents API var; BCF yalnız
-.bcfzip dosyası olarak alınıp verilir (`docs/features/BCF.md`, bkz. §6).
+Note: Solibri BCF Live requires BCF API 3.0. This version has Foundation, OAuth and the Documents API; BCF is only
+imported and exported as a .bcfzip file (`docs/features/BCF.md`, see §6).
 
-## 3a. AEC Pilot ve diğer araçlardan yükleme
+## 3a. Uploading from AEC Pilot and other tools
 
-AEC Pilot'un (Revit / Civil 3D) **CDE'ye Gönder** düğmesi ve benzeri masaüstü araçlar için tarif. `<kök>` = kullanıcının
-girdiği sunucu adresi (ör. `https://cde.firma.local`).
+A recipe for AEC Pilot's (Revit / Civil 3D) **Send to CDE** button and similar desktop tools. `<root>` = the server address the user
+entered (e.g. `https://cde.company.local`).
 
-**Bir kez (yönetici):** Yönetim → OAuth Uygulamaları → **AEC Pilot Ekle** (tek tık). Hazır kayıt: Ad `AEC Pilot`, tür
-**Açık İstemci** (PKCE, gizli anahtar yok), yönlendirme adresi `http://127.0.0.1/aecpilot/opencde/oauth` (her port, yol
-birebir), izin **OpenCDE Dokümanları** (`documents`). Açılan Bağlantı Bilgileri'nden `cde-…` istemci kimliğini kopyalayıp
-AEC Pilot'a yapıştırın (dinamik istemci kaydı yok). Elle kayıt da aynı değerlerle yapılabilir.
+**Once (administrator):** Administration → OAuth Applications → **Add AEC Pilot** (one click). Ready-made entry: Name `AEC Pilot`, type
+**Public Client** (PKCE, no secret), redirect address `http://127.0.0.1/aecpilot/opencde/oauth` (any port, path
+exact), permission **OpenCDE Documents** (`documents`). Copy the `cde-…` client ID from the Connection Details that open and
+paste it into AEC Pilot (no dynamic client registration). Manual registration with the same values also works.
 
-**Bağlanma (kullanıcı başına bir kez, sonra refresh token):**
+**Connecting (once per user, then the refresh token):**
 
-1. `GET <kök>/foundation/versions` → `documents 1.0` kaydının `api_base_url`'i (= `<docs>`, ör. `<kök>/documents/1.0`).
-2. `GET <kök>/foundation/1.1/auth` → `oauth2_auth_url`, `oauth2_token_url`.
-3. Araç boş bir yerel port açar (ör. `http://127.0.0.1:53682/aecpilot/opencde/oauth`), tarayıcıda `oauth2_auth_url` +
+1. `GET <root>/foundation/versions` → the `api_base_url` of the `documents 1.0` entry (= `<docs>`, e.g. `<root>/documents/1.0`).
+2. `GET <root>/foundation/1.1/auth` → `oauth2_auth_url`, `oauth2_token_url`.
+3. The tool opens a free local port (e.g. `http://127.0.0.1:53682/aecpilot/opencde/oauth`) and opens `oauth2_auth_url` in the browser with
    `response_type=code`, `client_id`, `redirect_uri`, `scope=documents`, `state`, `code_challenge` (S256).
-4. Kullanıcı giriş yapar, **Onayla**. Tarayıcı `redirect_uri?code=…&state=…` adresine döner.
+4. The user signs in and clicks **Approve**. The browser returns to `redirect_uri?code=…&state=…`.
 5. `POST oauth2_token_url` (`grant_type=authorization_code`, `code`, `client_id`, `redirect_uri`, `code_verifier`) →
-   `access_token` (1 saat), `refresh_token` (30 gün, her kullanımda yenilenir; yenisini saklayın).
+   `access_token` (1 hour), `refresh_token` (30 days, rotated on every use; store the new one).
 
-**Yükleme (her "CDE'ye Gönder"):**
+**Upload (every "Send to CDE"):**
 
-1. IFC dışa aktarımını başlatın (bitmesini beklemek gerekmez).
-2. Bir yerel port açın; `POST <docs>/upload-documents` (Bearer):
-   `{"callback":{"url":"http://127.0.0.1:<port>/<rastgele>/","expires_in":3600},"server_context":"<önceki değer ya da yok>","files":[{"file_name":"model.ifc","session_file_id":"<guid>"}]}`.
-   Aynı dokümanın yeni versiyonu ise dosyaya `"document_id":"<önceki yanıttaki document_id>"` ekleyin.
-3. Yanıttaki `upload_ui_url`'i varsayılan tarayıcıda açın (`expires_in` saniye içinde; varsayılan 10 dakika, tek kullanımlık).
-4. Kullanıcı sayfada klasörü, adı, revizyonu, durumu seçer ve **Yüklemeyi Başlat**'a basar. Tarayıcı
-   `http://127.0.0.1:<port>/<rastgele>/?upload_documents_url=…` (URL kodlu) adresine gelir. **İptal** edilirse `?user_cancelled_upload=true` gelir.
-   Tarayıcıya kısa bir "Tamam, CAD'e dönebilirsiniz" sayfası döndürün.
-5. `POST <upload_documents_url>` (Bearer) `{"files":[{"session_file_id":"<guid>","size_in_bytes":<boyut>}]}` →
-   `server_context` ve `documents_to_upload[].upload_file_parts`.
-6. Her parça için: `http_method` ile `url`'e, dosyanın `content_range_start`–`content_range_end` (dahil) baytları,
-   `include_authorization: true` olduğu için Bearer ile. Parçalar paralel ya da herhangi bir sırada gönderilebilir.
-7. `POST <upload_completion.url>` (gövdesiz, Bearer) → `DocumentVersion`. `document_id`'yi ve adım 5'teki `server_context`'i
-   saklayın: bir sonraki gönderim yeni versiyon olur ve sayfa aynı klasörde açılır.
-8. Vazgeçilirse `POST <upload_cancellation.url>` → `204`.
+1. Start the IFC export (no need to wait for it to finish).
+2. Open a local port; `POST <docs>/upload-documents` (Bearer):
+   `{"callback":{"url":"http://127.0.0.1:<port>/<random>/","expires_in":3600},"server_context":"<previous value or none>","files":[{"file_name":"model.ifc","session_file_id":"<guid>"}]}`.
+   If it is a new version of the same document, add `"document_id":"<document_id from the previous response>"` to the file.
+3. Open the `upload_ui_url` from the response in the default browser (within `expires_in` seconds; default 10 minutes, single-use).
+4. On the page, the user chooses the folder, name, revision and status and clicks **Start Upload**. The browser
+   comes to `http://127.0.0.1:<port>/<random>/?upload_documents_url=…` (URL-encoded). On **Cancel**, `?user_cancelled_upload=true` arrives.
+   Return a short "Done, you can go back to CAD" page to the browser.
+5. `POST <upload_documents_url>` (Bearer) `{"files":[{"session_file_id":"<guid>","size_in_bytes":<size>}]}` →
+   `server_context` and `documents_to_upload[].upload_file_parts`.
+6. For each part: to `url` with `http_method`, the file bytes `content_range_start`–`content_range_end` (inclusive),
+   with Bearer because `include_authorization: true`. Parts can be sent in parallel or in any order.
+7. `POST <upload_completion.url>` (no body, Bearer) → `DocumentVersion`. Store the `document_id` and the `server_context` from step 5:
+   the next send becomes a new version and the page opens in the same folder.
+8. If the user gives up, `POST <upload_cancellation.url>` → `204`.
 
-**Seçme / indirme:** `POST <docs>/select-documents` `{"callback":{…},"supported_file_extensions":[".ifc"]}` →
-`select_documents_url`'i tarayıcıda açın → `?selected_documents_url=…` (ya da `?user_cancelled_selection=true`) →
-`GET` (Bearer) → `documents[].links.document_version_download.url`'den indirin. Güncellik için
-`POST <docs>/document-versions` `{"document_ids":[…]}` ve `If-None-Match`.
+**Selection / download:** `POST <docs>/select-documents` `{"callback":{…},"supported_file_extensions":[".ifc"]}` →
+open `select_documents_url` in the browser → `?selected_documents_url=…` (or `?user_cancelled_selection=true`) →
+`GET` (Bearer) → download from `documents[].links.document_version_download.url`. For freshness use
+`POST <docs>/document-versions` `{"document_ids":[…]}` and `If-None-Match`.
 
-**Callback kuralları:** `callback.url` uygulamanın kayıtlı yönlendirme adresiyle birebir eşleşmeli. Kayıtlı bir loopback
-adresi (`http://127.0.0.1/…`, `http://localhost/…`) olan masaüstü uygulamaları herhangi bir loopback port ve yolu
-kullanabilir (RFC 8252). https bir web uygulaması yalnız kayıtlı adresine döner. Başka hiçbir adrese yönlendirilmez;
-`#`, kullanıcı adı ya da şifre içeren adresler reddedilir. Kişisel API anahtarlarıyla yalnız loopback.
+**Callback rules:** `callback.url` must match the application's registered redirect address exactly. Desktop applications with a registered loopback
+address (`http://127.0.0.1/…`, `http://localhost/…`) may use any loopback port and path
+(RFC 8252). An https web application only returns to its registered address. There is no redirect to any other address;
+addresses containing `#`, a user name or a password are rejected. With personal API tokens, loopback only.
 
-**Süreler ve sınırlar:** sayfa bağlantısı en çok 10 dakika içinde açılmalı ve yalnız ilk açan tarayıcı oturumunda çalışır
-(başka kullanıcı ya da başka tarayıcı `403`). Sayfa gönderildikten sonra talimatlar, parçalar ve tamamlama 24 saat geçerli.
-`callback.expires_in` en çok 24 saat sayılır; süresi geçince sayfa gönderilemez (`410`). Tek dosya en çok
-`max_size_in_bytes` (sunucunun yükleme sınırı, varsayılan 20 GB), oturum başına en çok 50 dosya, seçimde en çok 200 doküman.
+**Durations and limits:** the page link must be opened within 10 minutes at most and only works in the first browser session that opens it
+(another user or another browser gets `403`). After the page is submitted, the instructions, parts and completion are valid for 24 hours.
+`callback.expires_in` counts as 24 hours at most; once it passes, the page cannot be submitted (`410`). A single file at most
+`max_size_in_bytes` (the server's upload limit, default 20 GB), at most 50 files per session, at most 200 documents in a selection.
 
-**Ne olur:** tamamlama normal yüklemenin servisini (`addVersion` + `afterVersionAdded`) kullanır: klasör yetkisi, inceleme
-kapısı, isimlendirme standardı, zorunlu öznitelikler, aynı adda dosya varsa yeni versiyon, IFC → Fragments, önizleme ve
-arama metni işleri, denetim kaydı (`file.uploaded` / `file.version_added`, `via: "opencde-documents"`). Yetkiler sayfa
-gönderildikten sonra değiştiyse tamamlama reddedilir.
+**What happens:** completion uses the normal upload service (`addVersion` + `afterVersionAdded`): folder permission, review
+gate, naming standard, required attributes, a new version if a file with the same name exists, IFC → Fragments, preview and
+search text jobs, audit log (`file.uploaded` / `file.version_added`, `via: "opencde-documents"`). If permissions changed after the page
+was submitted, completion is rejected.
 
-**Denetim kaydı:** `opencde.upload_started`, `opencde.upload_prepared`, `opencde.upload_instructions`,
+**Audit log:** `opencde.upload_started`, `opencde.upload_prepared`, `opencde.upload_instructions`,
 `opencde.upload_completed`, `opencde.upload_cancelled`, `opencde.select_started`, `opencde.documents_selected`,
-`opencde.selection_read`, `opencde.select_cancelled`, indirmeler `file.downloaded` (`via: "opencde-documents"`).
+`opencde.selection_read`, `opencde.select_cancelled`, downloads `file.downloaded` (`via: "opencde-documents"`).
 
-**Sözleşme testi:** `apps/server/test/opencde-documents.test.ts` → "meets the AEC Pilot Send to CDE contract" AEC Pilot'un
-istek sırasını birebir tekrarlar (keşif, hazır OAuth kaydı, upload-documents, sayfa, rastgele yollu callback, talimatlar,
-iki parça, ek başlıklar, `multipart_form_data` varsa prefix/suffix çerçeveleme, tamamlama, iki iptal yolu, hata biçimi).
-SiteKeep `multipart_form_data` göndermez; istemcinin çerçeveleme adımı boş kalır.
+**Contract test:** `apps/server/test/opencde-documents.test.ts` → "meets the AEC Pilot Send to CDE contract" replays AEC Pilot's
+request sequence exactly (discovery, ready-made OAuth entry, upload-documents, page, callback with a random path, instructions,
+two parts, additional headers, prefix/suffix framing if `multipart_form_data` is present, completion, two cancellation paths, error format).
+SiteKeep does not send `multipart_form_data`; the client's framing step stays empty.
 
-**Spesifikasyondan dışarıda kalanlar:** dış depolama ve `multipart_form_data` (gerek yok, her şey yerel), uzun tamamlama
-isteklerinde boşluk karakteriyle bağlantı canlı tutma (tamamlama yerel birleştirme, kısa sürer), indirmede `303`
-yönlendirme (doğrudan `200`), seçim sayfasında eski bir versiyonu seçme (her zaman son versiyon seçilir; eski
-versiyonlara `document_versions` ile ulaşılır).
+**Left out of the specification:** external storage and `multipart_form_data` (not needed, everything is local), keeping the connection alive with
+whitespace on long completion requests (completion is a local join and is short), `303`
+redirect on download (direct `200`), selecting an old version on the selection page (the latest version is always selected; old
+versions are reached through `document_versions`).
 
-## 4. Güvenlik notları
+## 4. Security notes
 
-- Kodlar, erişim anahtarları, refresh token'lar ve gizli anahtarlar yalnız SHA-256 özetiyle saklanır.
-- OAuth erişim anahtarları `tokens` tablosunda `kind = "oauth"` olarak durur. API erişim anahtarlarıyla **aynı** Bearer
-  doğrulamasından ve aynı proje/klasör yetki kontrollerinden geçer. Uygulama kullanıcının yetkisinden fazlasını göremez.
-- OAuth anahtarı tarayıcı oturumu isteyen işleri yapamaz: anahtar yönetimi, şifre, yönetim değişiklikleri, onay verme,
-  bağlı uygulama kaldırma, tarayıcıda ofis düzenleme. MCP uç noktası yalnız kişisel API erişim anahtarlarını kabul eder.
-- Kod yalnız tarayıcı oturumuyla verilir. Bearer anahtarı ile `/oauth2/authorize` çağrısı giriş sayfasına gider.
-- Kayıtlı olmayan yönlendirme adresine asla yönlendirilmez. Bilinmeyen istemci ve yanlış adres hataları kullanıcıya sayfa olarak gösterilir.
-- Giriş sonrası dönüş adresi (`/login?next=`) yalnız aynı sunucudaki `/oauth2/authorize` olabilir.
-- Kod ikinci kez kullanılırsa o koddan çıkan bütün anahtarlar iptal edilir.
-- Eski bir refresh token yeniden gelirse bütün aile (erişim + refresh) iptal edilir ve denetim kaydına yazılır.
-- Uygulama devre dışı bırakılınca anahtarları hemen çalışmaz olur. Yeniden etkinleştirince geri gelir.
-  Silinince onaylar ve anahtarlar da silinir.
-- `/oauth2/token` ve `/oauth2/revoke` hatalı istekleri IP başına sınırlanır: 10 dakikada 20 hata, sonra `429` + `Retry-After`.
-  Sayaç bellek içinde, sunucu süreci başına tutulur. Ters vekil (nginx, IIS) arkasında bütün istekler vekilin IP'sinden
-  gelir; o durumda sınır herkes için ortak işler. Gerekirse Fastify `trustProxy` ayarı ayrıca açılmalı.
-- Denetim kaydı: `oauth.authorize`, `oauth.consent_granted`, `oauth.consent_denied`, `oauth.token_issued`,
+- Codes, access tokens, refresh tokens and secrets are stored only as SHA-256 hashes.
+- OAuth access tokens are stored in the `tokens` table as `kind = "oauth"`. They go through the **same** Bearer
+  validation and the same project/folder permission checks as API access tokens. An application cannot see more than the user's permissions.
+- An OAuth token cannot do work that requires a browser session: token management, password, administration changes, granting consent,
+  removing a connected application, office editing in the browser. The MCP endpoint only accepts personal API access tokens.
+- A code is only issued with a browser session. Calling `/oauth2/authorize` with a Bearer token goes to the sign-in page.
+- There is never a redirect to an unregistered redirect address. Unknown-client and wrong-address errors are shown to the user as a page.
+- The return address after sign-in (`/login?next=`) can only be `/oauth2/authorize` on the same server.
+- If a code is used a second time, all tokens issued from that code are revoked.
+- If an old refresh token arrives again, the whole family (access + refresh) is revoked and recorded in the audit log.
+- When an application is disabled, its tokens stop working immediately. Re-enabling brings them back.
+  Deleting it also deletes the consents and tokens.
+- Failed requests to `/oauth2/token` and `/oauth2/revoke` are limited per IP: 20 errors in 10 minutes, then `429` + `Retry-After`.
+  The counter is in memory, per server process. Behind a reverse proxy (nginx, IIS) all requests come from the proxy's IP;
+  in that case the limit is shared by everyone. If needed, the Fastify `trustProxy` setting must be enabled separately.
+- Audit log: `oauth.authorize`, `oauth.consent_granted`, `oauth.consent_denied`, `oauth.token_issued`,
   `oauth.token_refreshed`, `oauth.token_failed`, `oauth.code_reused`, `oauth.refresh_reused`, `oauth.revoked`,
-  `oauth.client_*`. Ayrıntılarda gizli değer yok.
-- Günlüklerde `code`, `access_token`, `refresh_token`, `client_secret`, `code_verifier`, `token` sorgu parametreleri ve
-  `7dcde_…` anahtarları `***` ile gizlenir (`redactUrl`, `redactSecrets`).
-- Üretimde **HTTPS ve `CDE_PUBLIC_URL` şart**. Foundation en az TLS 1.2 ister. Müşterinin iç CA sertifikası
-  Solibri'nin çalıştığı Windows makinelerinde güvenilir olmalı.
+  `oauth.client_*`. The details contain no secret values.
+- In logs, the `code`, `access_token`, `refresh_token`, `client_secret`, `code_verifier`, `token` query parameters and
+  `7dcde_…` tokens are masked with `***` (`redactUrl`, `redactSecrets`).
+- In production, **HTTPS and `CDE_PUBLIC_URL` are required**. Foundation requires at least TLS 1.2. The customer's internal CA certificate
+  must be trusted on the Windows machines where Solibri runs.
 
-## 5. İleride SSO (Keycloak / Entra ID)
+## 5. Future SSO (Keycloak / Entra ID)
 
-- `/foundation/1.1/auth` yanıtındaki adresler yapılandırılabilir: `CDE_OAUTH_AUTH_URL`, `CDE_OAUTH_TOKEN_URL`.
-- Bugün bu değişkenler yalnız duyurulan adresi değiştirir. Dış kimlik sağlayıcının verdiği anahtarlar (JWT) henüz
-  **doğrulanmaz**. Bu yüzden şimdilik boş bırakın.
-- Gerekecek iş: JWKS ile JWT doğrulama, `sub`/`email` → 7D kullanıcısı eşlemesi, scope eşlemesi, yerleşik sunucuyu kapatma bayrağı.
+- The addresses in the `/foundation/1.1/auth` response are configurable: `CDE_OAUTH_AUTH_URL`, `CDE_OAUTH_TOKEN_URL`.
+- Today these variables only change the announced address. Tokens (JWT) issued by an external identity provider are not
+  **validated** yet. So leave them empty for now.
+- Work needed: JWT validation with JWKS, `sub`/`email` → 7D user mapping, scope mapping, a flag to turn off the built-in server.
 
-## 6. Sonraki adımlar
+## 6. Next steps
 
-1. **BCF API 3.0** (araştırma §7.1 adım B): projeler, topic, yorum, viewpoint. Görüntüleyici dalı birleştikten sonra.
-   Bitince `CDE_OPENCDE_APIS=bcf` ve Solibri özel bağlantı başvurusu.
-2. ~~Documents API 1.0~~ ✓ (bkz. §1, §3a).
-3. Dinamik istemci kaydı (`oauth2_dynamic_client_reg_url`): gerekirse, Faz 3.
-4. Hız sınırı için ortak depo (birden çok sunucu süreci olursa).
+1. **BCF API 3.0** (research §7.1 step B): projects, topic, comment, viewpoint. After the viewer branch is merged.
+   When done, `CDE_OPENCDE_APIS=bcf` and the Solibri private connection application.
+2. ~~Documents API 1.0~~ ✓ (see §1, §3a).
+3. Dynamic client registration (`oauth2_dynamic_client_reg_url`): if needed, Phase 3.
+4. Shared store for rate limiting (if there are several server processes).
 
-## 7. Duman testi (elle)
+## 7. Smoke test (manual)
 
-`apps/server/scripts/opencde-smoke.mjs` çalışan **yerel** geliştirme sunucusunda bütün akışı dener:
-versions → auth → giriş → geçici açık istemci → authorize (PKCE) → onay → kod → token → current-user ve `/api/v1`
-→ refresh rotation → yeniden kullanım tespiti → Documents API (yabancı callback reddi, yükleme ve seçme sayfaları açılıp
-iptal edilir; dosya yazılmaz) → Erişimi Kaldır → istemciyi silme.
+`apps/server/scripts/opencde-smoke.mjs` runs the whole flow against a running **local** development server:
+versions → auth → sign-in → temporary public client → authorize (PKCE) → consent → code → token → current-user and `/api/v1`
+→ refresh rotation → reuse detection → Documents API (foreign callback rejected, upload and selection pages opened and
+cancelled; no file is written) → Remove Access → client deletion.
 
 ```bash
 cd apps/server
 node --env-file=.env.development scripts/opencde-smoke.mjs
 ```
 
-- Ortam: `PORT` (varsayılan 8787) ya da `CDE_SMOKE_BASE`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
-- Yalnız `127.0.0.1` / `localhost` adreslerinde çalışır. Başka adres verilirse durur.
-- Anahtarları tam yazdırmaz. Geçici istemciyi sonunda siler.
-- Geliştirmede Vite (`:5173`) `/foundation`, `/oauth2` ve `/documents` isteklerini sunucuya aktarır. Solibri ve AEC Pilot
-  ile denemede bu adresi kullanın (sayfa bağlantıları da bu adresle üretilir).
+- Environment: `PORT` (default 8787) or `CDE_SMOKE_BASE`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+- Only works on `127.0.0.1` / `localhost` addresses. It stops if another address is given.
+- It does not print tokens in full. It deletes the temporary client at the end.
+- In development, Vite (`:5173`) forwards `/foundation`, `/oauth2` and `/documents` requests to the server. Use this address when testing with Solibri and AEC Pilot
+  (page links are also built with this address).
 
-## 8. Kod haritası
+## 8. Code map
 
-| Dosya | İçerik |
+| File | Contents |
 |---|---|
-| `apps/server/src/oauth/foundation.ts` | Foundation uçları, `OPENCDE_APIS` listesi |
+| `apps/server/src/oauth/foundation.ts` | Foundation endpoints, the `OPENCDE_APIS` list |
 | `apps/server/src/oauth/routes.ts` | `/oauth2/authorize`, `/oauth2/token`, `/oauth2/revoke` |
-| `apps/server/src/oauth/authorize.ts` | Yetkilendirme isteği doğrulaması |
-| `apps/server/src/oauth/service.ts` | Kod, anahtar, aile, iptal |
-| `apps/server/src/oauth/redirect.ts` | Yönlendirme adresi kuralları (loopback) |
-| `apps/server/src/oauth/api-routes.ts` | Onay sayfası, Bağlı Uygulamalar, yönetim uçları |
-| `apps/server/src/db/schema-oauth.ts` | Tablolar (göç `0026_opencde_auth`) |
-| `packages/shared/src/oauth.ts` | Scope'lar, Türkçe etiketler, DTO'lar |
-| `apps/web/src/features/integrations/pages/OAuthConsent.tsx`, `apps/web/src/features/admin/pages/AdminOAuth.tsx` | Onay sayfası, yönetim sekmesi |
-| `apps/server/src/opencde/documents.ts` | Documents API 1.0 uçları (`/documents/1.0/…`) |
-| `apps/server/src/opencde/pages.ts` | CDE sayfalarının API'si (`/api/v1/opencde/sessions/…`), yalnız tarayıcı oturumu |
-| `apps/server/src/opencde/common.ts` | Erişim ve callback kuralları, `server_context`, `DocumentVersion` |
-| `apps/server/src/db/schema-opencde-docs.ts` | Oturumlar, dosyalar, parçalar (göç `0030_opencde_docs`) |
-| `packages/shared/src/opencde-documents.ts` | Scope → erişim, sınırlar, sayfa DTO'ları, Uygunluk kodları |
-| `apps/web/src/features/integrations/pages/OpenCdeDocuments.tsx` | Dış Uygulamadan Yükleme, Dış Uygulama İçin Belge Seç |
+| `apps/server/src/oauth/authorize.ts` | Authorization request validation |
+| `apps/server/src/oauth/service.ts` | Code, token, family, revocation |
+| `apps/server/src/oauth/redirect.ts` | Redirect address rules (loopback) |
+| `apps/server/src/oauth/api-routes.ts` | Consent page, Connected Applications, administration endpoints |
+| `apps/server/src/db/schema-oauth.ts` | Tables (migration `0026_opencde_auth`) |
+| `packages/shared/src/oauth.ts` | Scopes, Turkish labels, DTOs |
+| `apps/web/src/features/integrations/pages/OAuthConsent.tsx`, `apps/web/src/features/admin/pages/AdminOAuth.tsx` | Consent page, administration tab |
+| `apps/server/src/opencde/documents.ts` | Documents API 1.0 endpoints (`/documents/1.0/…`) |
+| `apps/server/src/opencde/pages.ts` | API for the CDE pages (`/api/v1/opencde/sessions/…`), browser session only |
+| `apps/server/src/opencde/common.ts` | Access and callback rules, `server_context`, `DocumentVersion` |
+| `apps/server/src/db/schema-opencde-docs.ts` | Sessions, files, parts (migration `0030_opencde_docs`) |
+| `packages/shared/src/opencde-documents.ts` | Scope → access, limits, page DTOs, Suitability codes |
+| `apps/web/src/features/integrations/pages/OpenCdeDocuments.tsx` | Upload from an External Application, Select Documents for an External Application |

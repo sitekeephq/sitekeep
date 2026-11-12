@@ -2,23 +2,23 @@
 
 commit `{{COMMIT}}`
 
-| Sürüm | Kurulum paketi (Linux, {{ARCH}}) | İmaj |
+| Edition | Installation package (Linux, {{ARCH}}) | Image |
 |---|---|---|
-| **SiteKeep Community** (AGPL-3.0, lisans gerekmez) | `sitekeep-community-{{VERSION}}-linux-{{ARCH}}.tar.gz` | `ghcr.io/sitekeephq/sitekeep:{{VERSION}}` |
-| **SiteKeep Enterprise** (modüller lisansla açılır) | `sitekeep-enterprise-{{VERSION}}-linux-{{ARCH}}.tar.gz` | `ghcr.io/sitekeephq/sitekeep-enterprise:{{VERSION}}` |
+| **SiteKeep Community** (AGPL-3.0, no licence required) | `sitekeep-community-{{VERSION}}-linux-{{ARCH}}.tar.gz` | `ghcr.io/sitekeephq/sitekeep:{{VERSION}}` |
+| **SiteKeep Enterprise** (modules unlocked by licence) | `sitekeep-enterprise-{{VERSION}}-linux-{{ARCH}}.tar.gz` | `ghcr.io/sitekeephq/sitekeep-enterprise:{{VERSION}}` |
 
-Her paketin yanında `.sha256`; bağımlılık listesi (SBOM, CycloneDX): `sitekeep-{{VERSION}}-sbom.cdx.json`.
-Bu sayfa iç dağıtım içindir (özel depo). Enterprise paketi müşteriye Odoo müşteri portalından verilir
-(docs/onprem/kurulum-paketi.md, yayın planı C-3); Community paketi ve imajı depo açılınca herkese açıktır.
+Each package comes with a `.sha256`; dependency list (SBOM, CycloneDX): `sitekeep-{{VERSION}}-sbom.cdx.json`.
+This page is for internal distribution (private repository). The Enterprise package is delivered to customers through the Odoo customer portal
+(docs/onprem/installation-bundle.md, release plan C-3); the Community package and image are public once the repository is opened.
 
-### Ekip: indirme
+### Team: download
 
 ```bash
 gh release download v{{VERSION}} -R sitekeephq/sitekeep -p 'sitekeep-*-{{VERSION}}-linux-{{ARCH}}.tar.gz*'
 shasum -a 256 -c sitekeep-*-{{VERSION}}-linux-{{ARCH}}.tar.gz.sha256
 ```
 
-### Müşteri BT'si: yeni kurulum (paket)
+### Customer IT: new installation (package)
 
 ```bash
 tar -xzf sitekeep-<community|enterprise>-{{VERSION}}-linux-{{ARCH}}.tar.gz && cd sitekeep-<…>-{{VERSION}}-linux-{{ARCH}}
@@ -26,20 +26,20 @@ sha256sum -c SHA256SUMS
 sudo ./install.sh
 ```
 
-### Müşteri BT'si: güncelleme (paket)
+### Customer IT: upgrade (package)
 
 ```bash
 tar -xzf sitekeep-<…>-{{VERSION}}-linux-{{ARCH}}.tar.gz
 sudo sitekeep upgrade ./sitekeep-<…>-{{VERSION}}-linux-{{ARCH}}
 ```
 
-Güncelleme önce yedek alır; yeni sürüm 3 dakikada sağlıklı açılmazsa eski sürüme ve güncelleme
-öncesi veritabanına kendiliğinden döner.
+The upgrade first takes a backup; if the new version does not come up healthy within 3 minutes, it automatically rolls back to the old version and the
+pre-upgrade database.
 
 ### Docker Compose
 
-`.env`'de `SITEKEEP_VERSION={{VERSION}}`, sonra `docker compose pull && docker compose up -d`
+Set `SITEKEEP_VERSION={{VERSION}}` in `.env`, then run `docker compose pull && docker compose up -d`
 (docs/onprem/docker-compose.md).
 
-Her iki paket CI'da boş bir Linux sunucuda kurulum duman testinden geçti (kurulum, sürüm ve lisans
-kontrolü, HTTPS, giriş, yükleme, yedek/geri yükleme, güncelleme, geri dönüş, kaldırma).
+Both packages passed an installation smoke test on a clean Linux server in CI (installation, version and licence
+check, HTTPS, login, upload, backup/restore, upgrade, rollback, uninstall).
