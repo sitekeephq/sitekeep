@@ -2,6 +2,9 @@ import path from "node:path";
 import type { APIRequestContext, Locator, Page } from "@playwright/test";
 import { expect, test } from "../support/project-features";
 import { uploadServerIfc } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost", "planning");
 
 /** A project of its own: other specs' unit prices and rules stay out of the suggestions. */
 async function seedProject(request: APIRequestContext, code: string, items: object[]) {

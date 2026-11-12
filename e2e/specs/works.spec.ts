@@ -1,4 +1,7 @@
 import { test, expect, runState } from "../support/fixtures";
+import { needsModules } from "../support/modules";
+
+needsModules("manage");
 
 test("opens the works hub and creates a correspondence through the UI", async ({ page, diagnostics }) => {
   void diagnostics;

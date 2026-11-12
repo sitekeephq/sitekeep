@@ -1,4 +1,5 @@
 import { expect, runState, test } from "../support/project-features";
+import { moduleInstalled } from "../support/modules";
 
 test("coordination routes show their tabs and deterministic empty states", async ({ page }) => {
   const { project } = await runState();
@@ -6,7 +7,9 @@ test("coordination routes show their tabs and deterministic empty states", async
 
   await expect(page.getByRole("heading", { name: "Koordinasyon" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Model Setleri", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Çakışma Testleri", exact: true })).toBeVisible();
+  // Çakışma Testleri is the Coordinate module's tab.
+  const clash = moduleInstalled("coordinate");
+  if (clash) await expect(page.getByRole("link", { name: "Çakışma Testleri", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Bilgi Gereksinimi Kontrolleri", exact: true })).toBeVisible();
   await expect(page.getByText("Henüz model seti yok.")).toBeVisible();
 
@@ -16,10 +19,12 @@ test("coordination routes show their tabs and deterministic empty states", async
   await expect(modelSetDialog.getByRole("button", { name: "Kaydet" })).toBeDisabled();
   await modelSetDialog.getByRole("button", { name: "Vazgeç" }).click();
 
-  await page.getByRole("link", { name: "Çakışma Testleri", exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/coordination/tests$`));
-  await expect(page.getByText("Henüz çakışma testi yok.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "+ Yeni Çakışma Testi", exact: true })).toBeDisabled();
+  if (clash) {
+    await page.getByRole("link", { name: "Çakışma Testleri", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/coordination/tests$`));
+    await expect(page.getByText("Henüz çakışma testi yok.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "+ Yeni Çakışma Testi", exact: true })).toBeDisabled();
+  }
 
   await page.getByRole("link", { name: "Bilgi Gereksinimi Kontrolleri", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/coordination/ids$`));

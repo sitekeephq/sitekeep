@@ -1,5 +1,8 @@
 import { expect, runState, test } from "../support/project-features";
 import { uploadServerIfc } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 test("metraj onayı: approve the inventory, bind groups to contract items, fill a payment and revoke", async ({ page, request }) => {
   test.setTimeout(150_000);

@@ -5,8 +5,10 @@ import { webModules } from "./modules";
 /** The grouped project menu; names are "shell" keys, rendered with t(). */
 
 export type ProjectNavItem = { to: string; labelKey: ShellKey; icon: IconName; adminOnly?: boolean; systemAdmin?: boolean };
+/** A core entry whose page comes from a module: shown only when that module is enabled. */
+type CoreNavItem = ProjectNavItem & { module?: string };
 
-const CORE_NAV: { titleKey: ShellKey; items: ProjectNavItem[] }[] = [
+const CORE_NAV: { titleKey: ShellKey; items: CoreNavItem[] }[] = [
   {
     titleKey: "projectNav.groups.work",
     items: [
@@ -38,7 +40,7 @@ const CORE_NAV: { titleKey: ShellKey; items: ProjectNavItem[] }[] = [
       { to: "deleted", labelKey: "projectNav.items.deleted", icon: "trash", adminOnly: true },
       { to: "settings", labelKey: "projectNav.items.settings", icon: "settings", adminOnly: true },
       { to: "sistem-durumu", labelKey: "projectNav.items.sistemDurumu", icon: "chart", systemAdmin: true },
-      { to: "forma-esitleme", labelKey: "projectNav.items.formaEsitleme", icon: "link", adminOnly: true },
+      { to: "forma-esitleme", labelKey: "projectNav.items.formaEsitleme", icon: "link", adminOnly: true, module: "connect" },
     ],
   },
 ];
@@ -53,7 +55,8 @@ let built: { from: readonly unknown[]; nav: ProjectNavGroup[]; items: ProjectNav
  */
 export function projectNav(): ProjectNavGroup[] {
   if (built?.from === webModules) return built.nav;
-  const nav = CORE_NAV.map((g) => {
+  const nav = CORE_NAV.map(({ items, ...rest }) => {
+    const g = { ...rest, items: items.filter((i) => !i.module || webModules.some((m) => m.id === i.module)).map(({ module: _m, ...i }) => i) };
     const group = g.titleKey.split(".").pop();
     const extra = webModules.flatMap((m) => m.projectNav ?? []).filter((n) => n.group === group).map(({ group: _g, ...item }) => item);
     if (!extra.length) return g;

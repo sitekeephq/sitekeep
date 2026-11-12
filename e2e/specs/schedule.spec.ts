@@ -1,5 +1,8 @@
 import path from "node:path";
 import { expect, runState, test } from "../support/project-features";
+import { needsModules } from "../support/modules";
+
+needsModules("planning");
 
 test("imports a tiny CSV schedule through the empty schedule page", async ({ page }) => {
   const { project } = await runState();

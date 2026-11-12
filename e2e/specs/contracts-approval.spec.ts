@@ -1,4 +1,7 @@
 import { expect, runState, test } from "../fixtures/access";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 test("multi-step payment approval: flow picked on the contract, member answers from Görevlerim, admin finishes", async ({
   page,

@@ -1,5 +1,8 @@
 import type { Page, Route } from "@playwright/test";
 import { test, expect, runState } from "../support/fixtures";
+import { needsModules } from "../support/modules";
+
+needsModules("connect");
 
 /**
  * Proje → Forma Eşitleme. The e2e server runs without Autodesk (launch.mjs), so the first test

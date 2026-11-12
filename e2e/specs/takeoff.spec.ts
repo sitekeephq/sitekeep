@@ -3,6 +3,9 @@ import path from "node:path";
 import type { APIRequestContext, Locator, Page } from "@playwright/test";
 import { expect, test } from "../support/project-features";
 import { E2E_FIXTURES, uploadProjectFile } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 /** takeoff-plan.pdf: a 600 × 400 pt page; the 10 m reference line runs from (100, 50) to (500, 50), top-left page coordinates. */
 const PAGE_W = 600;

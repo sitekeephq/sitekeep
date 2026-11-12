@@ -3,6 +3,9 @@ import path from "node:path";
 import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "../support/fixtures";
 import { E2E_FIXTURES, uploadProjectFile } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 async function assertNoSidewaysScroll(page: Page) {
   const extra = await page.evaluate(

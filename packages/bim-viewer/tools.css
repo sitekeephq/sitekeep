@@ -1,0 +1,122 @@
+/* Model viewer tools (components/viewer-tools): view cube, tool rail, panels, walk bar, joystick, brand. */
+:root {
+  --vt-section-line: #1d2939;   /* cut edges */
+  --vt-section-fill: #9aa5b1;   /* cut fills */
+  --vt-measure: #d97706;        /* measurement lines and labels */
+  --vt-glass: rgba(255, 255, 255, 0.92);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --vt-section-line: #f2f4f7;
+    --vt-section-fill: #475467;
+    --vt-measure: #fbbf24;
+    --vt-glass: rgba(10, 31, 61, 0.92);
+  }
+  .vt-topbar { color: #f8fafc; }
+  .vt-topbar button { color: #172033; background: #fff; border-color: #d0d5dd; }
+  .vt-rail { background: #fff; }
+  .vt-rail > button, .vt-rail .vt-seg > button { color: #172033; }
+}
+
+/* View cube, top-right. */
+.vt-cube-host { position: absolute; top: 10px; right: 10px; z-index: 5; }
+.vt-cube { position: relative; }
+.vt-cube-body { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+.vt-cube-face {
+  position: absolute; left: 0; top: 0; display: grid; place-items: center; padding: 0; box-sizing: border-box;
+  backface-visibility: hidden; border: 1px solid var(--border); border-radius: 4px; background: var(--vt-glass);
+  color: var(--text); font-size: 11px; font-weight: 600; cursor: pointer; box-shadow: none;
+}
+.vt-cube-face:hover { background: var(--primary-soft); color: var(--primary); }
+.vt-cube-top, .vt-cube-bottom { background: var(--surface-2); }
+
+/* Tool rail under the cube. */
+.vt-rail {
+  position: absolute; top: 118px; right: 10px; z-index: 5; display: flex; flex-direction: column; gap: 4px;
+  width: 84px; max-height: calc(100% - 128px); overflow-y: auto; padding: 4px; border-radius: var(--radius);
+  background: var(--vt-glass); box-shadow: var(--shadow);
+}
+.vt-rail > button, .vt-seg > button {
+  display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 2px; font-size: 11px; line-height: 1.15;
+  border: 1px solid transparent; background: transparent; box-shadow: none; color: var(--text); border-radius: 8px; white-space: normal;
+}
+.vt-rail > button > span, .vt-seg > button > span { font-size: 16px; }
+.vt-rail > button:hover:not(:disabled), .vt-seg > button:hover:not(:disabled) { background: var(--primary-soft); }
+.vt-rail > button.active, .vt-seg > button.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.vt-rail > button:disabled { opacity: 0.45; }
+.vt-seg { display: flex; flex-direction: column; gap: 2px; padding-bottom: 4px; margin-bottom: 2px; border-bottom: 1px solid var(--border); }
+.vt-seg.horizontal { flex-direction: row; flex-wrap: wrap; border-bottom: 0; margin: 4px 0 8px; }
+.vt-seg.horizontal > button { flex: 1; min-width: 56px; font-size: 12px; border-color: var(--border); }
+
+/* Panels open next to the rail. */
+.vt-panel {
+  position: absolute; top: 118px; right: 104px; z-index: 6; width: 280px; max-height: calc(100% - 128px); overflow-y: auto;
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+}
+.vt-panel p { margin: 6px 0; }
+.vt-panel-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.vt-help { width: 360px; }
+.vt-help kbd { font-family: inherit; font-size: 11px; white-space: nowrap; padding: 1px 5px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-2); }
+.vt-list { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 2px; }
+.vt-list li { display: flex; align-items: center; gap: 6px; padding: 2px 0; border-bottom: 1px solid var(--border); }
+.vt-list li .vt-check { flex: 1; min-width: 0; }
+.vt-list li .vt-value { margin-left: auto; }
+.vt-check { margin: 0; color: inherit; gap: 6px; }
+.vt-check input { width: auto; margin: 0; }
+.vt-stack { display: grid; gap: 6px; }
+.vt-stack button { display: flex; justify-content: space-between; }
+
+/* Hint / walk bar, top centre. */
+.vt-topbar {
+  position: absolute; top: 54px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 10px;
+  max-width: calc(100% - 220px); padding: 6px 10px; border-radius: var(--radius); background: var(--vt-glass); box-shadow: var(--shadow); font-size: 12px;
+}
+.vt-topbar-hint { min-width: 0; }
+.vt-speed { display: flex; align-items: center; gap: 6px; margin: 0; color: inherit; white-space: nowrap; }
+.vt-speed input { width: 100px; padding: 0; border: 0; }
+
+/* Phone joystick (coarse pointers only). */
+.vt-joystick {
+  display: none; position: absolute; left: 18px; bottom: 28px; z-index: 6; width: 112px; height: 112px; border-radius: 50%;
+  background: var(--vt-glass); border: 1px solid var(--border); box-shadow: var(--shadow); touch-action: none;
+}
+.vt-joystick-knob {
+  position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+  background: var(--primary); opacity: 0.85; pointer-events: none;
+}
+@media (pointer: coarse) { .vt-joystick { display: block; } }
+
+/* Optional host-injected mark: small, light, not clickable. */
+.vt-brand {
+  position: absolute; left: 10px; bottom: 8px; z-index: 4; pointer-events: none; opacity: 0.6; line-height: 0;
+  --mark-from: #ffffff; --mark-to: #cde1ff; filter: drop-shadow(0 0 1.5px rgba(2, 30, 69, 0.55));
+}
+
+/* Properties panel additions. */
+.vt-props-head { display: grid; gap: 4px; margin: 8px 0 4px; padding: 8px; border-radius: 8px; background: var(--surface-2); }
+.vt-props-head > div { display: grid; grid-template-columns: 84px 1fr; gap: 6px; align-items: baseline; }
+.vt-props-head dt { color: var(--muted); font-size: 12px; }
+.vt-props-head dd { margin: 0; overflow-wrap: anywhere; }
+.vt-prop-value { position: relative; padding-right: 26px !important; }
+.vt-copy { padding: 0 4px; line-height: 1.4; opacity: 0.55; }
+.vt-prop-value .vt-copy { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+.vt-copy:hover { opacity: 1; }
+
+@media (max-width: 700px) {
+  .vt-rail { display: none; }
+  .vt-cube-host { top: 54px; }
+  .vt-panel, .vt-help { top: auto; left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 48%; }
+  .vt-topbar { top: auto; bottom: 10px; left: 10px; right: 10px; transform: none; max-width: none; flex-wrap: wrap; }
+  .vt-brand.walking { display: none; }
+}
+@media (max-width: 700px) and (pointer: coarse) {
+  .vt-topbar:has(.vt-speed) { bottom: auto; top: 54px; right: 96px; }
+}
+
+/* Keep controls legible when the OS is dark but the application theme is light. */
+@media (prefers-color-scheme: dark) {
+  .vt-rail, .vt-topbar { background: #fff; color: #172033; }
+  .vt-rail > button, .vt-rail .vt-seg > button { color: #172033; }
+  .vt-rail > button.active, .vt-rail .vt-seg > button.active { color: var(--primary); }
+  .vt-topbar button { color: #172033; background: #fff; border-color: #d0d5dd; }
+}

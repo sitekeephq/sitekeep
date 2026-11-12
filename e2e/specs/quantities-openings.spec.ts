@@ -1,5 +1,8 @@
 import { expect, runState, test } from "../support/project-features";
 import { uploadServerIfc } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 test("metraj deducts openings measured from the IFC geometry and shows the model's own value next to it", async ({ page, request }) => {
   test.setTimeout(120_000);

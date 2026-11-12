@@ -1,5 +1,8 @@
 import type { APIRequestContext, APIResponse } from "@playwright/test";
 import { test, expect, runState } from "../support/fixtures";
+import { needsModules } from "../support/modules";
+
+needsModules("field");
 
 async function expectJson<T>(response: APIResponse, operation: string): Promise<T> {
   if (!response.ok()) throw new Error(`${operation} failed (${response.status()}): ${await response.text()}`);

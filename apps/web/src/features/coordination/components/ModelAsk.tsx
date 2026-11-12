@@ -18,6 +18,7 @@ import { ApiError, api, formatNumber, type AiProviderSelection, type ProjectAiDt
 import type { ViewerEngine } from "@7dimensions-project/bim-viewer";
 import { useLabel } from "../../../i18n";
 import { AiTaskButton } from "../../../shared/ai/AiTaskButton";
+import { webModules } from "../../../app/modules";
 
 type Result = ModelQueryResultDto & Partial<Pick<ModelAskResultDto, "source" | "model" | "aiError" | "cached" | "question" | "ms">>;
 type Mode = "color" | "isolate" | "none";
@@ -143,6 +144,8 @@ export function ModelAskPanel({
   useEffect(() => () => void engine?.clearMatches(), [engine]);
 
   useEffect(() => {
+    // Project AI settings come from the AI module; without it there is nothing to ask for.
+    if (!webModules.some((m) => m.id === "ai")) return setAi(null);
     api.projectAi(projectId).then(setAi, () => setAi(null));
   }, [projectId]);
 

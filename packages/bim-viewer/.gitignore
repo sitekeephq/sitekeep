@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tgz
+.DS_Store
+playwright-report/
+test-results/
+playground/public/fragments-worker.mjs
+playground/public/models/
+playground/public/scans/
+playground/public/iot-sample.json
+coverage/

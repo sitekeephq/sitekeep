@@ -1,5 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 import { test, expect, runState } from "../support/fixtures";
+import { moduleInstalled, needsModules, withInstalled, type ModuleId } from "../support/modules";
 
 async function openAdminTab(page: Page, label: string, apiPath: string, rendered: Locator) {
   const response = page.waitForResponse(
@@ -27,6 +28,43 @@ async function openSettingsTab(
   await expect(rendered).toBeVisible();
 }
 
+/** Yönetim tabs; `module`: the tab belongs to that Enterprise module and is only there when it is installed. */
+const ADMIN_TABS: { label: string; apiPath: string; rendered: (page: Page) => Locator; also?: (page: Page) => Locator; module?: ModuleId }[] = [
+  {
+    label: "Yapay Zekâ ve MCP",
+    apiPath: "/api/v1/admin/settings",
+    rendered: (page) => page.getByRole("heading", { name: "Yapay Zekâ Modu", exact: true }),
+    also: (page) => page.getByText("MCP Bağlantı Bilgileri", { exact: false }),
+    module: "ai",
+  },
+  {
+    label: "Office Entegrasyonu",
+    apiPath: "/api/v1/admin/office",
+    rendered: (page) => page.getByRole("heading", { name: "Tarayıcıda Düzenleme (WOPI)", exact: true }),
+  },
+  {
+    label: "OAuth Uygulamaları",
+    apiPath: "/api/v1/admin/oauth-clients",
+    rendered: (page) => page.getByRole("heading", { name: "OAuth Uygulamaları", exact: true }),
+  },
+  {
+    label: "Gizlilik Merkezi",
+    apiPath: "/api/v1/admin/privacy",
+    rendered: (page) => page.getByRole("heading", { name: "Tüm Dış Bağlantıları Kapat", exact: true }),
+  },
+  {
+    label: "Sistem Durumu",
+    apiPath: "/api/v1/admin/status",
+    rendered: (page) => page.getByRole("heading", { name: "Otomatik Yedek", exact: true }),
+  },
+  {
+    label: "Forma Eşitleme",
+    apiPath: "/api/v1/admin/forma-sync",
+    rendered: (page) => page.getByRole("heading", { name: "Dosya Eşlemeleri", exact: true }),
+    module: "connect",
+  },
+];
+
 test("administration tabs render their local settings without external configuration", async ({ page }) => {
   await page.goto("/administration");
   await expect(page.getByRole("heading", { name: "Yönetim", exact: true })).toBeVisible();
@@ -34,126 +72,32 @@ test("administration tabs render their local settings without external configura
   await expect(page.getByRole("heading", { name: "İzinli Alan Adı", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Firmalar", exact: true })).toBeVisible();
 
-  await openAdminTab(
-    page,
-    "Yapay Zekâ ve MCP",
-    "/api/v1/admin/settings",
-    page.getByRole("heading", { name: "Yapay Zekâ Modu", exact: true }),
-  );
-  await expect(page.getByText("MCP Bağlantı Bilgileri", { exact: false })).toBeVisible();
-
-  await openAdminTab(
-    page,
-    "Office Entegrasyonu",
-    "/api/v1/admin/office",
-    page.getByRole("heading", { name: "Tarayıcıda Düzenleme (WOPI)", exact: true }),
-  );
-
-  await openAdminTab(
-    page,
-    "OAuth Uygulamaları",
-    "/api/v1/admin/oauth-clients",
-    page.getByRole("heading", { name: "OAuth Uygulamaları", exact: true }),
-  );
-
-  await openAdminTab(
-    page,
-    "Gizlilik Merkezi",
-    "/api/v1/admin/privacy",
-    page.getByRole("heading", { name: "Tüm Dış Bağlantıları Kapat", exact: true }),
-  );
-
-  await openAdminTab(
-    page,
-    "Sistem Durumu",
-    "/api/v1/admin/status",
-    page.getByRole("heading", { name: "Otomatik Yedek", exact: true }),
-  );
-
-  await openAdminTab(
-    page,
-    "Forma Eşitleme",
-    "/api/v1/admin/forma-sync",
-    page.getByRole("heading", { name: "Dosya Eşlemeleri", exact: true }),
-  );
+  for (const tab of withInstalled(ADMIN_TABS)) {
+    await openAdminTab(page, tab.label, tab.apiPath, tab.rendered(page));
+    if (tab.also) await expect(tab.also(page)).toBeVisible();
+  }
 });
+
+/** Proje Ayarları tabs; `module`: the tab belongs to that Enterprise module and is only there when it is installed. */
+const SETTINGS_TABS: { key: string; label: string; api: string; rendered: (page: Page) => Locator; module?: ModuleId }[] = [
+  { key: "yapay-zeka", label: "Yapay Zekâ", api: "/ai", rendered: (page) => page.getByRole("heading", { name: "Kendi API Anahtarlarım", exact: true }), module: "ai" },
+  { key: "uyeler", label: "Üyeler", api: "/members", rendered: (page) => page.getByRole("heading", { name: "Üye Ekle", exact: true }) },
+  { key: "roller", label: "Roller", api: "/roles", rendered: (page) => page.getByRole("button", { name: "+ Rol", exact: true }) },
+  { key: "moduller", label: "Modüller", api: "/modules", rendered: (page) => page.getByText("Dokümanlar her zaman açıktır.", { exact: false }) },
+  { key: "isimlendirme", label: "İsimlendirme Standartları", api: "/naming-standards", rendered: (page) => page.getByRole("button", { name: "+ Standart", exact: true }) },
+  { key: "is-akislari", label: "İş Akışları", api: "/workflow-templates", rendered: (page) => page.getByRole("button", { name: "+ Şablon", exact: true }) },
+  { key: "is-tipleri", label: "İş Tipleri", api: "/work-types", rendered: (page) => page.getByRole("heading", { name: "İş Tipleri", exact: true }) },
+  { key: "oznitelikler", label: "Öznitelikler", api: "/attribute-definitions", rendered: (page) => page.getByRole("button", { name: "+ Öznitelik", exact: true }) },
+  { key: "aktivite", label: "Aktivite Kaydı", api: "/activity", rendered: (page) => page.getByRole("columnheader", { name: "İşlem", exact: true }) },
+];
 
 test("project administration tabs route and render", async ({ page }) => {
   const { project } = await runState();
   const projectApi = `/api/v1/projects/${project.id}`;
 
-  await openSettingsTab(
-    page,
-    project.id,
-    "yapay-zeka",
-    "Yapay Zekâ",
-    new RegExp(`^${projectApi}/ai$`),
-    page.getByRole("heading", { name: "Kendi API Anahtarlarım", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "uyeler",
-    "Üyeler",
-    new RegExp(`^${projectApi}/members$`),
-    page.getByRole("heading", { name: "Üye Ekle", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "roller",
-    "Roller",
-    new RegExp(`^${projectApi}/roles$`),
-    page.getByRole("button", { name: "+ Rol", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "moduller",
-    "Modüller",
-    new RegExp(`^${projectApi}/modules$`),
-    page.getByText("Dokümanlar her zaman açıktır.", { exact: false }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "isimlendirme",
-    "İsimlendirme Standartları",
-    new RegExp(`^${projectApi}/naming-standards$`),
-    page.getByRole("button", { name: "+ Standart", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "is-akislari",
-    "İş Akışları",
-    new RegExp(`^${projectApi}/workflow-templates$`),
-    page.getByRole("button", { name: "+ Şablon", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "is-tipleri",
-    "İş Tipleri",
-    new RegExp(`^${projectApi}/work-types$`),
-    page.getByRole("heading", { name: "İş Tipleri", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "oznitelikler",
-    "Öznitelikler",
-    new RegExp(`^${projectApi}/attribute-definitions$`),
-    page.getByRole("button", { name: "+ Öznitelik", exact: true }),
-  );
-  await openSettingsTab(
-    page,
-    project.id,
-    "aktivite",
-    "Aktivite Kaydı",
-    new RegExp(`^${projectApi}/activity$`),
-    page.getByRole("columnheader", { name: "İşlem", exact: true }),
-  );
+  for (const tab of withInstalled(SETTINGS_TABS)) {
+    await openSettingsTab(page, project.id, tab.key, tab.label, new RegExp(`^${projectApi}${tab.api}$`), tab.rendered(page));
+  }
   await openSettingsTab(
     page,
     project.id,
@@ -162,13 +106,16 @@ test("project administration tabs route and render", async ({ page }) => {
     /^\/api\/v1\/admin\/status$/,
     page.getByRole("heading", { name: "Otomatik Yedek", exact: true }),
   );
-  // Autodesk is not a settings tab any more: the old address opens Proje → Forma Eşitleme.
-  await page.goto(`/projects/${project.id}/settings?sekme=forma-esitleme`);
-  await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/forma-esitleme$`));
-  await expect(page.getByRole("heading", { name: "ACC Projesi", exact: true })).toBeVisible();
+  // Autodesk is not a settings tab any more: the old address opens Proje → Forma Eşitleme (Connect module).
+  if (moduleInstalled("connect")) {
+    await page.goto(`/projects/${project.id}/settings?sekme=forma-esitleme`);
+    await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/forma-esitleme$`));
+    await expect(page.getByRole("heading", { name: "ACC Projesi", exact: true })).toBeVisible();
+  }
 });
 
 test("a validated personal Claude key is masked and can be removed", async ({ page }) => {
+  needsModules("ai");
   const { project } = await runState();
   await page.route("**/api/v1/me/ai-credentials/anthropic", async (route) => {
     const body = route.request().postDataJSON() as { apiKey?: string | null; model?: string };

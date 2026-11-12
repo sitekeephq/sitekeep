@@ -38,15 +38,6 @@
     "three": "^0.186.1",
     "web-ifc": "^0.0.78"
   },
-  "optionalDependencies": {
-    "@7dimensions-project/sitekeep-ee-ai": "0.4.1",
-    "@7dimensions-project/sitekeep-ee-connect": "0.3.3",
-    "@7dimensions-project/sitekeep-ee-coordinate": "0.3.1",
-    "@7dimensions-project/sitekeep-ee-cost": "0.6.2",
-    "@7dimensions-project/sitekeep-ee-field": "0.3.3",
-    "@7dimensions-project/sitekeep-ee-manage": "0.3.2",
-    "@7dimensions-project/sitekeep-ee-planning": "0.3.1"
-  },
   "devDependencies": {
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",

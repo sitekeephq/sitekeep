@@ -1,6 +1,7 @@
 import path from "node:path";
 import type { APIRequestContext, APIResponse, Page } from "@playwright/test";
 import { test, expect, runState } from "../support/fixtures";
+import { moduleInstalled, needsModules } from "../support/modules";
 
 async function expectJson<T>(response: APIResponse, operation: string): Promise<T> {
   if (!response.ok()) throw new Error(`${operation} failed (${response.status()}): ${await response.text()}`);
@@ -90,6 +91,7 @@ async function seedReview(request: APIRequestContext, projectId: string, rootFol
 }
 
 test("iPhone form create dialog and filled form stay usable", async ({ page, request, diagnostics }) => {
+  needsModules("field");
   void diagnostics;
   const { project } = await runState();
   const templateName = `E2E Mobile Form ${Date.now().toString(36)}`;
@@ -157,6 +159,7 @@ test("iPhone BCF export opens from Diğer with a seeded issue", async ({ page, r
 });
 
 test("iPhone correspondence create and letter dialog stay tappable", async ({ page, diagnostics }) => {
+  needsModules("manage");
   void diagnostics;
   const { project } = await runState();
   const title = `E2E Mobile yazı ${Date.now().toString(36)}`;
@@ -182,6 +185,7 @@ test("iPhone correspondence create and letter dialog stay tappable", async ({ pa
 });
 
 test("iPhone schedule Özet, S-eğrisi and 5D dialogs open after CSV import", async ({ page, diagnostics }) => {
+  needsModules("planning", "cost");
   void diagnostics;
   test.setTimeout(60_000);
   const { project } = await runState();
@@ -330,13 +334,19 @@ test("iPhone project-settings create dialogs stay usable", async ({ page, diagno
   await page.getByRole("button", { name: "+ Öznitelik" }).click();
   await closeDialog(page, "Yeni Öznitelik", "Vazgeç");
 
-  await page.goto(`${base}?sekme=yapay-zeka`);
-  await expect(page.getByRole("heading", { name: "Kendi API Anahtarlarım" })).toBeVisible();
-  await assertNoSidewaysScroll(page);
+  // The Yapay Zekâ tab is the AI module's.
+  if (moduleInstalled("ai")) {
+    await page.goto(`${base}?sekme=yapay-zeka`);
+    await expect(page.getByRole("heading", { name: "Kendi API Anahtarlarım" })).toBeVisible();
+    await assertNoSidewaysScroll(page);
+  }
 
-  await page.goto(`${base}?sekme=autodesk`);
-  await expect(page.getByText(/AUTODESK_CLIENT_ID ve AUTODESK_CALLBACK_URL/)).toBeVisible();
-  await assertNoSidewaysScroll(page);
+  // The old Autodesk tab opens Forma Eşitleme, the Connect module's page.
+  if (moduleInstalled("connect")) {
+    await page.goto(`${base}?sekme=autodesk`);
+    await expect(page.getByText(/AUTODESK_CLIENT_ID ve AUTODESK_CALLBACK_URL/)).toBeVisible();
+    await assertNoSidewaysScroll(page);
+  }
 
   await page.goto(`${base}?sekme=moduller`);
   await expect(page.getByText("Dokümanlar her zaman açıktır.", { exact: false })).toBeVisible();
@@ -352,24 +362,30 @@ test("iPhone admin OAuth and AI provider dialogs stay usable", async ({ page, di
   await expect(oauth.getByText("Yönlendirme Adresleri", { exact: false })).toBeVisible();
   await closeDialog(page, "Yeni OAuth Uygulaması", "Vazgeç");
 
-  await page.getByRole("button", { name: "Yapay Zekâ ve MCP", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Yapay Zekâ Modu" })).toBeVisible();
-  await page.locator("select").filter({ has: page.getByRole("option", { name: "Ollama" }) }).selectOption({ label: "Ollama" });
-  const provider = page.getByRole("dialog", { name: /Yeni Sağlayıcı: Ollama/ });
-  await expect(provider.getByText("Veri nerede işlenir", { exact: false })).toBeVisible();
-  await closeDialog(page, /Yeni Sağlayıcı: Ollama/, "Vazgeç");
+  // "Yapay Zekâ ve MCP" is the AI module's tab.
+  if (moduleInstalled("ai")) {
+    await page.getByRole("button", { name: "Yapay Zekâ ve MCP", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Yapay Zekâ Modu" })).toBeVisible();
+    await page.locator("select").filter({ has: page.getByRole("option", { name: "Ollama" }) }).selectOption({ label: "Ollama" });
+    const provider = page.getByRole("dialog", { name: /Yeni Sağlayıcı: Ollama/ });
+    await expect(provider.getByText("Veri nerede işlenir", { exact: false })).toBeVisible();
+    await closeDialog(page, /Yeni Sağlayıcı: Ollama/, "Vazgeç");
+  }
 });
 
 test("iPhone form-template and reports AI boundary stay usable", async ({ page, diagnostics }) => {
   void diagnostics;
   const { project } = await runState();
 
-  await page.goto(`/projects/${project.id}/forms`);
-  await page.getByRole("button", { name: "Şablonlar" }).click();
-  await page.getByRole("button", { name: "Hazır Şablonlar" }).click();
-  await closeDialog(page, "Hazır Şablonlar");
-  await page.getByRole("button", { name: "+ Boş Şablon" }).click();
-  await closeDialog(page, "Yeni Form Şablonu", "Vazgeç");
+  // Form templates are the Field module's.
+  if (moduleInstalled("field")) {
+    await page.goto(`/projects/${project.id}/forms`);
+    await page.getByRole("button", { name: "Şablonlar" }).click();
+    await page.getByRole("button", { name: "Hazır Şablonlar" }).click();
+    await closeDialog(page, "Hazır Şablonlar");
+    await page.getByRole("button", { name: "+ Boş Şablon" }).click();
+    await closeDialog(page, "Yeni Form Şablonu", "Vazgeç");
+  }
 
   await page.goto(`/projects/${project.id}/reports`);
   await expect(page.getByRole("button", { name: "Yapay Zekâ ile Oluştur" })).toBeDisabled();

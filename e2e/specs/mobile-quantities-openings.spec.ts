@@ -1,6 +1,9 @@
 import type { Page } from "@playwright/test";
 import { test, expect, runState } from "../support/fixtures";
 import { uploadServerIfc } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 async function assertNoSidewaysScroll(page: Page) {
   const extra = await page.evaluate(

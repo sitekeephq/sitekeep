@@ -18,6 +18,7 @@ Node.js 22 or newer and npm.
 
 ```bash
 npm ci
+npm run build -w @7dimensions-project/bim-viewer   # the 3D viewer; again after changing it
 cp apps/server/.env.development.example apps/server/.env.development   # set the admin e-mail and password
 npm run dev        # API on http://127.0.0.1:8787, web app on http://localhost:5173
 ```

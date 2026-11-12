@@ -62,6 +62,7 @@ Node.js 22 or newer.
 
 ```bash
 npm ci
+npm run build -w @7dimensions-project/bim-viewer   # the 3D viewer; again after changing it
 cp apps/server/.env.development.example apps/server/.env.development   # set the admin e-mail and password
 npm run dev -w @sitekeep/server      # API → http://127.0.0.1:8787
 npm run dev -w @sitekeep/web         # web app → http://localhost:5173
@@ -71,14 +72,11 @@ npm run build && npm run e2e:install && npm run e2e   # end-to-end tests (Playwr
 
 Without `DATABASE_URL` the server uses an embedded PostgreSQL (PGlite) under `DATA_DIR/db`; no other service is needed.
 
-> The 3D viewer and the module SDK are being published to npmjs.com. Until then `npm ci` needs read access to
-> their package registry, so building from source is not yet possible for everyone. The published Docker image
-> and the installation bundle work without it.
-
 ## Architecture
 
 ```
 packages/shared     permission levels and inheritance, naming validation, shared types
+packages/bim-viewer 3D viewer engine and React integration (That Open Components)
 packages/sdk        module SDK (MIT): how SiteKeep Enterprise modules plug into the core
 packages/cde-tools  cde_* MCP tools (the /mcp endpoint and the stdio server share them)
 apps/server         Fastify + Drizzle ORM (PostgreSQL / PGlite), local disk storage, IFC conversion queue

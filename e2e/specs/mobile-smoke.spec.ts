@@ -2,29 +2,33 @@ import path from "node:path";
 import type { Page } from "@playwright/test";
 import { E2E_BASE_URL, signedOutState } from "../support/signed-out";
 import { test, expect, runState } from "../support/fixtures";
+import { moduleInstalled, needsModules, withInstalled, type ModuleId } from "../support/modules";
 
-/** Project menu labels (hamburger `.sidenav-current`) for each route. */
-const ROUTES = [
-  ["today", "Bugün"],
-  ["works", "İşler"],
-  ["files", "Dokümanlar"],
-  ["reviews", "İncelemeler"],
-  ["forms", "Formlar"],
-  ["viewer", "Model Görüntüleyici"],
-  ["coordination", "Koordinasyon"],
-  ["issues", "Sorunlar"],
-  ["param-changes", "Parametre Değişiklikleri"],
-  ["schedule", "İş Programı"],
-  ["contracts", "Sözleşme ve Hakediş"],
-  ["quantities", "Metraj"],
-  ["quantities?mode=2d", "Metraj"],
-  ["quantities?mode=approvals", "Metraj"],
-  ["locations", "Konumlar"],
-  ["reports", "Raporlar"],
-  ["spec", "Şartname Analizi"],
-  ["deleted", "Silinenler"],
-  ["settings", "Proje Ayarları"],
-] as const;
+/**
+ * Project menu labels (hamburger `.sidenav-current`) for each route. `module`: the page belongs to that
+ * Enterprise module and is only there when it is installed.
+ */
+const ROUTES: { route: string; label: string; module?: ModuleId }[] = [
+  { route: "today", label: "Bugün" },
+  { route: "works", label: "İşler" },
+  { route: "files", label: "Dokümanlar" },
+  { route: "reviews", label: "İncelemeler" },
+  { route: "forms", label: "Formlar", module: "field" },
+  { route: "viewer", label: "Model Görüntüleyici" },
+  { route: "coordination", label: "Koordinasyon" },
+  { route: "issues", label: "Sorunlar" },
+  { route: "param-changes", label: "Parametre Değişiklikleri", module: "coordinate" },
+  { route: "schedule", label: "İş Programı", module: "planning" },
+  { route: "contracts", label: "Sözleşme ve Hakediş", module: "cost" },
+  { route: "quantities", label: "Metraj", module: "cost" },
+  { route: "quantities?mode=2d", label: "Metraj", module: "cost" },
+  { route: "quantities?mode=approvals", label: "Metraj", module: "cost" },
+  { route: "locations", label: "Konumlar" },
+  { route: "reports", label: "Raporlar" },
+  { route: "spec", label: "Şartname Analizi" },
+  { route: "deleted", label: "Silinenler" },
+  { route: "settings", label: "Proje Ayarları" },
+];
 
 async function assertNoSidewaysScroll(page: Page) {
   const extra = await page.evaluate(
@@ -57,7 +61,7 @@ test("iPhone project pages keep the hamburger tappable and do not scroll sideway
   test.setTimeout(90_000);
   const { project } = await runState();
 
-  for (const [route, label] of ROUTES) {
+  for (const { route, label } of withInstalled(ROUTES)) {
     await test.step(label, async () => {
       await page.goto(`/projects/${project.id}/${route}`);
       const menu = page.getByRole("button", { name: "Proje menüsü" });
@@ -101,15 +105,18 @@ test("iPhone hamburger, ask panel and create dialogs stay clickable", async ({ p
   await expect(page.locator(".sidenav-title", { hasText: "Planlama ve Analiz" })).toBeVisible();
   await expect(page.locator(".sidenav-title", { hasText: "Yönetim" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Proje Ayarları" })).toBeVisible();
-  // Autodesk is on its own page now, not a settings tab.
-  await expect(page.getByRole("link", { name: "Forma Eşitleme" })).toBeVisible();
+  // Autodesk is on its own page now, not a settings tab (Forma Eşitleme is the Connect module's).
+  if (moduleInstalled("connect")) await expect(page.getByRole("link", { name: "Forma Eşitleme" })).toBeVisible();
   await page.getByRole("link", { name: "Proje Ayarları" }).click();
   await expect(page).toHaveURL(new RegExp(`${base}/settings`));
-  await expect(page.getByRole("tab", { name: "Yapay Zekâ" })).toBeVisible();
+  // The project's Yapay Zekâ tab and "Projeye sor" are the AI module's.
+  if (moduleInstalled("ai")) await expect(page.getByRole("tab", { name: "Yapay Zekâ" })).toBeVisible();
 
   await page.goto(`${base}/today`);
-  await page.getByRole("button", { name: "Projeye sor" }).click();
-  await openAndCloseDialog(page, "Sor");
+  if (moduleInstalled("ai")) {
+    await page.getByRole("button", { name: "Projeye sor" }).click();
+    await openAndCloseDialog(page, "Sor");
+  }
 
   await page.getByRole("button", { name: "+ Yeni" }).click();
   await openAndCloseDialog(page, "Ne Yapmak İstiyorsunuz?");
@@ -128,9 +135,11 @@ test("iPhone hamburger, ask panel and create dialogs stay clickable", async ({ p
   await page.getByRole("button", { name: "+ Konum" }).click();
   await openAndCloseDialog(page, "Yeni Konum");
 
-  await page.goto(`${base}/schedule`);
-  await page.getByRole("button", { name: "İçe Aktar" }).click();
-  await openAndCloseDialog(page, "İş Programı İçe Aktar");
+  if (moduleInstalled("planning")) {
+    await page.goto(`${base}/schedule`);
+    await page.getByRole("button", { name: "İçe Aktar" }).click();
+    await openAndCloseDialog(page, "İş Programı İçe Aktar");
+  }
 
   await page.goto(`${base}/coordination`);
   await page.getByRole("button", { name: "+ Yeni Model Seti" }).click();
@@ -179,6 +188,7 @@ test("iPhone home and account fit; login form stays submittable", async ({ page,
 });
 
 test("iPhone schedule import draws Gantt bars", async ({ page, diagnostics }) => {
+  needsModules("planning");
   void diagnostics;
   const { project } = await runState();
   const fixture = path.resolve(__dirname, "../fixtures/tiny-schedule.csv");
@@ -265,14 +275,15 @@ test("iPhone administration tabs stay tappable", async ({ page, diagnostics }) =
   await expect(page.getByRole("heading", { name: "Kullanıcılar", exact: true })).toBeVisible();
   await assertNoSidewaysScroll(page);
 
-  const tabs: [string, string][] = [
-    ["Yapay Zekâ ve MCP", "Yapay Zekâ Modu"],
-    ["Office Entegrasyonu", "Tarayıcıda Düzenleme (WOPI)"],
-    ["OAuth Uygulamaları", "OAuth Uygulamaları"],
-    ["Gizlilik Merkezi", "Tüm Dış Bağlantıları Kapat"],
-    ["Kullanıcılar ve Firmalar", "Kullanıcılar"],
+  // `module`: the tab belongs to that Enterprise module and is only there when it is installed.
+  const tabs: { label: string; heading: string; module?: ModuleId }[] = [
+    { label: "Yapay Zekâ ve MCP", heading: "Yapay Zekâ Modu", module: "ai" },
+    { label: "Office Entegrasyonu", heading: "Tarayıcıda Düzenleme (WOPI)" },
+    { label: "OAuth Uygulamaları", heading: "OAuth Uygulamaları" },
+    { label: "Gizlilik Merkezi", heading: "Tüm Dış Bağlantıları Kapat" },
+    { label: "Kullanıcılar ve Firmalar", heading: "Kullanıcılar" },
   ];
-  for (const [label, heading] of tabs) {
+  for (const { label, heading } of withInstalled(tabs)) {
     await page.getByRole("button", { name: label, exact: true }).click();
     await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
     await assertNoSidewaysScroll(page);

@@ -1,4 +1,5 @@
 import { test, expect, runState } from "../support/fixtures";
+import { needsModules, withInstalled, type ModuleId } from "../support/modules";
 
 test("home lists the API-created project", async ({ page }) => {
   const { project } = await runState();
@@ -32,6 +33,7 @@ test("top bar opens tasks and account", async ({ page }) => {
 });
 
 test("Modele Sor disables the project-wide assistant", async ({ page }) => {
+  needsModules("ai"); // "Projeye sor" is the AI module's
   const { project } = await runState();
   await page.goto(`/projects/${project.id}/files`);
   const projectAsk = page.getByRole("button", { name: "Projeye sor", exact: false });
@@ -49,21 +51,22 @@ test("Modele Sor disables the project-wide assistant", async ({ page }) => {
 
 test("main project navigation routes render without browser or API errors", async ({ page }) => {
   const { project } = await runState();
-  const routes = [
-    ["today", "Bugün"],
-    ["works", "İşler"],
-    ["files", "Dokümanlar"],
-    ["reviews", "İncelemeler"],
-    ["forms", "Formlar"],
-    ["issues", "Sorunlar"],
-    ["schedule", "İş Programı"],
-    ["locations", "Konumlar"],
-    ["reports", "Raporlar"],
-    ["deleted", "Silinenler"],
-    ["settings", "Proje Ayarları"],
-  ] as const;
+  // `module`: the page belongs to that Enterprise module and is only there when it is installed.
+  const routes: { route: string; label: string; module?: ModuleId }[] = [
+    { route: "today", label: "Bugün" },
+    { route: "works", label: "İşler" },
+    { route: "files", label: "Dokümanlar" },
+    { route: "reviews", label: "İncelemeler" },
+    { route: "forms", label: "Formlar", module: "field" },
+    { route: "issues", label: "Sorunlar" },
+    { route: "schedule", label: "İş Programı", module: "planning" },
+    { route: "locations", label: "Konumlar" },
+    { route: "reports", label: "Raporlar" },
+    { route: "deleted", label: "Silinenler" },
+    { route: "settings", label: "Proje Ayarları" },
+  ];
 
-  for (const [route, label] of routes) {
+  for (const { route, label } of withInstalled(routes)) {
     await test.step(label, async () => {
       await page.goto(`/projects/${project.id}/${route}`);
       await expect(page.getByLabel("Konum").getByText(label, { exact: true })).toBeVisible();

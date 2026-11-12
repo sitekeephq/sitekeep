@@ -1,4 +1,7 @@
 import { expect, runState, test } from "../support/project-features";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 test("contract card, unit price schedule, period payment approval, exports, variation, guarantee and delete", async ({
   page,

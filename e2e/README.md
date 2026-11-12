@@ -71,6 +71,17 @@ issue, form template, or review. The browser must still perform and assert the u
 under test. Do not replace the behavior being tested with direct API calls, and never seed from
 live, shared, customer, or production data.
 
+## Enterprise modules and SiteKeep Community
+
+The suite runs both with the Enterprise module packages installed and in SiteKeep Community, where no
+`@7dimensions-project/sitekeep-ee-*` package is in `node_modules` (delete them, rebuild `@sitekeep/web`, run
+the suite). `e2e/support/modules.ts` reads which packages are installed: `moduleInstalled(id)` checks one
+module, `needsModules(...ids)` skips the file (at top level) or the test (inside it) with the reason
+"needs SiteKeep Enterprise module(s): …", and `withInstalled(list)` drops the entries of a route, tab or
+dialog list whose `module` is not installed. A spec about one module calls `needsModules` at the top; a
+core journey that touches a module page checks that part only when `moduleInstalled` says so, so the
+full install still asserts everything.
+
 ## Commands
 
 Use Node 22 or later:

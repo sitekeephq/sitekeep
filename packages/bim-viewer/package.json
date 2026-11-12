@@ -1,0 +1,99 @@
+{
+  "name": "@7dimensions-project/bim-viewer",
+  "version": "0.4.6",
+  "description": "Shared BIM viewer engine and React integration for 7Dimensions products",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sitekeephq/sitekeep.git",
+    "directory": "packages/bim-viewer"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.js"
+    },
+    "./styles.css": "./styles.css",
+    "./tools.css": "./tools.css",
+    "./copy-assets": "./scripts/copy-assets.mjs",
+    "./scan": {
+      "types": "./dist/scan/index.d.ts",
+      "import": "./dist/scan/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "scripts/copy-assets.mjs",
+    "styles.css",
+    "tools.css",
+    "README.md"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p e2e/tsconfig.json",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:package": "node scripts/check-package.mjs",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "playground": "node scripts/copy-assets.mjs playground/public && node scripts/copy-test-models.mjs playground/public && vite --config playground/vite.config.ts",
+    "fixtures": "node scripts/build-test-frags.mjs && node scripts/build-discipline-frags.mjs && node scripts/build-shell-frags.mjs && node scripts/build-scan-fixtures.mjs",
+    "copy-assets": "node scripts/copy-assets.mjs"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@thatopen/components": "3.4.9",
+    "@thatopen/components-front": "3.4.5",
+    "@thatopen/fragments": "3.4.8",
+    "camera-controls": "3.1.2",
+    "chart.js": "4.4.1",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@thatopen/components": "3.4.9",
+    "@thatopen/components-front": "3.4.5",
+    "@thatopen/fragments": "3.4.8",
+    "@types/node": "^26.6.5",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/coverage-v8": "5.0.3",
+    "camera-controls": "3.1.2",
+    "happy-dom": "^21.0.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "three": "0.186.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "5.0.3",
+    "web-ifc": "0.0.78"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  }
+}

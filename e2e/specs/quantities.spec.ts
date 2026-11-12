@@ -1,5 +1,8 @@
 import { expect, runState, test } from "../support/project-features";
 import { uploadServerIfc } from "../support/seed-files";
+import { needsModules } from "../support/modules";
+
+needsModules("cost");
 
 test("metraj inventory, group elements, grouping, version difference and Excel export", async ({ page, request }) => {
   test.setTimeout(150_000);

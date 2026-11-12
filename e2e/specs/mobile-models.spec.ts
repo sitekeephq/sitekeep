@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { APIRequestContext, Page } from "@playwright/test";
 import { test, expect, runState } from "../support/fixtures";
+import { moduleInstalled, needsModules } from "../support/modules";
 import { generateSiteIfc } from "../support/site-ifc";
 import { E2E_FIXTURES, uploadIfcBuffer, uploadProjectFile, uploadServerIfc } from "../support/seed-files";
 
@@ -108,22 +109,26 @@ test("iPhone IFC viewer loads a fixture and opens the 4D bar", async ({ page, re
   const { project } = await runState();
   const stamp = Date.now().toString(36);
   const ifc = await uploadServerIfc(request, project.id, project.rootFolderId, "sample-wall.ifc", `e2e-wall-${stamp}.ifc`);
-  const scheduleId = await importTinySchedule(page, project.id);
+  // The programme and the viewer's 4D bar are the Planning module's.
+  const fourD = moduleInstalled("planning");
+  const scheduleId = fourD ? await importTinySchedule(page, project.id) : null;
 
   await page.goto(`/projects/${project.id}/files`);
   await page.getByRole("button", { name: ifc.name }).click();
   await expect(page.getByRole("heading", { name: "IFC Özeti" })).toBeVisible();
   await expect(page.getByText("Ornek Proje")).toBeVisible();
 
-  await page.goto(`/projects/${project.id}/viewer?v=${ifc.versionId}&takvim=1&program=${scheduleId}`);
+  await page.goto(`/projects/${project.id}/viewer?v=${ifc.versionId}${fourD ? `&takvim=1&program=${scheduleId}` : ""}`);
   await expect(page.getByRole("button", { name: /Sığdır/ })).toBeEnabled({ timeout: 90_000 });
-  const panel = page.locator('[aria-label="4D / 5D simülasyon"]');
-  await expect(panel).toBeVisible();
-  await expect(panel.getByText("Bağlı eleman yok", { exact: false })).toBeVisible();
-  // The panel starts collapsed; its tools are under Ayrıntılar.
-  await panel.getByRole("button", { name: "Ayrıntıları Göster" }).click();
-  await panel.getByRole("button", { name: "Bağlantı Kuralları" }).click();
-  await closeDialog(page, "Bağlantı Kuralları");
+  if (fourD) {
+    const panel = page.locator('[aria-label="4D / 5D simülasyon"]');
+    await expect(panel).toBeVisible();
+    await expect(panel.getByText("Bağlı eleman yok", { exact: false })).toBeVisible();
+    // The panel starts collapsed; its tools are under Ayrıntılar.
+    await panel.getByRole("button", { name: "Ayrıntıları Göster" }).click();
+    await panel.getByRole("button", { name: "Bağlantı Kuralları" }).click();
+    await closeDialog(page, "Bağlantı Kuralları");
+  }
   await page.getByRole("button", { name: "Diğer" }).click();
   await page.getByRole("menuitem", { name: /Görünümden Sorun/ }).click();
   await closeDialog(page, "Yeni Sorun", "Vazgeç");
@@ -137,6 +142,7 @@ test("iPhone IFC viewer loads a fixture and opens the 4D bar", async ({ page, re
 });
 
 test("iPhone clash test dialog and a fixture run stay usable", async ({ page, request, diagnostics }) => {
+  needsModules("coordinate");
   void diagnostics;
   test.setTimeout(180_000);
   const { project } = await runState();
@@ -215,6 +221,8 @@ test("iPhone IDS check, IFC locations and param-change dialogs stay usable", asy
   await expect(ifcLoc.getByText(/Tamamlandı/)).toBeVisible({ timeout: 60_000 });
   await closeDialog(page, "IFC'den Konum Oluştur");
 
+  // Parameter change requests are the Coordinate module's.
+  if (!moduleInstalled("coordinate")) return;
   await page.goto(`/projects/${project.id}/param-changes`);
   await page.getByRole("button", { name: "+ Yeni Değişiklik Talebi" }).click();
   const param = page.getByRole("dialog", { name: "Yeni Değişiklik Talebi" });

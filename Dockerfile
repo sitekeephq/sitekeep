@@ -12,17 +12,17 @@ FROM node:22-bookworm-slim AS build
 ARG EDITION=
 
 WORKDIR /app
-COPY package.json package-lock.json tsconfig.base.json .npmrc ./
+COPY package.json package-lock.json tsconfig.base.json ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/cde-tools/package.json packages/cde-tools/
 COPY packages/sdk/package.json packages/sdk/
+COPY packages/bim-viewer/package.json packages/bim-viewer/
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
 COPY apps/mcp/package.json apps/mcp/
 # SheetJS CE is fetched from cdn.sheetjs.com (see package-lock.json), the rest from npm.
 # The private viewer package token is mounted only for this install step and never copied into an image layer.
-RUN --mount=type=secret,id=npm_token,required=true \
-    NODE_AUTH_TOKEN="$(cat /run/secrets/npm_token)" npm ci
+RUN npm ci
 RUN case "$EDITION" in \
       ""|enterprise) ;; \
       community) rm -rf node_modules/@7dimensions-project/sitekeep-ee-* ;; \
@@ -35,7 +35,8 @@ COPY tools/harden-dist.mjs tools/
 # declarations; developer seed / load scripts stay out of the image (docs/onprem/installation-bundle.md).
 # Modules (docs/modules/README.md) are published packages installed by npm ci: the server loads
 # them by package name at run time, the web build bundles them. SITEKEEP_MODULES unset = all of them.
-RUN npm run build -w @sitekeep/shared \
+RUN npm run build -w @7dimensions-project/bim-viewer \
+ && npm run build -w @sitekeep/shared \
  && npm run build -w @sitekeep/cde-tools \
  && npm run build -w @7dimensions-project/sitekeep-sdk \
  && npm run build -w @sitekeep/server \
