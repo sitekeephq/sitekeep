@@ -33,13 +33,14 @@ The wizard asks, in order: the estimated number of users, the server address, th
 email and password, the language, and the time of the nightly backup. At the end it shows the address and (if one was generated) the administrator
 password once.
 
-Unattended installation: `cp cevap.env.example cevap.env`, edit it, then `sudo ./install.sh --answers cevap.env`.
+Unattended installation: `cp answers.env.example answers.env`, edit it, then `sudo ./install.sh --answers answers.env`.
+An answers file under its old name `cevap.env` is still accepted when `answers.env` is missing.
 
 ### HTTPS types
 
 | Type | When |
 |---|---|
-| `internal` (default) | internal network. The installer generates the certificate; distribute the root certificate `/opt/sitekeep/config/sitekeep-kok-sertifika.crt` to clients (via GPO) and the browser warning goes away. |
+| `internal` (default) | internal network. The installer generates the certificate; distribute the root certificate `/opt/sitekeep/config/sitekeep-root-ca.crt` to clients (via GPO; installations from earlier bundles have it as `sitekeep-kok-sertifika.crt`) and the browser warning goes away. |
 | `files` | the organisation's own certificate (PEM; certificate including chain + private key). |
 | `auto` | public domain name and internet: a Let's Encrypt certificate is obtained and renewed automatically (ports 80 and 443 must be reachable from outside). |
 | `off` | HTTP only. Not recommended. |
@@ -80,7 +81,7 @@ rolls back to the old version and the pre-upgrade database.
 
 | Symptom | Check |
 |---|---|
-| Installation says "Port 443 kullanımda" (port 443 in use) | another web server runs on the same server; set a different port, e.g. `CDE_HTTPS_PORT=8443` |
+| Installation says "Port 443 is in use" | another web server runs on the same server; set a different port, e.g. `CDE_HTTPS_PORT=8443` |
 | Browser certificate warning | with the `internal` type, distribute the root certificate to clients |
 | Page does not open | `sitekeep status`, `sitekeep logs proxy`, port 443 in the firewall |
 | For support | the output of `sitekeep status` and the last lines of `sitekeep logs app` |

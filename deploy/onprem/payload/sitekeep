@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# SiteKeep yönetim komutu (install.sh kurar: /usr/local/bin/sitekeep → <kurulum>/bin/sitekeep).
+# SiteKeep management command (installed by install.sh: /usr/local/bin/sitekeep -> <install>/bin/sitekeep).
 #
-#   sitekeep status                  servisler, sürüm, sağlık, son yedek
-#   sitekeep logs [app|db|proxy]     günlükler (izler; Ctrl+C ile çıkılır)
+#   sitekeep status                  services, version, health, last backup
+#   sitekeep logs [app|db|proxy]     logs (follows; Ctrl+C to quit)
 #   sitekeep start | stop | restart
-#   sitekeep backup                  veritabanı + dosyalar + ayarlar → <veri>/backups/<zaman>/
-#   sitekeep backups                 yedek listesi
-#   sitekeep restore <yedek>         yedeği geri yükler (mevcut durum önce yedeklenir)
-#   sitekeep upgrade <paket dizini>  yeni sürüm: yedek → yükle → başlat → sağlık; olmazsa geri al
-#   sitekeep uninstall [--purge]     servisleri kaldırır; --purge verileri de siler
+#   sitekeep backup                  database + files + settings -> <data>/backups/<time>/
+#   sitekeep backups                 list backups
+#   sitekeep restore <backup>        restores a backup (the current state is backed up first)
+#   sitekeep upgrade <bundle dir>    new version: backup -> load -> start -> health; rolls back on failure
+#   sitekeep uninstall [--purge]     removes the services; --purge also deletes the data
 set -euo pipefail
 
 SELF="$(readlink -f "${BASH_SOURCE[0]}")"
 CDE_HOME="${CDE_HOME:-$(cd "$(dirname "$SELF")/.." && pwd)}"
-[ -f "$CDE_HOME/.env" ] || { echo "Kurulum bulunamadı: $CDE_HOME/.env" >&2; exit 1; }
+[ -f "$CDE_HOME/.env" ] || { echo "No installation found: $CDE_HOME/.env" >&2; exit 1; }
 # shellcheck disable=SC1091
 set -a; . "$CDE_HOME/.env"; set +a
 
@@ -22,7 +22,7 @@ info() { printf '  %s\n' "$*"; }
 warn() { printf '\033[33m! %s\033[0m\n' "$*" >&2; }
 die() { printf '\033[31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 ok() { printf '\033[32m✓\033[0m %s\n' "$*"; }
-need_root() { [ "$(id -u)" = 0 ] || die "Bu komut yönetici (root) ister: sudo sitekeep $*"; }
+need_root() { [ "$(id -u)" = 0 ] || die "This command needs root: sudo sitekeep $*"; }
 
 # Compose prefers the shell environment over --env-file; this script exported .env at start, so
 # re-read it here or a version written by upgrade would be ignored.
@@ -49,18 +49,18 @@ latest_backup() { find "$CDE_DATA/backups" -mindepth 1 -maxdepth 1 -type d -name
 
 cmd_status() {
   bold "SiteKeep $CDE_VERSION"
-  info "Adres:  $CDE_PUBLIC_URL"
-  info "Kurulum: $(cat "$CDE_HOME/config/installation.id" 2>/dev/null || echo -)"
+  info "Address:      $CDE_PUBLIC_URL"
+  info "Installation: $(cat "$CDE_HOME/config/installation.id" 2>/dev/null || echo -)"
   dc ps --format 'table {{.Service}}\t{{.Status}}' | sed 's/^/  /'
-  info "Sağlık: $(app_health)"
+  info "Health:       $(app_health)"
   local last
   last="$(latest_backup)"
-  info "Son yedek: ${last:+$(basename "$last")}${last:-yok}"
-  info "Veri diski: $(df -Ph "$CDE_DATA" | awk 'NR==2 {print $4 " boş / " $2}')"
+  info "Last backup:  ${last:+$(basename "$last")}${last:-none}"
+  info "Data disk:    $(df -Ph "$CDE_DATA" | awk 'NR==2 {print $4 " free / " $2}')"
 }
 
-# Yedek: veritabanı (pg_dump, özel biçim), dosyalar (önceki yedeğe sabit bağlarla artımlı, rsync
-# varsa; yoksa tam kopya), ayarlar (sırlar dahil; dizin yalnız root'a açık).
+# Backup: database (pg_dump, custom format), files (incremental with hard links to the previous backup
+# if rsync is available, otherwise a full copy), settings (including secrets; the directory is root-only).
 cmd_backup() {
   need_root backup
   local scheduled=0
@@ -71,10 +71,10 @@ cmd_backup() {
   prev="$(latest_backup)"
   umask 077
   mkdir -p "$dir.partial"
-  [ "$scheduled" = 1 ] && echo "[$(date -Is)] yedek başladı: $ts"
+  [ "$scheduled" = 1 ] && echo "[$(date -Is)] backup started: $ts"
 
-  dc exec -T db pg_dump -U cde -d cde -Fc > "$dir.partial/db.dump" || { rm -rf "$dir.partial"; die "Veritabanı yedeği alınamadı."; }
-  dc exec -T db pg_restore --list < "$dir.partial/db.dump" > /dev/null || { rm -rf "$dir.partial"; die "Veritabanı yedeği doğrulanamadı."; }
+  dc exec -T db pg_dump -U cde -d cde -Fc > "$dir.partial/db.dump" || { rm -rf "$dir.partial"; die "Database backup failed."; }
+  dc exec -T db pg_restore --list < "$dir.partial/db.dump" > /dev/null || { rm -rf "$dir.partial"; die "Database backup could not be verified."; }
 
   if command -v rsync >/dev/null 2>&1; then
     if [ -n "$prev" ] && [ -d "$prev/app" ]; then
@@ -91,11 +91,11 @@ cmd_backup() {
   printf '{ "version": "%s", "at": "%s" }\n' "$CDE_VERSION" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$dir.partial/backup.json"
   mv "$dir.partial" "$dir"
 
-  # Saklama: en yeni CDE_BACKUP_KEEP yedek kalır.
+  # Retention: the newest CDE_BACKUP_KEEP backups are kept.
   local keep="${CDE_BACKUP_KEEP:-14}"
   find "$CDE_DATA/backups" -mindepth 1 -maxdepth 1 -type d -name '20*' ! -name '*.partial' | sort -r | tail -n "+$((keep + 1))" | xargs -r rm -rf
-  ok "Yedek: $dir ($(du -sh "$dir/db.dump" | cut -f1) veritabanı)"
-  [ "$scheduled" = 1 ] && echo "[$(date -Is)] yedek bitti: $ts"
+  ok "Backup: $dir ($(du -sh "$dir/db.dump" | cut -f1) database)"
+  [ "$scheduled" = 1 ] && echo "[$(date -Is)] backup finished: $ts"
   true
 }
 
@@ -108,7 +108,7 @@ cmd_backups() {
 resolve_backup() {
   local b="$1"
   [ -d "$b" ] || b="$CDE_DATA/backups/$1"
-  [ -f "$b/db.dump" ] || die "Yedek bulunamadı veya eksik: $1 (sitekeep backups)"
+  [ -f "$b/db.dump" ] || die "Backup not found or incomplete: $1 (sitekeep backups)"
   printf '%s' "$b"
 }
 
@@ -122,14 +122,14 @@ restore_db() {
 
 cmd_restore() {
   need_root restore
-  [ -n "${1:-}" ] || die "Kullanım: sitekeep restore <yedek> (sitekeep backups)"
+  [ -n "${1:-}" ] || die "Usage: sitekeep restore <backup> (sitekeep backups)"
   local b
   b="$(resolve_backup "$1")"
-  bold "Geri yükleme: $(basename "$b")"
-  warn "Mevcut veriler bu yedekteki durumla değişecek. Önce şu anki durum yedeklenir."
+  bold "Restore: $(basename "$b")"
+  warn "Current data will be replaced by this backup. The current state is backed up first."
   if [ "${2:-}" != "--yes" ]; then
-    read -r -p "  Devam edilsin mi? [e/H]: " reply
-    [[ "$reply" =~ ^[eEyY] ]] || die "Vazgeçildi."
+    read -r -p "  Continue? [y/N]: " reply
+    [[ "$reply" =~ ^[eEyY] ]] || die "Cancelled."
   fi
   cmd_backup
   dc stop app proxy > /dev/null
@@ -137,19 +137,19 @@ cmd_restore() {
   if command -v rsync >/dev/null 2>&1; then rsync -a --delete "$b/app/" "$CDE_DATA/app/"
   else rm -rf "$CDE_DATA/app" && cp -a "$b/app" "$CDE_DATA/app"; fi
   dc up -d > /dev/null
-  wait_healthy || die "Geri yüklemeden sonra uygulama sağlıklı olmadı: sitekeep logs app"
-  ok "Geri yüklendi: $(basename "$b")"
+  wait_healthy || die "The application is not healthy after the restore: sitekeep logs app"
+  ok "Restored: $(basename "$b")"
 }
 
 cmd_upgrade() {
   need_root upgrade
   local bundle="${1:-}"
-  [ -n "$bundle" ] && [ -f "$bundle/VERSION" ] && [ -f "$bundle/images/IMAGES" ] || die "Kullanım: sitekeep upgrade <yeni paketin açıldığı dizin>"
+  [ -n "$bundle" ] && [ -f "$bundle/VERSION" ] && [ -f "$bundle/images/IMAGES" ] || die "Usage: sitekeep upgrade <directory of the unpacked new bundle>"
   local new old
   new="$(cat "$bundle/VERSION")"
   old="$CDE_VERSION"
-  [ "$new" != "$old" ] || die "Bu sürüm zaten kurulu: $old"
-  bold "Güncelleme: $old → $new"
+  [ "$new" != "$old" ] || die "This version is already installed: $old"
+  bold "Upgrade: $old → $new"
   cmd_backup
   local pre
   pre="$(latest_backup)"
@@ -161,14 +161,14 @@ cmd_upgrade() {
   cp "$CDE_HOME/compose.yml" "$CDE_HOME/compose.yml.previous"
   mv "$CDE_HOME/compose.yml.new" "$CDE_HOME/compose.yml"
   sed -i "s/^CDE_VERSION=.*/CDE_VERSION=$new/; s|^CDE_DB_IMAGE=.*|CDE_DB_IMAGE=$DB_IMAGE|; s|^CDE_PROXY_IMAGE=.*|CDE_PROXY_IMAGE=$PROXY_IMAGE|" "$CDE_HOME/.env"
-  # Veritabanı şeması açılışta yeni sürüme taşınır (migration).
+  # The database schema is migrated to the new version on startup.
   if dc up -d > /dev/null && wait_healthy; then
     mv "$CDE_HOME/bin/sitekeep.new" "$CDE_HOME/bin/sitekeep"
     cp "$bundle/README.md" "$bundle/VERSION" "$CDE_HOME/"
-    ok "Güncellendi: $new (geri dönüş yedeği: $(basename "$pre"))"
+    ok "Upgraded: $new (rollback backup: $(basename "$pre"))"
     return
   fi
-  warn "Yeni sürüm sağlıklı açılmadı; $old sürümüne ve güncelleme öncesi veritabanına dönülüyor."
+  warn "The new version did not come up healthy; rolling back to $old and the pre-upgrade database."
   dc logs --tail 40 app >&2 || true
   rm -f "$CDE_HOME/bin/sitekeep.new"
   mv "$CDE_HOME/compose.yml.previous" "$CDE_HOME/compose.yml"
@@ -177,37 +177,37 @@ cmd_upgrade() {
   dc stop app > /dev/null
   restore_db "$pre/db.dump"
   dc up -d > /dev/null
-  wait_healthy && die "Güncelleme geri alındı; $old çalışıyor. Günlük yukarıda." || die "Geri alma da sağlıklı açılmadı: sitekeep logs app"
+  wait_healthy && die "Upgrade rolled back; $old is running. Logs above." || die "The rollback did not come up healthy either: sitekeep logs app"
 }
 
 cmd_uninstall() {
   need_root uninstall
   local purge=0
   [ "${1:-}" = "--purge" ] && purge=1
-  warn "SiteKeep servisleri kaldırılacak.$([ $purge = 1 ] && echo " VERİLER DE SİLİNECEK: $CDE_DATA")"
-  read -r -p "  Onaylamak için 'kaldır' yazın: " reply
-  [ "$reply" = kaldır ] || die "Vazgeçildi."
+  warn "The SiteKeep services will be removed.$([ $purge = 1 ] && echo " ALL DATA WILL BE DELETED: $CDE_DATA")"
+  read -r -p "  Type 'uninstall' to confirm: " reply
+  [ "$reply" = uninstall ] || die "Cancelled."
   dc down > /dev/null || true
   systemctl disable --now sitekeep-backup.timer > /dev/null 2>&1 || true
   rm -f /etc/systemd/system/sitekeep-backup.service /etc/systemd/system/sitekeep-backup.timer /etc/cron.d/sitekeep-backup /usr/local/bin/sitekeep
-  if [ "$purge" = 1 ]; then rm -rf "${CDE_DATA:?}" "${CDE_HOME:?}"; ok "Kaldırıldı, veriler silindi."
+  if [ "$purge" = 1 ]; then rm -rf "${CDE_DATA:?}" "${CDE_HOME:?}"; ok "Uninstalled; data deleted."
   else
     rm -rf "${CDE_HOME:?}/bin" "${CDE_HOME:?}/compose.yml"
-    ok "Kaldırıldı. Veriler ve ayarlar duruyor: $CDE_DATA, $CDE_HOME/config"
+    ok "Uninstalled. Data and settings kept: $CDE_DATA, $CDE_HOME/config"
   fi
 }
 
 case "${1:-status}" in
   status) cmd_status ;;
   logs) shift; dc logs -f --tail 100 "$@" ;;
-  start) dc up -d && wait_healthy && ok "Çalışıyor" ;;
-  stop) dc stop && ok "Durdu" ;;
-  restart) dc up -d --force-recreate && wait_healthy && ok "Yeniden başladı" ;;
+  start) dc up -d && wait_healthy && ok "Running" ;;
+  stop) dc stop && ok "Stopped" ;;
+  restart) dc up -d --force-recreate && wait_healthy && ok "Restarted" ;;
   backup) shift; cmd_backup "$@" ;;
   backups) cmd_backups ;;
   restore) shift; cmd_restore "$@" ;;
   upgrade) shift; cmd_upgrade "$@" ;;
   uninstall) shift; cmd_uninstall "$@" ;;
   -h|--help|help) sed -n '2,13p' "$SELF" ;;
-  *) die "Bilinmeyen komut: $1 (sitekeep help)" ;;
+  *) die "Unknown command: $1 (sitekeep help)" ;;
 esac

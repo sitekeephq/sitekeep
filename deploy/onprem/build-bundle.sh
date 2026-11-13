@@ -66,7 +66,7 @@ EOF
 
 cp "$ROOT/deploy/onprem/payload/install.sh" "$ROOT/deploy/onprem/payload/sitekeep" \
    "$ROOT/deploy/onprem/payload/compose.yml" "$ROOT/deploy/onprem/payload/README.md" \
-   "$ROOT/deploy/onprem/payload/cevap.env.example" "$STAGE/"
+   "$ROOT/deploy/onprem/payload/answers.env.example" "$STAGE/"
 chmod 755 "$STAGE/install.sh" "$STAGE/sitekeep"
 printf '%s\n' "$VERSION" > "$STAGE/VERSION"
 printf '%s\n' "$EDITION" > "$STAGE/EDITION"

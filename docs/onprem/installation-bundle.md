@@ -62,7 +62,7 @@ sitekeep-<community|enterprise>-<version>-linux-amd64.tar.gz
    ├─ install.sh            installation wizard (asks questions, or unattended with --answers)
    ├─ sitekeep                management command (becomes /usr/local/bin/sitekeep on install)
    ├─ compose.yml           PostgreSQL + SiteKeep + Caddy
-   ├─ cevap.env.example     sample for unattended installation
+   ├─ answers.env.example   sample for unattended installation (an old cevap.env is still read)
    ├─ README.md             installation and administration for the customer's IT
    ├─ VERSION, ARCH, SHA256SUMS
    └─ images/images.tar.gz  sitekeep:<version>, postgres:17, caddy:2 (docker save)
@@ -110,7 +110,7 @@ readability but does not provide confidentiality. The real protection is the sig
 
 | HTTPS type | Caddy | Note |
 |---|---|---|
-| `internal` (default) | `tls internal` | internal network; root certificate `config/sitekeep-kok-sertifika.crt`, pushed to clients via GPO |
+| `internal` (default) | `tls internal` | internal network; root certificate `config/sitekeep-root-ca.crt` (`sitekeep-kok-sertifika.crt` on installations from earlier bundles), pushed to clients via GPO |
 | `files` | `tls /certs/cert.pem /certs/key.pem` | the organisation's certificate |
 | `auto` | Let's Encrypt | public domain name, 80/443 open to the outside |
 | `off` | `:80` | HTTP only, `SECURE_COOKIES=0` |

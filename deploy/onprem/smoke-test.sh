@@ -10,8 +10,8 @@ set -euo pipefail
 
 BUNDLE="${1:?usage: smoke-test.sh <bundle .tar.gz>}"
 VM="cde-smoke-$$"
-DOMAIN="cde.sirket.test"
-EMAIL="bt@sirket.test"
+DOMAIN="cde.example.test"
+EMAIL="it@example.test"
 PASSWORD="Smoke-Test-2026"
 
 step() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
@@ -32,8 +32,19 @@ NAME="$(basename "$BUNDLE" .tar.gz)"
 vm "cd /root && tar -xzf bundle.tar.gz && cd $NAME && sha256sum -c SHA256SUMS >/dev/null" || fail "bundle checksum"
 pass "server ready, bundle verified"
 
+step "Old answers file name (cevap.env)"
+# An answers file under the old name is still read. Pointing CDE_HOME at a directory that already holds
+# a .env stops the installer at its pre-checks, before it changes anything.
+out="$(vm "mkdir -p /root/compat /root/compat-home && touch /root/compat-home/.env
+  echo CDE_HOME=/root/compat-home > /root/compat/cevap.env
+  cd /root/compat && /root/$NAME/install.sh --answers answers.env 2>&1" || true)"
+case "$out" in *"using the old answers file ./cevap.env"*"already installed in /root/compat-home"*) ;; *) fail "cevap.env fallback: $out" ;; esac
+vm "rm -rf /root/compat /root/compat-home"
+pass "answers.env missing: cevap.env used, with a note"
+
 step "Install (answers file)"
-vm "cat > /root/cevap.env <<EOF
+LOG="$(mktemp)"
+vm "cat > /root/answers.env <<EOF
 CDE_DOMAIN=$DOMAIN
 CDE_TLS=internal
 ADMIN_EMAIL=$EMAIL
@@ -41,7 +52,9 @@ ADMIN_PASSWORD=$PASSWORD
 CDE_USERS=5
 CDE_BACKUP_KEEP=3
 EOF
-cd /root/$NAME && ./install.sh --answers /root/cevap.env"
+cd /root/$NAME && ./install.sh --answers /root/answers.env" | tee "$LOG"
+grep -q 'Installation complete' "$LOG" || fail "installer output (English)"
+rm -f "$LOG"
 pass "installed"
 
 CURL="curl -sk --resolve $DOMAIN:443:127.0.0.1"
@@ -49,7 +62,7 @@ API="https://$DOMAIN/api/v1"
 [ "$(vm "$CURL -o /dev/null -w '%{http_code}' $API/health")" = 200 ] || fail "HTTPS health"
 vm "grep -q '^ADMIN_PASSWORD=$' /opt/sitekeep/config/app.env" || fail "admin password left in app.env"
 [ "$(vm "stat -c %a /opt/sitekeep/config/app.env")" = 600 ] || fail "app.env permissions"
-vm "test -s /opt/sitekeep/config/sitekeep-kok-sertifika.crt" || fail "internal root certificate exported"
+vm "test -s /opt/sitekeep/config/sitekeep-root-ca.crt" || fail "internal root certificate exported"
 vm "! docker exec sitekeep-app-1 sh -c 'find /app/apps /app/packages -path \"*/node_modules\" -prune -o -name \"*.map\" -print -o -name \"*.ts\" ! -name \"*.d.ts\" -print' | grep -q ." || fail "source files in the image"
 pass "HTTPS, secrets, root certificate, no sources in the image"
 
@@ -69,8 +82,8 @@ PROJECT="$(vm "$CURL -b /root/jar -H 'content-type: application/json' -d '{\"cod
 PID="$(printf '%s' "$PROJECT" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -1)"
 ROOT="$(printf '%s' "$PROJECT" | sed -n 's/.*"rootFolderId":"\([^"]*\)".*/\1/p')"
 [ -n "$PID" ] && [ -n "$ROOT" ] || fail "project create: $PROJECT"
-FOLDER="$(vm "$CURL -b /root/jar -H 'content-type: application/json' -d '{\"parentId\":\"$ROOT\",\"name\":\"Dokumanlar\"}' $API/projects/$PID/folders" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -1)"
-vm "echo 'kurulum testi' > /root/not.txt && $CURL -b /root/jar -F file=@/root/not.txt $API/projects/$PID/folders/$FOLDER/files" | grep -q '"ok":true' || fail "upload"
+FOLDER="$(vm "$CURL -b /root/jar -H 'content-type: application/json' -d '{\"parentId\":\"$ROOT\",\"name\":\"Documents\"}' $API/projects/$PID/folders" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -1)"
+vm "echo 'installation test' > /root/not.txt && $CURL -b /root/jar -F file=@/root/not.txt $API/projects/$PID/folders/$FOLDER/files" | grep -q '"ok":true' || fail "upload"
 files() { vm "$CURL -b /root/jar $API/projects/$PID/folders/$FOLDER/contents" | grep -o '"name":"not.txt"' | wc -l | tr -d ' '; }
 [ "$(files)" = 1 ] || fail "uploaded file listed"
 pass "signed in, project created, file uploaded"
@@ -119,7 +132,7 @@ vm "grep -q '^CDE_VERSION=9.9.9-next' /opt/sitekeep/.env" || fail "version after
 pass "rolled back to 9.9.9-next"
 
 step "Uninstall (data kept)"
-vm "echo kaldır | sitekeep uninstall" >/dev/null
+vm "echo uninstall | sitekeep uninstall" >/dev/null
 vm "test -d /var/lib/sitekeep/pgdata && test -f /opt/sitekeep/config/app.env && ! test -e /usr/local/bin/sitekeep" || fail "uninstall"
 pass "services removed, data and settings kept"
 
