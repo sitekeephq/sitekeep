@@ -102,6 +102,8 @@ and to a lifetime. Administrators can switch the endpoint off.
 
 ## Documentation
 
+Start with the **[map](docs/MAP.md)**: what belongs to Community and what to an Enterprise module, where code goes, and which rules apply.
+
 - [Docker Compose installation](docs/onprem/docker-compose.md) and [installation bundle](docs/onprem/installation-bundle.md)
 - [Backups](docs/onprem/backups.md), [monitoring](docs/onprem/monitoring.md), [capacity](docs/onprem/capacity.md)
 - [Repository structure](docs/architecture/structure.md) and [tests](docs/architecture/tests.md)

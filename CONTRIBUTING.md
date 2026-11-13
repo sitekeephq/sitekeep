@@ -5,6 +5,8 @@ construction projects, licensed under the [AGPL-3.0](LICENSE).
 
 ## Before you start
 
+- Read the [map](docs/MAP.md): it says whether a feature belongs to SiteKeep Community or to an Enterprise
+  module and where its code goes. Only Community changes are accepted in this repository.
 - Look for an existing issue, or open one to discuss larger changes before writing code.
 - Security problems are never reported in public issues: see [SECURITY.md](SECURITY.md).
 - Contributions are accepted under the [SiteKeep Contributor License Agreement](CLA.md). You keep the

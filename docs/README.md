@@ -10,6 +10,8 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 [local Google sign-in](onboarding/GOOGLE_SIGN_IN.md). For the product language, see
 [Concept](product/CONCEPT.md) and [Terminology](product/TERMINOLOGY.md).
 
+**Start here: [map](MAP.md)** (Community or Enterprise, where code goes, rules).
+
 ## Architecture
 
 - [Repository structure](architecture/structure.md)
