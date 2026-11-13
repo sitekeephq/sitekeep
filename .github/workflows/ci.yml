@@ -1,0 +1,69 @@
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm test
+      # Browsers are cached by Playwright version; the install step retries because apt mirrors sometimes stall.
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Install Playwright browsers
+        timeout-minutes: 20
+        run: |
+          for i in 1 2 3; do
+            timeout 360 npx playwright install --with-deps chromium webkit && exit 0
+            echo "::warning::playwright install attempt $i did not finish; retrying"
+          done
+          exit 1
+      # Journeys that need an Enterprise module are skipped here (e2e/support/modules.ts).
+      - run: npm run e2e
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-diagnostics
+          path: |
+            playwright-report/
+            test-results/playwright/
+          if-no-files-found: ignore
+          retention-days: 5
+
+  docker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the SiteKeep Community image
+        run: DOCKER_BUILDKIT=1 docker build --build-arg EDITION=community --build-arg WITH_LIBREDWG=0 -t sitekeep:ci .
+      - name: Start it and check that it answers
+        run: |
+          docker run -d --name sk -e ADMIN_EMAIL=admin@example.com -e ADMIN_PASSWORD=ci-password-123456 -p 8080:8080 sitekeep:ci
+          for i in $(seq 1 60); do curl -fs http://127.0.0.1:8080/api/v1/app-info && exit 0; sleep 2; done
+          docker logs sk; exit 1
