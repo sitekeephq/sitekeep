@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "invalidTime": "Geçerli bir tarih ya da saat değil: {{value}}."
+  },
+  "csv": {
+    "columns": {
+      "id": "No.",
+      "time": "Zaman (UTC)",
+      "project": "Proje",
+      "user": "Kullanıcı",
+      "action": "İşlem",
+      "targetType": "Hedef Türü",
+      "targetId": "Hedef Kimliği",
+      "target": "Hedef",
+      "ip": "IP Adresi",
+      "userAgent": "Tarayıcı Bilgisi",
+      "details": "Ayrıntılar",
+      "hash": "Özet (Hash)"
+    }
+  }
+}

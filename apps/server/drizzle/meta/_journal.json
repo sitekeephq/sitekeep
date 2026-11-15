@@ -302,6 +302,13 @@
       "when": 1794744836892,
       "tag": "0042_cde_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1794747292568,
+      "tag": "0043_audit_chain",
+      "breakpoints": true
     }
   ]
 }

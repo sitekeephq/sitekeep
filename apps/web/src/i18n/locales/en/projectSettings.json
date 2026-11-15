@@ -39,7 +39,9 @@
         "zip_downloaded": "Bulk download (zip)",
         "restored": "File restored",
         "purged": "File permanently deleted",
-        "attributes_updated": "File attributes changed"
+        "attributes_updated": "File attributes changed",
+        "viewed": "File viewed",
+        "moved": "File moved"
       },
       "attribute": {
         "created": "Attribute added",
@@ -180,7 +182,12 @@
         "form_template_generated": "Form template generated with AI"
       },
       "cde": {
-        "settings_updated": "CDE settings changed"
+        "settings_updated": "CDE settings changed",
+        "transition": "State changed"
+      },
+      "audit": {
+        "exported": "Audit log exported",
+        "chain_started": "Audit chain started"
       }
     },
     "columns": {
@@ -655,6 +662,49 @@
         "addValue": "+ Value"
       },
       "valuePlaceholder": "Value, e.g. S"
+    }
+  },
+  "auditLog": {
+    "description": "Every change, view and download in this project, newest first. Entries cannot be changed or deleted; each one is chained to the one before it (hash), so tampering is detected. IP address and browser are stored with each entry.",
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "action": "Action",
+      "person": "Person",
+      "all": "All",
+      "target": "Only entries about {{id}}.",
+      "clear": "Show All"
+    },
+    "groups": {
+      "file": "All File Actions",
+      "cde": "All State Actions",
+      "folder": "All Folder Actions",
+      "member": "All Member Actions",
+      "role": "All Role Actions",
+      "review": "All Review Actions",
+      "issue": "All Issue Actions",
+      "project": "All Project Actions",
+      "audit": "Audit Log Actions"
+    },
+    "columns": {
+      "client": "IP Address"
+    },
+    "onlyThisTarget": "Show only entries about this",
+    "downloadCsv": "Download CSV",
+    "empty": "No entries match the filters.",
+    "more": "Load More",
+    "chain": {
+      "heading": "Chain Check",
+      "check": "Check the Chain",
+      "ok_one": "Intact: {{count}} entry checked",
+      "ok_other": "Intact: {{count}} entries checked",
+      "broken": "Broken at entry {{id}}: {{reason}}",
+      "head": "Latest hash {{hash}}…",
+      "reasons": {
+        "missing_hash": "entry without hash",
+        "prev_mismatch": "an entry is missing or out of order",
+        "hash_mismatch": "the entry was changed"
+      }
     }
   }
 }

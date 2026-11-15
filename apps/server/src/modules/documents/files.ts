@@ -15,6 +15,7 @@ import { assertDirectWriteAllowed } from "../../workflow/service.js";
 import { effectiveDefinitions } from "./attributes.js";
 import { VIEWABLE, addVersion, afterVersionAdded, type FileRow } from "../../files/new-version.js";
 import { checkDocumentCode, checkMove, checkUpload } from "../../cde/guards.js";
+import { documentCodeWarning, registerNewFileCode } from "../../cde/document-code.js";
 import { clientInfo, recordTransition, recordView } from "../../cde/events.js";
 import { cdeStateOf } from "../../cde/state.js";
 import { cleanFileName, toFileDto, toVersionDto } from "./mapper.js";
@@ -41,7 +42,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
 
     const fields: Record<string, string> = {};
     const stored: { name: string; obj: StoredObject }[] = [];
-    const results: { name: string; ok: boolean; errors: string[]; fileId?: string; version?: number }[] = [];
+    const results: { name: string; ok: boolean; errors: string[]; fileId?: string; version?: number; conflict?: unknown; warning?: unknown }[] = [];
     const seen = new Set<string>();
 
     for await (const part of req.parts()) {
@@ -101,13 +102,17 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
     for (const s of stored) {
       try {
         const r = await addVersion(db, a, folderId, s.name, s.obj, comment, attributes, can(perm.level, "edit"), defs, { lang });
-        results.push({ name: s.name, ok: true, errors: [], fileId: r.file.id, version: r.version.version });
+        // Enforcement off (D-8): a code held by another document is stored with a warning (ISO-3).
+        const warning = await documentCodeWarning(db, r.file);
+        results.push({ name: s.name, ok: true, errors: [], fileId: r.file.id, version: r.version.version, ...(warning ? { warning } : {}) });
         await afterVersionAdded(db, jobs, a, r);
       } catch (err) {
         await storage.remove(s.obj.key);
         const message = err instanceof HttpError ? (err.msg ? render(lang, err.msg) : err.message) : t("documents:errors.saveFailed");
         if (!(err instanceof HttpError)) req.log.error(err);
-        results.push({ name: s.name, ok: false, errors: [message] });
+        // A document code held by another document: the client shows where it is (ISO-3).
+        const codeConflict = err instanceof HttpError && (err.details as { kind?: string } | undefined)?.kind === "document_code";
+        results.push({ name: s.name, ok: false, errors: [message], ...(codeConflict ? { conflict: (err as HttpError).details } : {}) });
       }
     }
     if (!results.length) throw badRequest(msg("documents:errors.noFile"));
@@ -136,6 +141,8 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
         folderId: z.string().uuid().optional(),
         attributes: z.record(z.string(), z.string()).optional(),
         description: z.string().trim().max(500).nullable().optional(),
+        /** Reason for a change that needs one (e.g. renaming a document that is shared). */
+        reason: z.string().trim().max(500).optional(),
       })
       .parse(req.body);
     requireAction(tree, a, file.folderId, "edit");
@@ -147,7 +154,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       await assertDirectWriteAllowed(db, tree, body.folderId!);
     }
     const lang = requestLanguage(req);
-    const guard = { projectId: a.project.id, access: a, tree, source: "move", lang } as const;
+    const guard = { projectId: a.project.id, access: a, tree, source: "move", lang, reason: body.reason ?? null } as const;
     if (moved) await checkMove(db, { ...guard, fileId: file.id, fromFolderId: file.folderId, toFolderId: body.folderId! });
     const newName = body.name !== undefined ? cleanFileName(body.name) : file.name;
     if (!newName) throw badRequest(msg("documents:errors.invalidFileName"));
@@ -192,6 +199,15 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       targetId: file.id,
       details: { from: { name: file.name, folderId: file.folderId }, ...body },
     });
+    if (moved)
+      await audit(db, {
+        projectId: a.project.id,
+        userId: a.user.id,
+        action: "file.moved",
+        targetType: "file",
+        targetId: file.id,
+        details: { name: newName, fromFolderId: file.folderId, toFolderId: targetFolder },
+      });
     if (moved)
       await recordTransition(db, {
         projectId: a.project.id,
@@ -255,7 +271,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
         fileId: null,
         containerId: null,
       });
-      const [newFile] = await tx
+      const [inserted] = await tx
         .insert(files)
         .values({
           projectId: a.project.id,
@@ -266,11 +282,12 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
           createdBy: a.user.id,
         })
         .returning();
+      const newFile = await registerNewFileCode(tx as unknown as Db, inserted!, "copy");
       const pendingDerivative = VIEWABLE.has(splitExtension(name).extension.toLowerCase());
       const [version] = await tx
         .insert(fileVersions)
         .values({
-          fileId: newFile!.id,
+          fileId: newFile.id,
           version: 1,
           storageKey: source.storageKey,
           size: source.size,
@@ -280,7 +297,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
           derivativeStatus: pendingDerivative ? "pending" : "none",
         })
         .returning();
-      return { file: newFile!, version: version! };
+      return { file: newFile, version: version! };
     });
     await afterVersionAdded(db, jobs, a, copied, { copiedFromFileId: file.id });
     return toFileDto(copied.file, copied.version, await userNames(db, [a.user.id]));

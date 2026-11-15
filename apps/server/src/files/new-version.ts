@@ -18,6 +18,7 @@ import { effectiveDefinitions } from "../modules/documents/attributes.js";
 import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, folderGate } from "../workflow/service.js";
 import { checkCodes, checkDocumentCode, checkUpload, type CdeCodes, type CdeWriteSource } from "../cde/guards.js";
+import { registerNewFileCode } from "../cde/document-code.js";
 
 export type FileRow = typeof files.$inferSelect;
 export type VersionRow = typeof fileVersions.$inferSelect;
@@ -132,14 +133,16 @@ export async function addVersion(
       return { file: file!, version: version! };
     }
     requireAttributes(attributes);
-    const [file] = await tx
+    const [inserted] = await tx
       .insert(files)
       .values({ projectId: a.project.id, folderId, name, attributes, createdBy: a.user.id, documentCode })
       .returning();
+    // A new container registers its code (a rendition joins the container that holds it).
+    const file = await registerNewFileCode(txDb, inserted!, guard.source);
     const [version] = await tx
       .insert(fileVersions)
       .values({
-        fileId: file!.id,
+        fileId: file.id,
         version: 1,
         storageKey: obj.key,
         size: obj.size,
@@ -150,7 +153,7 @@ export async function addVersion(
         ...codeColumns,
       })
       .returning();
-    return { file: file!, version: version! };
+    return { file, version: version! };
   });
 }
 

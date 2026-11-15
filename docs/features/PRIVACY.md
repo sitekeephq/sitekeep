@@ -45,6 +45,24 @@ What is recorded for each call:
 
 Content, prompts, responses and file names are not recorded. Records are kept for 90 days by default. The period is changed in the Privacy Centre. Expired records are deleted daily. The log can be downloaded as CSV.
 
+## Audit log: IP address and user agent
+
+The [audit log](AUDIT_LOG.md) stores, with every row written during a request, the client's **IP
+address** and the browser's **user agent** (at most 500 characters), next to the person, the time and
+what they did. This includes viewing a document (once per person, version and 15 minutes),
+downloading, moving, deleting, restoring and permission changes (decision D-9 of the ISO 19650 work).
+
+- **Purpose:** an ISO 19650 audit trail that shows who acted, when and from where; evidence in
+  disputes and security investigations.
+- **Who sees it:** project administrators (their project's log, CSV) and system administrators (the
+  whole log). Other members see a file's history without IP address and user agent.
+- **Behind a reverse proxy** set `CDE_TRUST_PROXY` so the address of the client, not of the proxy, is stored.
+- **Retention: never deleted.** The log is append-only and hash-chained; the database refuses updates
+  and deletes, so the rows (and their IP addresses) are kept for the life of the installation, also
+  after a person or project is removed. An organisation that needs a retention period must cover it in
+  its own records of processing (KVKK / GDPR) and inform users, e.g. in its privacy notice.
+- Background work (jobs, automatic steps) writes rows without IP address and user agent.
+
 ## Data minimisation in AI
 
 In every prompt sent to a model outside the network, the following data is replaced with placeholders:
@@ -103,6 +121,8 @@ KVKK is the Turkish Personal Data Protection Law.
   - every call is logged.
 - The organisation should assess the provider's data processing agreement and the legal basis for the transfer.
 - The outbound connection log can be used as evidence for the transfer inventory and for audits.
+- The audit log keeps IP addresses and user agents without a retention period
+  ([above](#audit-log-ip-address-and-user-agent)); the organisation records this in its processing inventory.
 - Masking is a security layer, not full anonymisation. Indirect identifiers in free text (e.g. address, job title) are not masked.
 
 ## Security headers

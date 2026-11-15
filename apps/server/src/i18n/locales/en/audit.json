@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "invalidTime": "Not a valid date or time: {{value}}."
+  },
+  "csv": {
+    "columns": {
+      "id": "No.",
+      "time": "Time (UTC)",
+      "project": "Project",
+      "user": "User",
+      "action": "Action",
+      "targetType": "Target Type",
+      "targetId": "Target ID",
+      "target": "Target",
+      "ip": "IP Address",
+      "userAgent": "User Agent",
+      "details": "Details",
+      "hash": "Hash"
+    }
+  }
+}

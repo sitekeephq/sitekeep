@@ -18,6 +18,7 @@ import { mailerFromEnv } from "./works/letter.js";
 import { startOutboundCleanup } from "./privacy/outbound.js";
 import { FALLBACK_LANGUAGE, render } from "./i18n/index.js";
 import { editionName } from "./app/module-ids.js";
+import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
 
 /**
  * Configuration (environment):
@@ -77,6 +78,8 @@ const jobs = new JobQueue(db, storage, {
 });
 
 await bootstrapAdmin();
+// ISO-3: register the document codes of existing files (idempotent, batched).
+await backfillDocumentCodesAtStart(db, (m, e) => (e ? console.error(m, e) : console.log(m)));
 // Default labels templates wrote before they became Title Case ("İş sonu" → "İş Sonu").
 await upgradeSeededLabels(db);
 

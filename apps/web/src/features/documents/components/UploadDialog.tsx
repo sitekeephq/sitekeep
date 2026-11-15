@@ -9,6 +9,7 @@ import {
 } from "@sitekeep/shared";
 import { formatSize } from "../../../shared/api/api";
 import { documentsApi, type DocIntelSuggestResult, type UploadResult } from "../api";
+import { DocumentCodeConflictNote } from "./DocumentCodeConflictNote";
 import { AttributeInput } from "../../../shared/ui/AttributeInput";
 import { ConfidenceBadge } from "./AntetPanel";
 import { Dialog } from "../../../shared/ui/Dialog";
@@ -59,6 +60,8 @@ export function UploadDialog({
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
+  // Per-file failures when nothing was stored (the form stays open), e.g. a code conflict.
+  const [failed, setFailed] = useState<Record<string, UploadResult["results"][number]>>({});
   const [error, setError] = useState<string | null>(null);
   const [intel, setIntel] = useState<DocIntelSuggestResult | null>(null);
   const [intelBusy, setIntelBusy] = useState<"read" | "ai" | null>(null);
@@ -155,6 +158,7 @@ export function UploadDialog({
     if (attrErrors.length || planAttrErrors.length) return;
     setBusy(true);
     setError(null);
+    setFailed({});
     try {
       const plain = valid.filter((f) => !planOf(f));
       const planned = valid.filter((f) => planOf(f));
@@ -180,6 +184,7 @@ export function UploadDialog({
         onDone();
       } else {
         // Nothing was stored: keep the form so the values can be fixed and sent again.
+        setFailed(Object.fromEntries(all.map((x) => [x.name, x])));
         setError(all.map((x) => `${x.name}: ${x.errors.join("; ")}`).join(" · ") || t("upload.errors.failed"));
       }
     } catch (e) {
@@ -242,7 +247,7 @@ export function UploadDialog({
           {files.map((f) => {
             const errs = fileErrors(f);
             const shown = effectiveName(f);
-            const res = result?.results.find((r) => r.name === shown);
+            const res = result?.results.find((r) => r.name === shown) ?? failed[shown];
             const info = intelOf(f);
             const plan = plans[f.name];
             return (
@@ -264,7 +269,12 @@ export function UploadDialog({
                   <td data-label={t("upload.columns.check")}>
                     {res ? (
                       res.ok ? (
-                        <span className="badge ok">{t("upload.uploadedVersion", { version: res.version })}</span>
+                        <>
+                          <span className="badge ok">{t("upload.uploadedVersion", { version: res.version })}</span>
+                          {res.warning && <DocumentCodeConflictNote conflict={res.warning} warning />}
+                        </>
+                      ) : res.conflict ? (
+                        <DocumentCodeConflictNote conflict={res.conflict} />
                       ) : (
                         <span className="badge danger">{res.errors.join("; ")}</span>
                       )

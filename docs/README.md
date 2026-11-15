@@ -43,6 +43,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 ## Features
 
 - [CDE states (ISO 19650)](features/CDE_STATES.md)
+- [Audit log](features/AUDIT_LOG.md)
 - [OpenCDE](features/OPENCDE.md)
 - [Forma sync (Autodesk)](features/FORMA_SYNC.md)
 - [BCF](features/BCF.md)

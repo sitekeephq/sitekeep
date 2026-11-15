@@ -67,7 +67,7 @@
       "isTipleri": "Work Types",
       "oznitelikler": "Attributes",
       "cde": "CDE",
-      "aktivite": "Activity Log",
+      "aktivite": "Audit Log",
       "sistemDurumu": "System Status"
     },
     "hub": {

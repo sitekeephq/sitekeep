@@ -3,6 +3,7 @@ import type { CdeState } from "@sitekeep/shared";
 import { api } from "../../../shared/api/api";
 import { cdeApi } from "../../../shared/api/api-cde";
 import { useLoad, useProject } from "../../../app/context/project";
+import { CdeCodeConflicts } from "../components/CdeCodeConflicts";
 
 /**
  * Proje Ayarları → CDE: the project's ISO 19650 settings (docs/features/CDE_STATES.md). Read-only
@@ -113,6 +114,8 @@ export function CdeSettings() {
           {t("settings.teams.pending")}
         </p>
       </section>
+
+      <CdeCodeConflicts projectId={project.id} />
     </div>
   );
 }

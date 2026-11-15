@@ -6,5 +6,10 @@
     "sameState": "{{transition}} geçişi durumu değiştirmiyor.",
     "workflowOnlyForReview": "{{transition}} geçişi: iş akışı yalnız inceleme ile yapılan geçişe verilebilir.",
     "workflowUnknown": "Bir geçişte bu projeye ait olmayan bir iş akışı seçilmiş."
+  },
+  "documentCode": {
+    "taken": "{{code}} doküman kodu başka bir dokümanda kullanılıyor: {{path}}. Farklı bir kod kullanın ya da o dokümana yeni sürüm yükleyin.",
+    "renameLocked": "Bu dokümanın paylaşılmış durumda bir kopyası var ({{path}}); adı artık değiştirilemez. Proje yöneticisi gerekçe yazarak yeniden adlandırabilir.",
+    "renameReasonRequired": "Paylaşılmış bir dokümanı yeniden adlandırmak için gerekçe gerekir."
   }
 }

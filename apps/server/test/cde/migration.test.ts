@@ -166,9 +166,9 @@ describe("migration 0042 (ISO 19650 information containers)", () => {
       [ids.project],
     );
     expect(role).toEqual({ kind: "role", is_lead: false });
-    // Not immutable yet: ISO-4 adds the trigger.
+    // Append-only since 0043 (ISO-4, test/audit/audit-chain.test.ts).
     await q(`insert into audit_log (action) values ('x')`);
-    await q(`update audit_log set action = 'y' where action = 'x'`);
+    await expect(q(`update audit_log set action = 'y' where action = 'x'`)).rejects.toThrow(/append-only/);
   });
 
   it("backfill is idempotent and repairs a broken chain in batches", async () => {

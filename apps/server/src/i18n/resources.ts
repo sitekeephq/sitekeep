@@ -6,6 +6,7 @@
 import type access from "./locales/en/access.json";
 import type admin from "./locales/en/admin.json";
 import type ai from "./locales/en/ai.json";
+import type audit from "./locales/en/audit.json";
 import type auth from "./locales/en/auth.json";
 import type bcf from "./locales/en/bcf.json";
 import type cde from "./locales/en/cde.json";
@@ -52,6 +53,7 @@ export interface CoreServerResources {
   access: typeof access;
   admin: typeof admin;
   ai: typeof ai;
+  audit: typeof audit;
   auth: typeof auth;
   bcf: typeof bcf;
   cde: typeof cde;

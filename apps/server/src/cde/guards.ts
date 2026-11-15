@@ -112,7 +112,6 @@ export interface DocumentCodeCheck extends GuardBase {
  * The unique document code of a file (D-5, D-6), or null when the name gives none. Refuses a
  * code that belongs to another container. The result is stored in files.document_code.
  */
-export async function checkDocumentCode(_db: Db, _input: DocumentCodeCheck): Promise<{ documentCode: string | null }> {
-  // ISO-3: parse the name against the container standard, register in document_codes.
-  return { documentCode: null };
+export async function checkDocumentCode(db: Db, input: DocumentCodeCheck): Promise<{ documentCode: string | null }> {
+  return (await import("./document-code.js")).checkDocumentCodeImpl(db, input);
 }

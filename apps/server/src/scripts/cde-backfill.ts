@@ -6,6 +6,7 @@
  * Opening the database applies pending migrations first (0042 includes the same backfill).
  */
 import { runCdeBackfill } from "../cde/backfill.js";
+import { runDocumentCodeBackfill } from "../cde/document-code.js";
 import { openDb } from "../db/index.js";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -18,6 +19,8 @@ const handle = await openDb(databaseUrl);
 try {
   const report = await runCdeBackfill(handle.db, { batchSize, log: (line) => console.log(line) });
   console.log(JSON.stringify(report));
+  // ISO-3: document codes of existing files, first come first served (idempotent).
+  console.log(JSON.stringify(await runDocumentCodeBackfill(handle.db, { batchSize, log: (line) => console.log(line) })));
 } finally {
   await handle.close();
 }

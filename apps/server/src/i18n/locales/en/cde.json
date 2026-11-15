@@ -6,5 +6,10 @@
     "sameState": "The transition {{transition}} does not change the state.",
     "workflowOnlyForReview": "The transition {{transition}}: a workflow can only be set on a review transition.",
     "workflowUnknown": "A transition names a workflow that is not one of this project's."
+  },
+  "documentCode": {
+    "taken": "The document code {{code}} is already used by another document: {{path}}. Use a different code, or upload a new version of that document.",
+    "renameLocked": "This document has a copy in a shared state ({{path}}); its name can no longer be changed. A project administrator can rename it with a reason.",
+    "renameReasonRequired": "Renaming a shared document needs a reason."
   }
 }

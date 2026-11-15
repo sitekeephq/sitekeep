@@ -13,6 +13,7 @@ import { oauthClients, tokens, users } from "../db/schema.js";
 import { HttpError, errorHandler } from "../core/platform/http.js";
 import { msg, render, requestLanguage } from "../i18n/index.js";
 import { logMethodHook } from "../core/platform/error-ring.js";
+import { clientInfo, withAuditClient } from "../core/platform/audit.js";
 import { devToolsEnabled } from "../dev/flag.js";
 import { devRoutes } from "../dev/routes.js";
 import { authRoutes } from "../auth/routes.js";
@@ -55,6 +56,7 @@ import { newCspNonce, registerSecurityHeaders, withNonce } from "../privacy/head
 import { configureOutbound, withOutboundContext } from "../privacy/outbound.js";
 import { privacyRoutes } from "../privacy/routes.js";
 import { cdeRoutes } from "../cde/routes.js";
+import { auditRoutes } from "../audit/routes.js";
 import { loadPrivacyState } from "../privacy/settings.js";
 import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
@@ -115,6 +117,8 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
     ...(deps.trustProxy && { trustProxy: deps.trustProxy }),
   });
   app.setErrorHandler(errorHandler);
+  // Audit rows written while a request runs carry its client: IP and user agent (D-9, AUDIT_LOG.md).
+  app.addHook("onRequest", (req, _reply, done) => withAuditClient(clientInfo(req), done));
   await app.register(cookie);
   await app.register(multipart, {
     limits: { fileSize: deps.maxUploadBytes ?? 20 * 1024 * 1024 * 1024, files: 50 },
@@ -194,6 +198,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await opencdePageRoutes(api, deps);
       await privacyRoutes(api, deps);
       await cdeRoutes(api, deps);
+      await auditRoutes(api, deps);
       // Developer tools: registered only on a development server (CDE_DEV_TOOLS=1, not production).
       if (deps.devTools) await devRoutes(api, deps);
     },

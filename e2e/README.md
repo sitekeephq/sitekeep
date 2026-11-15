@@ -7,6 +7,8 @@ coverage for critical browser journeys:
 - authentication guards, invalid credentials, real password login, and logout;
 - the API-created project on home, project-shell redirects, top-bar actions, and primary navigation;
 - document folder metadata and a tiny upload/delete/restore lifecycle;
+- the audit log (ISO 19650): a file's Denetim Geçmişi in the drawer, the Denetim Kaydı tab with an action
+  filter, the CSV download and the hash-chain check;
 - system, project, and account settings plus regular-member access boundaries;
 - coordination empty states and issue/BCF export UI;
 - form creation, editing, persistence, and reload;

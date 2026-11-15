@@ -62,9 +62,16 @@ export interface ExternalFolderContents {
   current: ExternalDocumentEntry | null;
   entries: ExternalDocumentEntry[];
 }
+/** A document code held by another document (ISO-3, 409 per file in the upload results). */
+export interface DocumentCodeConflict {
+  kind: "document_code";
+  code: string;
+  existingPath: string;
+  existingFileId: string | null;
+}
 export interface UploadResult {
   standard: string | null;
-  results: { name: string; ok: boolean; errors: string[]; fileId?: string; version?: number }[];
+  results: { name: string; ok: boolean; errors: string[]; fileId?: string; version?: number; conflict?: DocumentCodeConflict; warning?: DocumentCodeConflict }[];
 }
 export interface DocIntelSuggestResult {
   standard: NamingStandard | null;

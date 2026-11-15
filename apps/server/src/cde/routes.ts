@@ -9,9 +9,11 @@ import type { AppDeps } from "../app/deps.js";
 import { projectAccess, requireProjectAdmin } from "../core/security/access.js";
 import { audit } from "../core/platform/audit.js";
 import { cdeSettingsInputSchema, loadCdeSettings, saveCdeSettings } from "./settings.js";
+import { documentCodeRoutes } from "./document-code-routes.js";
 
 export async function cdeRoutes(api: FastifyInstance, deps: AppDeps) {
   const { db } = deps;
+  await documentCodeRoutes(api, deps);
 
   api.get<{ Params: { pid: string } }>("/projects/:pid/cde/settings", async (req): Promise<CdeSettingsDto> => {
     const a = await projectAccess(db, req.params.pid, req.user!);

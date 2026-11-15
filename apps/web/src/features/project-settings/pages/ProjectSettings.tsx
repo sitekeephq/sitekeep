@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useSearchParams } from "react-router-dom";
-import type { ParseKeys } from "i18next";
 import {
   PROJECT_MODULES,
   resolveModules,
@@ -11,7 +10,7 @@ import {
   type ProjectModuleState,
   type UserPrefs,
 } from "@sitekeep/shared";
-import { api, formatDate } from "../../../shared/api/api";
+import { api } from "../../../shared/api/api";
 import { useAuth } from "../../../app/context/auth";
 import { useLoad, useProject } from "../../../app/context/project";
 import { useAsk } from "../../../shared/ui/Ask";
@@ -25,12 +24,12 @@ import { webCapability } from "../../../sdk/capabilities";
 import { RoleChip, RolesSettings } from "./ProjectSettingsRoles";
 import { LocationsPage } from "./Locations";
 import { CdeSettings } from "./ProjectSettingsCde";
+import { AuditLog } from "./ProjectAuditLog";
 import { hubApi } from "../../../shared/api/api-hub";
 import { SETTINGS_ADVANCED_LABEL, SETTINGS_TABS, type SettingsTabKey } from "../../../app/navigation/nav";
 import { AdminStatusSection } from "../../admin/pages/AdminStatus";
 import { i18n, useLabel } from "../../../i18n";
 
-type ProjectSettingsKey = ParseKeys<"projectSettings">;
 
 
 /**
@@ -106,7 +105,7 @@ export function ProjectSettingsPage() {
       {tab === "is-tipleri" && <WorkTypesSettings />}
       {tab === "oznitelikler" && <AttributeSettings />}
       {tab === "cde" && <CdeSettings />}
-      {tab === "aktivite" && <Activity />}
+      {tab === "aktivite" && <AuditLog />}
       {tab === "sistem-durumu" && user?.isAdmin && <AdminStatusSection />}
     </div>
   );
@@ -475,50 +474,6 @@ function NamingEditor({ initial, onClose, onSaved }: { initial: NamingStandardDt
       </div>
     </Dialog>
   );
-}
-
-
-function Activity() {
-  const { t } = useTranslation("projectSettings");
-  const project = useProject();
-  const { data, error } = useLoad(() => api.activity(project.id), [project.id]);
-  return (
-    <div className="card" style={{ padding: 0 }}>
-      {error && <p className="error">{error}</p>}
-      <table className="phone-cards">
-        <thead>
-          <tr>
-            <th style={{ width: 140 }}>{t("activity.columns.time")}</th>
-            <th style={{ width: 160 }}>{t("activity.columns.person")}</th>
-            <th style={{ width: 220 }}>{t("activity.columns.action")}</th>
-            <th>{t("activity.columns.details")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.map((e) => (
-            <tr key={e.id}>
-              <td className="muted small">{formatDate(e.at)}</td>
-              <td>{e.userName ?? "—"}</td>
-              <td>{t(`activity.events.${e.action}` as ProjectSettingsKey, { defaultValue: e.action })}</td>
-              <td
-                className="muted small mono"
-                style={{ maxWidth: 480, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-              >
-                {summary(e.details)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function summary(d: Record<string, unknown> | null): string {
-  if (!d) return "";
-  const parts: string[] = [];
-  for (const k of ["tool", "name", "title", "number", "version", "email", "count"]) if (d[k] !== undefined) parts.push(`${k}: ${String(d[k])}`);
-  return parts.length ? parts.join(" · ") : JSON.stringify(d).slice(0, 200);
 }
 
 /** Downloads the project's structure as a template JSON (no files, records or people). */

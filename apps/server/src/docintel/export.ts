@@ -46,14 +46,22 @@ export function registerRows(items: SubmittalRegisterItem[], t: T, lang: string)
     ]);
 }
 
-export function toCsv(header: string[], rows: (string | number)[][]): string {
+/** Byte order mark that starts a CSV file (Excel reads it as UTF-8). */
+export const CSV_BOM = "\uFEFF";
+
+/** One CSV line (";" separated, CRLF), safe against spreadsheet formulas. */
+export function csvLine(row: (string | number)[]): string {
   const cell = (v: string | number) => {
     const s = String(v);
     // Leading = + - @ would be read as a formula by spreadsheet programs.
     const safe = /^[=+\-@]/.test(s) ? `'${s}` : s;
     return /[";\r\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
   };
-  return "﻿" + [header, ...rows].map((r) => r.map(cell).join(";")).join("\r\n") + "\r\n";
+  return row.map(cell).join(";") + "\r\n";
+}
+
+export function toCsv(header: string[], rows: (string | number)[][]): string {
+  return CSV_BOM + [header, ...rows].map(csvLine).join("");
 }
 
 function xml(s: string): string {

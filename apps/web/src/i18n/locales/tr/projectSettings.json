@@ -39,7 +39,9 @@
         "zip_downloaded": "Toplu indirme (zip)",
         "restored": "Dosya geri yüklendi",
         "purged": "Dosya kalıcı silindi",
-        "attributes_updated": "Dosya öznitelikleri değişti"
+        "attributes_updated": "Dosya öznitelikleri değişti",
+        "viewed": "Dosya görüntülendi",
+        "moved": "Dosya taşındı"
       },
       "attribute": {
         "created": "Öznitelik eklendi",
@@ -180,7 +182,12 @@
         "form_template_generated": "Form şablonu yapay zekâyla üretildi"
       },
       "cde": {
-        "settings_updated": "CDE ayarları değişti"
+        "settings_updated": "CDE ayarları değişti",
+        "transition": "Durum değişti"
+      },
+      "audit": {
+        "exported": "Denetim kaydı dışa aktarıldı",
+        "chain_started": "Denetim zinciri başladı"
       }
     },
     "columns": {
@@ -655,6 +662,49 @@
         "addValue": "+ Değer"
       },
       "valuePlaceholder": "Değer, ör. S"
+    }
+  },
+  "auditLog": {
+    "description": "Bu projedeki her değişiklik, görüntüleme ve indirme, en yenisi üstte. Kayıtlar değiştirilemez ve silinemez; her kayıt bir öncekine bağlıdır (hash), böylece kurcalama fark edilir. Her kayıtla IP adresi ve tarayıcı bilgisi saklanır.",
+    "filters": {
+      "from": "Başlangıç",
+      "to": "Bitiş",
+      "action": "İşlem",
+      "person": "Kişi",
+      "all": "Tümü",
+      "target": "Yalnız {{id}} ile ilgili kayıtlar.",
+      "clear": "Tümünü Göster"
+    },
+    "groups": {
+      "file": "Tüm Dosya İşlemleri",
+      "cde": "Tüm Durum İşlemleri",
+      "folder": "Tüm Klasör İşlemleri",
+      "member": "Tüm Üye İşlemleri",
+      "role": "Tüm Rol İşlemleri",
+      "review": "Tüm İnceleme İşlemleri",
+      "issue": "Tüm Sorun İşlemleri",
+      "project": "Tüm Proje İşlemleri",
+      "audit": "Denetim Kaydı İşlemleri"
+    },
+    "columns": {
+      "client": "IP Adresi"
+    },
+    "onlyThisTarget": "Yalnız bununla ilgili kayıtları göster",
+    "downloadCsv": "CSV İndir",
+    "empty": "Filtrelere uyan kayıt yok.",
+    "more": "Daha Fazla",
+    "chain": {
+      "heading": "Zincir Denetimi",
+      "check": "Zinciri Denetle",
+      "ok_one": "Sağlam: {{count}} kayıt denetlendi",
+      "ok_other": "Sağlam: {{count}} kayıt denetlendi",
+      "broken": "{{id}} numaralı kayıtta kırık: {{reason}}",
+      "head": "Son hash {{hash}}…",
+      "reasons": {
+        "missing_hash": "hash'i olmayan kayıt",
+        "prev_mismatch": "bir kayıt eksik ya da sırası bozuk",
+        "hash_mismatch": "kayıt değiştirilmiş"
+      }
     }
   }
 }

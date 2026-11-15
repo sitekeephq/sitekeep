@@ -359,6 +359,34 @@ export interface AuditEntryDto {
   targetId: string | null;
   details: Record<string, unknown> | null;
   at: string;
+  /** Client of the request (D-9): shown to project and system administrators only. */
+  ip?: string | null;
+  userAgent?: string | null;
+  /** Hash chain (docs/features/AUDIT_LOG.md); null on rows written before the chain started. */
+  hash?: string | null;
+  /** Name of the file or folder the row is about, when it still exists. */
+  targetName?: string;
+  /** Code of the row's project (system audit log). */
+  projectCode?: string;
+}
+
+/** A page of the audit log, newest first; pass nextCursor as `cursor` for the next page. */
+export interface AuditPageDto {
+  entries: AuditEntryDto[];
+  nextCursor: number | null;
+}
+
+/** Result of walking the audit hash chain (GET /admin/audit/verify, npm run audit:verify). */
+export interface AuditVerifyDto {
+  ok: boolean;
+  /** Chained rows checked. */
+  checked: number;
+  /** Rows written before the chain started (no hash; not covered by the chain). */
+  legacyRows: number;
+  /** The newest chained row: record its hash elsewhere to anchor the chain. */
+  head: { id: number; hash: string; at: string } | null;
+  /** The first row that breaks the chain. */
+  broken: { id: number; reason: "missing_hash" | "prev_mismatch" | "hash_mismatch" } | null;
 }
 
 export interface ApiError {
