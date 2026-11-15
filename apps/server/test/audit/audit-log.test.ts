@@ -97,7 +97,7 @@ const q = (text: string) => handle.db.execute(sql.raw(text));
 const rowsOf = (pid: string, action: string) =>
   handle.db.select().from(auditLog).where(and(eq(auditLog.projectId, pid), eq(auditLog.action, action))).orderBy(asc(auditLog.id));
 
-describe("ISO19650-1 12.x / -2 5.1.7 audit: hash chain (migration 0043)", () => {
+describe("ISO19650-2 5.1.7(d) audit: hash chain (migration 0043)", () => {
   it("starts the chain with a genesis row and chains every new row", async () => {
     const [genesis] = await handle.db.select().from(auditLog).where(eq(auditLog.action, "audit.chain_started"));
     expect(genesis!.prevHash).toBeNull();
@@ -204,7 +204,7 @@ describe("ISO19650-1 12.x / -2 5.1.7 audit: hash chain (migration 0043)", () => 
   });
 });
 
-describe("ISO19650-2 5.1.7 audit: events with the client of the request (D-9)", () => {
+describe("ISO19650-2 5.1.7(d) audit: events with the client of the request (D-9)", () => {
   let admin: Api;
   let pid: string;
   let rootId: string;
@@ -289,7 +289,7 @@ describe("ISO19650-2 5.1.7 audit: events with the client of the request (D-9)", 
   });
 });
 
-describe("ISO19650-2 5.1.7 audit: API, CSV and permissions", () => {
+describe("ISO19650-2 5.1.7(d) audit: API, CSV and permissions", () => {
   let admin: Api;
   let member: Api;
   let outsider: Api;

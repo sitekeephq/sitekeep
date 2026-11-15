@@ -5,7 +5,7 @@ import tr from "../../src/i18n/locales/tr/cde.json";
 import { SETTINGS_TABS } from "../../src/app/navigation/nav";
 
 /** The CDE settings tab and its labels (docs/features/CDE_STATES.md, docs/product/TERMINOLOGY.md). */
-describe("CDE labels", () => {
+describe("ISO19650-1 12.1 CDE labels", () => {
   const tables = [
     ["states", CDE_STATES],
     ["modes", CDE_TRANSITION_MODES],

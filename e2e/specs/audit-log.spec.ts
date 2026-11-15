@@ -1,12 +1,12 @@
 /**
- * ISO19650-1 12.x / -2 5.1.7 audit (docs/features/AUDIT_LOG.md): the project's Denetim Kaydı tab
+ * ISO19650-2 5.1.7(d) audit (docs/features/AUDIT_LOG.md): the project's Denetim Kaydı tab
  * (filter, CSV download, chain check) and a file's Denetim Geçmişi in the file drawer. Core only:
  * passes with and without Enterprise modules.
  */
 import { readFile } from "node:fs/promises";
 import { test, expect, runState } from "../support/fixtures";
 
-test("audit log: file history, project log with filter, CSV download and chain check", async ({ page }) => {
+test("ISO19650-2 5.1.7(d) audit: file history, project log with filter, CSV download and chain check", async ({ page }) => {
   const { project } = await runState();
   const fileName = `e2e-audit-${Date.now().toString(36)}.txt`;
   const upload = await page.request.post(`/api/v1/projects/${project.id}/folders/${project.rootFolderId}/files`, {

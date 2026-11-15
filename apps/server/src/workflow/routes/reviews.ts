@@ -61,6 +61,8 @@ const startSchema = z.object({
   targetFolderId: z.string().uuid().nullable().optional(),
   targetPattern: z.string().trim().max(300).nullable().optional(),
   targetFallback: z.boolean().optional(),
+  /** ISO-1: suitability of the approved copies in the target state. */
+  targetSuitability: z.string().trim().max(20).nullable().optional(),
 });
 
 export async function reviewRoutes(api: FastifyInstance, deps: AppDeps) {

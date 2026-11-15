@@ -2,8 +2,9 @@
 
 SiteKeep records who did what, when and from where in one append-only, tamper-evident log
 (`audit_log`). It is the audit trail ISO 19650 asks of a common data environment
-(ISO 19650-1 §12.1, ISO 19650-2 §5.1.7; row ISO-4 in [ISO 19650 conformance](../compliance/ISO19650.md)).
-Part of SiteKeep Community.
+(ISO 19650-1 §12.5, ISO 19650-2 §5.1.7(d); [ISO 19650 conformance](../compliance/ISO19650.md)).
+Part of SiteKeep Community. The CDE events it records are described with the [CDE states](CDE_STATES.md);
+rows about another task team's WIP are withheld as described in [task teams](TASK_TEAMS.md#query-paths-checked).
 
 ## What is recorded
 
@@ -30,6 +31,8 @@ Document events that matter for ISO 19650:
 | `file.downloaded`, `file.zip_downloaded` | The original or a ZIP is downloaded (also over OpenCDE) |
 | `file.moved` | The file changes folder |
 | `cde.transition` | The file changes CDE state: a direct move into a folder of another state, an approved review copy (`mode: review`), an automatic step. Details: `fromState`, `toState`, `mode`, folders, review, reason. A move between two folders of the same state is only `file.moved` |
+| `cde.override` | A project administrator went past a CDE rule with a reason: codes outside WIP (`what: "codes"`), a transition (`what: "transition"`, `POST /files/:id/transition`), a team WIP exception |
+| `cde.superseded`, `cde.returned`, `cde.withdrawn` | Transitions (ISO-1): a publication archived on a newer one; a WIP document sent back by a review (suitability S0, team notified); a Shared copy refused for publication |
 | `file.updated`, `file.deleted`, `file.restored`, `file.purged` | Rename, attributes, description; recycle bin |
 | `folder.permissions_set`, `role.*`, `member.*`, `role_package.applied` | Permission changes |
 | `folder.updated`, `folder.settings_updated`, `cde.settings_updated` | Folder and CDE settings |
@@ -131,6 +134,8 @@ append-only and has no retention period. Only project and system administrators 
   `cde.transition`, downloads / deletes / restores / permission changes, filters and cursor pages, CSV,
   file history, permissions, system log and chain check (PGlite).
 - `apps/server/test/cde/migration.test.ts` — the table is append-only after the migrations.
+- `apps/server/test/cde/iso19650-acceptance.test.ts` — the events of a whole ISO template project
+  (review, transition, superseded, returned, withdrawn) and a tampered row found through the API.
 - `apps/web/test/documents/audit-labels.test.ts` — row texts and query.
 - e2e `e2e/specs/audit-log.spec.ts` — file history, Audit Log tab with filter, CSV download, chain check;
   `e2e/specs/administration-settings.spec.ts` (tab).

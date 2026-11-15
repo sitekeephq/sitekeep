@@ -29,7 +29,8 @@ The user interface is available in English and Turkish.
 | Models | IFC → That Open Fragments conversion on the server, federated viewer, element selection and properties, DWG and PDF previews |
 | Issues | 3D pins, BCF viewpoints (camera, models, selected elements, snapshot), status, priority, assignee, due date, BCF import / export |
 | Reviews | Review and approval chains on documents |
-| Audit | Every write and download is recorded in the activity log |
+| ISO 19650 | Per-project rules: state transitions only through review, archive on publication, suitability and revision codes, unique document codes, task-team WIP; clause map and test pack in [ISO 19650 conformance](docs/compliance/ISO19650.md) |
+| Audit | Every write, view and download is recorded in an append-only, hash-chained audit log with CSV export |
 | Reports | Personal report dashboards from templates or HTML, sharing, version history, PDF export |
 | Integrations | REST API (`/api/v1`), OpenCDE, an MCP endpoint (`/mcp`) for AI assistants, office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora) |
 | Privacy | The server sends nothing out on its own; every outbound connection is listed in the Privacy Centre, logged and can be switched off |

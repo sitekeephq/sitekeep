@@ -26,6 +26,8 @@ jobs:
       # THIRD_PARTY_NOTICES.md matches the lockfile and every production licence is on the allow-list
       # (tools/third-party-notices.mjs).
       - run: npm run notices:check
+      # docs/compliance/ISO19650.md names only existing ISO19650-tagged tests (tools/iso19650.mjs).
+      - run: npm run iso:check
       - run: npm run build
       - run: npm run typecheck
       - run: npm test

@@ -1,9 +1,9 @@
-/** ISO19650-2 5.1.7 audit: texts of audit rows and the query of the audit API (docs/features/AUDIT_LOG.md). */
+/** ISO19650-2 5.1.7(d) audit: texts of audit rows and the query of the audit API (docs/features/AUDIT_LOG.md). */
 import { describe, expect, it } from "vitest";
 import { auditQuery } from "../../src/shared/api/api-audit";
 import { auditActionLabel, auditSummary } from "../../src/shared/lib/audit";
 
-describe("ISO19650-2 5.1.7 audit labels", () => {
+describe("ISO19650-2 5.1.7(d) audit labels", () => {
   it("labels known actions in Turkish and shows unknown ones as they are", () => {
     expect(auditActionLabel("file.viewed")).toBe("Dosya görüntülendi");
     expect(auditActionLabel("cde.transition")).toBe("Durum değişti");

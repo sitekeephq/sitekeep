@@ -11,12 +11,22 @@ import type { Db } from "../db/index.js";
 import { checkCodes, checkDocumentCode, checkUpload } from "../cde/guards.js";
 import { recordTransition } from "../cde/events.js";
 import { cdeStateOf } from "../cde/state.js";
+import { codeProfile } from "@sitekeep/shared";
+import { loadCodeSettings } from "../cde/codes.js";
+import { loadTransitionRules } from "../cde/transitions.js";
+import { containerRevisions, copyCodesFor, reviewSuitability } from "../cde/review-transition.js";
+import { archiveCurrentPublications } from "../cde/archive.js";
 
 /**
  * Copies approved versions into the review's target folder as new files / versions. With a
  * target pattern each file goes to its own sub-folder ("{Bölge}/{Disiplin}"), created when
  * missing. The copy reuses the stored object (same storage key) and runs with system rights;
  * the folder's naming standard still applies. Failures are reported per file, never thrown.
+ *
+ * ISO-1 (projects that enforce the transitions): the copy stays in its document's container and
+ * gets the codes of the target state: the suitability chosen at the start (else the source's when it
+ * fits, else the state's first) and the next revision (nextRevision). Publishing a new version of a
+ * document first archives its current publication (D-10, cde/archive.ts).
  */
 export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actorId: string | null): Promise<CopyReport> {
   const { db, jobs } = ctx;
@@ -31,6 +41,9 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
   const baseId = review.targetFolderId;
   const standards = new StandardCache(db, tree);
   const created: string[] = [];
+  const rules = await loadTransitionRules(db, review.projectId);
+  const profile = rules.enforce ? codeProfile(await loadCodeSettings(db, review.projectId)) : null;
+  const chosenSuitability = rules.enforce ? await reviewSuitability(db, review.id) : null;
 
   for (const rf of approved) {
     const [row] = await db
@@ -102,8 +115,31 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
     try {
       const src = row.file_versions;
       // CDE guards: the copy is the same document (container) arriving in the target state.
+      const fromState = cdeStateOf(tree, row.files.folderId);
+      const toState = cdeStateOf(tree, targetId);
+      // D-10: a new publication first archives the current one (same bytes, no copy of the object).
+      if (rules.enforce && toState === "published" && rules.archiveFolderId) {
+        const archived = await archiveCurrentPublications(db, {
+          projectId: review.projectId,
+          tree,
+          archiveFolderId: rules.archiveFolderId,
+          containerId: row.files.containerId,
+          newStorageKey: src.storageKey,
+          targetFolderId: targetId,
+          targetName: name,
+          review,
+          actorId,
+        });
+        tree = archived.tree;
+        standards.setTree(tree);
+      }
       const guard = { projectId: review.projectId, access: null, tree, source: "review_copy", lang: DEFAULT_LANGUAGE } as const;
       await checkUpload(db, { ...guard, folderId: targetId, name, existingFileId: null });
+      // ISO-1: the codes the copy gets in the target state (enforced projects); else the source's.
+      const requested =
+        profile && toState && fromState !== toState
+          ? copyCodesFor(profile, toState, fromState, chosenSuitability, src, (await containerRevisions(db, [row.files.containerId])).get(row.files.containerId) ?? [])
+          : { suitabilityCode: src.suitabilityCode, revisionCode: src.revisionCode };
       const isIfc = splitExtension(name).extension.toLowerCase() === "ifc";
       const derivative =
         src.derivativeStatus === "ready"
@@ -120,11 +156,16 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
           ...guard,
           folderId: targetId,
           fileId: existing?.id ?? null,
-          requested: { suitabilityCode: src.suitabilityCode, revisionCode: src.revisionCode },
-          state: cdeStateOf(tree, targetId),
+          requested,
+          state: toState,
         });
+        const derived = requested !== undefined && (requested.suitabilityCode !== src.suitabilityCode || requested.revisionCode !== src.revisionCode);
         const codeColumns =
-          codes.suitabilityCode || codes.revisionCode ? { ...codes, codesSetBy: src.codesSetBy, codesSetAt: src.codesSetAt ?? new Date() } : {};
+          codes.suitabilityCode || codes.revisionCode
+            ? derived
+              ? { ...codes, codesSetBy: actorId ?? review.createdBy, codesSetAt: new Date() }
+              : { ...codes, codesSetBy: src.codesSetBy, codesSetAt: src.codesSetAt ?? new Date() }
+            : {};
         const { documentCode } = await checkDocumentCode(txDb, {
           ...guard,
           folderId: targetId,
@@ -158,6 +199,8 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
               currentVersion: version!.version,
               attributes: { ...existing.attributes, ...row.files.attributes },
               ...(documentCode ? { documentCode } : {}),
+              // A new approved version is current again (withdrawn / superseded no longer apply).
+              ...(existing.cdeStatus ? { cdeStatus: null } : {}),
             })
             .where(eq(files.id, existing.id))
             .returning();
@@ -200,8 +243,8 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
           versionId: out.version.id,
           fromFolderId: row.files.folderId,
           toFolderId: targetId,
-          fromState: cdeStateOf(tree, row.files.folderId),
-          toState: cdeStateOf(tree, targetId),
+          fromState,
+          toState,
           mode: "review",
           reviewId: review.id,
         });

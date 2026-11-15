@@ -14,7 +14,7 @@ import {
   validateCodes,
 } from "../src/index.js";
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: normalising", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: normalising", () => {
   it("reads suitability codes the way people and older clients write them", () => {
     expect(normaliseSuitability(" s2 ")).toBe("S2");
     expect(normaliseSuitability("S2 · For Information")).toBe("S2");
@@ -40,7 +40,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: normalising", () => {
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: codes per state", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: codes per state", () => {
   it("offers S0 in WIP, S1–S4 in Shared, A/B/CR in Published (no S5–S7)", () => {
     expect(allowedSuitability(ISO_UK_NA, "wip")).toEqual(["S0"]);
     expect(allowedSuitability(ISO_UK_NA, "shared")).toEqual(["S1", "S2", "S3", "S4"]);
@@ -91,7 +91,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: codes per state", () => {
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: revision sequence", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: revision sequence", () => {
   it("counts WIP versions, shares them as P0n and publishes C0n", () => {
     expect(initialRevision(ISO_UK_NA, "wip")).toBe("P01.01");
     expect(initialRevision(ISO_UK_NA, "shared")).toBe("P01");
@@ -114,7 +114,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: revision sequence", () => {
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: legacy profile", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: legacy profile", () => {
   it("uses R00, R01 … in any state with no S/A split", () => {
     expect(initialRevision(LEGACY_R, "wip")).toBe("R00");
     expect(nextRevision(LEGACY_R, "R00", "wip", "wip")).toBe("R01");
@@ -126,7 +126,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: legacy profile", () => {
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: project overrides", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: project overrides", () => {
   it("replaces the suitability list with the project's own codes", () => {
     const p = codeProfile({
       codeScheme: "custom",

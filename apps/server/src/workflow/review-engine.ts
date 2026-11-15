@@ -24,6 +24,7 @@ import {
 } from "./chain.js";
 import { advance, finalOutcomes, isAssignee, isStepComplete, onBehalfOf, worstOutcome } from "./engine.js";
 import { copyApprovedFiles } from "./review-finalization.js";
+import { applyReviewRejections } from "../cde/rejection.js";
 import {
   SUBJECT_REVIEW,
   reviewLabel,
@@ -355,6 +356,7 @@ export async function afterEvaluate(ctx: ReviewCtx, review: ReviewRow, ev: Evalu
       body: names.join(", "),
       link,
     });
+    await cdeRejections(db, review, ev.stopped, actorId);
   }
   if (!ev.finished) {
     await notify(db, [review.createdBy], {
@@ -366,6 +368,9 @@ export async function afterEvaluate(ctx: ReviewCtx, review: ReviewRow, ev: Evalu
     await notifyStepAssignees(db, review, ev.instance);
     return;
   }
+  // Files the last step refused (not stopped earlier): returned / withdrawn (ISO-1, D-2).
+  const finalRows = await db.select().from(reviewFiles).where(eq(reviewFiles.reviewId, review.id));
+  await cdeRejections(db, review, finalRows.filter((rf) => rf.stoppedAtStep === null || rf.stoppedAtStep === undefined), actorId);
   const copy = await copyApprovedFiles(ctx, review, actorId);
   await audit(db, {
     projectId: review.projectId,
@@ -402,6 +407,15 @@ export async function afterEvaluate(ctx: ReviewCtx, review: ReviewRow, ev: Evalu
     templateId: ev.instance.templateId,
     actorId,
   });
+}
+
+/** ISO 19650 flags on refused documents (enforced projects); never breaks the review itself. */
+async function cdeRejections(db: Db, review: ReviewRow, rfs: ReviewFileRow[], actorId: string | null) {
+  try {
+    await applyReviewRejections(db, review, rfs, actorId);
+  } catch (err) {
+    console.error(`cde: returned / withdrawn flags not set (review ${review.id})`, err);
+  }
 }
 
 async function fileNames(db: Db, rfs: ReviewFileRow[]): Promise<string[]> {

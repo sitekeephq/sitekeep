@@ -107,8 +107,8 @@ const same = (a: string | null | undefined, b: string | null | undefined) => (a 
  * still fits the state, else the state's default (WIP: S0); the next revision of the sequence
  * (P01.01 → P01.02; R00 → R01).
  *
- * The approved review copy (system work) carries its source's codes unchecked; the transition
- * rules (ISO-1) decide what a copy becomes.
+ * The approved review copy (system work) is not checked here: copyApprovedFiles passes the codes
+ * the transition gives it (ISO-1, cde/review-transition.ts) or, not enforced, the source's.
  */
 export async function checkVersionCodes(db: Db, input: CodesCheck): Promise<CheckedCodes> {
   const requested = {

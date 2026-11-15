@@ -1,5 +1,5 @@
 /**
- * ISO19650-2 5.1.7 / UK NA suitability: suitability and revision codes per version
+ * ISO19650-2 5.1.7(b) / UK NA suitability: suitability and revision codes per version
  * (docs/features/CDE_STATES.md "Codes"). Core only: passes with and without modules.
  */
 import { test, expect, runState } from "../support/fixtures";
@@ -12,7 +12,7 @@ async function wipFolder(request: import("@playwright/test").APIRequestContext) 
   return { project, wipId: contents.folders.find((f) => f.state === "wip")!.id };
 }
 
-test("ISO19650-2 5.1.7 / UK NA suitability: an upload with codes shows the chips", async ({ page }) => {
+test("ISO19650-2 5.1.7(b) / UK NA suitability: an upload with codes shows the chips", async ({ page }) => {
   const { project, wipId } = await wipFolder(page.request);
   const name = `codes-${Date.now().toString(36)}.txt`;
   await page.goto(`/projects/${project.id}/files/${wipId}`);
@@ -34,7 +34,7 @@ test("ISO19650-2 5.1.7 / UK NA suitability: an upload with codes shows the chips
   await expect(row.getByTestId("code-revision")).toHaveText("P01.02");
 });
 
-test("ISO19650-2 5.1.7 / UK NA suitability: a code that does not fit the state is a warning, refused when the project enforces the rules", async ({ page, allowApiFailure }) => {
+test("ISO19650-2 5.1.7(b) / UK NA suitability: a code that does not fit the state is a warning, refused when the project enforces the rules", async ({ page, allowApiFailure }) => {
   const { project, wipId } = await wipFolder(page.request);
   allowApiFailure(400, `/api/v1/projects/${project.id}/folders/${wipId}/files`);
   const settings = `/api/v1/projects/${project.id}/cde/settings`;

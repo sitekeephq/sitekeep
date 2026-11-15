@@ -1,7 +1,7 @@
 # Task teams and WIP visibility (ISO 19650)
 
 ISO 19650 expects each task team to produce its information in its own work in progress (WIP)
-area, hidden from the other teams until it is shared (ISO 19650-1 §12.2, ISO 19650-2 §5.1.7 and
+area, hidden from the other teams until it is shared (ISO 19650-1 §12.2, ISO 19650-2 §5.1.7(e) and
 §5.6.2). In SiteKeep, a task team is a kind of project role. A WIP folder can be owned by one team,
 and a project setting closes a team's WIP folders to everyone outside that team.
 Model and settings: [CDE states](CDE_STATES.md). Conformance: [ISO 19650](../compliance/ISO19650.md) (ISO-5).
@@ -135,7 +135,7 @@ Every path that returns files or folders to a user was checked against the rule:
 
 ## Tests
 
-ISO19650-2 5.1.7 / -1 12.x task team WIP:
+ISO19650-2 5.1.7(e) / -1 12.2 task team WIP:
 - `apps/server/test/cde/task-teams.test.ts`:
   - another team's WIP returns 404 through the API, search, zip and BCF export;
   - `admin_sees_wip` on and off;
@@ -145,3 +145,5 @@ ISO19650-2 5.1.7 / -1 12.x task team WIP:
   - seeding is idempotent.
 - e2e `e2e/specs/task-teams.spec.ts`: a member of team B does not see team A's WIP folder. Core
   only; passes with and without modules.
+- `apps/server/test/cde/iso19650-acceptance.test.ts`: in an ISO template project with four parties,
+  the other parties get 404 for the designer's WIP, and a code conflict does not name the holder.

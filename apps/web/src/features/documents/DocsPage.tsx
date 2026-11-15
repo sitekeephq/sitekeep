@@ -33,6 +33,7 @@ import { LoadingSpinner } from "../../shared/ui/LoadingIndicator";
 import { PermissionsDialog } from "./components/PermissionsDialog";
 import { FolderSettingsDialog } from "./components/FolderSettingsDialog";
 import { StartReviewDialog } from "./components/StartReviewDialog";
+import { CdeStatusBadge, nextReviewStep, stateOfPath, stepLabelKey, useCdeFlow } from "./components/cde/CdeTransitions";
 import { ApprovalBadge } from "./components/ApprovalBadge";
 import { reportBuilderUrl } from "./components/ReportShortcut";
 import { DocsCards } from "./components/DocsCards";
@@ -52,7 +53,7 @@ const MIN_TREE_WIDTH = 190;
 const MAX_TREE_WIDTH = 520;
 
 export function DocsPage() {
-  const { t } = useTranslation(["documents", "common"]);
+  const { t } = useTranslation(["documents", "common", "cde"]);
   const label = useLabel();
   const project = useProject();
   const { fid } = useParams();
@@ -79,7 +80,7 @@ export function DocsPage() {
   const [selected, setSelected] = useState<string | null>(searchParams.get("file"));
   const [versionHistoryFile, setVersionHistoryFile] = useState<string | null>(null);
   const [pending, setPending] = useState<File[] | null>(null);
-  const [dialog, setDialog] = useState<"newFolder" | "permissions" | "settings" | "review" | null>(null);
+  const [dialog, setDialog] = useState<"newFolder" | "permissions" | "settings" | "review" | "transition" | null>(null);
   const [dragging, setDragging] = useState(false);
   const [treeWidth, setTreeWidth] = useState(() => {
     try {
@@ -288,6 +289,9 @@ export function DocsPage() {
   }, [folder, folderId, settings, canUpload]);
   // Reviews take files only (folders are for zip downloads).
   const checkedFiles = (search ? searchResult?.results ?? [] : contents?.files ?? []).filter((f) => checked.has(`file:${f.id}`));
+  // ISO 19650: "Send to Shared" / "Publish" for the files of a WIP / Shared folder (the transition table).
+  const cdeFlow = useCdeFlow(project.id, project.rootFolderId);
+  const cdeStep = nextReviewStep(cdeFlow.settings, cdeFlow.roots, stateOfPath(folder?.path));
 
   function hasDraggedFiles(e: DragEvent): boolean {
     return Array.from(e.dataTransfer.types).includes("Files");
@@ -484,8 +488,13 @@ export function DocsPage() {
             {label("level", level)}
           </span>
           <div className="spacer" />
+          {checkedFiles.length > 0 && modules.reviews && cdeStep && !search && (
+            <button className="primary" data-testid="cde-send" onClick={() => setDialog("transition")}>
+              {t(`cde:${stepLabelKey(cdeStep)}`)} ({checkedFiles.length})
+            </button>
+          )}
           {checkedFiles.length > 0 && modules.reviews && (
-            <button className="primary" onClick={() => setDialog("review")}>
+            <button className={cdeStep && !search ? undefined : "primary"} onClick={() => setDialog("review")}>
               {t("page.actions.startReview", { count: checkedFiles.length })}
             </button>
           )}
@@ -617,6 +626,7 @@ export function DocsPage() {
                 badges={(f) => (
                   <>
                     <ApprovalBadge projectId={project.id} approval={approvalByVersion.get(f.latest.id)} />
+                    <CdeStatusBadge status={f.cdeStatus} />
                     <DerivativeBadge file={f} projectId={project.id} />
                   </>
                 )}
@@ -822,6 +832,7 @@ export function DocsPage() {
                         V{f.currentVersion}
                       </button>
                       <CodeChips suitability={f.latest.suitabilityCode} revision={f.latest.revisionCode} />
+                      <CdeStatusBadge status={f.cdeStatus} />
                     </td>
                     {defs.map((d) => (
                       <td key={d.id} className="small">
@@ -929,6 +940,19 @@ export function DocsPage() {
           projectId={project.id}
           rootFolderId={project.rootFolderId}
           files={checkedFiles}
+          onClose={() => setDialog(null)}
+          onStarted={() => {
+            setChecked(new Set());
+            reloadApprovals();
+          }}
+        />
+      )}
+      {dialog === "transition" && cdeStep && (
+        <StartReviewDialog
+          projectId={project.id}
+          rootFolderId={project.rootFolderId}
+          files={checkedFiles}
+          transition={cdeStep}
           onClose={() => setDialog(null)}
           onStarted={() => {
             setChecked(new Set());

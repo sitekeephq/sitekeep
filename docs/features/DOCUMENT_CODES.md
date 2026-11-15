@@ -1,23 +1,25 @@
 # Unique document codes (ISO-3)
 
-ISO 19650-1 §12.1 and ISO 19650-2 §5.1.7 ask for a unique identifier for every information
+ISO 19650-1 §12.1 and ISO 19650-2 §5.1.7(a) ask for a unique identifier for every information
 container, based on an agreed naming convention. SiteKeep takes it from the project's naming
-standards. Part of the [CDE states](CDE_STATES.md) work; conformance row ISO-3 in
-[ISO19650.md](../compliance/ISO19650.md).
+standards. Part of the [CDE states](CDE_STATES.md) work; conformance:
+[ISO 19650 conformance](../compliance/ISO19650.md).
 
 ## The code of a file
 
 - The code is the part of the file name, without extension, that parses against a naming
   standard: the folder's own (or the nearest ancestor's), otherwise the project's container
-  standard (`project_cde_settings.container_standard_id`). With `allowSuffix`, the free text after
-  the last field is not part of the code.
+  standard (`project_cde_settings.container_standard_id`, Project Settings → CDE → **Document Code
+  Standard**). With `allowSuffix`, the free text after the last field is not part of the code. The
+  ISO 19650 template puts its standard on Shared and Published only; choose it as the document code
+  standard to check codes from WIP on.
 - A name that parses against no standard has no code and is not checked (D-5).
 - `files.document_code` keeps the code as written; the register `document_codes` keys it
   upper-cased (`code_norm`) per project.
 
 ## Enforcement (D-8)
 
-The refusals below (409 and the rename lock) apply only when the project enforces the ISO rules:
+The refusals below (the code conflict and the rename lock) apply only when the project enforces the ISO rules:
 `project_cde_settings.enforce_transitions` (Project Settings → CDE; on for projects from the ISO
 template, off for existing projects). When it is off, codes are still derived and registered,
 renditions still join their container, and the backfill and the conflicts list work as usual; a
@@ -33,7 +35,7 @@ the conflicts list.
 | New version of a file | Allowed (same container) |
 | Approved review copy | Allowed: the copy joins the source's container |
 | Same code, other extension, in a folder where a file of that container sits (rendition, D-6) | Allowed: the new file joins that container |
-| Same code anywhere else (upload, OpenCDE, a module's `addVersion`) | 409 with the path of the document that holds the code |
+| Same code anywhere else (upload, OpenCDE, a module's `addVersion`) | Refused: 409 `document_code` with the path of the document that holds the code. The upload route reports it per file (`results[].conflict`; the request answers 400 when no file was stored). A holder in a team's WIP closed to the caller is not named (`existingPath: "…"`) |
 | Manual "Copy to" keeping the code | 409: a copy is a new container |
 | Rename or move to a code held by another container | 409 |
 | Move without a code change | Allowed (same container) |
@@ -66,4 +68,5 @@ in Project Settings → CDE → Code Conflicts. Renaming the duplicates resolves
 - Web: `apps/web/src/features/documents/components/DocumentCodeConflictNote.tsx`,
   `apps/web/src/features/project-settings/components/CdeCodeConflicts.tsx`.
 - Tests: `apps/server/test/cde/document-code.test.ts`, e2e `documents.spec.ts`
-  ("ISO19650-2 5.1.7 unique container id").
+  ("ISO19650-2 5.1.7(a) unique container id"); in an ISO template project, step "refuses a document
+  code another container holds (ISO-3)" of `apps/server/test/cde/iso19650-acceptance.test.ts`.

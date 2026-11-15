@@ -51,7 +51,7 @@ test("uploads, deletes, and restores a tiny text document", async ({ page }) => 
   await expect(page.getByText(fileName, { exact: true })).toBeVisible();
 });
 
-test("ISO19650-2 5.1.7 unique container id: a duplicate code is refused per file when enforced, a warning otherwise", async ({ page, allowApiFailure }) => {
+test("ISO19650-2 5.1.7(a) unique container id: a duplicate code is refused per file when enforced, a warning otherwise", async ({ page, allowApiFailure }) => {
   allowApiFailure(400, /\/folders\/[^/]+\/files$/);
   const suffix = Date.now().toString(36).toUpperCase();
   const api = page.request;

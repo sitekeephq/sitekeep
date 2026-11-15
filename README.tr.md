@@ -30,7 +30,8 @@ Docs ve Issues tarafının açık formatlı karşılığı; 3B/BIM tarafı [That
 | İsimlendirme | Proje bazlı naming standard; klasöre bağlanır, yüklemede zorunlu, ön kontrol ucu |
 | Modeller | IFC → That Open Fragments dönüşümü sunucuda (worker thread), IFC özeti, birleşik model görüntüleyici, eleman seçimi ve özellikler |
 | Sorunlar | 3B nokta işareti, BCF tarzı görünüm (kamera, modeller, seçili GlobalId'ler, görüntü), durum, öncelik, atama, termin, yorum |
-| Denetim | Her yazma ve indirme işlemi aktivite kaydına düşer |
+| ISO 19650 | Proje bazında kurallar: durum geçişi yalnız inceleme ile, yayında eskinin arşivlenmesi, uygunluk ve revizyon kodları, tekil doküman kodu, görev ekibine kapalı WIP; madde eşlemesi ve test paketi [ISO 19650 conformance](docs/compliance/ISO19650.md) belgesinde |
+| Denetim | Her yazma, görüntüleme ve indirme işlemi değiştirilemez, hash zincirli denetim kaydına düşer; CSV olarak alınabilir |
 | Entegrasyon | REST API (`/api/v1`), sunucuda MCP ucu (`/mcp`) ve stdio MCP sunucusu (24 araç, Forma MCP ile aynı biçim), kapsamlı API erişim anahtarları, AECPilot teslimi için naming kontrol + yükleme uçları |
 | Yapay zekâ | Yönetici kontrollü sağlayıcılar (Ollama/vLLM/LM Studio, DeepSeek, Claude), tam yerel mod, proje bazlı politika |
 | Raporlar | Kişisel rapor panelleri: yapay zekâ ile, şablondan veya HTML ile; paylaşım, sürüm geçmişi, PDF çıktısı |

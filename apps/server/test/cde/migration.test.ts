@@ -105,7 +105,7 @@ async function containers(): Promise<Record<string, string>> {
   return Object.fromEntries(rows.map((r) => [r.id, r.container_id]));
 }
 
-describe("migration 0042 (ISO 19650 information containers)", () => {
+describe("ISO19650-1 12.1 / -2 5.1.7 information containers: migration 0042", () => {
   it("puts review copies in their source's container, along chains", async () => {
     const c = await containers();
     expect(c[ids.a]).toBe(ids.a);

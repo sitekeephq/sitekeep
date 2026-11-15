@@ -71,6 +71,23 @@ Core tests that rely on a module's internal code load the module only if it is i
 - The core **never** imports a module's code; `app/modules.ts` loads modules by package name.
 - Enforced by tests: on the module side in the module repository (`scripts/check-boundary.mjs`); in this repository `apps/server/test/architecture/module-boundary.test.ts` (the core does not import module code, modules are pinned packages) and `sdk-shim.test.ts` (the SDK package forwards the same names as the core's SDK and `shared`).
 
+## ISO 19650 enforcement
+
+When a project enforces the ISO 19650 transitions (`project_cde_settings.enforce_transitions`, opt-in per
+project, D-8; [CDE states](../features/CDE_STATES.md#transitions)), the SDK functions modules use for writing
+apply the transition table, with unchanged signatures:
+
+- `assertDirectWriteAllowed` and `folderGate` refuse (or report as gated) a folder whose state is not
+  written directly: with the ISO 19650 table, everything except Work in Progress. `GateInfo` has an optional
+  `message` with the reason.
+- `addVersion` refuses a new file or version in such a folder (403), whatever `source` the module passes.
+
+Effects: a Connect import into Shared or Published is refused (import into WIP and send the files for review),
+WOPI saving a document in Shared / Published is refused, Field and Manage writes into those states are refused.
+Project administrators are refused too; they use the override route with a reason. Projects that do not
+enforce the rules behave exactly as before. A module that must write outside WIP asks the user to go through
+a review, or targets a WIP folder.
+
 ## Module contract
 
 Server (`sdk/module.ts`), the default export of the package's `./server` entry:

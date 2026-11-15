@@ -8,6 +8,7 @@ import { documentsApi } from "../api";
 import { useLoad } from "../../../app/context/project";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { FolderTree } from "./FolderTree";
+import type { ReviewStep } from "./cde/CdeTransitions";
 
 function withDays(name: string, days: number | null | undefined): string {
   return days ? i18n.t("documents:startReview.stageDays", { name, count: days }) : name;
@@ -20,24 +21,31 @@ function stageText(tpl: WorkflowTemplateDto): string {
   return [...origin, ...stages.map((s) => withDays(s.name || label("reviewParty", s.party), s.days))].join(" → ");
 }
 
-/** Starts a document review on the current versions of the selected files. */
+/**
+ * Starts a document review on the current versions of the selected files. With `transition`
+ * ("Send to Shared", "Publish"), the workflow and the copy target come from the project's ISO 19650
+ * transition table, and the dialog shows the suitability the copies get and the proposed revisions.
+ */
 export function StartReviewDialog({
   projectId,
   rootFolderId,
   files,
+  transition,
   onClose,
   onStarted,
 }: {
   projectId: string;
   rootFolderId: string;
   files: FileDto[];
+  transition?: ReviewStep | null;
   onClose(): void;
   onStarted(): void;
 }) {
-  const { t } = useTranslation(["documents", "common"]);
+  const { t } = useTranslation(["documents", "common", "cde"]);
   const navigate = useNavigate();
   const { data: templates, error: tplError } = useLoad(() => api.workflowTemplates(projectId, "review"), [projectId]);
-  const [templateId, setTemplateId] = useState("");
+  const [templateId, setTemplateId] = useState(transition?.workflowTemplateId ?? "");
+  const [suitability, setSuitability] = useState("");
   const [name, setName] = useState(files.length === 1 ? files[0]!.name : "");
   const [note, setNote] = useState("");
   const [copy, setCopy] = useState(false);
@@ -57,8 +65,10 @@ export function StartReviewDialog({
   // The template's copy rule is the default; the starter can change it.
   useEffect(() => {
     const rule = template?.chain?.copyTarget;
-    setCopy(!!rule?.folderId);
-    setTargetId(rule?.folderId ?? null);
+    // A state transition copies into the target state's folder (unless the template's rule names one).
+    const target = transition?.targetFolderId && !rule?.folderId ? transition.targetFolderId : (rule?.folderId ?? null);
+    setCopy(!!target);
+    setTargetId(target);
     setPattern(rule?.pattern ?? "");
     setFallback(rule?.onUnresolved === "base");
   }, [template?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -72,6 +82,7 @@ export function StartReviewDialog({
         targetFolderId: copy ? targetId : null,
         targetPattern: copy ? pattern.trim() || null : null,
         targetFallback: fallback,
+        targetSuitability: suitability || null,
       }
     : null;
   const inputKey = JSON.stringify(input);
@@ -109,9 +120,13 @@ export function StartReviewDialog({
   }
 
   const resolvedSteps = preview?.steps.filter((s) => s.resolvedBy) ?? [];
+  const cde = copy ? preview?.cde : null;
+  const title = transition
+    ? t(transition.toState === "published" ? "cde:transitions.publish" : "cde:transitions.sendToShared")
+    : t("startReview.title");
 
   return (
-    <Dialog title={t("startReview.title")} onClose={onClose} wide>
+    <Dialog title={title} onClose={onClose} wide>
       <div className="muted small">
         {t("startReview.pinned", { count: files.length, files: files.map((f) => `${f.name} (V${f.currentVersion})`).join(", ") })}
       </div>
@@ -203,6 +218,50 @@ export function StartReviewDialog({
             </div>
           )}
         </>
+      )}
+      {cde && (
+        <div className="card stack small" data-testid="review-transition" style={{ marginTop: 8, padding: 8 }}>
+          <div>
+            <strong>{t("cde:transitions.dialog.heading")}</strong>{" "}
+            {[...new Set(cde.files.map((f) => f.fromState))]
+              .map((s) => `${s ? t(`cde:states.${s}`) : "—"} → ${t(`cde:states.${cde.toState}`)}`)
+              .join(", ")}
+          </div>
+          {cde.enforce ? (
+            <>
+              <div className="row wrap">
+                <label htmlFor="review-suitability" style={{ margin: 0 }}>
+                  {t("cde:transitions.dialog.suitability")}
+                </label>
+                <select
+                  id="review-suitability"
+                  value={suitability || cde.suitabilityCode || ""}
+                  onChange={(e) => setSuitability(e.target.value)}
+                  style={{ width: "auto" }}
+                >
+                  {cde.allowedSuitability.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <span className="muted">{t("cde:transitions.dialog.revisions")}</span>{" "}
+                {cde.files.map((f) => {
+                  const name = files.find((x) => x.latest.id === f.versionId)?.name ?? "";
+                  return (
+                    <span key={f.versionId} className="mono" style={{ marginRight: 8 }} data-testid="proposed-revision">
+                      {name}: {f.currentRevision ?? "—"} → {f.proposedRevision ?? "—"}
+                    </span>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <div className="muted">{t("cde:transitions.dialog.notEnforced")}</div>
+          )}
+        </div>
       )}
       {preview && !preview.ok && (
         <div className="notice" style={{ marginTop: 8 }}>

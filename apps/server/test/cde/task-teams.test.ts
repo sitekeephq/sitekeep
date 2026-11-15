@@ -1,5 +1,5 @@
 /**
- * ISO19650-2 5.1.7 / -1 12.x task team WIP (ISO-5, docs/features/TASK_TEAMS.md): task teams as
+ * ISO19650-2 5.1.7(e) / -1 12.2 task team WIP (ISO-5, docs/features/TASK_TEAMS.md): task teams as
  * project roles, owner teams on WIP folders, the team-only WIP rule in FolderTree (API, search,
  * zip, who-can-see), admin_sees_wip, exception grants with a reason (audit "cde.override"),
  * idempotent seeding, and the unchanged 'grants' policy.
@@ -85,7 +85,7 @@ function api(cookie: string) {
 type Api = ReturnType<typeof api>;
 let currentPid = "";
 
-describe("ISO19650-2 5.1.7 / -1 12.x task team WIP", () => {
+describe("ISO19650-2 5.1.7(e) / -1 12.2 task team WIP", () => {
   let admin: Api, ua: Api, ub: Api, viewer: Api, pa: Api;
   const ids: Record<string, string> = {};
   let pid: string;
@@ -288,7 +288,7 @@ describe("ISO19650-2 5.1.7 / -1 12.x task team WIP", () => {
   });
 });
 
-describe("ISO19650-2 5.1.7 task team seeding", () => {
+describe("ISO19650-2 5.1.7(e) task team seeding", () => {
   it("seeds one team per company once, joins members, and is idempotent", async () => {
     const admin = api(await login("admin@7d.test"));
     const c1 = (await admin.post("/companies", { name: "Gama Mühendislik", code: "GAM" })).body.id;

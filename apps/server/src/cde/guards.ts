@@ -8,18 +8,22 @@
  *   checkCodes         addVersion and the approved review copy: suitability / revision codes
  *   checkDocumentCode  addVersion, manual copy, rename / move, review copy: unique document code
  *
- * Foundation: they allow everything and change nothing, so behaviour is unchanged. The
- * follow-up work fills them in place: transitions (ISO-1: checkUpload, checkMove), codes (ISO-2:
- * checkCodes), unique codes (ISO-3: checkDocumentCode), task teams (ISO-5). A guard refuses by
- * throwing an HttpError (core/platform/http.ts) with a `cde:` message.
+ * Transitions (ISO-1: checkUpload, checkMove, rules in transitions.ts) refuse only when the
+ * project enforces them (`enforce_transitions`, D-8); codes (ISO-2: checkCodes), unique codes
+ * (ISO-3: checkDocumentCode), task teams (ISO-5). A guard refuses by throwing an HttpError
+ * (core/platform/http.ts) with a `cde:` message.
  *
  * `db` may be a transaction handle: addVersion calls checkCodes and checkDocumentCode inside its
  * transaction, so a registration they make is rolled back with the version.
  */
 import type { CdeState } from "@sitekeep/shared";
-import type { FolderTree, ProjectAccess } from "../core/security/access.js";
+import { FolderTree, type ProjectAccess } from "../core/security/access.js";
 import type { Db } from "../db/index.js";
+import { badRequest, forbidden } from "../core/platform/http.js";
+import { msg } from "../i18n/index.js";
 import { checkVersionCodes } from "./codes.js";
+import { cdeStateOf } from "./state.js";
+import { directWriteRefusal, findTransition, loadTransitionRules, moveRefusal } from "./transitions.js";
 
 /** Which write path is asking. */
 export type CdeWriteSource =
@@ -55,8 +59,15 @@ export interface UploadCheck extends GuardBase {
 }
 
 /** May a document be written into `folderId` (a new file, or a new version of `existingFileId`)? */
-export async function checkUpload(_db: Db, _input: UploadCheck): Promise<void> {
-  // ISO-1: transition `null → state` (new document) or the folder's own state (new version).
+export async function checkUpload(db: Db, input: UploadCheck): Promise<void> {
+  // The approved review copy is the transition itself (checked when the review started).
+  if (input.source === "review_copy") return;
+  const rules = await loadTransitionRules(db, input.projectId);
+  if (!rules.enforce) return;
+  const tree = input.tree ?? (await FolderTree.load(db, input.projectId));
+  // A new document or a new version: both are a direct write into the folder's state (upload → state).
+  const refusal = directWriteRefusal(rules, cdeStateOf(tree, input.folderId));
+  if (refusal) throw forbidden(refusal);
 }
 
 export interface MoveCheck extends GuardBase {
@@ -68,8 +79,16 @@ export interface MoveCheck extends GuardBase {
 }
 
 /** May a file be moved from one folder to another? (A state change is a transition.) */
-export async function checkMove(_db: Db, _input: MoveCheck): Promise<void> {
-  // ISO-1: transition `from folder state → to folder state` with mode `direct`.
+export async function checkMove(db: Db, input: MoveCheck): Promise<void> {
+  const rules = await loadTransitionRules(db, input.projectId);
+  if (!rules.enforce) return;
+  const tree = input.tree ?? (await FolderTree.load(db, input.projectId));
+  const from = cdeStateOf(tree, input.fromFolderId);
+  const to = cdeStateOf(tree, input.toFolderId);
+  const refusal = moveRefusal(rules, from, to);
+  if (refusal) throw forbidden(refusal);
+  const t = from !== to && to ? findTransition(rules, from, to) : null;
+  if (t?.requireReason && !input.reason?.trim()) throw badRequest(msg("cde:transitions.reasonRequired"));
 }
 
 /** Suitability and revision codes of a version (D-1). */

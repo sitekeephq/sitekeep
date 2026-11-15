@@ -287,7 +287,7 @@ describe("OpenCDE Documents API 1.0", () => {
     const sid = (await handle.db.select().from(opencdeDocSessions).where(eq(opencdeDocSessions.kind, "upload"))).find((r) => r.status === "pending" && r.claimedAt)!.id;
     expect((await client(writeToken, "POST", `/upload-sessions/${sid}`, { files: [{ size_in_bytes: 10, session_file_id: "f-ifc" }] })).status).toBe(409);
 
-    // ISO19650-2 5.1.7 / UK NA suitability: codes that do not fit the WIP state are refused on the
+    // ISO19650-2 5.1.7(b) / UK NA suitability: codes that do not fit the WIP state are refused on the
     // page when the project enforces the ISO 19650 rules ...
     const settingsUrl = `/projects/${projectId}/cde/settings`;
     expect((await web(adminCookie).put(settingsUrl, { enforceTransitions: true })).status).toBe(200);

@@ -182,7 +182,7 @@ export async function opencdePageRoutes(api: FastifyInstance, deps: ResolvedDeps
       return {
         standard: await standardForFolder(db, tree, req.params.fid),
         attributes: await effectiveDefinitions(db, tree, req.params.fid),
-        gateMessage: gate.gated ? render(requestLanguage(req), GATE_MESSAGE) : null,
+        gateMessage: gate.gated ? render(requestLanguage(req), gate.message ?? GATE_MESSAGE) : null,
       };
     },
   );
@@ -254,7 +254,8 @@ export async function opencdePageRoutes(api: FastifyInstance, deps: ResolvedDeps
 
     if (newFiles.length) {
       requireAction(tree, a, body.folderId, "upload");
-      if ((await folderGate(db, tree, body.folderId)).gated) throw forbidden(GATE_MESSAGE);
+      const gate = await folderGate(db, tree, body.folderId);
+      if (gate.gated) throw forbidden(gate.message ?? GATE_MESSAGE);
     }
     const standard = newFiles.length ? await standardForFolder(db, tree, body.folderId) : null;
     const names = new Map<string, string>();

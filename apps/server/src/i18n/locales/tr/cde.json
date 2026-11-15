@@ -47,5 +47,27 @@
       "suitability": "Uygunluk",
       "revision": "Revizyon"
     }
+  },
+  "transitions": {
+    "uploadNeedsReview": "{{state}} durumuna doğrudan dosya yazılamaz: projenin ISO 19650 kurallarına göre dosyalar {{from}} durumundan {{workflow}} ile gelir. Dosyayı Çalışma durumuna yükleyip incelemeye gönderin.",
+    "uploadForbidden": "Projenin ISO 19650 kurallarına göre {{state}} durumuna doğrudan dosya yazılamaz.",
+    "moveNeedsReview": "Bir doküman {{from}} durumundan {{to}} durumuna taşınarak değil, yalnızca {{workflow}} ile geçer.",
+    "moveAutomatic": "{{from}} durumundan {{to}} durumuna geçişi yalnızca sistem yapar.",
+    "moveForbidden": "Projenin ISO 19650 kuralları bir dokümanın {{from}} durumundan {{to}} durumuna geçmesine izin vermiyor.",
+    "leaveForbidden": "{{from}} durumundaki bir doküman CDE durumlarının dışına taşınamaz.",
+    "reasonRequired": "Bu geçiş için gerekçe gerekir.",
+    "namedWorkflow": "\"{{name}}\" inceleme akışı",
+    "anyReview": "onaylanmış bir inceleme",
+    "reviewNotAllowed": "Projenin ISO 19650 kuralları {{from}} durumundan {{to}} durumuna inceleme başlatılmasına izin vermiyor.",
+    "reviewWrongWorkflow": "{{from}} durumundan {{to}} durumuna geçiş için projenin ISO 19650 kuralları {{workflow}} istiyor; o akışı seçin.",
+    "overrideReasonRequired": "Kural dışı geçiş için gerekçe gerekir.",
+    "overrideSameFolder": "Dosya zaten bu klasörde."
+  },
+  "notifications": {
+    "returned": "{{name}}, {{review}} ile geri döndü",
+    "outcome": {
+      "rejected": "Reddedildi. Doküman Çalışma durumuna döndü, uygunluk kodu S0.",
+      "revise": "Revize edip tekrar gönderin. Doküman Çalışma durumuna döndü, uygunluk kodu S0."
+    }
   }
 }

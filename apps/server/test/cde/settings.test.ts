@@ -78,7 +78,7 @@ function api(cookie: string) {
 }
 type Api = ReturnType<typeof api>;
 
-describe("CDE settings API", () => {
+describe("ISO19650-2 5.1.7(c) CDE settings: API", () => {
   let admin: Api;
   let member: Api;
   let pid: string;
@@ -166,7 +166,7 @@ describe("CDE settings API", () => {
   });
 });
 
-describe("project template \"cde\" block", () => {
+describe("ISO19650-2 5.1.7(c) CDE settings: project template cde block", () => {
   let admin: Api;
   let pid: string;
 
@@ -232,7 +232,7 @@ describe("project template \"cde\" block", () => {
   });
 });
 
-describe("file DTO fields and information containers", () => {
+describe("ISO19650-1 12.1 information containers: file DTO fields", () => {
   let admin: Api;
   let pid: string;
   let wip: string;

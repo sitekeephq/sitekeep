@@ -189,7 +189,10 @@
         "override": "Rule exception (with reason)",
         "teams_seeded": "Task teams created",
         "codes_migrated": "Codes taken over from attributes",
-        "migration_unmapped": "Attribute values not converted to codes"
+        "migration_unmapped": "Attribute values not converted to codes",
+        "superseded": "Publication archived (superseded)",
+        "returned": "Document returned to its team",
+        "withdrawn": "Shared copy withdrawn"
       },
       "audit": {
         "exported": "Audit log exported",

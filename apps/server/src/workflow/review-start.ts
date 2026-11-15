@@ -24,6 +24,8 @@ import {
 } from "./chain.js";
 import { StandardCache, folderPath, nextReviewCounter, peekReviewCounter } from "./chain-service.js";
 import { notifyStepAssignees } from "./review-engine.js";
+import { planReviewTransition } from "../cde/review-transition.js";
+import type { ReviewCdePlanDto } from "@sitekeep/shared";
 import { SUBJECT_REVIEW, type ReviewCtx } from "./review-types.js";
 
 export interface StartReviewInput {
@@ -38,6 +40,8 @@ export interface StartReviewInput {
   targetPattern?: string | null;
   /** Copy files with missing pattern fields to the target folder itself instead of skipping them. */
   targetFallback?: boolean;
+  /** ISO-1: suitability code the approved copies get in the target state (enforced projects). */
+  targetSuitability?: string | null;
 }
 
 /** Everything a start resolves before writing (shared with the preview endpoint). */
@@ -53,6 +57,8 @@ export interface PreparedReview {
   fields: (FileFields & { versionId: string })[];
   problems: string[];
   tree: FolderTree;
+  /** ISO-1: the state transition of the files (null: the target has no state). */
+  cde: ReviewCdePlanDto | null;
 }
 
 export async function prepareReview(ctx: ReviewCtx, a: ProjectAccess, input: StartReviewInput): Promise<PreparedReview> {
@@ -124,6 +130,17 @@ export async function prepareReview(ctx: ReviewCtx, a: ProjectAccess, input: Sta
     codePrefix = p.prefix;
   }
   if (!input.name?.trim() && !chain.namePattern) problems.push(tFor(lang)("workflow:errors.reviewNameRequired"));
+  // ISO 19650 transition (enforced projects): the table must allow this review, with its workflow.
+  const transition = await planReviewTransition(db, {
+    projectId: a.project.id,
+    tree,
+    templateId: template.id,
+    rows,
+    targetFolderId,
+    targetSuitability: input.targetSuitability,
+    lang,
+  });
+  problems.push(...transition.problems);
 
   const snapshot: TemplateSnapshot = {
     templateId: template.id,
@@ -132,7 +149,7 @@ export async function prepareReview(ctx: ReviewCtx, a: ProjectAccess, input: Sta
     finalOutcomes: template.finalOutcomes,
     chain,
   };
-  return { template, rows, snapshot, targetFolderId, targetPattern, targetFallback, codePrefix, fields, problems, tree };
+  return { template, rows, snapshot, targetFolderId, targetPattern, targetFallback, codePrefix, fields, problems, tree, cde: transition.plan };
 }
 
 /** What a start would do: resolved assignees, review number and copy path per file. Writes nothing. */
@@ -147,6 +164,7 @@ export async function previewReview(ctx: ReviewCtx, a: ProjectAccess, input: Sta
     steps: p.snapshot.steps,
     targetFolderPath: base,
     targetPattern: p.targetPattern,
+    cde: p.cde,
     files: p.fields.map((f) => {
       if (!p.targetPattern || !base)
         return { versionId: f.versionId, name: f.name, values: f.values, targetPath: base, unresolved: [] as string[] };
@@ -212,7 +230,15 @@ export async function startReview(ctx: ReviewCtx, a: ProjectAccess, input: Start
       kind: "start",
       userId: a.user.id,
       comment: input.note ?? null,
-      details: { files: rows.length, template: template.name, targetFolderId, targetPattern: p.targetPattern, code },
+      details: {
+        files: rows.length,
+        template: template.name,
+        targetFolderId,
+        targetPattern: p.targetPattern,
+        code,
+        // ISO-1: the suitability the approved copies get (read by copyApprovedFiles).
+        ...(p.cde?.enforce && p.cde.suitabilityCode ? { targetSuitability: p.cde.suitabilityCode } : {}),
+      },
     });
     return { review: review!, instance: instance! };
   });

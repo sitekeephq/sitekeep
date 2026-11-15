@@ -74,7 +74,7 @@ export async function addVersion(
       .from(files)
       .where(and(eq(files.folderId, folderId), eq(files.name, name), isNull(files.deletedAt)));
     const derivativeStatus = VIEWABLE.has(splitExtension(name).extension.toLowerCase()) ? "pending" : "none";
-    // CDE guards (no-ops until the ISO 19650 rules are switched on): state, codes, document code.
+    // CDE guards (refusals only when the project enforces the ISO 19650 rules): state, codes, document code.
     const txDb = tx as unknown as Db;
     const guard = { projectId: a.project.id, access: a, source: opts.source ?? "upload", lang: opts.lang } as const;
     await checkUpload(txDb, { ...guard, folderId, name, existingFileId: existing?.id ?? null });
@@ -134,6 +134,8 @@ export async function addVersion(
           currentVersion: next,
           attributes: { ...existing.attributes, ...attributes },
           ...(documentCode ? { documentCode } : {}),
+          // ISO-1 (D-2): a returned WIP document is being worked on again.
+          ...(existing.cdeStatus === "returned" ? { cdeStatus: null } : {}),
         })
         .where(eq(files.id, existing.id))
         .returning();
@@ -216,7 +218,8 @@ export async function newVersionBlocker(
   const perm = tree.permission(a.principal, file.folderId);
   if (!perm.canUpload) return render(lang, msg("files:errors.noUploadPermission"));
   if (!can(perm.level, "edit") && file.createdBy !== a.user.id) return render(lang, msg("files:errors.noNewVersionPermission"));
-  if ((await folderGate(db, tree, file.folderId)).gated) return render(lang, GATE_MESSAGE);
+  const gate = await folderGate(db, tree, file.folderId);
+  if (gate.gated) return render(lang, gate.message ?? GATE_MESSAGE);
   const standard = await standardForFolder(db, tree, file.folderId);
   if (standard) {
     const r = validateName(standard, file.name, lang);

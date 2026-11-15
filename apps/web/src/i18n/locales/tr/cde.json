@@ -18,14 +18,9 @@
     }
   },
   "settings": {
-    "description": "Bu projede dokümanların Çalışma, Paylaşılan, Yayınlanan ve Arşivlenen durumları arasında nasıl geçtiği (ISO 19650). Şimdilik yalnız görüntülenir; düzenleme durum geçişleri çalışmasıyla gelecek.",
+    "description": "Bu projede dokümanların Çalışma, Paylaşılan, Yayınlanan ve Arşivlenen durumları arasında nasıl geçtiği (ISO 19650).",
     "general": {
-      "heading": "Genel",
-      "enforceTransitions": "Geçiş Kuralları Uygulansın",
-      "enforceOn": "Açık: yükleme ve taşıma geçiş tablosuna uyar.",
-      "enforceOff": "Kapalı: geçiş tablosu saklanır ama uygulanmaz.",
-      "archiveFolder": "Arşiv Klasörü",
-      "notSet": "Seçilmedi"
+      "enforceOff": "Kapalı: geçiş tablosu saklanır ama uygulanmaz."
     },
     "codes": {
       "heading": "Revizyon ve Uygunluk Kodları",
@@ -82,6 +77,13 @@
       "duplicate": "{{code}} kodu başka bir dokümanda da kullanılıyor",
       "heldBy": "kullanan doküman:",
       "hint": "Başka bir kod kullanın ya da o dokümana yeni sürüm yükleyin."
+    },
+    "standard": {
+      "label": "Doküman Kodu Standardı",
+      "none": "Yok: yalnız klasörlerin kendi isimlendirme standardı",
+      "help": "Kendi isimlendirme standardı olmayan klasörlerdeki dosyalar doküman kodunu bu standarttan alır; böylece kod Çalışma alanından itibaren proje genelinde tekil olur.",
+      "save": "Standardı Kaydet",
+      "saved": "Kaydedildi."
     },
     "conflicts": {
       "heading": "Kod Çakışmaları",
@@ -196,5 +198,44 @@
       "field": "Alan",
       "value": "Değer"
     }
+  },
+  "transitions": {
+    "heading": "Durum Geçişi",
+    "sendToShared": "Paylaşılana Gönder",
+    "publish": "Yayınla",
+    "next": "Sonraki adım: {{from}} → {{to}}, inceleme ile.",
+    "dialog": {
+      "heading": "Durum geçişi:",
+      "suitability": "Kopyaların uygunluk kodu",
+      "revisions": "Önerilen revizyon:",
+      "notEnforced": "Proje geçiş kurallarını uygulamıyor: kopyalar incelenen sürümlerin kodlarını taşır."
+    },
+    "override": {
+      "open": "Kural Dışı Taşı",
+      "title": "Kural Dışı Geçiş: {{name}}",
+      "description": "Dosyayı geçiş tablosuna bakmadan seçilen klasöre taşır. Bunu yalnız proje yöneticileri yapabilir; gerekçe denetim kaydına yazılır.",
+      "target": "Hedef:",
+      "reason": "Gerekçe",
+      "save": "Kural Dışı Taşı"
+    }
+  },
+  "statusHints": {
+    "returned": "Bir inceleme geri gönderdi: düzeltip yeniden gönderin.",
+    "superseded": "Daha yeni bir sürüm yayınlandı; bu arşivdeki kopyadır.",
+    "withdrawn": "Bu paylaşılan kopyanın yayınlanması reddedildi."
+  },
+  "transitionEditor": {
+    "enforce": "Geçiş Tablosu Uygulansın",
+    "enforceHelp": "Açık: doğrudan yükleme yalnız tablonun izin verdiği yere, durum değişikliği yalnız listelenen incelemelerle olur; proje yöneticileri de gerekçeli kural dışı geçişi kullanır. Enterprise modülleri (Connect aktarımı, Office düzenleme, Field, Manage) aynı kurallara uyar.",
+    "archiveFolder": "Arşiv Klasörü",
+    "archiveHelp": "Yeni bir yayında önceki yayın buraya, Yayınlanan altındaki yoluyla aynı yola kopyalanır.",
+    "noFolder": "Seçilmedi",
+    "defaultsNote": "Tablo boş: kurallar uygulanırken ISO 19650 varsayılanı geçerlidir (yükleme Çalışma durumuna; Çalışma → Paylaşılan → Yayınlanan onaylanmış herhangi bir inceleme ile).",
+    "add": "Geçiş Ekle",
+    "remove": "Kaldır",
+    "defaults": "ISO 19650 Varsayılanını Kullan",
+    "save": "Geçişleri Kaydet",
+    "saved": "Kaydedildi.",
+    "anyWorkflow": "Herhangi bir inceleme"
   }
 }

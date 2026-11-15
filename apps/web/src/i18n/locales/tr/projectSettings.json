@@ -189,7 +189,10 @@
         "override": "Kural istisnası (gerekçeli)",
         "teams_seeded": "Görev ekipleri oluşturuldu",
         "codes_migrated": "Kodlar özniteliklerden aktarıldı",
-        "migration_unmapped": "Koda dönüştürülemeyen öznitelik değerleri"
+        "migration_unmapped": "Koda dönüştürülemeyen öznitelik değerleri",
+        "superseded": "Yayın arşive alındı (yenisi yayınlandı)",
+        "returned": "Doküman ekibine geri döndü",
+        "withdrawn": "Paylaşılan kopya geri çekildi"
       },
       "audit": {
         "exported": "Denetim kaydı dışa aktarıldı",

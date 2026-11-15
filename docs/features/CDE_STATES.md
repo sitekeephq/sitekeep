@@ -4,6 +4,20 @@ SiteKeep runs a project's information as an ISO 19650 common data environment (C
 describes the data model behind the four states, the project settings that control them, and what
 is switched on today. Compliance mapping: [ISO 19650 conformance](../compliance/ISO19650.md).
 
+## ISO 19650 in SiteKeep
+
+ISO 19650 asks a CDE to keep information in containers that move from work in progress to shared,
+published and archived, each with a unique identifier, a suitability and a revision, with controlled
+access and a record of who moved what and when (ISO 19650-1 §12, ISO 19650-2 §5.1.7). SiteKeep
+Community does this with folder states and information containers (this page), suitability and
+revision codes per version ([codes](#codes)), a transition table enforced on every write path
+([transitions](#transitions)), unique document codes ([document codes](DOCUMENT_CODES.md)), task-team
+WIP ([task teams](TASK_TEAMS.md)) and a hash-chained audit log ([audit log](AUDIT_LOG.md)). The rules
+are per project: existing projects keep working as before until an administrator switches them on, and
+projects created from the template **ISO 19650 Temel** start with them on. The clause-by-clause
+mapping, the steps to switch the rules on and the conformance test pack (`npm run test:iso`) are in
+[ISO 19650 conformance](../compliance/ISO19650.md).
+
 ## Model
 
 | Concept | Where it lives | Notes |
@@ -22,21 +36,27 @@ One row per project in `project_cde_settings` (a project without a row uses the 
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `enforce_transitions` | `false` | Off: the transition table is stored, nothing is enforced. Existing projects stay off; new projects from the ISO 19650 template start on |
+| `enforce_transitions` | `false` | Off: the transition table is stored, nothing is enforced. Existing projects stay off; new projects from the ISO 19650 template start on. On: [transitions](#transitions) |
 | `code_scheme` | `iso_uk_na` | Code profile (`iso_uk_na`, `legacy_r`, `custom`) |
 | `suitability_codes`, `revision_rules` | null | Custom profile only |
 | `archive_folder_id` | null | Root of the archive; superseded publications go to the same path below it |
-| `container_standard_id` | null | Naming standard that defines the document code |
+| `container_standard_id` | null | Naming standard that gives the document code to files in folders without a standard of their own (**Document Code Standard**, [document codes](DOCUMENT_CODES.md)) |
 | `wip_policy` | `grants` | `grants`: folder permissions as set; `team_only`: a team's WIP folder is visible to its team only |
 | `admin_sees_wip` | `true` | Project administrators see every team's WIP |
 
 Transitions are rows of `cde_transitions (project_id, from_state, to_state, mode, workflow_template_id,
 require_reason)`; `from_state` null is a direct upload. Modes: `direct`, `review` (an approved review,
 optionally of a given workflow template), `auto` (done by the system), `forbidden`. A pair without a
-row is forbidden while enforcement is on. One row per (project, from, to); the uniqueness counts null as
-one value.
+row is forbidden while enforcement is on; a project that enforces the rules with an **empty** table uses
+the ISO 19650 default (`DEFAULT_CDE_TRANSITIONS`: the D-7 table below with any approved review). One row
+per (project, from, to); the uniqueness counts null as one value.
 
-The ISO 19650 template (`apps/server/templates/iso19650-temel.json`) sets:
+The ISO 19650 template (`apps/server/templates/iso19650-temel.json`) sets `enforceTransitions: true`,
+`codeScheme: "iso_uk_na"`, `wipPolicy: "team_only"`, `adminSeesWip: true`, the archive folder
+`04-ARCHIVED (Arşiv)` and this table. Its Shared and Published folders also carry the naming standard
+"ISO 19650 Kodlama" and the folder review gate (`gate`), so a direct upload there is refused by the gate
+first. It does not set `container_standard_id`: choose it in Project Settings → CDE (**Document Code
+Standard**) to make document codes unique from WIP on ([document codes](DOCUMENT_CODES.md)).
 
 | From | To | Mode |
 |---|---|---|
@@ -53,7 +73,9 @@ The ISO 19650 template (`apps/server/templates/iso19650-temel.json`) sets:
 | GET | `/api/v1/projects/:pid/cde/settings` | project members | `CdeSettingsDto` (`packages/shared/src/documents/cde.ts`) |
 | PUT | `/api/v1/projects/:pid/cde/settings` | project administrators | Any subset of the fields; `transitions` replaces the table. Validated (states, modes, duplicates, references inside the project). Audit: `cde.settings_updated` |
 
-The web app shows the settings read-only under **Project Settings → CDE** (advanced tab).
+**Project Settings → CDE** (advanced tab) shows the settings; project administrators edit the codes,
+the task teams and, in **State Transitions**, the enforcement switch, the archive folder and the
+transition table (`CdeTransitionsEditor.tsx`; "Use ISO 19650 Defaults" fills the D-7 table).
 
 ### Project templates
 
@@ -112,7 +134,7 @@ Legacy: R00 for a new document, R00 → R01 for a new version, a state change ke
 | `addVersion` (upload route, OpenCDE completion, modules) | `checkCodes` → `apps/server/src/cde/codes.ts`. Codes given (`AddVersionOptions.codes`, the upload fields `suitabilityCode` / `revisionCode`) are normalised and checked against the profile in the folder's state (`cdeStateOf`). A code that does not fit is refused with 400 and the allowed codes **only when the project enforces the rules** (`enforce_transitions`, D-8). Otherwise it is stored as given (normalised) and returned as a non-blocking `warnings` entry (`field`, `kind`, `value`, `state`, `allowed`, `message`) on the upload result, so existing projects and clients (AEC Pilot sending S2/C01 into WIP) keep working. A code equal to the previous version's is not checked again (existing data is grandfathered) |
 | Legacy attributes | Uploads, OpenCDE and modules that still write the free attributes `Uygunluk Kodu`, `Uygunluk` or a revision attribute (`Revizyon`, `Rev`, `Revision` …) get them as codes: any code of the profile when the project does not enforce the rules (with a warning when it does not fit the state), only codes that fit the state when it does. Other values stay attributes only and never refuse the upload. Attributes are never removed |
 | Enforcement on (`enforce_transitions`) | A version stored without codes in a folder with a state gets them: the previous suitability when it still fits, else the state's default (WIP: S0); the next revision of the sequence |
-| Approved review copy | Carries the source version's codes unchanged (system work); the transition work decides what a copy becomes |
+| Approved review copy | Not enforced: carries the source version's codes unchanged. Enforced: the codes of the target state ([transitions](#transitions)) |
 | OpenCDE upload page | The revision and suitability fields are checked against the target folder's state before any byte is sent: refused when the project enforces the rules, else returned as `warnings` beside `redirectTo`; `document_version_metadata` returns the version's codes as `Revizyon` / `Uygunluk` |
 
 ### API
@@ -152,6 +174,35 @@ database migrations) and from `apps/server/src/scripts/cde-backfill.ts`. Idempot
    `cde.migration_unmapped` (written again only when the list changes) and the unmapped endpoint /
    settings list.
 
+## Transitions
+
+ISO 19650-1 §12.2–12.5, ISO 19650-2 §5.1.7(d), §5.6.3, §5.7: information changes state only through a
+check, review and authorisation. The rules live in `apps/server/src/cde/transitions.ts` and apply **only
+when the project enforces them** (`enforce_transitions`, D-8). With enforcement off every path behaves as
+before ISO-1 (the folder review gate of the folder settings still applies).
+
+| Path | Enforced behaviour |
+|---|---|
+| Upload, new version, manual copy, OpenCDE upload, module `addVersion` (`checkUpload`) | A direct write into a folder is allowed only when the transition (upload → the folder's state) is `direct`. Otherwise 403 naming the way in, e.g. "Files cannot be written directly into Published: … they arrive from Shared through the review workflow "Publication"". A folder without a state is not affected |
+| `assertDirectWriteAllowed`, `folderGate` (SDK, unchanged signatures) | The same rule: a state that is not written directly is gated (`GateInfo.message` carries the reason; the folder settings, the OpenCDE upload page and WOPI show it) |
+| Move (`PATCH /files/:id`, `checkMove`) | The transition (from state → to state) must be `direct`: `review` → 403 naming the workflow, `auto` → 403 (done by the system), `forbidden` or no row → 403. A move inside one state is no transition. Leaving the CDE (into a folder without a state) is allowed from WIP only. `requireReason` asks for `reason` |
+| Review start (`prepareReview`, preview and start) | For each file, the transition (source state → target state) must be `review` (or `direct`) and, when the table names a workflow template, the review must use it; otherwise the start is refused and the preview lists the problem. The suitability chosen for the copies must fit the target state |
+| Approved review copy (`copyApprovedFiles`) | The copy keeps the document's container; its version gets the suitability chosen at the start (stored in the start action, `targetSuitability`; else the source's when it fits, else the state's first: S1, A1) and the next revision (`nextRevision` over the container's revisions: P01.03 → P01, → C01 …). Audit `cde.transition` (mode `review`). A new approved version clears a `withdrawn` / `superseded` flag on the target file |
+| Archive on publication (D-10, `cde/archive.ts`) | Before a new version is published, each current publication of the same container (a file in a Published folder without a status flag) is copied into the archive folder (`archive_folder_id`) at the same path it has below its Published folder (`ensureFolderPath`): same storage key, no byte copy, same codes. The archive copy is flagged `superseded` (a later superseded publication of the same document becomes a new version of it); a publication in another place than the new one is flagged `superseded` too. Audit `cde.superseded` and `cde.transition` (published → archived, mode `auto`) |
+| Rejection (D-2, `cde/rejection.ts`, `afterEvaluate`) | A file sent back (`rejected`, `revise_resubmit`; stopped in a stop stage or decided so at the end): its WIP original (the file itself when it is in WIP, else the container's files in WIP) is flagged `returned`, the current version's suitability goes back to S0 (ISO profiles), and the members of the task team owning its WIP folder are notified (`cde.returned`; the uploader when no team owns it). A Shared copy refused for publication is flagged `withdrawn`. Audit `cde.returned`, `cde.withdrawn`, `cde.transition` (shared → wip, mode `auto`). Nothing is moved. A new version of the WIP file clears `returned` |
+| Project administrators | No silent bypass: the routes above refuse them like anyone. `POST /api/v1/projects/:pid/files/:id/transition { toFolderId, reason }` moves a file whatever the table says (naming standard and document code still apply); project administrators only, reason required; audit `cde.override` (`what: "transition"`), `file.moved`, `cde.transition` with the reason |
+
+Enterprise modules call `addVersion`, `assertDirectWriteAllowed` and `folderGate`, so they follow the same
+rules without changes: under enforcement a Connect import into Shared or Published is refused (import into
+WIP and review), WOPI editing a Published document is refused, Field / Manage writes into Shared or
+Published are refused. This is intended ([modules](../modules/README.md#iso-19650-enforcement)).
+
+Web: **Send to Shared** / **Publish** in the documents toolbar (selected files of a WIP / Shared
+folder) and in the file drawer open the review dialog with the workflow and the target folder of the
+transition table; the dialog shows the transition, the suitability of the copies (enforced projects)
+and the proposed revision per file. Badges **Returned**, **Superseded**, **Withdrawn** beside the codes
+in the list and in the file drawer; the administrator override in the file drawer (folder and reason).
+
 ## Where the rules run
 
 Every write path calls the guards in `apps/server/src/cde/guards.ts` once, and the view routes
@@ -164,7 +215,7 @@ call the events in `apps/server/src/cde/events.ts`:
 | `checkCodes` | `addVersion` (codes from `AddVersionOptions.codes` or the legacy attributes), approved review copy (codes carried from the source version); rules in `apps/server/src/cde/codes.ts` |
 | `checkDocumentCode` | `addVersion`, manual copy, rename / move, approved review copy |
 | `recordView` | preview, PDF and media routes (`previews/routes.ts`), model route (`files.ts`) |
-| `recordTransition` | move to another folder, approved review copy |
+| `recordTransition` | move to another folder, approved review copy, archive on publication, rejection (shared → wip), administrator override |
 
 The SDK functions keep their signatures (`addVersion`, `assertDirectWriteAllowed`, `FolderTree`);
 `AddVersionOptions` gained the optional `source` and `codes`, so modules get the rules without changes.
@@ -177,8 +228,9 @@ migration 0042): `DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.
 | Part | Status |
 |---|---|
 | Data model, settings, template block, seams (this page) | done; no behaviour change |
-| Transitions enforced, archive on publication, returned / withdrawn on rejection | planned |
+| Transitions enforced, archive on publication, returned / withdrawn on rejection ([transitions](#transitions)) | done |
 | Suitability and revision codes per version ([codes](#codes)) | done |
 | Unique document codes ([details](DOCUMENT_CODES.md)) | done |
 | Task teams and WIP visibility ([task teams](TASK_TEAMS.md)) | done |
 | Audit trail: view events, hash chain, CSV ([details](AUDIT_LOG.md)) | done |
+| Conformance pack: clause map, tagged tests, acceptance scenario ([ISO 19650 conformance](../compliance/ISO19650.md)) | done |

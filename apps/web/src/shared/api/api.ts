@@ -97,6 +97,7 @@ import type {
   SubmittalRegisterSummaryDto,
   DocCompareDto,
   PageRegions,
+  ReviewCdePlanDto,
 } from "@sitekeep/shared";
 import { ApiError, del, get, patch, post, put, request, safeJson } from "./client";
 
@@ -853,6 +854,8 @@ export interface StartReviewInput {
   targetFolderId?: string | null;
   targetPattern?: string | null;
   targetFallback?: boolean;
+  /** ISO 19650: suitability of the approved copies in the target state (enforced projects). */
+  targetSuitability?: string | null;
 }
 
 export interface ReviewPreview {
@@ -863,6 +866,8 @@ export interface ReviewPreview {
   targetFolderPath: string | null;
   targetPattern: string | null;
   files: { versionId: string; name: string; values: Record<string, string>; targetPath: string | null; unresolved: string[] }[];
+  /** ISO 19650 state transition of the files (null: the target has no state). */
+  cde?: ReviewCdePlanDto | null;
 }
 
 export { dataLocale, formatDate, formatDay, formatNumber, formatPercent, formatRelative, formatSize, intlLocale } from "../lib/format";

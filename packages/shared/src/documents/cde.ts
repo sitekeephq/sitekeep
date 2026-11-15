@@ -129,3 +129,41 @@ export interface TemplateCdeSettings {
 export function cdeTransitionKey(from: CdeState | null, to: CdeState): string {
   return `${from ?? "upload"}>${to}`;
 }
+
+/**
+ * What a review does to the ISO 19650 state of its files (ISO-1), returned by the review preview
+ * (`POST /projects/:pid/reviews/preview`, field `cde`): the transition, the suitability the
+ * approved copies get and the revision proposed per file. Null when the target has no state.
+ */
+export interface ReviewCdePlanDto {
+  /** The project enforces the transitions; otherwise the copy keeps the source's codes. */
+  enforce: boolean;
+  toState: CdeState;
+  /** The workflow template the transition table asks for (null: any review). */
+  requiredWorkflowTemplateId: string | null;
+  /** Suitability codes allowed in the target state. */
+  allowedSuitability: string[];
+  /** The suitability the copies get (chosen, else the default). */
+  suitabilityCode: string | null;
+  files: {
+    versionId: string;
+    fromState: CdeState | null;
+    /** Mode of the transition (from → to) in the table; null: no row. */
+    mode: CdeTransitionMode | null;
+    currentRevision: string | null;
+    proposedRevision: string | null;
+  }[];
+}
+
+/**
+ * The ISO 19650 transition table of D-7 without named workflows: direct upload only into WIP,
+ * WIP → Shared and Shared → Published by an approved review, Shared → WIP and Published → Archived
+ * by the system. A project that enforces the rules with an empty table uses it (ISO-1).
+ */
+export const DEFAULT_CDE_TRANSITIONS: readonly CdeTransitionDto[] = [
+  { fromState: null, toState: "wip", mode: "direct", workflowTemplateId: null, requireReason: false },
+  { fromState: "wip", toState: "shared", mode: "review", workflowTemplateId: null, requireReason: false },
+  { fromState: "shared", toState: "wip", mode: "auto", workflowTemplateId: null, requireReason: false },
+  { fromState: "shared", toState: "published", mode: "review", workflowTemplateId: null, requireReason: false },
+  { fromState: "published", toState: "archived", mode: "auto", workflowTemplateId: null, requireReason: false },
+];

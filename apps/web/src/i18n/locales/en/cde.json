@@ -18,14 +18,9 @@
     }
   },
   "settings": {
-    "description": "How documents move between Work in Progress, Shared, Published and Archived in this project (ISO 19650). Read-only for now: editing arrives with the state transitions work.",
+    "description": "How documents move between Work in Progress, Shared, Published and Archived in this project (ISO 19650).",
     "general": {
-      "heading": "General",
-      "enforceTransitions": "Enforce Transitions",
-      "enforceOn": "On: uploads and moves follow the transition table.",
-      "enforceOff": "Off: the transition table is stored but not enforced.",
-      "archiveFolder": "Archive Folder",
-      "notSet": "Not set"
+      "enforceOff": "Off: the transition table is stored but not enforced."
     },
     "codes": {
       "heading": "Revision and Suitability Codes",
@@ -82,6 +77,13 @@
       "duplicate": "Code {{code}} is also used",
       "heldBy": "by the document:",
       "hint": "Use another code, or upload a new version of that document."
+    },
+    "standard": {
+      "label": "Document Code Standard",
+      "none": "None: only the folders' own naming standards",
+      "help": "Files in folders without a naming standard of their own take their document code from this standard, so a code is unique across the project from Work in Progress on.",
+      "save": "Save Standard",
+      "saved": "Saved."
     },
     "conflicts": {
       "heading": "Code Conflicts",
@@ -196,5 +198,44 @@
       "field": "Field",
       "value": "Value"
     }
+  },
+  "transitions": {
+    "heading": "State Transition",
+    "sendToShared": "Send to Shared",
+    "publish": "Publish",
+    "next": "Next step: {{from}} → {{to}}, through review.",
+    "dialog": {
+      "heading": "State transition:",
+      "suitability": "Suitability of the copies",
+      "revisions": "Proposed revision:",
+      "notEnforced": "The project does not enforce the transitions: the copies keep the codes of the reviewed versions."
+    },
+    "override": {
+      "open": "Override",
+      "title": "Override Transition: {{name}}",
+      "description": "Moves the file into the chosen folder regardless of the transition table. Only project administrators can do this; the reason is stored in the audit log.",
+      "target": "Target:",
+      "reason": "Reason",
+      "save": "Move With Override"
+    }
+  },
+  "statusHints": {
+    "returned": "Sent back by a review: revise it and send it again.",
+    "superseded": "A newer version was published; this is the archived copy.",
+    "withdrawn": "The publication of this shared copy was refused."
+  },
+  "transitionEditor": {
+    "enforce": "Enforce the Transition Table",
+    "enforceHelp": "On: direct uploads only where the table allows them, state changes only through the listed reviews, and project administrators too go through the override with a reason. Enterprise modules (Connect import, Office editing, Field, Manage) follow the same rules.",
+    "archiveFolder": "Archive Folder",
+    "archiveHelp": "On a new publication the previous one is copied here, at the same path it had under Published.",
+    "noFolder": "Not set",
+    "defaultsNote": "The table is empty: while enforcement is on, the ISO 19650 default applies (upload into Work in Progress; Work in Progress → Shared → Published through any approved review).",
+    "add": "Add Transition",
+    "remove": "Remove",
+    "defaults": "Use ISO 19650 Defaults",
+    "save": "Save Transitions",
+    "saved": "Saved.",
+    "anyWorkflow": "Any review"
   }
 }

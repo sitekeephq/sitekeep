@@ -102,13 +102,19 @@ async function latest(fileId: string) {
 let admin: Api;
 let pid: string;
 
+/**
+ * Lets every state take direct uploads, so these tests see the code rules alone (the transitions
+ * themselves are tested in transitions.test.ts).
+ */
+const DIRECT_EVERYWHERE = (["wip", "shared", "published"] as const).map((toState) => ({ fromState: null, toState, mode: "direct" }));
+
 /** Switches the ISO 19650 enforcement of a project (D-8): codes that do not fit are refused only when on. */
 async function enforce(project: string, on: boolean) {
-  expect((await admin.put(`/projects/${project}/cde/settings`, { enforceTransitions: on })).status).toBe(200);
+  expect((await admin.put(`/projects/${project}/cde/settings`, { enforceTransitions: on, transitions: DIRECT_EVERYWHERE })).status).toBe(200);
 }
 let F: Awaited<ReturnType<typeof stateFolders>>;
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: codes on upload, per state", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: codes on upload, per state", () => {
   it("stores normalised codes that fit the folder's state", async () => {
     admin = api(await login("admin@7d.test"));
     pid = (await admin.post("/projects", { code: "COD", name: "Codes", template: "iso19650" })).body.id;
@@ -242,11 +248,11 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: codes on upload, per state", () 
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: legacy profile and project overrides", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: legacy profile and project overrides", () => {
   it("legacy_r: R revisions in any state, no S/A split", async () => {
     const p = (await admin.post("/projects", { code: "LEG", name: "Legacy", template: "iso19650" })).body.id;
     const f = await stateFolders(p);
-    expect((await admin.put(`/projects/${p}/cde/settings`, { codeScheme: "legacy_r", enforceTransitions: true })).status).toBe(200);
+    expect((await admin.put(`/projects/${p}/cde/settings`, { codeScheme: "legacy_r", enforceTransitions: true, transitions: DIRECT_EVERYWHERE })).status).toBe(200);
     const a = await admin.upload(`/projects/${p}/folders/${f.wip}/files`, "R-1.pdf", { suitabilityCode: "A1", revisionCode: "r1" });
     expect(a.status, JSON.stringify(a.body)).toBe(200);
     expect(await latest(a.body.results[0].fileId)).toMatchObject({ suitabilityCode: "A1", revisionCode: "R01" });
@@ -265,6 +271,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: legacy profile and project overr
     const s = await admin.put(`/projects/${p}/cde/settings`, {
       codeScheme: "custom",
       enforceTransitions: true,
+      transitions: DIRECT_EVERYWHERE,
       suitabilityCodes: [{ code: "S0", states: ["wip"] }, { code: "D1", description: "For costing", states: ["shared"] }],
     });
     expect(s.status, JSON.stringify(s.body)).toBe(200);
@@ -274,7 +281,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: legacy profile and project overr
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: changing the codes of a version", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: changing the codes of a version", () => {
   let eda: Api;
   let vural: Api;
   let wipVersion: string;
@@ -372,7 +379,7 @@ describe("ISO19650-2 5.1.7 / UK NA suitability: changing the codes of a version"
   });
 });
 
-describe("ISO19650-2 5.1.7 / UK NA suitability: live-data migration", () => {
+describe("ISO19650-2 5.1.7(b) / UK NA suitability: live-data migration", () => {
   /** A file with old attributes and no codes (as before codes were stored per version). */
   async function oldFile(project: string, folder: string, name: string, attributes: Record<string, string>) {
     const r = await admin.upload(`/projects/${project}/folders/${folder}/files`, name, { attributes: JSON.stringify(attributes) });

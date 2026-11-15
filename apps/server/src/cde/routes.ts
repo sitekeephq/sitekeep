@@ -2,6 +2,7 @@
  * CDE settings API (docs/features/CDE_STATES.md):
  *   GET /projects/:pid/cde/settings   any project member
  *   PUT /projects/:pid/cde/settings   project administrators; audit "cde.settings_updated"
+ *   POST /projects/:pid/files/:id/transition   administrator override (transition-routes.ts)
  */
 import type { FastifyInstance } from "fastify";
 import type { CdeSettingsDto } from "@sitekeep/shared";
@@ -10,10 +11,12 @@ import { projectAccess, requireProjectAdmin } from "../core/security/access.js";
 import { audit } from "../core/platform/audit.js";
 import { cdeSettingsInputSchema, loadCdeSettings, saveCdeSettings } from "./settings.js";
 import { documentCodeRoutes } from "./document-code-routes.js";
+import { transitionRoutes } from "./transition-routes.js";
 
 export async function cdeRoutes(api: FastifyInstance, deps: AppDeps) {
   const { db } = deps;
   await documentCodeRoutes(api, deps);
+  await transitionRoutes(api, deps);
 
   api.get<{ Params: { pid: string } }>("/projects/:pid/cde/settings", async (req): Promise<CdeSettingsDto> => {
     const a = await projectAccess(db, req.params.pid, req.user!);

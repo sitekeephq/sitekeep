@@ -11,7 +11,7 @@ import { HttpError, badRequest, conflict, forbidden, notFound } from "../../core
 import { msg, render, requestLanguage, tFor } from "../../i18n/index.js";
 import type { StoredObject } from "../../core/platform/storage.js";
 import { standardForFolder } from "../../modules/documents/naming-routes.js";
-import { assertDirectWriteAllowed } from "../../workflow/service.js";
+import { GATE_MESSAGE, assertDirectWriteAllowed, folderGate } from "../../workflow/service.js";
 import { effectiveDefinitions } from "./attributes.js";
 import { VIEWABLE, addVersion, afterVersionAdded, type FileRow } from "../../files/new-version.js";
 import { checkDocumentCode, checkMove, checkUpload } from "../../cde/guards.js";
@@ -174,13 +174,17 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
     const description = body.description === undefined ? file.description : body.description || null;
     const targetFolder = body.folderId ?? file.folderId;
     const moved = !!body.folderId && body.folderId !== file.folderId;
-    if (moved) {
-      requireAction(tree, a, body.folderId!, "upload");
-      await assertDirectWriteAllowed(db, tree, body.folderId!);
-    }
     const lang = requestLanguage(req);
     const guard = { projectId: a.project.id, access: a, tree, source: "move", lang, reason: body.reason ?? null } as const;
-    if (moved) await checkMove(db, { ...guard, fileId: file.id, fromFolderId: file.folderId, toFolderId: body.folderId! });
+    if (moved) {
+      requireAction(tree, a, body.folderId!, "upload");
+      // ISO 19650 transition rules (enforced projects): a move is the transition between the two states.
+      await checkMove(db, { ...guard, fileId: file.id, fromFolderId: file.folderId, toFolderId: body.folderId! });
+      // The folder's review gate still applies; the state part of the gate was decided by checkMove
+      // (a move inside one state is no transition).
+      const gate = await folderGate(db, tree, body.folderId!);
+      if (gate.gated && !gate.message) throw forbidden(GATE_MESSAGE);
+    }
     const newName = body.name !== undefined ? cleanFileName(body.name) : file.name;
     if (!newName) throw badRequest(msg("documents:errors.invalidFileName"));
     let attributes = file.attributes;

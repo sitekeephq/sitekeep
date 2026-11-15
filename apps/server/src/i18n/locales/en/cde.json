@@ -47,5 +47,27 @@
       "suitability": "Suitability",
       "revision": "Revision"
     }
+  },
+  "transitions": {
+    "uploadNeedsReview": "Files cannot be written directly into {{state}}: under the project's ISO 19650 rules they arrive from {{from}} through {{workflow}}. Upload into Work in Progress and send the file for review.",
+    "uploadForbidden": "Files cannot be written directly into {{state}} under the project's ISO 19650 rules.",
+    "moveNeedsReview": "A document goes from {{from}} to {{to}} only through {{workflow}}, not by moving it.",
+    "moveAutomatic": "The step from {{from}} to {{to}} is done by the system only.",
+    "moveForbidden": "The project's ISO 19650 rules do not allow a document to go from {{from}} to {{to}}.",
+    "leaveForbidden": "A document in {{from}} cannot be moved out of the CDE states.",
+    "reasonRequired": "This transition needs a reason.",
+    "namedWorkflow": "the review workflow \"{{name}}\"",
+    "anyReview": "an approved review",
+    "reviewNotAllowed": "The project's ISO 19650 rules do not allow a review from {{from}} to {{to}}.",
+    "reviewWrongWorkflow": "From {{from}} to {{to}} the project's ISO 19650 rules ask for {{workflow}}; choose that workflow.",
+    "overrideReasonRequired": "An override needs a reason.",
+    "overrideSameFolder": "The file is already in this folder."
+  },
+  "notifications": {
+    "returned": "{{name}} was returned by {{review}}",
+    "outcome": {
+      "rejected": "Rejected. The document is back in Work in Progress with suitability S0.",
+      "revise": "Revise and resubmit. The document is back in Work in Progress with suitability S0."
+    }
   }
 }

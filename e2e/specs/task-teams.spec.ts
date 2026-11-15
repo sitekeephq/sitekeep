@@ -1,5 +1,5 @@
 /**
- * ISO19650-2 5.1.7 / -1 12.x task team WIP (ISO-5, docs/features/TASK_TEAMS.md): in a project
+ * ISO19650-2 5.1.7(e) / -1 12.2 task team WIP (ISO-5, docs/features/TASK_TEAMS.md): in a project
  * from the ISO 19650 template, a member of task team B cannot see task team A's WIP folder.
  * Core only: passes with and without Enterprise modules.
  */
@@ -59,7 +59,7 @@ async function setUp(request: APIRequestContext) {
   return { project, users, wip, wipA };
 }
 
-test("ISO19650-2 5.1.7: a member of task team B cannot see task team A's WIP folder", async ({ request, browser, baseURL }) => {
+test("ISO19650-2 5.1.7(e) / -1 12.2 task team WIP: a member of task team B cannot see task team A's WIP folder", async ({ request, browser, baseURL }) => {
   if (!baseURL) throw new Error("E2E baseURL is not configured.");
   const { project, users, wip, wipA } = await setUp(request);
 

@@ -7,6 +7,7 @@ import { folderSettings, memberRoles, notifications, projectMembers } from "../d
 import { forbidden } from "../core/platform/http.js";
 import { DEFAULT_LANGUAGE, isMsg, msg, render, type Msg } from "../i18n/index.js";
 import type { ActorContext } from "./engine.js";
+import { cdeWriteGate } from "../cde/transitions.js";
 
 /** A project membership plus the project roles (teams) the member holds. */
 export type Member = typeof projectMembers.$inferSelect & { roleIds?: string[] };
@@ -109,16 +110,28 @@ export interface GateInfo {
   gated: boolean;
   /** Folder that switches the gate on (the folder itself or a parent). */
   byFolderId: string | null;
+  /**
+   * Why (when the ISO 19650 transition rules close the folder: they name the way in). Missing:
+   * the review gate of the folder settings (GATE_MESSAGE).
+   */
+  message?: Msg;
 }
 
-/** The gate applies to the folder where it is set and to every folder below it. */
+/**
+ * The gate applies to the folder where it is set and to every folder below it. With the ISO 19650
+ * transition rules enforced (docs/features/CDE_STATES.md), a folder whose state cannot be written
+ * directly (transition upload → state other than `direct`) is gated as well.
+ */
 export async function folderGate(db: Db, tree: FolderTree, folderId: string): Promise<GateInfo> {
   const chain = tree.ancestry(folderId);
   const rows = await db
     .select()
     .from(folderSettings)
     .where(and(inArray(folderSettings.folderId, chain), eq(folderSettings.requireApprovedReview, true)));
-  if (!rows.length) return { gated: false, byFolderId: null };
+  if (!rows.length) {
+    const cde = await cdeWriteGate(db, tree, folderId);
+    return cde ? { gated: true, byFolderId: cde.byFolderId, message: cde.message } : { gated: false, byFolderId: null };
+  }
   const on = new Set(rows.map((r) => r.folderId));
   const by = [...chain].reverse().find((id) => on.has(id)) ?? null;
   return { gated: true, byFolderId: by };
@@ -127,10 +140,15 @@ export async function folderGate(db: Db, tree: FolderTree, folderId: string): Pr
 /** A Msg: render it in the reader's language (`render(lang, GATE_MESSAGE)`). */
 export const GATE_MESSAGE: Msg = msg("workflow:errors.folderGated");
 
-/** Rejects direct uploads/moves into a gated folder (approved review copies bypass this). */
+/**
+ * Rejects direct uploads/moves into a gated folder (approved review copies bypass this). With the
+ * ISO 19650 transition rules enforced it also rejects writes into a state that only a review (or
+ * the system) may bring documents into, for everyone: modules (Connect import, WOPI, Field / Manage)
+ * included. Project administrators use the override route instead.
+ */
 export async function assertDirectWriteAllowed(db: Db, tree: FolderTree, folderId: string): Promise<void> {
   const gate = await folderGate(db, tree, folderId);
-  if (gate.gated) throw forbidden(GATE_MESSAGE);
+  if (gate.gated) throw forbidden(gate.message ?? GATE_MESSAGE);
 }
 
 // ---- Workflow events (extension point) --------------------------------------------------------

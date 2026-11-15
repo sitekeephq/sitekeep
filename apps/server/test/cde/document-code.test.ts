@@ -87,7 +87,7 @@ const STANDARD = {
   ],
 };
 
-describe("document code derivation", () => {
+describe("ISO19650-2 5.1.7(a) unique container id: document code derivation", () => {
   it("is the part of the name that parses; none without a match (D-5)", () => {
     const std = { ...STANDARD, allowSuffix: true } as Parameters<typeof documentCodeOf>[0];
     expect(documentCodeOf(std, "ZAVM-PAS-A-0001.pdf")).toBe("ZAVM-PAS-A-0001");
@@ -97,7 +97,7 @@ describe("document code derivation", () => {
   });
 });
 
-describe("ISO19650-2 5.1.7 unique container id", () => {
+describe("ISO19650-2 5.1.7(a) unique container id", () => {
   let admin: Api;
   let member: Api;
   let memberId: string;
@@ -113,7 +113,7 @@ describe("ISO19650-2 5.1.7 unique container id", () => {
   const fileIn = async (folder: string, name: string) =>
     (await handle.db.select().from(files).where(and(eq(files.folderId, folder), eq(files.name, name))))[0]!;
 
-  it("registers the code of a new document (ISO19650-2 5.1.7 unique container id)", async () => {
+  it("registers the code of a new document (ISO19650-2 5.1.7(a) unique container id)", async () => {
     admin = api(await login("admin@7d.test"));
     const u = await admin.post("/users", { email: "uye@7d.test", name: "Üye", password: PW });
     memberId = u.body.id;
@@ -145,7 +145,7 @@ describe("ISO19650-2 5.1.7 unique container id", () => {
     expect(row).toMatchObject({ codeNorm: "ZAVM-PAS-A-0001", containerId: f.containerId, firstFileId: f.id });
   });
 
-  it("refuses the code in another folder with the path of the holder (ISO19650-2 5.1.7 unique container id)", async () => {
+  it("refuses the code in another folder with the path of the holder (ISO19650-2 5.1.7(a) unique container id)", async () => {
     const r = await up(folderB, "ZAVM-PAS-A-0001.pdf", "%PDF-1.4 y", member);
     expect(r.status).toBe(400);
     expect(r.body.results[0].ok).toBe(false);
@@ -156,7 +156,7 @@ describe("ISO19650-2 5.1.7 unique container id", () => {
     expect(await handle.db.select().from(files).where(eq(files.folderId, folderB))).toHaveLength(0);
   });
 
-  it("allows a new version and a rendition with another extension (ISO19650-2 5.1.7, D-6)", async () => {
+  it("allows a new version and a rendition with another extension (ISO19650-2 5.1.7(a), D-6)", async () => {
     const pdf = await fileIn(folderA, "ZAVM-PAS-A-0001.pdf");
     expect((await up(folderA, "ZAVM-PAS-A-0001.pdf", "%PDF-1.4 v2")).status).toBe(200);
     const dwg = await up(folderA, "ZAVM-PAS-A-0001.dwg", "AC1032");
@@ -168,7 +168,7 @@ describe("ISO19650-2 5.1.7 unique container id", () => {
     expect((await up(folderB, "ZAVM-PAS-A-0001.dwg", "AC1032")).status).toBe(400);
   });
 
-  it("lets an approved review copy keep the code (ISO19650-2 5.1.7 unique container id)", async () => {
+  it("lets an approved review copy keep the code (ISO19650-2 5.1.7(a) unique container id)", async () => {
     const src = await fileIn(folderA, "ZAVM-PAS-A-0001.pdf");
     const [version] = await handle.db
       .select()
@@ -200,7 +200,7 @@ describe("ISO19650-2 5.1.7 unique container id", () => {
     expect(ok.body.documentCode).toBe("ZAVM-PAS-A-0002");
   });
 
-  it("checks rename and move (ISO19650-2 5.1.7 unique container id)", async () => {
+  it("checks rename and move (ISO19650-2 5.1.7(a) unique container id)", async () => {
     const two = await fileIn(folderB, "ZAVM-PAS-A-0002.pdf");
     // Rename onto a taken code.
     const taken = await admin.patch(`/projects/${pid}/files/${two.id}`, { name: "ZAVM-PAS-A-0001.pdf" });
@@ -263,13 +263,13 @@ describe("ISO19650-2 5.1.7 unique container id", () => {
   });
 });
 
-describe("live data: backfill and conflicts list", () => {
+describe("ISO19650-2 5.1.7(a) unique container id: live data backfill and conflicts list", () => {
   let admin: Api;
   let pid: string;
   let one: string;
   let two: string;
 
-  it("registers existing codes first come by created_at; idempotent (ISO19650-2 5.1.7 unique container id)", async () => {
+  it("registers existing codes first come by created_at; idempotent (ISO19650-2 5.1.7(a) unique container id)", async () => {
     admin = api(await login("admin@7d.test"));
     const p = await admin.post("/projects", { code: "DC2", name: "Legacy", template: "empty" });
     pid = p.body.id;
@@ -313,7 +313,7 @@ describe("live data: backfill and conflicts list", () => {
   });
 });
 
-describe("enforcement off (D-8): codes registered, never refused", () => {
+describe("ISO19650-2 5.1.7(a) unique container id: enforcement off (D-8), codes registered, never refused", () => {
   let admin: Api;
   let pid: string;
   let wip: string;
@@ -324,7 +324,7 @@ describe("enforcement off (D-8): codes registered, never refused", () => {
   const fileIn = async (folder: string, name: string) =>
     (await handle.db.select().from(files).where(and(eq(files.folderId, folder), eq(files.name, name))))[0]!;
 
-  it("stores a duplicate with a warning and lists it (ISO19650-2 5.1.7 unique container id)", async () => {
+  it("stores a duplicate with a warning and lists it (ISO19650-2 5.1.7(a) unique container id)", async () => {
     admin = api(await login("admin@7d.test"));
     const p = await admin.post("/projects", { code: "DC3", name: "Off", template: "iso19650" });
     pid = p.body.id;
