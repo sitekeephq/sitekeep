@@ -58,6 +58,8 @@ export async function userEmails(db: Db, ids: (string | null | undefined)[]): Pr
 export interface BundleOptions {
   db: Db;
   storage: Storage;
+  /** Folder visibility of the requester; header files of models in folders they cannot see are left out. */
+  canSeeFolder?: (folderId: string) => boolean;
 }
 
 export interface IssueBundle extends BcfTopicBundle {
@@ -89,10 +91,11 @@ export async function issuesToBundles(o: BundleOptions, rows: IssueRow[], lang =
   for (const x of extras) x.viewpoint.fileVersionIds.forEach((v) => versionIds.add(v));
   const versions = versionIds.size
     ? await db
-        .select({ id: fileVersions.id, uploadedAt: fileVersions.uploadedAt, summary: fileVersions.ifcSummary, name: files.name })
+        .select({ id: fileVersions.id, uploadedAt: fileVersions.uploadedAt, summary: fileVersions.ifcSummary, name: files.name, folderId: files.folderId })
         .from(fileVersions)
         .innerJoin(files, eq(files.id, fileVersions.fileId))
         .where(inArray(fileVersions.id, [...versionIds]))
+        .then((list) => (o.canSeeFolder ? list.filter((v) => o.canSeeFolder!(v.folderId)) : list))
     : [];
   const versionById = new Map(versions.map((v) => [v.id, v]));
   const offsets = new Map<string, Vec3 | null>();

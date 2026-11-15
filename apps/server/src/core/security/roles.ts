@@ -16,7 +16,7 @@ import {
   type RolePackageAction,
   type RolePackagePlanEntry,
 } from "@sitekeep/shared";
-import type { FolderTree } from "./access.js";
+import { inTeam, type FolderTree } from "./access.js";
 
 export function folderPath(tree: FolderTree, id: string): string {
   return tree
@@ -104,13 +104,17 @@ export interface AccessExplanation extends EffectivePermission {
  */
 export function explainFolderAccess(tree: FolderTree, who: AccessSubject, folderId: string): AccessExplanation {
   const perm = tree.permission(who, folderId);
-  if (who.projectAdmin) {
+  // ISO-5: outside the owning task team only the grants on the team folder or below count.
+  const scope = tree.wipTeamScope(folderId);
+  const outside = scope && !inTeam(who, scope.teamId) ? scope : null;
+  if (who.projectAdmin && (!outside || tree.wip.adminSeesWip)) {
     return {
       ...perm,
       reasons: [{ via: who.systemAdmin ? "system_admin" : "project_admin", level: "manage", inherited: false, decisive: true }],
     };
   }
-  const chain = new Set(tree.ancestry(folderId));
+  const ancestry = tree.ancestry(folderId);
+  const chain = new Set(outside ? ancestry.slice(ancestry.indexOf(outside.ownedFolderId)) : ancestry);
   const roles = new Set(who.roleIds ?? []);
   const reasons: AccessReasonDto[] = [];
   for (const g of tree.grants) {
@@ -132,6 +136,16 @@ export function explainFolderAccess(tree: FolderTree, who: AccessSubject, folder
       decisive,
     });
   }
+  if (outside)
+    reasons.push({
+      via: "task_team_wip",
+      subjectId: outside.teamId,
+      level: "none",
+      folderId: outside.ownedFolderId,
+      folderName: tree.get(outside.ownedFolderId).name,
+      inherited: outside.ownedFolderId !== folderId,
+      decisive: perm.level === "none",
+    });
   reasons.sort((x, y) => Number(y.decisive) - Number(x.decisive) || rank(y.level) - rank(x.level));
   return { ...perm, reasons };
 }

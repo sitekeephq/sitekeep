@@ -10,9 +10,9 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { BCF_DEFAULT_VERSION, BCF_VERSIONS, type BcfExportInfo, type BcfImportMapping, type BcfVersion } from "@sitekeep/shared";
+import { BCF_DEFAULT_VERSION, BCF_VERSIONS, can, type BcfExportInfo, type BcfImportMapping, type BcfVersion } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
-import { isUuid, projectAccess, type ProjectAccess } from "../core/security/access.js";
+import { FolderTree, isUuid, projectAccess, type ProjectAccess } from "../core/security/access.js";
 import { audit } from "../core/platform/audit.js";
 import { issues, projectMembers, users } from "../db/schema.js";
 import { HttpError, badRequest } from "../core/platform/http.js";
@@ -78,7 +78,12 @@ export async function bcfRoutes(api: FastifyInstance, { db, storage }: AppDeps) 
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
       .where(eq(projectMembers.projectId, a.project.id));
-    const out = await buildBcfZip({ db, storage }, a.project, rows, q.version, members.map((m) => m.email), { snapshots: q.snapshots !== false, lang });
+    // Header files name the models: a model in a task team's WIP closed to the requester (ISO-5
+    // team-only rule) is left out. Other folders keep the earlier behaviour (issue members export).
+    const tree = await FolderTree.load(db, a.project.id);
+    const canSeeFolder = (folderId: string) =>
+      !tree.byId.has(folderId) || !tree.wipTeamScope(folderId) || can(tree.permission(a.principal, folderId).level, "view");
+    const out = await buildBcfZip({ db, storage, canSeeFolder }, a.project, rows, q.version, members.map((m) => m.email), { snapshots: q.snapshots !== false, lang });
     const fileName = bcfFileName(a.project.code, q.version, rows.length, rows[0]?.number);
     await audit(db, {
       projectId: a.project.id,

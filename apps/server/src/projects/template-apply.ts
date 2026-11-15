@@ -56,6 +56,7 @@ import { normaliseChainTemplate, withRuleAssignees } from "../workflow/chain-tem
 import { checkTemplate as checkWorkflowSteps } from "../workflow/engine.js";
 import { templateFromRequest } from "./template-built-ins.js";
 import { applyTemplateCde } from "../cde/settings.js";
+import { assignWipOwnerTeams, ensureCompanyTeams } from "../cde/teams.js";
 import {
   createRequestSchema,
   previewRequestSchema,
@@ -455,6 +456,13 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
   const roleIds = await ensureDefaultProjectRoles(db, projectId, rootId);
   const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
   if (adminRoleId) await ensureProjectAdminsHoldAdminRole(db, projectId, adminRoleId);
+  // ISO 19650 task teams (ISO-5): one per slot company (code from the slot) and the creator's
+  // company; WIP folders granted to one slot company belong to its team.
+  const { teams } = await ensureCompanyTeams(db, projectId, [
+    ...[...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code })),
+    ...(user.companyId ? [{ companyId: user.companyId }] : []),
+  ]);
+  await assignWipOwnerTeams(db, projectId, teams);
   await audit(db, {
     projectId,
     userId: user.id,

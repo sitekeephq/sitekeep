@@ -10,6 +10,7 @@ import type { PermissionLevel } from "../kernel/permissions.js";
 import { labelText, sharedText, SHARED_DEFAULT_LANGUAGE, type SharedParams } from "../platform/i18n.js";
 import type { FolderState } from "../core/types.js";
 import type { AssigneeType } from "./assignee-types.js";
+import type { ProjectRoleKind } from "../documents/cde.js";
 
 export interface ProjectRoleDto {
   id: string;
@@ -20,6 +21,14 @@ export interface ProjectRoleDto {
   color: string | null;
   /** Members holding the role. */
   memberIds: string[];
+  /** 'role' or an ISO 19650 task team (D-4). */
+  kind?: ProjectRoleKind;
+  /** Task team: the company it stands for. */
+  companyId?: string | null;
+  /** Task team: short code ("ARC"). */
+  code?: string | null;
+  /** Task team: the lead appointed party's team. */
+  isLead?: boolean;
 }
 
 /**
@@ -170,7 +179,8 @@ export interface RolePackagePlanDto {
 
 // ---- Who can see? -----------------------------------------------------------------------------
 
-export type AccessVia = "user" | "company" | "role" | "project_admin" | "system_admin";
+/** `task_team_wip`: the folder is a task team's WIP and the member is outside that team (ISO-5). */
+export type AccessVia = "user" | "company" | "role" | "project_admin" | "system_admin" | "task_team_wip";
 
 export interface AccessReasonDto {
   via: AccessVia;
@@ -216,12 +226,18 @@ export const ACCESS_VIA_LABELS_TR: Record<AccessVia, string> = {
   role: "rol yetkisi",
   project_admin: "proje yöneticisi",
   system_admin: "sistem yöneticisi",
+  task_team_wip: "görev ekibinin çalışma alanı",
 };
 
 function reasonText(r: AccessReasonDto, lang: string): string {
   const t = (key: string, params?: SharedParams) => sharedText(lang, `roles.access.${key}`, params);
   if (r.via === "project_admin") return t("reason.projectAdmin");
   if (r.via === "system_admin") return t("reason.systemAdmin");
+  if (r.via === "task_team_wip")
+    return sharedText(lang, r.subjectName ? "cde.teams.access.closedNamed" : "cde.teams.access.closed", {
+      team: r.subjectName ?? "",
+      folder: r.folderName ?? "",
+    });
   const who =
     r.via === "user"
       ? t("via.user")
@@ -239,6 +255,8 @@ export function explainAccess(
 ): string {
   const t = (key: string, params?: SharedParams) => sharedText(lang, `roles.access.${key}`, params);
   if (!e.reasons.length) return t("noAccess", { name: e.name });
+  const wip = e.reasons.find((r) => r.via === "task_team_wip");
+  if (wip && e.level === "none") return sharedText(lang, "cde.teams.access.noAccess", { name: e.name, reason: reasonText(wip, lang) });
   const decisive = e.reasons.filter((r) => r.decisive);
   const shown = decisive.length ? decisive : e.reasons;
   const head = !e.canSee

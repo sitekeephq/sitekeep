@@ -11,5 +11,14 @@
     "taken": "The document code {{code}} is already used by another document: {{path}}. Use a different code, or upload a new version of that document.",
     "renameLocked": "This document has a copy in a shared state ({{path}}); its name can no longer be changed. A project administrator can rename it with a reason.",
     "renameReasonRequired": "Renaming a shared document needs a reason."
+  },
+  "teams": {
+    "errors": {
+      "reasonRequired": "This is a WIP folder of task team \"{{team}}\". A permission for someone outside the team is an exception: give a reason.",
+      "notWip": "Only a folder in Work in Progress can be owned by a task team."
+    },
+    "entities": {
+      "team": "Task team"
+    }
   }
 }

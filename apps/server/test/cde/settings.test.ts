@@ -196,7 +196,7 @@ describe("project template \"cde\" block", () => {
     expect(t.cde).toEqual({
       codeScheme: "iso_uk_na",
       enforceTransitions: true,
-      wipPolicy: "grants",
+      wipPolicy: "team_only",
       adminSeesWip: true,
       archiveFolder: "04-ARCHIVED (Arşiv)",
       transitions: [

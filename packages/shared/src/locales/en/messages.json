@@ -516,5 +516,14 @@
       "fields": "the type's fields (label or key); list value \"M - Mekanik\" → M",
       "subject": "title (not part of the counter scope)"
     }
+  },
+  "cde": {
+    "teams": {
+      "access": {
+        "closed": "closed outside the owning task team (work in progress)",
+        "closedNamed": "work in progress of task team \"{{team}}\": closed outside the team",
+        "noAccess": "{{name}} cannot see this folder: {{reason}}."
+      }
+    }
   }
 }

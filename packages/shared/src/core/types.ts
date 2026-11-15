@@ -78,6 +78,8 @@ export interface FolderDto {
   canUpload?: boolean;
   /** True when the caller can see at least one real subfolder (tree chevron). */
   hasChildren?: boolean;
+  /** ISO 19650 task team that owns this WIP folder (ISO-5); null = none set on this folder. */
+  ownerTeamId?: string | null;
 }
 
 export type DerivativeStatus = "none" | "pending" | "processing" | "ready" | "failed";

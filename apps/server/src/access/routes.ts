@@ -11,6 +11,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import {
   DEFAULT_PROJECT_ROLES,
+  PROJECT_ROLE_KINDS,
   rolePackage,
   ROLE_PACKAGE_KEYS,
   WRITING_ACTIONS,
@@ -50,7 +51,12 @@ const roleBody = z.object({
     .regex(/^#[0-9a-fA-F]{6}$/, "Renk #rrggbb biçiminde olmalı.") // i18n-ok: zod issue detail (validation details stay untranslated)
     .nullable()
     .optional(),
+  /** ISO 19650 task team fields (D-4); `kind` is set on creation only. */
+  companyId: z.string().uuid().nullable().optional(),
+  code: z.string().trim().max(20).nullable().optional(),
+  isLead: z.boolean().optional(),
 });
+const createRoleBody = roleBody.extend({ kind: z.enum(PROJECT_ROLE_KINDS).default("role") });
 
 const packageBody = z.object({
   companyId: z.string().uuid(),
@@ -72,10 +78,20 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
   api.post<{ Params: { pid: string } }>("/projects/:pid/roles", async (req) => {
     const a = await projectAccess(db, req.params.pid, req.user!);
     requireProjectAdmin(a);
-    const body = roleBody.parse(req.body);
+    const body = createRoleBody.parse(req.body);
+    await requireCompany(db, body.companyId);
     const [row] = await db
       .insert(projectRoles)
-      .values({ projectId: a.project.id, name: body.name, description: body.description ?? null, color: body.color ?? null })
+      .values({
+        projectId: a.project.id,
+        name: body.name,
+        description: body.description ?? null,
+        color: body.color ?? null,
+        kind: body.kind,
+        companyId: body.companyId ?? null,
+        code: body.code || null,
+        isLead: body.isLead ?? false,
+      })
       .returning();
     await audit(db, {
       projectId: a.project.id,
@@ -83,7 +99,7 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
       action: "role.created",
       targetType: "role",
       targetId: row!.id,
-      details: { name: body.name },
+      details: { name: body.name, kind: body.kind, ...(body.companyId ? { companyId: body.companyId } : {}) },
     });
     return { ...toRoleDto(row!), memberIds: [] };
   });
@@ -93,7 +109,11 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
     requireProjectAdmin(a);
     const role = await loadRole(db, a, req.params.rid);
     const body = roleBody.partial().parse(req.body);
-    await db.update(projectRoles).set(body).where(eq(projectRoles.id, role.id));
+    await requireCompany(db, body.companyId);
+    await db
+      .update(projectRoles)
+      .set({ ...body, ...(body.code !== undefined ? { code: body.code || null } : {}) })
+      .where(eq(projectRoles.id, role.id));
     await audit(db, {
       projectId: a.project.id,
       userId: a.user.id,
@@ -297,7 +317,23 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
 // ---- Helpers --------------------------------------------------------------------------------
 
 function toRoleDto(r: typeof projectRoles.$inferSelect): Omit<ProjectRoleDto, "memberIds"> {
-  return { id: r.id, projectId: r.projectId, name: r.name, description: r.description, color: r.color };
+  return {
+    id: r.id,
+    projectId: r.projectId,
+    name: r.name,
+    description: r.description,
+    color: r.color,
+    kind: r.kind,
+    companyId: r.companyId ?? null,
+    code: r.code ?? null,
+    isLead: r.isLead,
+  };
+}
+
+async function requireCompany(db: Db, companyId: string | null | undefined) {
+  if (!companyId) return;
+  const [c] = await db.select({ id: companies.id }).from(companies).where(eq(companies.id, companyId));
+  if (!c) throw notFound(msg("access:entities.company"));
 }
 
 export async function listRoles(db: Db, projectId: string): Promise<ProjectRoleDto[]> {
@@ -425,7 +461,11 @@ async function whoCanSee(
     const ex = explainFolderAccess(tree, { userId: m.user.id, companyId: m.companyId, roleIds: m.roleIds, projectAdmin: m.projectAdmin, systemAdmin: m.systemAdmin }, folderId);
     for (const r of ex.reasons)
       r.subjectName =
-        r.via === "company" ? companyNames.get(r.subjectId!) : r.via === "role" ? roleNames.get(r.subjectId!) : undefined;
+        r.via === "company"
+          ? companyNames.get(r.subjectId!)
+          : r.via === "role" || r.via === "task_team_wip"
+            ? roleNames.get(r.subjectId!)
+            : undefined;
     const canSee =
       ex.level !== "none" && (can(ex.level, "view") || (ex.level === "upload_only" && (!file || file.createdBy === m.user.id)));
     const entry = {

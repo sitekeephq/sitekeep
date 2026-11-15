@@ -11,5 +11,14 @@
     "taken": "{{code}} doküman kodu başka bir dokümanda kullanılıyor: {{path}}. Farklı bir kod kullanın ya da o dokümana yeni sürüm yükleyin.",
     "renameLocked": "Bu dokümanın paylaşılmış durumda bir kopyası var ({{path}}); adı artık değiştirilemez. Proje yöneticisi gerekçe yazarak yeniden adlandırabilir.",
     "renameReasonRequired": "Paylaşılmış bir dokümanı yeniden adlandırmak için gerekçe gerekir."
+  },
+  "teams": {
+    "errors": {
+      "reasonRequired": "Bu klasör \"{{team}}\" görev ekibinin çalışma alanı. Ekip dışından birine yetki bir istisnadır: gerekçe yazın.",
+      "notWip": "Yalnız Çalışmada durumundaki bir klasörün sahibi görev ekibi olabilir."
+    },
+    "entities": {
+      "team": "Görev ekibi"
+    }
   }
 }

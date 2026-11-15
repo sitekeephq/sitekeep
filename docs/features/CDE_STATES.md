@@ -13,7 +13,7 @@ is switched on today. Compliance mapping: [ISO 19650 conformance](../compliance/
 | **Document code** | `files.document_code`, register `document_codes (project_id, code_norm) → container_id` | Unique per project: one code belongs to one container. Only names that follow the project's naming standard get a code; the same code with another extension is a rendition of the same document |
 | **Suitability and revision codes** | `file_versions.suitability_code`, `revision_code`, `codes_set_by`, `codes_set_at` | Per version. Profiles: `iso_uk_na` (S0, S1–S4, A1…, B1…, CR; P01.01 → P01 → C01), `legacy_r` (R00), `custom` |
 | **Status flag** | `files.cde_status`: `returned`, `superseded`, `withdrawn` | Beside the state: a rejected WIP original is *returned*, its Shared copy *withdrawn*; a publication replaced by a newer one is *superseded*. Nothing is moved physically |
-| **Task team** | `project_roles.kind = 'task_team'` (+ `company_id`, `code`, `is_lead`); `folders.owner_team_id` | A kind of project role, one per company; a person may belong to several teams. A WIP folder can be owned by one team |
+| **Task team** | `project_roles.kind = 'task_team'` (+ `company_id`, `code`, `is_lead`); `folders.owner_team_id` | A kind of project role, one per company; a person may belong to several teams. A WIP folder can be owned by one team ([task teams](TASK_TEAMS.md)) |
 | **Audit trail** | `audit_log` (+ `prev_hash`, `hash`, `ip`, `user_agent`; indexes by project/action, target, user) | Append-only and hash-chained (migration 0043); `file.viewed`, `file.moved`, `cde.transition`; IP and user agent ([privacy](PRIVACY.md#audit-log-ip-address-and-user-agent)). See [audit log](AUDIT_LOG.md) |
 
 ## Project settings
@@ -102,5 +102,5 @@ migration 0042): `DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.
 | Transitions enforced, archive on publication, returned / withdrawn on rejection | planned |
 | Suitability and revision codes per version | planned |
 | Unique document codes ([details](DOCUMENT_CODES.md)) | done |
-| Task teams and WIP visibility | planned |
+| Task teams and WIP visibility ([task teams](TASK_TEAMS.md)) | done |
 | Audit trail: view events, hash chain, CSV | planned |

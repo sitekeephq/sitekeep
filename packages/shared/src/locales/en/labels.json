@@ -4,7 +4,8 @@
     "company": "company permission",
     "role": "role permission",
     "project_admin": "project admin",
-    "system_admin": "system admin"
+    "system_admin": "system admin",
+    "task_team_wip": "task team WIP"
   },
   "antetField": {
     "projectNo": "Project No",

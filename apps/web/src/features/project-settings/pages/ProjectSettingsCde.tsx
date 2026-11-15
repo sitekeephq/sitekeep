@@ -4,16 +4,17 @@ import { api } from "../../../shared/api/api";
 import { cdeApi } from "../../../shared/api/api-cde";
 import { useLoad, useProject } from "../../../app/context/project";
 import { CdeCodeConflicts } from "../components/CdeCodeConflicts";
+import { TaskTeamsSection } from "./TaskTeamsSection";
 
 /**
  * Proje Ayarları → CDE: the project's ISO 19650 settings (docs/features/CDE_STATES.md). Read-only
  * for now; the sections are where the follow-up work adds editing: codes (ISO-2), transitions
- * (ISO-1) and task teams (ISO-5).
+ * (ISO-1); task teams (ISO-5) live in TaskTeamsSection.
  */
 export function CdeSettings() {
   const { t } = useTranslation("cde");
   const project = useProject();
-  const { data: s, error } = useLoad(() => cdeApi.settings(project.id), [project.id]);
+  const { data: s, error, setData: setSettings } = useLoad(() => cdeApi.settings(project.id), [project.id]);
   const { data: workflows } = useLoad(() => api.workflowTemplates(project.id, "review").catch(() => []), [project.id]);
   const state = (v: CdeState | null) => (v ? t(`states.${v}`) : t("settings.transitions.upload"));
   const yesNo = (v: boolean) => (v ? t("settings.yes") : t("settings.no"));
@@ -96,24 +97,7 @@ export function CdeSettings() {
         )}
       </section>
 
-      <section className="card stack" data-section="teams">
-        <h3 style={{ margin: 0 }}>{t("settings.teams.heading")}</h3>
-        <table className="props-table">
-          <tbody>
-            <tr>
-              <td>{t("settings.teams.wipPolicy")}</td>
-              <td>{t(`wipPolicies.${s.wipPolicy}`)}</td>
-            </tr>
-            <tr>
-              <td>{t("settings.teams.adminSeesWip")}</td>
-              <td>{yesNo(s.adminSeesWip)}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p className="muted small" style={{ margin: 0 }}>
-          {t("settings.teams.pending")}
-        </p>
-      </section>
+      <TaskTeamsSection settings={s} onSettings={setSettings} />
 
       <CdeCodeConflicts projectId={project.id} />
     </div>

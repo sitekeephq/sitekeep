@@ -15,7 +15,8 @@ import { FolderTree, projectAccess, requireAction, userNames, type ProjectAccess
 import { audit } from "../../core/platform/audit.js";
 import type { Db } from "../../db/index.js";
 import { companies, fileVersions, files, folderGrants, folders, namingStandards, projectRoles } from "../../db/schema.js";
-import { badRequest, notFound } from "../../core/platform/http.js";
+import { HttpError, badRequest, notFound } from "../../core/platform/http.js";
+import { subjectInTeam } from "../../cde/teams.js";
 import { msg } from "../../i18n/index.js";
 import { toFileDto } from "./mapper.js";
 import { virtualFolderDtos } from "../../projects/project-templates.js";
@@ -191,11 +192,25 @@ export async function folderRoutes(api: FastifyInstance, { db }: AppDeps) {
   api.put<{ Params: { pid: string; fid: string } }>("/projects/:pid/folders/:fid/permissions", async (req) => {
     const a = await projectAccess(db, req.params.pid, req.user!);
     const body = z
-      .object({ entries: z.array(entrySchema).min(1).max(500), mode: z.enum(["add", "replace"]).default("add") })
+      .object({
+        entries: z.array(entrySchema).min(1).max(500),
+        mode: z.enum(["add", "replace"]).default("add"),
+        /** Required for an exception grant outside the owning task team (ISO-5, D-3). */
+        reason: z.string().trim().max(1000).optional(),
+      })
       .parse(req.body);
     const tree = await FolderTree.load(db, a.project.id);
     const folder = tree.get(req.params.fid);
     requireAction(tree, a, folder.id, "manage");
+    // ISO-5: on a task team's WIP folder (team_only) a grant to anyone outside the team is an
+    // exception: it needs a reason and is logged as "cde.override" (warn + reason, not a block).
+    const override = await wipOverride(db, tree, folder.id, body.entries);
+    if (override && override.outside.size && !body.reason)
+      throw new HttpError(400, "wip_reason_required", msg("cde:teams.errors.reasonRequired", { team: override.team.name }), {
+        teamId: override.team.id,
+        teamName: override.team.name,
+        subjects: [...override.outside],
+      });
     const roleSubjects = [...new Set(body.entries.filter((e) => e.subjectType === "role").map((e) => e.subjectId))];
     if (roleSubjects.length) {
       const rows = await db
@@ -215,7 +230,10 @@ export async function folderRoutes(api: FastifyInstance, { db }: AppDeps) {
         results.push({ ...e, status: "skipped_existing" });
         continue;
       }
-      const inherited = inheritedLevel(tree, parentChain, e.subjectType, e.subjectId);
+      // Outside the owning team nothing above the team folder is inherited (FolderTree rule).
+      const ownedAt = override?.outside.has(key) ? parentChain.indexOf(override.ownedFolderId) : 0;
+      const chain = ownedAt < 0 ? [] : parentChain.slice(ownedAt);
+      const inherited = inheritedLevel(tree, chain, e.subjectType, e.subjectId);
       if (e.level !== "none" && isDowngrade(inherited, e.level)) {
         results.push({ ...e, status: `rejected_lower_than_inherited:${inherited}` });
         continue;
@@ -247,10 +265,49 @@ export async function folderRoutes(api: FastifyInstance, { db }: AppDeps) {
       action: "folder.permissions_set",
       targetType: "folder",
       targetId: folder.id,
-      details: { mode: body.mode, results },
+      details: { mode: body.mode, results, ...(body.reason ? { reason: body.reason } : {}) },
     });
+    const overrides = override ? results.filter((r) => r.status === "ok" && r.level !== "none" && override.outside.has(`${r.subjectType}:${r.subjectId}`)) : [];
+    if (override && overrides.length)
+      await audit(db, {
+        projectId: a.project.id,
+        userId: a.user.id,
+        action: "cde.override",
+        targetType: "folder",
+        targetId: folder.id,
+        details: {
+          name: folder.name,
+          teamId: override.team.id,
+          teamName: override.team.name,
+          reason: body.reason,
+          grants: overrides.map(({ subjectType, subjectId, level }) => ({ subjectType, subjectId, level })),
+        },
+      });
     return { results, grants: await listGrants(db, await FolderTree.load(db, a.project.id), folder.id) };
   });
+}
+
+/**
+ * The owning team of a task team's WIP folder under `team_only` and the grant subjects (as
+ * "type:id") outside it; null when the folder is not governed by the team rule.
+ */
+async function wipOverride(
+  db: Db,
+  tree: FolderTree,
+  folderId: string,
+  entries: readonly { subjectType: "user" | "company" | "role"; subjectId: string; level: string }[],
+) {
+  const scope = tree.wipTeamScope(folderId);
+  if (!scope) return null;
+  const [team] = await db
+    .select({ id: projectRoles.id, name: projectRoles.name, companyId: projectRoles.companyId })
+    .from(projectRoles)
+    .where(eq(projectRoles.id, scope.teamId));
+  if (!team) return null;
+  const outside = new Set<string>();
+  for (const e of entries)
+    if (e.level !== "none" && !(await subjectInTeam(db, team, e.subjectType, e.subjectId))) outside.add(`${e.subjectType}:${e.subjectId}`);
+  return { team, ownedFolderId: scope.ownedFolderId, outside };
 }
 
 function inheritedLevel(tree: FolderTree, chain: string[], subjectType: string, subjectId: string) {
@@ -322,5 +379,6 @@ export function toFolderDto(tree: FolderTree, principal: Principal, id: string):
     myLevel: perm.level,
     canUpload: perm.canUpload,
     hasChildren: (tree.children.get(id) ?? []).some((c) => tree.visible(principal, c.id)),
+    ownerTeamId: f.ownerTeamId ?? null,
   };
 }

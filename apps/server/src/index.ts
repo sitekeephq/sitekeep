@@ -11,6 +11,7 @@ import { JobQueue } from "./jobs/queue.js";
 import { Converters } from "./previews/converters.js";
 import { loadSecretKey } from "./core/platform/secrets.js";
 import { upgradeSeededLabels } from "./projects/seeded-labels.js";
+import { seedTaskTeams } from "./cde/teams.js";
 import { startDueReminders } from "./workflow/reminders.js";
 import { LocalStorage } from "./core/platform/storage.js";
 import { reportLlmFromEnv } from "./reports/llm.js";
@@ -82,6 +83,8 @@ await bootstrapAdmin();
 await backfillDocumentCodesAtStart(db, (m, e) => (e ? console.error(m, e) : console.log(m)));
 // Default labels templates wrote before they became Title Case ("İş sonu" → "İş Sonu").
 await upgradeSeededLabels(db);
+// ISO 19650 task teams: one per company in projects that have none yet (idempotent, batched).
+await seedTaskTeams(db).catch((e) => console.error("task team seeding failed", e));
 
 const converters = new Converters();
 const app = await buildApp({

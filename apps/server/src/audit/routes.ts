@@ -10,10 +10,10 @@
 import { Readable } from "node:stream";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { SQL } from "drizzle-orm";
-import type { AuditPageDto } from "@sitekeep/shared";
+import type { AuditPageDto, Principal } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import type { Db } from "../db/index.js";
-import { projectAccess, requireProjectAdmin } from "../core/security/access.js";
+import { FolderTree, projectAccess, requireProjectAdmin } from "../core/security/access.js";
 import { forbidden } from "../core/platform/http.js";
 import { audit } from "../core/platform/audit.js";
 import { msg, supportedLanguage, tFor, tReq } from "../i18n/index.js";
@@ -28,14 +28,22 @@ function requireSystemAdmin(req: FastifyRequest) {
 const CSV_COLUMNS = ["id", "time", "project", "user", "action", "targetType", "targetId", "target", "ip", "userAgent", "details", "hash"] as const;
 
 /** Streams every row of a query as CSV, newest first. */
-async function sendCsv(db: Db, req: FastifyRequest, reply: FastifyReply, where: SQL | undefined, fileName: string, projectId: string | null) {
+async function sendCsv(
+  db: Db,
+  req: FastifyRequest,
+  reply: FastifyReply,
+  where: SQL | undefined,
+  fileName: string,
+  projectId: string | null,
+  viewer?: { tree: FolderTree; principal: Principal },
+) {
   // A link cannot send the interface language as a header: `lang` in the query wins (column names).
   const asked = supportedLanguage((req.query as { lang?: string }).lang);
   const t = asked ? tFor(asked) : tReq(req);
   async function* lines() {
     yield CSV_BOM + csvLine(CSV_COLUMNS.map((c) => t(`audit:csv.columns.${c}`)));
     for await (const rows of auditRows(db, where)) {
-      for (const e of await toAuditDtos(db, rows, { client: true, projectCodes: true }))
+      for (const e of await toAuditDtos(db, rows, { client: true, projectCodes: true, viewer }))
         yield csvLine([
           e.id,
           e.at,
@@ -70,14 +78,16 @@ export async function auditRoutes(api: FastifyInstance, deps: AppDeps) {
     requireProjectAdmin(a);
     const q = auditQuery.parse(req.query);
     const page = await auditPage(db, auditWhere(q, { projectId: a.project.id }), q.limit, q.cursor);
-    return { entries: await toAuditDtos(db, page.rows, { client: true }), nextCursor: page.nextCursor };
+    const viewer = { tree: await FolderTree.load(db, a.project.id), principal: a.principal };
+    return { entries: await toAuditDtos(db, page.rows, { client: true, viewer }), nextCursor: page.nextCursor };
   });
 
   api.get("/projects/:pid/audit.csv", async (req, reply) => {
     const a = await projectAccess(db, (req.params as { pid: string }).pid, req.user!);
     requireProjectAdmin(a);
     const q = auditQuery.parse(req.query);
-    return sendCsv(db, req, reply, auditWhere(q, { projectId: a.project.id }), `audit-${a.project.code}-${stamp()}.csv`.replace(/[^\w.-]/g, "_"), a.project.id);
+    const viewer = { tree: await FolderTree.load(db, a.project.id), principal: a.principal };
+    return sendCsv(db, req, reply, auditWhere(q, { projectId: a.project.id }), `audit-${a.project.code}-${stamp()}.csv`.replace(/[^\w.-]/g, "_"), a.project.id, viewer);
   });
 
   api.get<{ Params: { pid: string; id: string } }>("/projects/:pid/files/:id/history", async (req): Promise<AuditPageDto> => {

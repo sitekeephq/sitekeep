@@ -138,7 +138,7 @@ export async function addVersion(
       .values({ projectId: a.project.id, folderId, name, attributes, createdBy: a.user.id, documentCode })
       .returning();
     // A new container registers its code (a rendition joins the container that holds it).
-    const file = await registerNewFileCode(txDb, inserted!, guard.source);
+    const file = await registerNewFileCode(txDb, inserted!, guard.source, a.principal);
     const [version] = await tx
       .insert(fileVersions)
       .values({

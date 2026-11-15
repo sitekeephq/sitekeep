@@ -24,7 +24,8 @@
         "attribute_bound": "Klasöre öznitelik bağlandı",
         "attribute_unbound": "Klasörden öznitelik kaldırıldı",
         "settings_updated": "Klasör ayarı değişti",
-        "materialized": "Klasör oluşturuldu (ilk dosya)"
+        "materialized": "Klasör oluşturuldu (ilk dosya)",
+        "owner_team_set": "Sahip görev ekibi değişti"
       },
       "naming": {
         "created": "İsimlendirme standardı eklendi",
@@ -183,7 +184,9 @@
       },
       "cde": {
         "settings_updated": "CDE ayarları değişti",
-        "transition": "Durum değişti"
+        "transition": "Durum değişti",
+        "override": "Kural istisnası (gerekçeli)",
+        "teams_seeded": "Görev ekipleri oluşturuldu"
       },
       "audit": {
         "exported": "Denetim kaydı dışa aktarıldı",

@@ -7,6 +7,7 @@ import { documentsApi } from "../api";
 import { useLoad } from "../../../app/context/project";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { WhoCanSeeDialog } from "./WhoCanSeeDialog";
+import { useWipReason } from "./WipReason";
 
 const LEVELS = PERMISSION_LEVELS.filter((l) => l !== "none");
 
@@ -29,6 +30,7 @@ export function PermissionsDialog({
   const { data: companies } = useLoad(() => api.companies(), []);
   const { data: roles } = useLoad(() => api.roles(projectId), [projectId]);
   const [whoOpen, setWhoOpen] = useState(false);
+  const withWipReason = useWipReason();
   const [subjectType, setSubjectType] = useState<SubjectType>("user");
   const [subjectId, setSubjectId] = useState("");
   const [level, setLevel] = useState<PermissionLevel>("view_download");
@@ -37,7 +39,8 @@ export function PermissionsDialog({
   async function save(entries: { subjectType: SubjectType; subjectId: string; level: PermissionLevel }[]) {
     setMsg(null);
     try {
-      const r = await documentsApi.setPermissions(projectId, folder.id, entries, "replace");
+      const r = await withWipReason((reason) => documentsApi.setPermissions(projectId, folder.id, entries, "replace", reason));
+      if (!r) return;
       setData(r.grants);
       const problems = r.results.filter((x) => x.status !== "ok");
       if (problems.length)

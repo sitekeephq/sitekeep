@@ -46,8 +46,7 @@
     "teams": {
       "heading": "Görev Ekipleri",
       "wipPolicy": "Çalışma Alanını Kim Görür",
-      "adminSeesWip": "Proje Yöneticileri Tüm Çalışma Alanını Görür",
-      "pending": "Görev ekipleri sonraki bir güncellemeyle gelecek."
+      "adminSeesWip": "Proje Yöneticileri Tüm Çalışma Alanını Görür"
     },
     "yes": "Evet",
     "no": "Hayır"
@@ -92,6 +91,53 @@
       "code": "Kod",
       "holder": "Kayıtlı Doküman",
       "others": "Aynı Kodu Kullananlar"
+    }
+  },
+  "teams": {
+    "description": "Görev ekibi, bir firmanın bu projedeki ekibidir (ISO 19650). Bir çalışma (WIP) klasörünün sahibi bir ekip olabilir; \"Yalnız Sahip Görev Ekibi\" seçiliyken üst klasörlerden ne gelirse gelsin ekip dışından kimse onu göremez.",
+    "policyHelp": {
+      "grants": "Klasör yetkileri olduğu gibi geçerlidir; sahip ekip bilgi amaçlıdır.",
+      "team_only": "Bir ekibin çalışma klasörü ekip dışına kapalıdır. Ekip dışından birine verilen yetki gerekçeli bir istisnadır."
+    },
+    "empty": "Henüz görev ekibi yok. Her firma için bir ekip ekleyin ya da SiteKeep projedeki firmalardan oluştursun.",
+    "lead": "Lider",
+    "columns": {
+      "team": "Ekip",
+      "code": "Kod",
+      "company": "Firma",
+      "members": "Üyeler"
+    },
+    "fields": {
+      "name": "Ekip Adı",
+      "code": "Kod",
+      "company": "Firma",
+      "noCompany": "Firma yok"
+    },
+    "actions": {
+      "create": "Ekip Ekle",
+      "delete": "Ekibi Sil",
+      "seed": "Firmalar İçin Ekip Oluştur",
+      "addMember": "Üye Ekle",
+      "removeMember": "{{name}} çıkar",
+      "setLead": "Lider Yap",
+      "unsetLead": "Lider Değil"
+    },
+    "deleteConfirm": "\"{{name}}\" görev ekibi silinsin mi? Üyelikleri ve klasör yetkileri kaldırılır; sahibi olduğu klasörlerin sahibi kalmaz.",
+    "seeded_one": "{{count}} ekip oluşturuldu; {{folders}} çalışma klasörüne sahip ekip atandı.",
+    "seeded_other": "{{count}} ekip oluşturuldu; {{folders}} çalışma klasörüne sahip ekip atandı.",
+    "ownerTeam": {
+      "label": "Sahip Görev Ekibi",
+      "none": "Sahip ekip yok",
+      "help": "Bu çalışma klasöründe çalışan ekip. \"Yalnız Sahip Görev Ekibi\" seçiliyken ekip dışındaki herkese kapalıdır."
+    },
+    "reason": {
+      "title": "Görev Ekibi Dışına İstisna",
+      "message": "Bu klasör \"{{team}}\" görev ekibinin çalışma alanı. Ekip dışından birine erişim vermek bir istisnadır ve denetim kaydına yazılır. Neden gerekli?",
+      "confirm": "Erişim Ver"
+    },
+    "whoCanSee": {
+      "via": "görev ekibi çalışma kuralı",
+      "note": "\"{{team}}\" görev ekibinin çalışma alanı (\"{{folder}}\" klasörü): istisna yetkileri dışında ekip dışındaki herkese kapalı."
     }
   }
 }

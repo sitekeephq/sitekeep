@@ -6,6 +6,7 @@ import { documentsApi } from "../api";
 import { useLoad } from "../../../app/context/project";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
+import { WipRuleNote } from "./WipRuleNote";
 
 const VIA_KEYS = {
   user: "whoCanSee.via.user",
@@ -13,6 +14,7 @@ const VIA_KEYS = {
   role: "whoCanSee.via.role",
   project_admin: "whoCanSee.via.projectAdmin",
   system_admin: "whoCanSee.via.systemAdmin",
+  task_team_wip: "cde:teams.whoCanSee.via",
 } as const satisfies Record<AccessReasonDto["via"], string>;
 
 /** "Bu dosyayı / klasörü kim görebilir?" — every member, their level and the grants behind it. */
@@ -57,6 +59,7 @@ export function WhoCanSeeDialog({
               components={{ b: <strong /> }}
             />
           </p>
+          <WipRuleNote data={data} />
           <EntryTable entries={visible} />
           {hidden.length > 0 && (
             <>
@@ -77,7 +80,7 @@ export function WhoCanSeeDialog({
 }
 
 function EntryTable({ entries }: { entries: WhoCanSeeEntryDto[] }) {
-  const { t } = useTranslation(["documents", "common"]);
+  const { t } = useTranslation(["documents", "common", "cde"]);
   const label = useLabel();
   if (!entries.length) return null;
   return (

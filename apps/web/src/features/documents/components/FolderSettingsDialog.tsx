@@ -8,6 +8,7 @@ import { useLoad } from "../../../app/context/project";
 import { useAsk } from "../../../shared/ui/Ask";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { WhoCanSeeDialog } from "./WhoCanSeeDialog";
+import { OwnerTeamField } from "./OwnerTeamField";
 
 export function FolderSettingsDialog({
   projectId,
@@ -99,6 +100,7 @@ export function FolderSettingsDialog({
           </option>
         ))}
       </select>
+      <OwnerTeamField folder={folder} onChanged={onChanged} />
       <label>{t("folderSettings.fields.standard")}</label>
       <select value={standardId} onChange={(e) => setStandardId(e.target.value)}>
         <option value="">{t("folderSettings.options.inheritStandard")}</option>

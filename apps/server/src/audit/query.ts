@@ -5,10 +5,10 @@
  */
 import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, like, lt, min, or, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
-import type { AuditEntryDto, AuditVerifyDto } from "@sitekeep/shared";
+import type { AuditEntryDto, AuditVerifyDto, Principal } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { auditLog, fileVersions, files, folders, projects } from "../db/schema.js";
-import { userNames } from "../core/security/access.js";
+import { hiddenByWipRule, userNames, type FolderTree } from "../core/security/access.js";
 import { badRequest } from "../core/platform/http.js";
 import { msg } from "../i18n/index.js";
 
@@ -83,35 +83,106 @@ export async function* auditRows(db: Db, where: SQL | undefined, pageSize = 1000
 }
 
 /** Rows as DTOs with user, file / folder and project names; the client only when `client`. */
-export async function toAuditDtos(db: Db, rows: AuditRow[], opts: { client: boolean; projectCodes?: boolean }): Promise<AuditEntryDto[]> {
+export async function toAuditDtos(
+  db: Db,
+  rows: AuditRow[],
+  opts: {
+    client: boolean;
+    projectCodes?: boolean;
+    /**
+     * ISO-5: the reader of a project's log. A row about a file or folder in a task team's WIP
+     * closed to them (team-only policy with admin_sees_wip off) keeps its place in the log but
+     * not its target name or details.
+     */
+    viewer?: { tree: FolderTree; principal: Principal };
+  },
+): Promise<AuditEntryDto[]> {
   const names = await userNames(db, rows.map((r) => r.userId));
   const ids = (type: string) => [...new Set(rows.filter((r) => r.targetType === type && r.targetId && isUuidLike(r.targetId)).map((r) => r.targetId!))];
   const fileIds = ids("file");
   const folderIds = ids("folder");
   const targetNames = new Map<string, string>();
+  /** Folder of each file / folder / version target, for the WIP rule. */
+  const targetFolder = new Map<string, string>();
   if (fileIds.length)
-    for (const f of await db.select({ id: files.id, name: files.name }).from(files).where(inArray(files.id, fileIds))) targetNames.set(`file:${f.id}`, f.name);
+    for (const f of await db.select({ id: files.id, name: files.name, folderId: files.folderId }).from(files).where(inArray(files.id, fileIds))) {
+      targetNames.set(`file:${f.id}`, f.name);
+      targetFolder.set(`file:${f.id}`, f.folderId);
+    }
   if (folderIds.length)
-    for (const f of await db.select({ id: folders.id, name: folders.name }).from(folders).where(inArray(folders.id, folderIds))) targetNames.set(`folder:${f.id}`, f.name);
+    for (const f of await db.select({ id: folders.id, name: folders.name }).from(folders).where(inArray(folders.id, folderIds))) {
+      targetNames.set(`folder:${f.id}`, f.name);
+      targetFolder.set(`folder:${f.id}`, f.id);
+    }
+  // Files and folders named inside details (zip items, moves, copies): their folders too.
+  const refs = new Map<number, { files: string[]; folders: string[] }>();
+  if (opts.viewer)
+    for (const r of rows) if (r.details) refs.set(r.id, detailRefs(r.details));
+  const detailFileIds = [...new Set([...refs.values()].flatMap((x) => x.files))].filter((id) => !targetFolder.has(`file:${id}`));
+  for (let i = 0; i < detailFileIds.length; i += 500)
+    for (const f of await db.select({ id: files.id, folderId: files.folderId }).from(files).where(inArray(files.id, detailFileIds.slice(i, i + 500))))
+      targetFolder.set(`file:${f.id}`, f.folderId);
+  const versionIds = opts.viewer ? ids("file_version") : [];
+  if (versionIds.length)
+    for (const v of await db
+      .select({ id: fileVersions.id, folderId: files.folderId })
+      .from(fileVersions)
+      .innerJoin(files, eq(files.id, fileVersions.fileId))
+      .where(inArray(fileVersions.id, versionIds)))
+      targetFolder.set(`file_version:${v.id}`, v.folderId);
+  const hidden = (r: AuditRow) => {
+    if (!opts.viewer) return false;
+    const { tree, principal } = opts.viewer;
+    const folderIds = [
+      r.targetId ? targetFolder.get(`${r.targetType}:${r.targetId}`) : undefined,
+      ...(refs.get(r.id)?.files ?? []).map((id) => targetFolder.get(`file:${id}`)),
+      ...(refs.get(r.id)?.folders ?? []),
+    ];
+    return folderIds.some((id) => !!id && hiddenByWipRule(tree, principal, id));
+  };
   const codes = new Map<string, string>();
   const pids = [...new Set(rows.map((r) => r.projectId).filter((x): x is string => !!x))];
   if (opts.projectCodes && pids.length)
     for (const p of await db.select({ id: projects.id, code: projects.code }).from(projects).where(inArray(projects.id, pids))) codes.set(p.id, p.code);
-  return rows.map((r) => ({
-    id: r.id,
-    projectId: r.projectId,
-    userId: r.userId,
-    ...(r.userId && names.has(r.userId) && { userName: names.get(r.userId) }),
-    action: r.action,
-    targetType: r.targetType,
-    targetId: r.targetId,
-    details: r.details,
-    at: r.at.toISOString(),
-    hash: r.hash,
-    ...(opts.client && { ip: r.ip, userAgent: r.userAgent }),
-    ...(r.targetId && targetNames.has(`${r.targetType}:${r.targetId}`) && { targetName: targetNames.get(`${r.targetType}:${r.targetId}`) }),
-    ...(r.projectId && codes.has(r.projectId) && { projectCode: codes.get(r.projectId) }),
-  }));
+  return rows.map((r) => {
+    const withheld = hidden(r);
+    const targetName = targetNames.get(`${r.targetType}:${r.targetId}`);
+    return {
+      id: r.id,
+      projectId: r.projectId,
+      userId: r.userId,
+      ...(r.userId && names.has(r.userId) && { userName: names.get(r.userId) }),
+      action: r.action,
+      targetType: r.targetType,
+      targetId: r.targetId,
+      details: withheld ? { withheld: "task_team_wip" } : r.details,
+      at: r.at.toISOString(),
+      hash: r.hash,
+      ...(opts.client && { ip: r.ip, userAgent: r.userAgent }),
+      ...(r.targetId && targetName !== undefined && !withheld && { targetName }),
+      ...(r.projectId && codes.has(r.projectId) && { projectCode: codes.get(r.projectId) }),
+    };
+  });
+}
+
+const FILE_KEYS = new Set(["fileId", "fileIds", "copiedFileId", "sourceFileId"]);
+const FOLDER_KEYS = new Set(["folderId", "folderIds", "parentId", "fromFolderId", "toFolderId", "sourceFolderId", "targetFolderId"]);
+
+/** File and folder ids named anywhere in a row's details (keys in FILE_KEYS / FOLDER_KEYS). */
+function detailRefs(details: unknown): { files: string[]; folders: string[] } {
+  const out = { files: [] as string[], folders: [] as string[] };
+  const walk = (v: unknown, depth: number) => {
+    if (depth > 4 || !v || typeof v !== "object") return;
+    if (Array.isArray(v)) return v.slice(0, 1000).forEach((x) => walk(x, depth + 1));
+    for (const [k, x] of Object.entries(v)) {
+      const list = Array.isArray(x) ? x : [x];
+      const into = FILE_KEYS.has(k) ? out.files : FOLDER_KEYS.has(k) ? out.folders : null;
+      if (into) for (const id of list) if (typeof id === "string" && isUuidLike(id)) into.push(id);
+      if (typeof x === "object") walk(x, depth + 1);
+    }
+  };
+  walk(details, 0);
+  return out;
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

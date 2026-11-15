@@ -24,7 +24,8 @@
         "attribute_bound": "Attribute linked to folder",
         "attribute_unbound": "Attribute removed from folder",
         "settings_updated": "Folder setting changed",
-        "materialized": "Folder created (first file)"
+        "materialized": "Folder created (first file)",
+        "owner_team_set": "Owner task team changed"
       },
       "naming": {
         "created": "Naming standard added",
@@ -183,7 +184,9 @@
       },
       "cde": {
         "settings_updated": "CDE settings changed",
-        "transition": "State changed"
+        "transition": "State changed",
+        "override": "Rule exception (with reason)",
+        "teams_seeded": "Task teams created"
       },
       "audit": {
         "exported": "Audit log exported",

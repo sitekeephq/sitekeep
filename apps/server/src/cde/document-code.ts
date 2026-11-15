@@ -22,10 +22,10 @@
  *   are listed by `listCodeConflicts`.
  */
 import { and, asc, eq, gt, inArray, isNotNull, isNull, or, type SQL } from "drizzle-orm";
-import { nameFields, parseName, splitExtension, type NamingStandard } from "@sitekeep/shared";
+import { nameFields, parseName, splitExtension, type NamingStandard, type Principal } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { documentCodes, files, folders, namingStandards, projectCdeSettings } from "../db/schema.js";
-import { FolderTree } from "../core/security/access.js";
+import { FolderTree, hiddenByWipRule } from "../core/security/access.js";
 import { folderPath } from "../core/security/roles.js";
 import { audit } from "../core/platform/audit.js";
 import { badRequest, conflict, forbidden } from "../core/platform/http.js";
@@ -137,7 +137,7 @@ function isRendition(members: FileLite[], folderId: string, name: string, norm: 
   );
 }
 
-async function conflictDetails(db: Db, tree: FolderTree, row: CodeRow, code: string): Promise<DocumentCodeConflictDetails> {
+async function conflictDetails(db: Db, tree: FolderTree, row: CodeRow, code: string, principal?: Principal): Promise<DocumentCodeConflictDetails> {
   const members = await containerFiles(db, row.containerId);
   const norm = row.codeNorm;
   const pick =
@@ -145,12 +145,13 @@ async function conflictDetails(db: Db, tree: FolderTree, row: CodeRow, code: str
     members.find((m) => !m.deletedAt && sameCode(m, norm)) ??
     members.find((m) => !m.deletedAt) ??
     members[0];
+  if (pick && hiddenByWipRule(tree, principal, pick.folderId)) return { kind: "document_code", code, existingPath: "…", existingFileId: null };
   const existingPath = pick ? pathOf(tree, pick) : code;
   return { kind: "document_code", code, existingPath, existingFileId: pick?.id ?? null };
 }
 
-async function conflictError(db: Db, tree: FolderTree, row: CodeRow, code: string): Promise<Error> {
-  const details = await conflictDetails(db, tree, row, code);
+async function conflictError(db: Db, tree: FolderTree, row: CodeRow, code: string, principal?: Principal): Promise<Error> {
+  const details = await conflictDetails(db, tree, row, code, principal);
   return conflict(msg("cde:documentCode.taken", { code, path: details.existingPath }), details);
 }
 
@@ -211,7 +212,7 @@ export async function checkDocumentCodeImpl(db: Db, input: DocumentCodeCheck): P
   // Enforcement off (D-8): codes are still derived and registered, a duplicate is only recorded
   // (files.document_code) and listed as a conflict, never refused.
   const refuse = async (held: CodeRow): Promise<void> => {
-    if (standards.enforce) throw await conflictError(db, tree, held, code);
+    if (standards.enforce) throw await conflictError(db, tree, held, code, input.access?.principal);
   };
 
   if (!containerId) {
@@ -268,6 +269,8 @@ export async function registerNewFileCode<F extends { id: string; projectId: str
   db: Db,
   file: F,
   source: DocumentCodeCheck["source"],
+  /** The caller: a holder in a WIP folder closed to them is not named (ISO-5). */
+  principal?: Principal,
 ): Promise<F> {
   if (!file.documentCode) return file;
   const norm = normalizeDocumentCode(file.documentCode);
@@ -293,7 +296,7 @@ export async function registerNewFileCode<F extends { id: string; projectId: str
     .from(projectCdeSettings)
     .where(eq(projectCdeSettings.projectId, file.projectId));
   if (!settings?.enforce) return file;
-  throw await conflictError(db, await FolderTree.load(db, file.projectId), row, file.documentCode);
+  throw await conflictError(db, await FolderTree.load(db, file.projectId), row, file.documentCode, principal);
 }
 
 /**
@@ -304,11 +307,13 @@ export async function registerNewFileCode<F extends { id: string; projectId: str
 export async function documentCodeWarning(
   db: Db,
   file: { projectId: string; containerId: string; documentCode: string | null },
+  /** The caller: a holder in a WIP folder closed to them is not named (ISO-5). */
+  principal?: Principal,
 ): Promise<DocumentCodeConflictDetails | null> {
   if (!file.documentCode) return null;
   const row = await codeRow(db, file.projectId, normalizeDocumentCode(file.documentCode));
   if (!row || row.containerId === file.containerId) return null;
-  return conflictDetails(db, await FolderTree.load(db, file.projectId), row, file.documentCode);
+  return conflictDetails(db, await FolderTree.load(db, file.projectId), row, file.documentCode, principal);
 }
 
 // ---- Live data ----------------------------------------------------------------------------------
@@ -412,7 +417,7 @@ export interface CodeConflict {
 }
 
 /** Live files whose code is registered to another container (duplicates from before ISO-3). */
-export async function listCodeConflicts(db: Db, projectId: string): Promise<CodeConflict[]> {
+export async function listCodeConflicts(db: Db, projectId: string, principal?: Principal): Promise<CodeConflict[]> {
   const coded = await db
     .select({ ...fileLite, createdAt: files.createdAt })
     .from(files)
@@ -447,7 +452,10 @@ export async function listCodeConflicts(db: Db, projectId: string): Promise<Code
     createdAt: f.createdAt.toISOString(),
   });
   const out: CodeConflict[] = [];
-  for (const [norm, list] of candidates) {
+  for (const [norm, all] of candidates) {
+    // ISO-5: files in a task team's WIP closed to the caller (admin_sees_wip off) are left out.
+    const list = all.filter((f) => !hiddenByWipRule(tree, principal, f.folderId));
+    if (!list.length) continue;
     const row = registered.get(norm);
     const holderContainer = row?.containerId ?? list[0]!.containerId;
     const others = list.filter((f) => f.containerId !== holderContainer);

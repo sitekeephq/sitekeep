@@ -516,5 +516,14 @@
       "fields": "tipin alanları (etiket ya da anahtar); liste değeri \"M - Mekanik\" → M",
       "subject": "başlık (sayaç kapsamına girmez)"
     }
+  },
+  "cde": {
+    "teams": {
+      "access": {
+        "closed": "sahibi olan görev ekibi dışına kapalı (çalışmada)",
+        "closedNamed": "\"{{team}}\" görev ekibinin çalışma alanı: ekip dışına kapalı",
+        "noAccess": "{{name}} bu klasörü göremez: {{reason}}."
+      }
+    }
   }
 }

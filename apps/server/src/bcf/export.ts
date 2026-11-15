@@ -10,7 +10,7 @@ import type { Db } from "../db/index.js";
 import type { issues, projects } from "../db/schema.js";
 import type { Storage } from "../core/platform/storage.js";
 import { writeExtensions, writeMarkup, writeProject, writeVersion, writeVisinfo, type ViewpointEntry } from "./bcf-xml.js";
-import { issuesToBundles } from "./topics.js";
+import { issuesToBundles, type BundleOptions } from "./topics.js";
 import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
 
 export interface BcfZipResult {
@@ -20,7 +20,7 @@ export interface BcfZipResult {
 }
 
 export async function buildBcfZip(
-  o: { db: Db; storage: Storage },
+  o: BundleOptions,
   project: Pick<typeof projects.$inferSelect, "id" | "code" | "name">,
   rows: (typeof issues.$inferSelect)[],
   version: BcfVersion,

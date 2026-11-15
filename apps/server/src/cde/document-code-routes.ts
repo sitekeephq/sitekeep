@@ -14,6 +14,6 @@ export async function documentCodeRoutes(api: FastifyInstance, deps: AppDeps) {
   api.get<{ Params: { pid: string } }>("/projects/:pid/cde/code-conflicts", async (req): Promise<{ conflicts: CodeConflict[] }> => {
     const a = await projectAccess(db, req.params.pid, req.user!);
     requireProjectAdmin(a);
-    return { conflicts: await listCodeConflicts(db, a.project.id) };
+    return { conflicts: await listCodeConflicts(db, a.project.id, a.principal) };
   });
 }

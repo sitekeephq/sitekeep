@@ -3,7 +3,9 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { DEFAULT_PROJECT_ROLES, PROJECT_MODULES, type FolderState, type ProjectModule } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
-import { projectAccess, requireProjectAdmin, tokenAllowsProject, userNames } from "../core/security/access.js";
+import { FolderTree, projectAccess, requireProjectAdmin, tokenAllowsProject, userNames } from "../core/security/access.js";
+import { joinCompanyTeam } from "../cde/teams.js";
+import { toAuditDtos } from "../audit/query.js";
 import { audit } from "../core/platform/audit.js";
 import { ensureCdeSettings } from "../cde/settings.js";
 import { auditLog, companies, folders, memberRoles, projectMembers, projectRoles, projects, users } from "../db/schema.js";
@@ -227,6 +229,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
         .values({ projectId: a.project.id, userId: user.id, roleId })
         .onConflictDoNothing();
     }
+    await joinCompanyTeam(db, a.project.id, user.id, body.companyId ?? user.companyId);
     await audit(db, {
       projectId: a.project.id,
       userId: a.user.id,
@@ -250,6 +253,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
       .where(and(eq(projectMembers.projectId, a.project.id), eq(projectMembers.userId, req.params.uid)))
       .returning();
     if (!rows.length) throw notFound(msg("projects:entities.member"));
+    if (body.companyId) await joinCompanyTeam(db, a.project.id, req.params.uid, body.companyId);
     if (body.isProjectAdmin === true) {
       const roleIds = await ensureDefaultProjectRoles(db, a.project.id, a.project.rootFolderId);
       const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
@@ -308,7 +312,17 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
         .orderBy(desc(auditLog.id))
         .limit(limit);
       const names = await userNames(db, rows.map((r) => r.userId));
-      return rows.map((r) => ({ ...r, at: r.at.toISOString(), userName: r.userId ? names.get(r.userId) : undefined }));
+      // ISO-5: rows about a task team's WIP closed to this administrator keep only their action.
+      const viewer = { tree: await FolderTree.load(db, a.project.id), principal: a.principal };
+      const withheld = new Set(
+        (await toAuditDtos(db, rows, { client: false, viewer })).filter((e) => e.details?.withheld === "task_team_wip").map((e) => e.id),
+      );
+      return rows.map((r) => ({
+        ...r,
+        ...(withheld.has(r.id) && { details: { withheld: "task_team_wip" } }),
+        at: r.at.toISOString(),
+        userName: r.userId ? names.get(r.userId) : undefined,
+      }));
     },
   );
 }

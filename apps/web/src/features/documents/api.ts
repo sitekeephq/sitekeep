@@ -111,10 +111,12 @@ export const documentsApi = {
     folderId: string,
     entries: { subjectType: SubjectType; subjectId: string; level: PermissionLevel }[],
     mode: "add" | "replace",
+    /** Exception grant outside the owning task team of a WIP folder (ISO-5). */
+    reason?: string,
   ) =>
     put<{ results: { subjectId: string; status: string }[]; grants: GrantDto[] }>(
       `/projects/${projectId}/folders/${folderId}/permissions`,
-      { entries, mode },
+      { entries, mode, ...(reason ? { reason } : {}) },
     ),
   whoCanSee: (projectId: string, folderId: string, fileId?: string) =>
     get<WhoCanSeeDto>(

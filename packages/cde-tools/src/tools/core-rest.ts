@@ -120,14 +120,21 @@ tool(
 tool(
   "cde_folder_permissions_set",
   "Grants users or companies a level on a folder. mode add = only subjects without a direct grant; replace = overwrite. " +
-    "A subfolder grant lower than the inherited one is rejected (as in Forma).",
+    "A subfolder grant lower than the inherited one is rejected (as in Forma). On a task team's WIP folder, " +
+    "a grant to someone outside the team needs a reason (logged as an exception).",
   {
     projectId: pid,
     folderId: id("Folder id"),
     entries: z.array(z.object({ subjectType: z.enum(["user", "company"]), subjectId: z.string().uuid(), level })).min(1),
     mode: z.enum(["add", "replace"]).default("add"),
+    reason: z.string().max(1000).optional().describe("Why someone outside the owning task team gets access (WIP exception)"),
   },
-  (a) => call("PUT", `/projects/${a.projectId}/folders/${a.folderId}/permissions`, { entries: a.entries, mode: a.mode }),
+  (a) =>
+    call("PUT", `/projects/${a.projectId}/folders/${a.folderId}/permissions`, {
+      entries: a.entries,
+      mode: a.mode,
+      ...(a.reason ? { reason: a.reason } : {}),
+    }),
   { write: true },
 );
 

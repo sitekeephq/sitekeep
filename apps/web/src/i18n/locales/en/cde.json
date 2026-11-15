@@ -46,8 +46,7 @@
     "teams": {
       "heading": "Task Teams",
       "wipPolicy": "Who Sees WIP",
-      "adminSeesWip": "Project Administrators See All WIP",
-      "pending": "Task teams are added in a later update."
+      "adminSeesWip": "Project Administrators See All WIP"
     },
     "yes": "Yes",
     "no": "No"
@@ -92,6 +91,53 @@
       "code": "Code",
       "holder": "Registered Document",
       "others": "Also Used By"
+    }
+  },
+  "teams": {
+    "description": "A task team is a company's team in this project (ISO 19650). A WIP folder can be owned by one team; with \"Owning Task Team Only\" nobody outside the team sees it, whatever they inherit from parent folders.",
+    "policyHelp": {
+      "grants": "Folder permissions decide as set; owner teams are informative.",
+      "team_only": "A team's WIP folder is closed outside the team. A permission for someone else on it is an exception with a reason."
+    },
+    "empty": "No task teams yet. Create one per company, or let SiteKeep create them from the project's companies.",
+    "lead": "Lead",
+    "columns": {
+      "team": "Team",
+      "code": "Code",
+      "company": "Company",
+      "members": "Members"
+    },
+    "fields": {
+      "name": "Team Name",
+      "code": "Code",
+      "company": "Company",
+      "noCompany": "No company"
+    },
+    "actions": {
+      "create": "Add Team",
+      "delete": "Delete Team",
+      "seed": "Create Teams for Companies",
+      "addMember": "Add Member",
+      "removeMember": "Remove {{name}}",
+      "setLead": "Make Lead",
+      "unsetLead": "Not Lead"
+    },
+    "deleteConfirm": "Delete the task team \"{{name}}\"? Its memberships and folder permissions are removed; folders it owns get no owner.",
+    "seeded_one": "{{count}} team created; {{folders}} WIP folders got an owner team.",
+    "seeded_other": "{{count}} teams created; {{folders}} WIP folders got an owner team.",
+    "ownerTeam": {
+      "label": "Owner Task Team",
+      "none": "No owner team",
+      "help": "The team that works in this WIP folder. With \"Owning Task Team Only\" it is closed to everyone outside the team."
+    },
+    "reason": {
+      "title": "Exception Outside the Task Team",
+      "message": "This is a WIP folder of task team \"{{team}}\". Giving access to someone outside the team is an exception and is recorded in the audit log. Why is it needed?",
+      "confirm": "Give Access"
+    },
+    "whoCanSee": {
+      "via": "task team WIP rule",
+      "note": "Work in progress of task team \"{{team}}\" (folder \"{{folder}}\"): closed to everyone outside the team except exception permissions."
     }
   }
 }

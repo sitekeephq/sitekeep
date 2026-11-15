@@ -79,6 +79,11 @@ export interface Principal {
   roleIds?: readonly string[];
   /** Project administrators manage every folder. */
   projectAdmin?: boolean;
+  /**
+   * ISO 19650 task teams (project roles of kind 'task_team') the principal belongs to. Used by the
+   * WIP team-only rule (FolderTree); a team id listed in `roleIds` counts as well.
+   */
+  teamIds?: readonly string[];
 }
 
 export interface EffectivePermission {

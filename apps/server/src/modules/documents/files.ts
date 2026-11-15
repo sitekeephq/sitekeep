@@ -103,7 +103,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       try {
         const r = await addVersion(db, a, folderId, s.name, s.obj, comment, attributes, can(perm.level, "edit"), defs, { lang });
         // Enforcement off (D-8): a code held by another document is stored with a warning (ISO-3).
-        const warning = await documentCodeWarning(db, r.file);
+        const warning = await documentCodeWarning(db, r.file, a.principal);
         results.push({ name: s.name, ok: true, errors: [], fileId: r.file.id, version: r.version.version, ...(warning ? { warning } : {}) });
         await afterVersionAdded(db, jobs, a, r);
       } catch (err) {
