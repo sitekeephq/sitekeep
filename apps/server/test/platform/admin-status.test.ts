@@ -89,7 +89,33 @@ describe("GET /modules", () => {
   it("tells anyone the product, edition and modules, without signing in (the web app's start)", async () => {
     const res = await app.inject({ method: "GET", url: "/api/v1/app-info" });
     expect(res.statusCode, res.body).toBe(200);
-    expect(res.json()).toEqual({ product: "SiteKeep", edition: editionName(), modules: moduleIds() });
+    expect(res.json()).toEqual({
+      product: "SiteKeep",
+      edition: editionName(),
+      modules: moduleIds(),
+      version: null,
+      sourceUrl: "https://github.com/sitekeephq/sitekeep",
+    });
+  });
+
+  it("links a release build to its source tag (AGPL-3.0 §13)", async () => {
+    const before = process.env.SITEKEEP_VERSION;
+    process.env.SITEKEEP_VERSION = "1.2.3";
+    try {
+      const res = await app.inject({ method: "GET", url: "/api/v1/app-info" });
+      expect(res.json()).toMatchObject({ version: "1.2.3", sourceUrl: "https://github.com/sitekeephq/sitekeep/tree/v1.2.3" });
+    } finally {
+      if (before === undefined) delete process.env.SITEKEEP_VERSION;
+      else process.env.SITEKEEP_VERSION = before;
+    }
+  });
+
+  it("serves the third-party notices without signing in", async () => {
+    const res = await app.inject({ method: "GET", url: "/api/v1/legal/notices" });
+    expect(res.statusCode, res.body).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/^text\/markdown/);
+    expect(res.body).toMatch(/^# Third-Party Notices/);
+    expect(res.body).toContain("LibreDWG");
   });
 
   it("names the edition after the installed modules", () => {

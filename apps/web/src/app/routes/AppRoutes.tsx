@@ -3,6 +3,7 @@ import type { UserDto } from "@sitekeep/shared";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "../../features/auth/pages/Login";
 import { AccountPage } from "../../features/auth/pages/Account";
+import { AboutPage, LicencesPage } from "../../features/about/AboutPage";
 import { IssuesPage } from "../../features/coordination/pages/Issues";
 import { CoordinationPage } from "../../features/coordination/pages/Coordination";
 import { DocsPage } from "../../features/documents/DocsPage";
@@ -39,6 +40,8 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/about" element={<AboutPage signedIn={false} />} />
+        <Route path="/about/licences" element={<LicencesPage signedIn={false} />} />
         <Route path="/oauth/consent" element={<OAuthConsentPage />} />
         <Route path="/opencde/upload" element={<OpenCdeUploadPage />} />
         <Route path="/opencde/select" element={<OpenCdeSelectPage />} />
@@ -59,6 +62,8 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
         <Route path="administration" element={user.isAdmin ? <AdminPage /> : <Navigate to="/home" replace />} />
         <Route path="admin" element={<Navigate to="/administration" replace />} />
         <Route path="account" element={<AccountPage />} />
+        <Route path="about" element={<AboutPage signedIn />} />
+        <Route path="about/licences" element={<LicencesPage signedIn />} />
         <Route path="tasks" element={<TodayPage />} />
         <Route path="today" element={<Navigate to="/tasks" replace />} />
         <Route path="projects/:pid" element={<ProjectShell />}>

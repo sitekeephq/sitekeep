@@ -8,6 +8,10 @@
 #               (SITEKEEP_LICENSE_ENFORCE follows, src/license/state.ts)
 #   (empty)     our own installations: every installed module on, no licence check (today's live server)
 # --build-arg BUILD_DATE (ISO date): builds after a licence's support end are not covered by it.
+# --build-arg SITEKEEP_VERSION (release version, e.g. 1.0.0) and SOURCE_COMMIT (git commit): the About page
+#   shows the version and links to its source (AGPL-3.0 §13): tag v<version> for a release, else the repository.
+# Licence texts go to /usr/share/sitekeep: LICENSE, THIRD_PARTY_NOTICES.md (tools/third-party-notices.mjs) and,
+#   with LibreDWG, LIBREDWG-COPYING.
 FROM node:22-bookworm-slim AS build
 ARG EDITION=
 
@@ -30,7 +34,7 @@ RUN case "$EDITION" in \
     esac
 COPY packages packages
 COPY apps apps
-COPY tools/harden-dist.mjs tools/
+COPY tools/harden-dist.mjs tools/third-party-notices.mjs tools/
 # Release hardening: compiled server code ships minified, without comments, source maps or type
 # declarations; developer seed / load scripts stay out of the image (docs/onprem/installation-bundle.md).
 # Modules (docs/modules/README.md) are published packages installed by npm ci: the server loads
@@ -45,8 +49,13 @@ RUN npm run build -w @7dimensions-project/bim-viewer \
  && rm -f apps/server/dist/scripts/seed-* apps/server/dist/scripts/assign-ui-load.* \
  && node tools/harden-dist.mjs apps/server/dist apps/mcp/dist packages/shared/dist packages/cde-tools/dist \
  && npm prune --omit=dev \
- && if [ "$EDITION" = community ]; then rm -rf node_modules/@7dimensions-project/sitekeep-ee-*; fi
-# (again after prune: npm restores missing optional packages from its cache)
+ && if [ "$EDITION" = community ]; then \
+      rm -rf node_modules/@7dimensions-project/sitekeep-ee-* \
+      && node tools/third-party-notices.mjs --ee-only | xargs -r rm -rf \
+      && find node_modules -mindepth 1 -maxdepth 1 -name '@*' -type d -empty -delete; \
+    fi
+# (again after prune: npm restores missing optional packages from its cache; the packages only the Enterprise
+# modules need, such as @cursor/sdk, go too)
 
 # LibreDWG (GPL-3.0) dwg2dxf for DWG previews, built from the GNU release (0.14+: 0.13 writes MTEXT
 # values broken over lines; the server repairs them, see docs/features/VIEWERS.md). The server runs it
@@ -63,15 +72,23 @@ RUN mkdir -p /opt/libredwg/bin \
       && cd "/tmp/libredwg-${LIBREDWG_VERSION}" \
       && ./configure --prefix=/opt/libredwg --disable-bindings --disable-python --disable-shared \
       && make -j"$(nproc)" \
-      && make install-strip; \
-    fi
+      && make install-strip \
+      && mkdir -p /opt/libredwg/legal \
+      && cp COPYING /opt/libredwg/legal/LIBREDWG-COPYING; \
+    fi \
+ && mkdir -p /opt/libredwg/legal
 
 FROM node:22-bookworm-slim
 ARG EDITION=
 ARG BUILD_DATE=
+ARG SITEKEEP_VERSION=
+ARG SOURCE_COMMIT=
 LABEL org.opencontainers.image.title="SiteKeep" \
       org.opencontainers.image.vendor="7Dimensions OÜ" \
       org.opencontainers.image.licenses="AGPL-3.0-only" \
+      org.opencontainers.image.source="https://github.com/sitekeephq/sitekeep" \
+      org.opencontainers.image.version="${SITEKEEP_VERSION}" \
+      org.opencontainers.image.revision="${SOURCE_COMMIT}" \
       eu.7dimensions.sitekeep.edition="${EDITION}" \
       org.opencontainers.image.created="${BUILD_DATE}"
 WORKDIR /app
@@ -79,12 +96,16 @@ WORKDIR /app
 # conversion come from optional services (ONLYOFFICE Docs, Collabora Online or Gotenberg, see
 # docker-compose.yml profiles and docs/features/OFFICE_INTEGRATION.md).
 COPY --from=libredwg /opt/libredwg/bin/ /usr/local/bin/
+COPY --from=libredwg /opt/libredwg/legal/ /usr/share/sitekeep/
+COPY LICENSE THIRD_PARTY_NOTICES.md /usr/share/sitekeep/
 ENV NODE_ENV=production \
     PORT=8080 \
     DATA_DIR=/data \
     WEB_DIST=/app/apps/web/dist \
     SITEKEEP_EDITION=${EDITION} \
-    SITEKEEP_BUILD_DATE=${BUILD_DATE}
+    SITEKEEP_BUILD_DATE=${BUILD_DATE} \
+    SITEKEEP_VERSION=${SITEKEEP_VERSION} \
+    SITEKEEP_SOURCE_COMMIT=${SOURCE_COMMIT}
 COPY --from=build /app/package.json ./
 COPY --from=build /app/node_modules node_modules
 COPY --from=build /app/packages/shared/package.json packages/shared/

@@ -126,7 +126,8 @@
     "noResults": "Sonuç bulunamadı.",
     "accountSettings": "Hesap ayarları",
     "systemAdmin": "Sistem yönetimi",
-    "signOut": "Oturumu kapat"
+    "signOut": "Oturumu kapat",
+    "about": "SiteKeep Hakkında"
   },
   "projectShell": {
     "navLabel": "Proje navigasyonu",

@@ -4,7 +4,8 @@
 #   deploy/onprem/build-bundle.sh [--edition enterprise|community] [--version 1.0.0] [--platform linux/amd64] [--out dist-bundle]
 #
 # Output: <out>/sitekeep-<edition>-<version>-linux-<arch>.tar.gz with the application image (minified server,
-# no sources), PostgreSQL and Caddy images, install.sh, the sitekeep command and the README. The
+# no sources), PostgreSQL and Caddy images, install.sh, the sitekeep command, the README, LICENSE and
+# THIRD_PARTY_NOTICES.md. --version is the release version the About page shows and links to. The
 # customer server needs Docker only; nothing is pulled there.
 set -euo pipefail
 
@@ -22,7 +23,7 @@ while [ $# -gt 0 ]; do
     --edition) EDITION="$2"; shift 2 ;;
     --platform) PLATFORM="$2"; shift 2 ;;
     --out) OUT="$2"; shift 2 ;;
-    -h|--help) sed -n '2,10p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,9p' "$0"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -41,6 +42,7 @@ mkdir -p "$STAGE/images"
 echo "==> application image $APP_IMAGE ($EDITION, $PLATFORM)"
 DOCKER_BUILDKIT=1 docker build --platform "$PLATFORM" \
   --build-arg EDITION="$EDITION" --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --build-arg SITEKEEP_VERSION="$VERSION" --build-arg SOURCE_COMMIT="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)" \
   -t "$APP_IMAGE" "$ROOT"
 
 echo "==> base images"
@@ -54,7 +56,14 @@ leaks="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 
 if [ "$EDITION" = community ]; then
   ee="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 'ls -d /app/node_modules/@7dimensions-project/sitekeep-ee-* 2>/dev/null | head -3')"
   [ -z "$ee" ] || { echo "Enterprise modules found in the Community image:"; echo "$ee"; exit 1; }
+  # Closed packages only the Enterprise modules need (tools/third-party-notices.mjs --ee-only).
+  closed="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 'ls -d /app/node_modules/@cursor/sdk 2>/dev/null')" || true
+  [ -z "$closed" ] || { echo "closed packages found in the Community image:"; echo "$closed"; exit 1; }
 fi
+# Licence texts in the image (AGPL-3.0, third-party notices).
+docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c \
+  'test -s /usr/share/sitekeep/LICENSE && test -s /usr/share/sitekeep/THIRD_PARTY_NOTICES.md' \
+  || { echo "licence texts missing from /usr/share/sitekeep in the image" >&2; exit 1; }
 
 echo "==> saving images"
 docker save "$APP_IMAGE" "$DB_IMAGE" "$PROXY_IMAGE" | gzip -6 > "$STAGE/images/images.tar.gz"
@@ -66,7 +75,7 @@ EOF
 
 cp "$ROOT/deploy/onprem/payload/install.sh" "$ROOT/deploy/onprem/payload/sitekeep" \
    "$ROOT/deploy/onprem/payload/compose.yml" "$ROOT/deploy/onprem/payload/README.md" \
-   "$ROOT/deploy/onprem/payload/answers.env.example" "$STAGE/"
+   "$ROOT/deploy/onprem/payload/answers.env.example" "$ROOT/LICENSE" "$ROOT/THIRD_PARTY_NOTICES.md" "$STAGE/"
 chmod 755 "$STAGE/install.sh" "$STAGE/sitekeep"
 printf '%s\n' "$VERSION" > "$STAGE/VERSION"
 printf '%s\n' "$EDITION" > "$STAGE/EDITION"

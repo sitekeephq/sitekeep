@@ -2139,3 +2139,14 @@ button.qty-toggle { text-decoration: none; font-weight: 600; text-align: left; }
 .kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; word-break: break-word; }
+
+/* About SiteKeep (features/about) */
+.about-page { max-width: 880px; }
+.about-standalone { min-height: 100%; }
+.about-title { display: flex; align-items: center; gap: 12px; margin: 0; }
+.about-source-link { font-weight: 600; }
+.about-notices {
+  margin: 0; padding: 16px; max-height: 70vh; overflow: auto; white-space: pre-wrap; word-break: break-word;
+  font-size: 12px; line-height: 1.5; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+}
+.login-footer a { color: inherit; text-decoration: underline; }

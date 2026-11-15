@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { api, formatDate, type TokenScope } from "../../../shared/api/api";
 import { useAuth } from "../../../app/context/auth";
 import { useLoad } from "../../../app/context/project";
@@ -63,6 +64,9 @@ export function AccountPage() {
         <h2>{t("account.about.heading")}</h2>
         <p className="small" style={{ margin: 0 }}>
           {viewerAboutText()}
+        </p>
+        <p className="small" style={{ margin: "8px 0 0" }}>
+          <Link to="/about">{t("account.about.actions.open")}</Link>
         </p>
       </div>
     </div>

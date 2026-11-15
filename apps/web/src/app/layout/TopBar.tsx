@@ -293,6 +293,10 @@ function AccountMenu() {
               <span className="menu-item-text">{t("topbar.tour")}</span>
             </button>
           )}
+          <button role="menuitem" className="menu-item" onClick={() => goTo("/about")}>
+            <Icon name="info" />
+            <span className="menu-item-text">{t("topbar.about")}</span>
+          </button>
           <LanguageMenuItems onChosen={() => setOpen(false)} />
           {user?.isAdmin && (
             <button role="menuitem" className="menu-item" onClick={() => goTo("/administration")}>

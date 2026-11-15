@@ -1,0 +1,36 @@
+{
+  "title": "About SiteKeep",
+  "fields": {
+    "product": "Product",
+    "version": "Version",
+    "licence": "Licence"
+  },
+  "developmentBuild": "Development build",
+  "licence": {
+    "agpl": "GNU Affero General Public License, version 3 (AGPL-3.0)",
+    "enterprise": "The Enterprise modules installed here are licensed commercially by 7Dimensions OÜ; they are not covered by the AGPL."
+  },
+  "source": {
+    "heading": "Source Code",
+    "description": "SiteKeep is free software: you may use, study, change and share it under the GNU Affero General Public License. The source code of the version you are using is published here.",
+    "actions": {
+      "open": "Get the Source Code"
+    }
+  },
+  "notices": {
+    "heading": "Open-Source Licences",
+    "description": "SiteKeep includes open-source software by other authors. Their licences and copyright notices are listed here.",
+    "actions": {
+      "show": "Show Open-Source Licences"
+    },
+    "errors": {
+      "load": "The licence list could not be loaded."
+    }
+  },
+  "trademark": "SiteKeep™ is a trademark of 7Dimensions OÜ.",
+  "actions": {
+    "trademarkPolicy": "Trademark Policy",
+    "backToSignIn": "Back to Sign In",
+    "backToAbout": "Back to About"
+  }
+}

@@ -126,7 +126,8 @@
     "noResults": "Nothing found.",
     "accountSettings": "Account Settings",
     "systemAdmin": "System Administration",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "about": "About SiteKeep"
   },
   "projectShell": {
     "navLabel": "Project navigation",

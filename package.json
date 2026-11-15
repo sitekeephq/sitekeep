@@ -16,6 +16,8 @@
     "e2e:ui": "playwright test -c e2e/playwright.config.ts --ui",
     "e2e:install": "playwright install chromium webkit",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "notices": "node tools/third-party-notices.mjs",
+    "notices:check": "node tools/third-party-notices.mjs --check",
     "scenarios": "npm run build -w @sitekeep/shared && npm run build -w @sitekeep/cde-tools && npm run scenarios -w @sitekeep/server --"
   },
   "engines": {

@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/api";
 import { useAuth } from "../../../app/context/auth";
@@ -151,7 +152,9 @@ export function LoginPage() {
             {t("login.helpQuestion")} <span>{t("login.helpContact")}</span>
           </p>
         </div>
-        <footer className="login-footer">{t("login.footer")}</footer>
+        <footer className="login-footer">
+          {t("login.footer")} · <Link to="/about">{t("login.actions.about")}</Link>
+        </footer>
       </section>
     </main>
   );

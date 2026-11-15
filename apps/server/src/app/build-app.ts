@@ -59,6 +59,7 @@ import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
 import { licenseRoutes } from "../license/routes.js";
 import { editionName, moduleIds } from "./module-ids.js";
+import { aboutRoutes, sourceInfo } from "./about.js";
 import { worksCapabilities } from "../works/capabilities.js";
 import { SESSION_COOKIE, type AppDeps, type ResolvedDeps } from "./deps.js";
 import "./fastify-types.js";
@@ -148,8 +149,15 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       api.get("/health", { config: { public: true } }, async () => ({ ok: true }));
       // Installed SiteKeep modules (signed-in only): the stdio MCP server offers only their tools
       api.get("/modules", async () => ({ modules: moduleIds(), edition: editionName() }));
-      // Before sign-in too: the web app turns on these modules and shows the edition (app/modules.ts).
-      api.get("/app-info", { config: { public: true } }, async () => ({ product: "SiteKeep", edition: editionName(), modules: moduleIds() }));
+      // Before sign-in too: the web app turns on these modules and shows the edition (app/modules.ts), the
+      // version and the source link (About page, AGPL-3.0 §13).
+      api.get("/app-info", { config: { public: true } }, async () => ({
+        product: "SiteKeep",
+        edition: editionName(),
+        modules: moduleIds(),
+        ...sourceInfo(),
+      }));
+      await aboutRoutes(api);
       await authRoutes(api, deps);
       await adminRoutes(api, deps);
       await projectRoutes(api, deps);

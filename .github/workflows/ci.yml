@@ -23,6 +23,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # THIRD_PARTY_NOTICES.md matches the lockfile and every production licence is on the allow-list
+      # (tools/third-party-notices.mjs).
+      - run: npm run notices:check
       - run: npm run build
       - run: npm run typecheck
       - run: npm test

@@ -1,0 +1,36 @@
+{
+  "title": "SiteKeep Hakkında",
+  "fields": {
+    "product": "Ürün",
+    "version": "Sürüm",
+    "licence": "Lisans"
+  },
+  "developmentBuild": "Geliştirme derlemesi",
+  "licence": {
+    "agpl": "GNU Affero Genel Kamu Lisansı, sürüm 3 (AGPL-3.0)",
+    "enterprise": "Bu kurulumdaki Enterprise modülleri 7Dimensions OÜ tarafından ticari lisansla sunulur; AGPL kapsamında değildir."
+  },
+  "source": {
+    "heading": "Kaynak Kodu",
+    "description": "SiteKeep özgür yazılımdır: GNU Affero Genel Kamu Lisansı koşullarıyla kullanabilir, inceleyebilir, değiştirebilir ve paylaşabilirsiniz. Kullandığınız sürümün kaynak kodu burada yayımlanır.",
+    "actions": {
+      "open": "Kaynak Kodunu Al"
+    }
+  },
+  "notices": {
+    "heading": "Açık Kaynak Lisansları",
+    "description": "SiteKeep başka geliştiricilerin açık kaynak yazılımlarını içerir. Bu yazılımların lisansları ve telif hakkı bildirimleri burada listelenir.",
+    "actions": {
+      "show": "Açık Kaynak Lisanslarını Göster"
+    },
+    "errors": {
+      "load": "Lisans listesi yüklenemedi."
+    }
+  },
+  "trademark": "SiteKeep™, 7Dimensions OÜ'nün ticari markasıdır.",
+  "actions": {
+    "trademarkPolicy": "Marka Politikası",
+    "backToSignIn": "Girişe Dön",
+    "backToAbout": "Hakkında Sayfasına Dön"
+  }
+}

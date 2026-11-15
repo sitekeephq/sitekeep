@@ -32,6 +32,28 @@ test("top bar opens tasks and account", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Hesabım" })).toBeVisible();
 });
 
+// AGPL-3.0 §13: every user is offered the source of the version they use (About, account menu).
+test("account menu opens About with the source code link and the open-source licences", async ({ page }) => {
+  await page.goto("/home");
+
+  await page.getByRole("button", { name: "Y", exact: true }).click();
+  await page.getByRole("menuitem", { name: "SiteKeep Hakkında" }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.getByRole("heading", { name: "SiteKeep Hakkında" })).toBeVisible();
+  await expect(page.getByText(/^SiteKeep (Community|Enterprise)$/)).toBeVisible();
+  const source = page.getByRole("link", { name: "Kaynak Kodunu Al" });
+  await expect(source).toBeVisible();
+  await expect(source).toHaveAttribute("href", /^https:\/\/github\.com\/sitekeephq\/sitekeep(\/tree\/v[\w.-]+)?$/);
+  await expect(page.getByText("SiteKeep™, 7Dimensions OÜ'nün ticari markasıdır.")).toBeVisible();
+
+  await page.getByRole("link", { name: "Açık Kaynak Lisanslarını Göster" }).click();
+  await expect(page).toHaveURL(/\/about\/licences$/);
+  const notices = page.getByTestId("third-party-notices");
+  await expect(notices).toContainText("# Third-Party Notices");
+  await expect(notices).toContainText("LibreDWG");
+  await expect(notices).not.toContainText("sitekeep-ee-");
+});
+
 test("Modele Sor disables the project-wide assistant", async ({ page }) => {
   needsModules("ai"); // "Projeye sor" is the AI module's
   const { project } = await runState();

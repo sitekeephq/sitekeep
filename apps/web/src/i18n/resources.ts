@@ -5,6 +5,7 @@
  *
  * One namespace per area of the app; a new area adds its file here and to NAMESPACES.
  */
+import about from "./locales/en/about.json";
 import admin from "./locales/en/admin.json";
 import ai from "./locales/en/ai.json";
 import auth from "./locales/en/auth.json";
@@ -27,6 +28,7 @@ import viewers from "./locales/en/viewers.json";
 import works from "./locales/en/works.json";
 
 export const en = {
+  about,
   admin,
   ai,
   auth,

@@ -12,6 +12,18 @@ test("unauthenticated users are redirected to login", async ({ page, allowApiFai
   await expect(page.getByRole("heading", { name: "Hesabınıza giriş yapın" })).toBeVisible();
 });
 
+test("the login page links to About and its source code link before sign-in", async ({ page, allowApiFailure }) => {
+  allowApiFailure(401, "/api/v1/auth/me");
+  await page.goto("/login");
+
+  await page.getByRole("link", { name: "Hakkında", exact: true }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.getByRole("heading", { name: "SiteKeep Hakkında" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Kaynak Kodunu Al" })).toHaveAttribute("href", /^https:\/\/github\.com\/sitekeephq\/sitekeep/);
+  await page.getByRole("link", { name: "Girişe Dön" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+});
+
 test("UI login rejects invalid credentials", async ({ page, allowApiFailure }) => {
   allowApiFailure(401, "/api/v1/auth/me");
   allowApiFailure(401, "/api/v1/auth/login");
