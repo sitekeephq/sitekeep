@@ -54,6 +54,7 @@ import { opencdePageRoutes } from "../opencde/pages.js";
 import { newCspNonce, registerSecurityHeaders, withNonce } from "../privacy/headers.js";
 import { configureOutbound, withOutboundContext } from "../privacy/outbound.js";
 import { privacyRoutes } from "../privacy/routes.js";
+import { cdeRoutes } from "../cde/routes.js";
 import { loadPrivacyState } from "../privacy/settings.js";
 import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
@@ -192,6 +193,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await oauthApiRoutes(api, deps);
       await opencdePageRoutes(api, deps);
       await privacyRoutes(api, deps);
+      await cdeRoutes(api, deps);
       // Developer tools: registered only on a development server (CDE_DEV_TOOLS=1, not production).
       if (deps.devTools) await devRoutes(api, deps);
     },

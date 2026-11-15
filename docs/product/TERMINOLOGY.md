@@ -57,6 +57,11 @@ sunucusu", a tool server for AI clients).
 | Forma / ACC file sync | Forma Eşitleme (en: Forma Sync) | Project → Administration. ACC project connection, registration and file fetching on one page. [Forma sync](../features/FORMA_SYNC.md) |
 | Upload / download | Yükle / indir (en: Upload / Download) | |
 | WIP / Shared / Published / Archived | Çalışma / Paylaşılan / Yayınlanan / Arşivlenen (en: Work in Progress / Shared / Published / Archived) | ISO 19650 status labels |
+| CDE (Common Data Environment) | CDE (en: CDE) | Project Settings tab; the abbreviation stays. [CDE states](../features/CDE_STATES.md) |
+| Suitability code / revision code | Uygunluk kodu / Revizyon kodu (en: Suitability Code / Revision Code) | Per version (ISO 19650) |
+| Task team | Görev ekibi (en: Task Team) | A kind of project role |
+| State transition | Durum geçişi (en: State Transition) | Modes: Doğrudan / İnceleme ile / Otomatik / Yasak (Direct / Through Review / Automatic / Forbidden) |
+| Returned / Superseded / Withdrawn | Geri Döndü / Yenisi Yayınlandı / Geri Çekildi | Document status flags beside the state |
 | Shared for Review / Shared for Approval | İnceleme için / Onay için (en, latter only: For Approval) | Sub-status label in project templates |
 | As-Built | İş sonu | From the name "04-İş Sonu (As-Built)" in the İBB structure |
 | IDS check | Bilgi gereksinimi kontrolü (IDS) (en: Information Requirement Check) | Stays as the name of the IDS file format: "IDS dosyası" (IDS File) |

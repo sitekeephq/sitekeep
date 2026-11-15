@@ -463,7 +463,9 @@
     "workflowNoSteps": "\"{{name}}\": en az bir adım gerekli.",
     "stepNoAssignee": "\"{{name}}\" {{step}}. adım: en az bir atanan gerekli.",
     "stepSlotUnknown": "\"{{name}}\" {{step}}. adım: \"{{slot}}\" rolü tanımlı değil.",
-    "copyTargetInvalid": "\"{{name}}\": kopya hedef klasör yolu geçersiz (\"{{folder}}\")."
+    "copyTargetInvalid": "\"{{name}}\": kopya hedef klasör yolu geçersiz (\"{{folder}}\").",
+    "cdeWorkflowUnknown": "CDE geçişi {{transition}}: şablonda \"{{name}}\" adlı iş akışı yok.",
+    "cdeDuplicateTransition": "CDE geçişi {{transition}} birden fazla kez yazılmış."
   },
   "viewers": {
     "kinds": {

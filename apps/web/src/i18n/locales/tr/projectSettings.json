@@ -178,6 +178,9 @@
         "ask": "Sor asistanı kullanıldı",
         "clash_summary": "Çakışma özeti (yapay zekâ)",
         "form_template_generated": "Form şablonu yapay zekâyla üretildi"
+      },
+      "cde": {
+        "settings_updated": "CDE ayarları değişti"
       }
     },
     "columns": {

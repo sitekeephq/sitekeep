@@ -16,6 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type {
   DerivativeStatus,
+  CdeFileStatus,
   FolderState,
   IfcSummary,
   IssueImportInfo,
@@ -31,6 +32,7 @@ import type {
   UserPrefs,
 } from "@sitekeep/shared";
 import { oauthClients } from "./schema-oauth.js";
+import { projectRoles } from "./schema-roles.js";
 
 const id = () => uuid("id").primaryKey().default(sql`gen_random_uuid()`);
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -147,6 +149,8 @@ export const folders = pgTable(
     /** Free sub-status shown next to the state ("Onay için", "As-Built"); set by project templates. */
     stateLabel: text("state_label"),
     namingStandardId: uuid("naming_standard_id").references(() => namingStandards.id),
+    /** Task team (project role of kind 'task_team') that owns this WIP folder (D-4). */
+    ownerTeamId: uuid("owner_team_id").references((): AnyPgColumn => projectRoles.id, { onDelete: "set null" }),
     createdBy: uuid("created_by").references(() => users.id),
     createdAt: createdAt(),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -184,12 +188,25 @@ export const files = pgTable(
     description: text("description"),
     currentVersion: integer("current_version").notNull().default(1),
     attributes: jsonb("attributes").$type<Record<string, string>>().notNull().default({}),
+    /**
+     * The document (ISO 19650 information container) this file belongs to: review copies of one
+     * document share it; any other new file starts its own. Filled by the database when not given
+     * (trigger files_container_default, migration 0042: container_id = id).
+     */
+    containerId: uuid("container_id")
+      .notNull()
+      .$defaultFn(() => sql`DEFAULT`),
+    /** Unique document code (normalised name without extension), registered in document_codes. */
+    documentCode: text("document_code"),
+    /** Status flag beside the folder state: returned, superseded, withdrawn (docs/features/CDE_STATES.md). */
+    cdeStatus: text("cde_status").$type<CdeFileStatus>(),
     createdBy: uuid("created_by").references(() => users.id),
     createdAt: createdAt(),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (t) => [
     index("files_folder_idx").on(t.folderId),
+    index("files_container_idx").on(t.containerId),
     uniqueIndex("files_unique_name").on(t.folderId, t.name).where(sql`deleted_at IS NULL`),
   ],
 );
@@ -212,6 +229,11 @@ export const fileVersions = pgTable(
     derivativeKey: text("derivative_key"),
     derivativeError: text("derivative_error"),
     ifcSummary: jsonb("ifc_summary").$type<IfcSummary>(),
+    /** ISO 19650 codes of this version (D-1): suitability "S2", revision "P01.02". */
+    suitabilityCode: text("suitability_code"),
+    revisionCode: text("revision_code"),
+    codesSetBy: uuid("codes_set_by").references(() => users.id, { onDelete: "set null" }),
+    codesSetAt: timestamp("codes_set_at", { withTimezone: true }),
   },
   (t) => [uniqueIndex("file_versions_unique").on(t.fileId, t.version)],
 );
@@ -354,8 +376,19 @@ export const auditLog = pgTable(
     targetId: text("target_id"),
     details: jsonb("details").$type<Record<string, unknown>>(),
     at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+    /** Hash chain (ISO-4): hash of the previous row and of this row (filled by the audit work). */
+    prevHash: text("prev_hash"),
+    hash: text("hash"),
+    /** Client of the request (D-9; documented in docs/features/PRIVACY.md). */
+    ip: text("ip"),
+    userAgent: text("user_agent"),
   },
-  (t) => [index("audit_project_idx").on(t.projectId, t.at)],
+  (t) => [
+    index("audit_project_idx").on(t.projectId, t.at),
+    index("audit_project_action_idx").on(t.projectId, t.action, t.at),
+    index("audit_target_idx").on(t.targetType, t.targetId),
+    index("audit_user_idx").on(t.userId, t.at),
+  ],
 );
 
 export * from "./schema-workflow.js";
@@ -379,4 +412,5 @@ export * from "./schema-bcf.js";
 export * from "./schema-privacy.js";
 export * from "./schema-opencde-docs.js";
 export * from "./schema-integrations.js";
+export * from "./schema-cde.js";
 

@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import {
+  DEFAULT_CDE_SETTINGS,
   PROJECT_MODULES,
   TEMPLATE_FORMAT,
   WORKFLOW_ROLES,
@@ -9,6 +10,7 @@ import {
   type PermissionLevel,
   type ProjectTemplate,
   type TemplateAssignee,
+  type TemplateCdeSettings,
   type TemplateAssigneeRule,
   type TemplateChainConfig,
   type TemplateFolder,
@@ -37,6 +39,7 @@ import {
   workflowTemplates,
 } from "../db/schema.js";
 import { withRuleAssignees } from "../workflow/chain-template.js";
+import { loadCdeSettings } from "../cde/settings.js";
 
 function slugify(text: string): string {
   const map: Record<string, string> = { ç: "c", ğ: "g", ı: "i", İ: "i", ö: "o", ş: "s", ü: "u" };
@@ -310,6 +313,50 @@ export async function exportProjectTemplate(db: Db, projectId: string, lang: str
   if (workflowsOut.length) template.workflows = workflowsOut;
   const modules = resolveModules(project.settings?.modules);
   if (PROJECT_MODULES.some((module) => !modules[module])) template.modules = modules;
+  const cde = await exportCde(db, projectId, folderPath, new Map(workflowRows.map((w) => [w.id, w.name])));
+  if (cde) template.cde = cde;
   if (notes.length) template.notes = notes;
   return template;
+}
+
+/**
+ * The project's CDE settings as a template "cde" block; undefined while they are the defaults
+ * (no transitions, nothing changed), so exports of older projects stay as they were.
+ */
+async function exportCde(
+  db: Db,
+  projectId: string,
+  folderPath: (id: string) => string | null,
+  workflowNames: ReadonlyMap<string, string>,
+): Promise<TemplateCdeSettings | undefined> {
+  const settings = await loadCdeSettings(db, projectId);
+  const defaults = DEFAULT_CDE_SETTINGS;
+  const changed =
+    settings.transitions.length > 0 ||
+    settings.enforceTransitions !== defaults.enforceTransitions ||
+    settings.codeScheme !== defaults.codeScheme ||
+    settings.wipPolicy !== defaults.wipPolicy ||
+    settings.adminSeesWip !== defaults.adminSeesWip ||
+    settings.archiveFolderId !== null;
+  if (!changed) return undefined;
+  const out: TemplateCdeSettings = {
+    codeScheme: settings.codeScheme,
+    enforceTransitions: settings.enforceTransitions,
+    wipPolicy: settings.wipPolicy,
+    adminSeesWip: settings.adminSeesWip,
+  };
+  const archive = settings.archiveFolderId ? folderPath(settings.archiveFolderId) : null;
+  if (archive) out.archiveFolder = archive;
+  if (settings.transitions.length)
+    out.transitions = settings.transitions.map((t) => {
+      const workflow = t.workflowTemplateId ? workflowNames.get(t.workflowTemplateId) : undefined;
+      return {
+        from: t.fromState,
+        to: t.toState,
+        mode: t.mode,
+        ...(workflow ? { workflow } : {}),
+        ...(t.requireReason ? { requireReason: true } : {}),
+      };
+    });
+  return out;
 }

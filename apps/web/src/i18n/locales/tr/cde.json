@@ -1,0 +1,63 @@
+{
+  "settings": {
+    "description": "Bu projede dokümanların Çalışma, Paylaşılan, Yayınlanan ve Arşivlenen durumları arasında nasıl geçtiği (ISO 19650). Şimdilik yalnız görüntülenir; düzenleme durum geçişleri çalışmasıyla gelecek.",
+    "general": {
+      "heading": "Genel",
+      "enforceTransitions": "Geçiş Kuralları Uygulansın",
+      "enforceOn": "Açık: yükleme ve taşıma geçiş tablosuna uyar.",
+      "enforceOff": "Kapalı: geçiş tablosu saklanır ama uygulanmaz.",
+      "archiveFolder": "Arşiv Klasörü",
+      "notSet": "Seçilmedi"
+    },
+    "codes": {
+      "heading": "Revizyon ve Uygunluk Kodları",
+      "scheme": "Kod Düzeni",
+      "pending": "Versiyon başına kodlar sonraki bir güncellemeyle gelecek."
+    },
+    "transitions": {
+      "heading": "Durum Geçişleri",
+      "from": "Nereden",
+      "to": "Nereye",
+      "mode": "Nasıl",
+      "workflow": "İş Akışı",
+      "reason": "Gerekçe Gerekli",
+      "upload": "Yeni yükleme",
+      "empty": "Tanımlı geçiş yok. Kurallar uygulanırken tanımsız geçiş yasaktır.",
+      "anyReview": "Onaylanmış herhangi bir inceleme"
+    },
+    "teams": {
+      "heading": "Görev Ekipleri",
+      "wipPolicy": "Çalışma Alanını Kim Görür",
+      "adminSeesWip": "Proje Yöneticileri Tüm Çalışma Alanını Görür",
+      "pending": "Görev ekipleri sonraki bir güncellemeyle gelecek."
+    },
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "states": {
+    "wip": "Çalışma",
+    "shared": "Paylaşılan",
+    "published": "Yayınlanan",
+    "archived": "Arşivlenen"
+  },
+  "modes": {
+    "direct": "Doğrudan",
+    "review": "İnceleme ile",
+    "auto": "Otomatik",
+    "forbidden": "Yasak"
+  },
+  "schemes": {
+    "iso_uk_na": "ISO 19650 (Birleşik Krallık Ulusal Eki)",
+    "legacy_r": "Eski Düzen (R00)",
+    "custom": "Özel"
+  },
+  "wipPolicies": {
+    "grants": "Klasör Yetkileri",
+    "team_only": "Yalnız Sahip Görev Ekibi"
+  },
+  "statuses": {
+    "returned": "Geri Döndü",
+    "superseded": "Yenisi Yayınlandı",
+    "withdrawn": "Geri Çekildi"
+  }
+}

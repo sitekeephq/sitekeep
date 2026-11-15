@@ -41,6 +41,7 @@ import { withParams } from "../oauth/redirect.js";
 import { effectiveDefinitions } from "../modules/documents/attributes.js";
 import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, folderGate } from "../workflow/service.js";
+import { checkUpload } from "../cde/guards.js";
 import { callbackTarget, documentsBase, dropParts, expired, type DocSessionRow } from "./common.js";
 import { msg, render, requestLanguage, tReq } from "../i18n/index.js";
 
@@ -268,6 +269,24 @@ export async function opencdePageRoutes(api: FastifyInstance, deps: ResolvedDeps
         if (!v.ok) push(r.id, tl("opencde:errors.namingStandardShort", { errors: v.errors.join("; ") }));
       }
       names.set(r.id, name);
+    }
+    // CDE guards for the new documents, before the client sends any byte (addVersion checks again).
+    for (const [id, name] of names) {
+      try {
+        await checkUpload(db, {
+          projectId: a.project.id,
+          access: a,
+          tree,
+          source: "opencde",
+          lang: requestLanguage(req),
+          folderId: body.folderId,
+          name,
+          existingFileId: null,
+        });
+      } catch (err) {
+        if (!(err instanceof HttpError)) throw err;
+        push(id, err.msg ? render(requestLanguage(req), err.msg) : err.message);
+      }
     }
 
     const attributes: Record<string, string> = {};

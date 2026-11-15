@@ -7,6 +7,10 @@ import { DEFAULT_LANGUAGE, isMsg, render, tFor } from "../i18n/index.js";
 import { fileFieldValues } from "./chain.js";
 import { ensureFolderPath, folderPath, StandardCache } from "./chain-service.js";
 import type { CopyReport, ReviewCtx, ReviewRow } from "./review-types.js";
+import type { Db } from "../db/index.js";
+import { checkCodes, checkDocumentCode, checkUpload } from "../cde/guards.js";
+import { recordTransition } from "../cde/events.js";
+import { cdeStateOf } from "../cde/state.js";
 
 /**
  * Copies approved versions into the review's target folder as new files / versions. With a
@@ -97,6 +101,9 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
 
     try {
       const src = row.file_versions;
+      // CDE guards: the copy is the same document (container) arriving in the target state.
+      const guard = { projectId: review.projectId, access: null, tree, source: "review_copy", lang: DEFAULT_LANGUAGE } as const;
+      await checkUpload(db, { ...guard, folderId: targetId, name, existingFileId: null });
       const isIfc = splitExtension(name).extension.toLowerCase() === "ifc";
       const derivative =
         src.derivativeStatus === "ready"
@@ -104,10 +111,27 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
           : { derivativeStatus: isIfc ? ("pending" as const) : ("none" as const) };
       const comment = `İnceleme ${review.code ?? `#${review.number}`} ile onaylandı (kaynak V${src.version})`; // i18n-ok: version comment stored as data
       const out = await db.transaction(async (tx) => {
+        const txDb = tx as unknown as Db;
         const [existing] = await tx
           .select()
           .from(files)
           .where(and(eq(files.folderId, targetId), eq(files.name, name), isNull(files.deletedAt)));
+        const codes = await checkCodes(txDb, {
+          ...guard,
+          folderId: targetId,
+          fileId: existing?.id ?? null,
+          requested: { suitabilityCode: src.suitabilityCode, revisionCode: src.revisionCode },
+          state: cdeStateOf(tree, targetId),
+        });
+        const codeColumns =
+          codes.suitabilityCode || codes.revisionCode ? { ...codes, codesSetBy: src.codesSetBy, codesSetAt: src.codesSetAt ?? new Date() } : {};
+        const { documentCode } = await checkDocumentCode(txDb, {
+          ...guard,
+          folderId: targetId,
+          name,
+          fileId: existing?.id ?? null,
+          containerId: existing?.containerId ?? row.files.containerId,
+        });
         if (existing) {
           const [current] = await tx
             .select()
@@ -125,11 +149,16 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
               uploadedBy: review.createdBy,
               comment,
               ...derivative,
+              ...codeColumns,
             })
             .returning();
           const [file] = await tx
             .update(files)
-            .set({ currentVersion: version!.version, attributes: { ...existing.attributes, ...row.files.attributes } })
+            .set({
+              currentVersion: version!.version,
+              attributes: { ...existing.attributes, ...row.files.attributes },
+              ...(documentCode ? { documentCode } : {}),
+            })
             .where(eq(files.id, existing.id))
             .returning();
           return { file: file!, version: version!, created: true };
@@ -141,6 +170,9 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
             folderId: targetId,
             name,
             attributes: row.files.attributes,
+            // The approved copy is the same document: it joins the source's container.
+            containerId: row.files.containerId,
+            documentCode,
             createdBy: review.createdBy,
           })
           .returning();
@@ -155,10 +187,24 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
             uploadedBy: review.createdBy,
             comment,
             ...derivative,
+            ...codeColumns,
           })
           .returning();
         return { file: file!, version: version!, created: true };
       });
+      if (out.created)
+        await recordTransition(db, {
+          projectId: review.projectId,
+          userId: actorId,
+          fileId: out.file.id,
+          versionId: out.version.id,
+          fromFolderId: row.files.folderId,
+          toFolderId: targetId,
+          fromState: cdeStateOf(tree, row.files.folderId),
+          toState: cdeStateOf(tree, targetId),
+          mode: "review",
+          reviewId: review.id,
+        });
       await db
         .update(reviewFiles)
         .set({

@@ -295,6 +295,13 @@
       "when": 1793653091229,
       "tag": "0041_autodesk_sync_kinds",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1794744836892,
+      "tag": "0042_cde_foundation",
+      "breakpoints": true
     }
   ]
 }

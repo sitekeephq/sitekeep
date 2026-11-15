@@ -119,7 +119,7 @@ export const MODEL_TABS: { key: "viewer" | "coordination" | "schedule" | "params
 
 export type SettingsTabKey =
   | "uyeler" | "roller" | "moduller" | "konumlar" | "sablon" | "yapay-zeka"
-  | "isimlendirme" | "is-akislari" | "is-tipleri" | "oznitelikler" | "aktivite" | "sistem-durumu";
+  | "isimlendirme" | "is-akislari" | "is-tipleri" | "oznitelikler" | "cde" | "aktivite" | "sistem-durumu";
 
 /**
  * Tabs of Proje Ayarları (?sekme=…). Advanced tabs show after "Gelişmiş Ayarları Göster";
@@ -136,6 +136,7 @@ export const SETTINGS_TABS: { key: SettingsTabKey; labelKey: ShellKey; advanced?
   { key: "is-akislari", labelKey: "nav.settingsTabs.isAkislari", advanced: true },
   { key: "is-tipleri", labelKey: "nav.settingsTabs.isTipleri", advanced: true },
   { key: "oznitelikler", labelKey: "nav.settingsTabs.oznitelikler", advanced: true },
+  { key: "cde", labelKey: "nav.settingsTabs.cde", advanced: true },
   { key: "aktivite", labelKey: "nav.settingsTabs.aktivite", advanced: true },
   { key: "sistem-durumu", labelKey: "nav.settingsTabs.sistemDurumu", systemAdmin: true },
 ];

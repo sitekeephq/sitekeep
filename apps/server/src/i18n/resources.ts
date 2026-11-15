@@ -8,6 +8,7 @@ import type admin from "./locales/en/admin.json";
 import type ai from "./locales/en/ai.json";
 import type auth from "./locales/en/auth.json";
 import type bcf from "./locales/en/bcf.json";
+import type cde from "./locales/en/cde.json";
 import type coordination from "./locales/en/coordination.json";
 import type doccompare from "./locales/en/doccompare.json";
 import type docintel from "./locales/en/docintel.json";
@@ -53,6 +54,7 @@ export interface CoreServerResources {
   ai: typeof ai;
   auth: typeof auth;
   bcf: typeof bcf;
+  cde: typeof cde;
   coordination: typeof coordination;
   doccompare: typeof doccompare;
   docintel: typeof docintel;

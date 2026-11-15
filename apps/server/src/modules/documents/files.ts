@@ -1,15 +1,7 @@
-import path from "node:path";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
-import {
-  can,
-  splitExtension,
-  validateAttributes,
-  validateName,
-  type FileDto,
-  type FileVersionDto,
-} from "@sitekeep/shared";
+import { can, splitExtension, validateAttributes, validateName } from "@sitekeep/shared";
 import type { AppDeps } from "../../app/deps.js";
 import { FolderTree, isUuid, projectAccess, requireAction, userNames, type ProjectAccess } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
@@ -21,7 +13,11 @@ import type { StoredObject } from "../../core/platform/storage.js";
 import { standardForFolder } from "../../modules/documents/naming-routes.js";
 import { assertDirectWriteAllowed } from "../../workflow/service.js";
 import { effectiveDefinitions } from "./attributes.js";
-import { VIEWABLE, addVersion, afterVersionAdded, type FileRow, type VersionRow } from "../../files/new-version.js";
+import { VIEWABLE, addVersion, afterVersionAdded, type FileRow } from "../../files/new-version.js";
+import { checkDocumentCode, checkMove, checkUpload } from "../../cde/guards.js";
+import { clientInfo, recordTransition, recordView } from "../../cde/events.js";
+import { cdeStateOf } from "../../cde/state.js";
+import { cleanFileName, toFileDto, toVersionDto } from "./mapper.js";
 import { ensureGeometryUpgrade } from "../../model/service.js";
 
 export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
@@ -145,10 +141,14 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
     requireAction(tree, a, file.folderId, "edit");
     const description = body.description === undefined ? file.description : body.description || null;
     const targetFolder = body.folderId ?? file.folderId;
-    if (body.folderId && body.folderId !== file.folderId) {
-      requireAction(tree, a, body.folderId, "upload");
-      await assertDirectWriteAllowed(db, tree, body.folderId);
+    const moved = !!body.folderId && body.folderId !== file.folderId;
+    if (moved) {
+      requireAction(tree, a, body.folderId!, "upload");
+      await assertDirectWriteAllowed(db, tree, body.folderId!);
     }
+    const lang = requestLanguage(req);
+    const guard = { projectId: a.project.id, access: a, tree, source: "move", lang } as const;
+    if (moved) await checkMove(db, { ...guard, fileId: file.id, fromFolderId: file.folderId, toFolderId: body.folderId! });
     const newName = body.name !== undefined ? cleanFileName(body.name) : file.name;
     if (!newName) throw badRequest(msg("documents:errors.invalidFileName"));
     let attributes = file.attributes;
@@ -163,12 +163,15 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
         else delete attributes[k];
       }
     }
+    let documentCode = file.documentCode;
     if (newName !== file.name || targetFolder !== file.folderId) {
       const standard = await standardForFolder(db, tree, targetFolder);
       if (standard) {
-        const r = validateName(standard, newName, requestLanguage(req));
+        const r = validateName(standard, newName, lang);
         if (!r.ok) throw badRequest(msg("documents:errors.nameNotStandard", { errors: r.errors.join("; ") }), r);
       }
+      const checked = await checkDocumentCode(db, { ...guard, folderId: targetFolder, name: newName, fileId: file.id, containerId: file.containerId });
+      documentCode = checked.documentCode ?? documentCode;
     }
     const [row] = await db
       .update(files)
@@ -177,6 +180,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
         folderId: targetFolder,
         attributes,
         description,
+        documentCode,
       })
       .where(eq(files.id, file.id))
       .returning();
@@ -188,6 +192,18 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       targetId: file.id,
       details: { from: { name: file.name, folderId: file.folderId }, ...body },
     });
+    if (moved)
+      await recordTransition(db, {
+        projectId: a.project.id,
+        userId: a.user.id,
+        fileId: file.id,
+        fromFolderId: file.folderId,
+        toFolderId: targetFolder,
+        fromState: cdeStateOf(tree, file.folderId),
+        toState: cdeStateOf(tree, targetFolder),
+        mode: "direct",
+        client: clientInfo(req),
+      });
     const [v] = await db
       .select()
       .from(fileVersions)
@@ -210,6 +226,9 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
     await assertDirectWriteAllowed(db, tree, body.folderId);
     const name = cleanFileName(body.name ?? file.name);
     if (!name) throw badRequest(msg("documents:errors.invalidFileName"));
+    // A copy is a new document (its own container); the CDE guards decide like for an upload.
+    const guard = { projectId: a.project.id, access: a, tree, source: "copy", lang: requestLanguage(req) } as const;
+    await checkUpload(db, { ...guard, folderId: body.folderId, name, existingFileId: null });
     const standard = await standardForFolder(db, tree, body.folderId);
     if (standard) {
       const result = validateName(standard, name, requestLanguage(req));
@@ -229,6 +248,13 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       .where(and(eq(fileVersions.fileId, file.id), eq(fileVersions.version, file.currentVersion)));
     if (!source) throw notFound(msg("documents:entities.fileVersion"));
     const copied = await db.transaction(async (tx) => {
+      const { documentCode } = await checkDocumentCode(tx as unknown as Db, {
+        ...guard,
+        folderId: body.folderId,
+        name,
+        fileId: null,
+        containerId: null,
+      });
       const [newFile] = await tx
         .insert(files)
         .values({
@@ -236,6 +262,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
           folderId: body.folderId,
           name,
           attributes: file.attributes,
+          documentCode,
           createdBy: a.user.id,
         })
         .returning();
@@ -299,6 +326,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
     requireView(tree, a, file);
     if (version.derivativeStatus !== "ready" || !version.derivativeKey)
       throw conflict(msg("documents:errors.modelNotReady", { status: version.derivativeStatus }));
+    await recordView(db, { projectId: a.project.id, userId: a.user.id, fileId: file.id, versionId: version.id, kind: "model", client: clientInfo(req) });
     try {
       await storage.size(version.derivativeKey);
     } catch (error) {
@@ -383,40 +411,4 @@ function sendStream(reply: FastifyReply, stream: NodeJS.ReadableStream, name: st
   return reply.send(stream);
 }
 
-export function cleanFileName(raw: string): string {
-  const base = path.basename(raw.replace(/\\/g, "/")).trim();
-  if (!base || base === "." || base === ".." || /[<>:"|?*\x00-\x1f]/.test(base)) return "";
-  return base.normalize("NFC");
-}
-
-export function toVersionDto(v: VersionRow, names: Map<string, string>): FileVersionDto {
-  return {
-    id: v.id,
-    fileId: v.fileId,
-    version: v.version,
-    size: v.size,
-    sha256: v.sha256,
-    uploadedBy: v.uploadedBy ?? "",
-    uploadedByName: v.uploadedBy ? names.get(v.uploadedBy) : undefined,
-    uploadedAt: v.uploadedAt.toISOString(),
-    comment: v.comment,
-    derivativeStatus: v.derivativeStatus,
-    derivativeError: v.derivativeError,
-    ifcSummary: v.ifcSummary,
-  };
-}
-
-export function toFileDto(f: FileRow, v: VersionRow, names: Map<string, string>): FileDto {
-  return {
-    id: f.id,
-    folderId: f.folderId,
-    name: f.name,
-    description: f.description ?? null,
-    extension: splitExtension(f.name).extension.toLowerCase(),
-    currentVersion: f.currentVersion,
-    attributes: f.attributes,
-    createdAt: f.createdAt.toISOString(),
-    createdBy: f.createdBy ?? "",
-    latest: toVersionDto(v, names),
-  };
-}
+export { cleanFileName, toFileDto, toVersionDto } from "./mapper.js";

@@ -2,6 +2,7 @@
 import type { PermissionLevel, SubjectType } from "../kernel/permissions.js";
 import type { NamingStandard } from "../kernel/naming.js";
 import type { ProjectModuleState } from "./module-state.js";
+import type { CdeFileStatus } from "../documents/cde.js";
 
 export type FolderState = "wip" | "shared" | "published" | "archived";
 
@@ -120,6 +121,10 @@ export interface FileVersionDto {
   derivativeStatus: DerivativeStatus;
   derivativeError: string | null;
   ifcSummary: IfcSummary | null;
+  /** ISO 19650 suitability code of this version ("S2"); null or missing: not set. */
+  suitabilityCode?: string | null;
+  /** ISO 19650 revision code of this version ("P01.02", "C01"); null or missing: not set. */
+  revisionCode?: string | null;
 }
 
 export interface FileDto {
@@ -134,6 +139,12 @@ export interface FileDto {
   createdAt: string;
   createdBy: string;
   latest: FileVersionDto;
+  /** The document (information container) this file belongs to; review copies share it. */
+  containerId?: string;
+  /** Unique document code (from the name, when it follows the project's naming standard). */
+  documentCode?: string | null;
+  /** Status flag beside the folder state: returned, superseded, withdrawn (docs/features/CDE_STATES.md). */
+  cdeStatus?: CdeFileStatus | null;
 }
 
 export interface GrantDto {

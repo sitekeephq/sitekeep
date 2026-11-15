@@ -42,6 +42,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 
 ## Features
 
+- [CDE states (ISO 19650)](features/CDE_STATES.md)
 - [OpenCDE](features/OPENCDE.md)
 - [Forma sync (Autodesk)](features/FORMA_SYNC.md)
 - [BCF](features/BCF.md)
@@ -61,6 +62,10 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [Reports](features/REPORTS.md)
 - [Form PDF](features/FORM_PDF.md)
 - [Document Comparison](features/DOCUMENT_COMPARISON.md)
+
+## Compliance
+
+- [ISO 19650 conformance](compliance/ISO19650.md)
 
 ## Review notes
 

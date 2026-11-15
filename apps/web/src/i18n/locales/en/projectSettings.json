@@ -178,6 +178,9 @@
         "ask": "Ask assistant used",
         "clash_summary": "Clash summary (AI)",
         "form_template_generated": "Form template generated with AI"
+      },
+      "cde": {
+        "settings_updated": "CDE settings changed"
       }
     },
     "columns": {

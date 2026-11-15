@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "archiveFolderUnknown": "Arşiv klasörü bu projenin klasörü değil.",
+    "namingStandardUnknown": "İsimlendirme standardı bu projenin değil.",
+    "duplicateTransition": "{{transition}} geçişi birden fazla kez yazılmış.",
+    "sameState": "{{transition}} geçişi durumu değiştirmiyor.",
+    "workflowOnlyForReview": "{{transition}} geçişi: iş akışı yalnız inceleme ile yapılan geçişe verilebilir.",
+    "workflowUnknown": "Bir geçişte bu projeye ait olmayan bir iş akışı seçilmiş."
+  }
+}

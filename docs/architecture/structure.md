@@ -200,6 +200,7 @@ apps/server/
 │   ├── app/
 │   ├── auth/
 │   ├── bcf/
+│   ├── cde/
 │   ├── coordination/
 │   ├── core/
 │   │   ├── platform/
@@ -247,6 +248,7 @@ Ownership:
 - `drizzle/`: ordered SQL migrations and metadata; domain directories: their own routes, services, access and helpers.
 - `src/jobs/`: queue and CPU/long-running workers; `src/admin/`: system administrator (users, companies, `GET /admin/status`).
 - `src/auth/`: session, password and Google sign-in (§7.1). `src/oauth/` is its counterpart: the CDE's OpenCDE OAuth2 server.
+- `src/cde/`: ISO 19650 CDE settings, the guards every write path calls and the audit events ([CDE states](../features/CDE_STATES.md)).
 - `src/integrations/`: third-party adapters.
 - `test/`: category-based backend integration and behaviour tests.
 - `src/sdk/`: the only surface modules can use from the core (`bind.ts` exposes it to modules); `src/app/modules.ts`: loads installed modules (`SITEKEEP_MODULES`) by package name. Modules live in their own repositories and arrive as pinned-version packages (`@7dimensions-project/sitekeep-ee-<id>`). Rules and capabilities: [Modules](../modules/README.md).

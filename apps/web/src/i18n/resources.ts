@@ -9,6 +9,7 @@ import about from "./locales/en/about.json";
 import admin from "./locales/en/admin.json";
 import ai from "./locales/en/ai.json";
 import auth from "./locales/en/auth.json";
+import cde from "./locales/en/cde.json";
 import common from "./locales/en/common.json";
 import coordination from "./locales/en/coordination.json";
 import documents from "./locales/en/documents.json";
@@ -32,6 +33,7 @@ export const en = {
   admin,
   ai,
   auth,
+  cde,
   common,
   coordination,
   documents,

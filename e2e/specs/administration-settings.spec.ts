@@ -88,6 +88,7 @@ const SETTINGS_TABS: { key: string; label: string; api: string; rendered: (page:
   { key: "is-akislari", label: "İş Akışları", api: "/workflow-templates", rendered: (page) => page.getByRole("button", { name: "+ Şablon", exact: true }) },
   { key: "is-tipleri", label: "İş Tipleri", api: "/work-types", rendered: (page) => page.getByRole("heading", { name: "İş Tipleri", exact: true }) },
   { key: "oznitelikler", label: "Öznitelikler", api: "/attribute-definitions", rendered: (page) => page.getByRole("button", { name: "+ Öznitelik", exact: true }) },
+  { key: "cde", label: "CDE", api: "/cde/settings", rendered: (page) => page.getByRole("heading", { name: "Durum Geçişleri", exact: true }) },
   { key: "aktivite", label: "Aktivite Kaydı", api: "/activity", rendered: (page) => page.getByRole("columnheader", { name: "İşlem", exact: true }) },
 ];
 

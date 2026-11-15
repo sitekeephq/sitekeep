@@ -12,6 +12,7 @@ import { AttributeInput } from "../../../shared/ui/AttributeInput";
 import { FileTransferDialog } from "./FileTransferDialog";
 import { WhoCanSeeDialog } from "./WhoCanSeeDialog";
 import { webCapability } from "../../../sdk";
+import { FileCdeChips, FileCdePanel } from "./cde/FileCdeSlots";
 
 // Parameter change bits come from the Coordinate module; without it the hook returns nothing. Read when
 // used: modules are turned on at start (app/modules.ts), after this file loads; fixed for the session.
@@ -74,6 +75,11 @@ export function FileDrawer({
   const changed = file ? Object.fromEntries(Object.entries(draft).filter(([k, v]) => (file.attributes[k] ?? "") !== v)) : {};
   const draftErrors = validateAttributes(typed, changed, { partial: true, lang: i18n.language });
 
+  const cdeChanged = () => {
+    reload();
+    onChanged();
+  };
+
   async function act(fn: () => Promise<unknown>) {
     setMsg(null);
     try {
@@ -96,6 +102,7 @@ export function FileDrawer({
       {msg && <p className="error">{msg}</p>}
       {file && (
         <div className="stack" style={{ marginTop: 12 }}>
+          <FileCdeChips projectId={projectId} file={file} level={level} onChanged={cdeChanged} />
           <h3 style={{ margin: 0 }}>{t("page.fileActions")}</h3>
           <div className="row wrap">
             {canDownload && (
@@ -308,6 +315,8 @@ export function FileDrawer({
               </form>
             )}
           </div>
+
+          <FileCdePanel projectId={projectId} file={file} level={level} onChanged={cdeChanged} />
 
           <div>
             <h3>{t("drawer.history.heading")}</h3>

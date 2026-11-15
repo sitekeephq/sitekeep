@@ -17,6 +17,7 @@ import type { StoredObject } from "../core/platform/storage.js";
 import { effectiveDefinitions } from "../modules/documents/attributes.js";
 import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, folderGate } from "../workflow/service.js";
+import { checkCodes, checkDocumentCode, checkUpload, type CdeCodes, type CdeWriteSource } from "../cde/guards.js";
 
 export type FileRow = typeof files.$inferSelect;
 export type VersionRow = typeof fileVersions.$inferSelect;
@@ -29,6 +30,10 @@ export interface AddVersionOptions {
   ignoreEditLock?: boolean;
   /** Language of the uploader (validation messages). */
   lang?: string;
+  /** Which write path stores the version (CDE guards, docs/features/CDE_STATES.md); default "upload". */
+  source?: CdeWriteSource;
+  /** ISO 19650 codes of the new version (suitability, revision); checked by the CDE guards. */
+  codes?: Partial<CdeCodes>;
 }
 
 /** The active editor lock of a file (WOPI), or null. */
@@ -67,6 +72,28 @@ export async function addVersion(
       .from(files)
       .where(and(eq(files.folderId, folderId), eq(files.name, name), isNull(files.deletedAt)));
     const derivativeStatus = VIEWABLE.has(splitExtension(name).extension.toLowerCase()) ? "pending" : "none";
+    // CDE guards (no-ops until the ISO 19650 rules are switched on): state, codes, document code.
+    const txDb = tx as unknown as Db;
+    const guard = { projectId: a.project.id, access: a, source: opts.source ?? "upload", lang: opts.lang } as const;
+    await checkUpload(txDb, { ...guard, folderId, name, existingFileId: existing?.id ?? null });
+    let previous: CdeCodes | null = null;
+    if (existing) {
+      const [current] = await tx
+        .select({ suitabilityCode: fileVersions.suitabilityCode, revisionCode: fileVersions.revisionCode })
+        .from(fileVersions)
+        .where(and(eq(fileVersions.fileId, existing.id), eq(fileVersions.version, existing.currentVersion)));
+      previous = current ?? null;
+    }
+    const codes = await checkCodes(txDb, { ...guard, folderId, fileId: existing?.id ?? null, requested: opts.codes ?? {}, previous });
+    const codeColumns =
+      codes.suitabilityCode || codes.revisionCode ? { ...codes, codesSetBy: a.user.id, codesSetAt: new Date() } : {};
+    const { documentCode } = await checkDocumentCode(txDb, {
+      ...guard,
+      folderId,
+      name,
+      fileId: existing?.id ?? null,
+      containerId: existing?.containerId ?? null,
+    });
     if (existing) {
       if (!canEdit && existing.createdBy !== a.user.id)
         throw forbidden(msg("files:errors.noNewVersionPermission"));
@@ -90,11 +117,16 @@ export async function addVersion(
           uploadedBy: a.user.id,
           comment,
           derivativeStatus,
+          ...codeColumns,
         })
         .returning();
       const [file] = await tx
         .update(files)
-        .set({ currentVersion: next, attributes: { ...existing.attributes, ...attributes } })
+        .set({
+          currentVersion: next,
+          attributes: { ...existing.attributes, ...attributes },
+          ...(documentCode ? { documentCode } : {}),
+        })
         .where(eq(files.id, existing.id))
         .returning();
       return { file: file!, version: version! };
@@ -102,7 +134,7 @@ export async function addVersion(
     requireAttributes(attributes);
     const [file] = await tx
       .insert(files)
-      .values({ projectId: a.project.id, folderId, name, attributes, createdBy: a.user.id })
+      .values({ projectId: a.project.id, folderId, name, attributes, createdBy: a.user.id, documentCode })
       .returning();
     const [version] = await tx
       .insert(fileVersions)
@@ -115,6 +147,7 @@ export async function addVersion(
         uploadedBy: a.user.id,
         comment,
         derivativeStatus,
+        ...codeColumns,
       })
       .returning();
     return { file: file!, version: version! };

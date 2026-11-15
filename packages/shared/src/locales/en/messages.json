@@ -463,7 +463,9 @@
     "workflowNoSteps": "\"{{name}}\": at least one step is required.",
     "stepNoAssignee": "\"{{name}}\" step {{step}}: at least one assignee is required.",
     "stepSlotUnknown": "\"{{name}}\" step {{step}}: role \"{{slot}}\" is not defined.",
-    "copyTargetInvalid": "\"{{name}}\": the copy target folder path is invalid (\"{{folder}}\")."
+    "copyTargetInvalid": "\"{{name}}\": the copy target folder path is invalid (\"{{folder}}\").",
+    "cdeWorkflowUnknown": "CDE transition {{transition}}: no workflow named \"{{name}}\" in the template.",
+    "cdeDuplicateTransition": "CDE transition {{transition}} is listed more than once."
   },
   "viewers": {
     "kinds": {

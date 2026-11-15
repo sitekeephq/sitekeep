@@ -5,6 +5,7 @@ import { DEFAULT_PROJECT_ROLES, PROJECT_MODULES, type FolderState, type ProjectM
 import type { AppDeps } from "../app/deps.js";
 import { projectAccess, requireProjectAdmin, tokenAllowsProject, userNames } from "../core/security/access.js";
 import { audit } from "../core/platform/audit.js";
+import { ensureCdeSettings } from "../cde/settings.js";
 import { auditLog, companies, folders, memberRoles, projectMembers, projectRoles, projects, users } from "../db/schema.js";
 import { badRequest, forbidden, notFound } from "../core/platform/http.js";
 import { msg } from "../i18n/index.js";
@@ -81,6 +82,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
       });
       return updated!;
     });
+    await ensureCdeSettings(db, project.id);
     await audit(db, { projectId: project.id, userId: req.user!.id, action: "project.created", details: body });
     const roleIds = await ensureDefaultProjectRoles(db, project.id, project.rootFolderId);
     const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)

@@ -531,7 +531,10 @@ export async function documentsApiRoutes(app: FastifyInstance, deps: ResolvedDep
       }
       let result: Awaited<ReturnType<typeof addVersion>>;
       try {
-        result = await addVersion(db, a, folderId, name, obj, s.comment, attributes, canEdit, defs, { lang: requestLanguage(req) });
+        result = await addVersion(db, a, folderId, name, obj, s.comment, attributes, canEdit, defs, {
+          lang: requestLanguage(req),
+          source: "opencde",
+        });
       } catch (err) {
         await storage.remove(obj.key);
         throw err;

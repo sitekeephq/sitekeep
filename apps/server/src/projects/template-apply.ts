@@ -55,6 +55,7 @@ import {
 import { normaliseChainTemplate, withRuleAssignees } from "../workflow/chain-template.js";
 import { checkTemplate as checkWorkflowSteps } from "../workflow/engine.js";
 import { templateFromRequest } from "./template-built-ins.js";
+import { applyTemplateCde } from "../cde/settings.js";
 import {
   createRequestSchema,
   previewRequestSchema,
@@ -406,8 +407,9 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
     for (const chunk of chunks(bindingRows)) await tx.insert(folderAttributeBindings).values(chunk);
     for (const chunk of chunks(gateRows)) await tx.insert(folderSettings).values(chunk);
     for (const chunk of chunks(virtualRows, 100)) await tx.insert(folderVirtualChildren).values(chunk);
+    const workflowIds = new Map<string, string>();
     if (prepared.workflows.length) {
-      await tx.insert(workflowTemplates).values(
+      const inserted = await tx.insert(workflowTemplates).values(
         prepared.workflows.map((workflow) => ({
           projectId,
           kind: workflow.kind,
@@ -420,8 +422,11 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
               : workflow.chain,
           createdBy: user.id,
         })),
-      );
+      ).returning({ id: workflowTemplates.id, name: workflowTemplates.name });
+      for (const w of inserted) if (!workflowIds.has(w.name)) workflowIds.set(w.name, w.id);
     }
+    // ISO 19650 CDE settings: the template's "cde" block, or the defaults (enforcement off).
+    await applyTemplateCde(tx as unknown as Db, projectId, template.cde, workflowIds, realPaths);
     if (template.slots.length) {
       await tx.insert(projectSlots).values(
         template.slots.map((slot, position) => {

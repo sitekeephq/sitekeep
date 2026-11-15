@@ -24,6 +24,7 @@ import { AttributeSettings } from "./ProjectSettingsDocs";
 import { webCapability } from "../../../sdk/capabilities";
 import { RoleChip, RolesSettings } from "./ProjectSettingsRoles";
 import { LocationsPage } from "./Locations";
+import { CdeSettings } from "./ProjectSettingsCde";
 import { hubApi } from "../../../shared/api/api-hub";
 import { SETTINGS_ADVANCED_LABEL, SETTINGS_TABS, type SettingsTabKey } from "../../../app/navigation/nav";
 import { AdminStatusSection } from "../../admin/pages/AdminStatus";
@@ -104,6 +105,7 @@ export function ProjectSettingsPage() {
       {tab === "is-akislari" && <WorkflowTemplates />}
       {tab === "is-tipleri" && <WorkTypesSettings />}
       {tab === "oznitelikler" && <AttributeSettings />}
+      {tab === "cde" && <CdeSettings />}
       {tab === "aktivite" && <Activity />}
       {tab === "sistem-durumu" && user?.isAdmin && <AdminStatusSection />}
     </div>

@@ -25,6 +25,7 @@ import type { NamingStandard } from "../kernel/naming.js";
 import type { PermissionLevel } from "../kernel/permissions.js";
 import type { FolderState } from "../core/types.js";
 import type { ProjectModule } from "../core/modules.js";
+import { cdeTransitionKey, type TemplateCdeSettings } from "../documents/cde.js";
 import type { OutcomeOption, ReviewParty, ReviewStage } from "../workflow/review-chains.js";
 import type { FinalOutcomeMap, OutcomeCode, StepRule, WorkflowKind, WorkflowRole } from "../workflow/workflow.js";
 
@@ -177,6 +178,8 @@ export interface ProjectTemplate {
   issueTypes?: unknown[];
   /** Module switches of new projects; missing modules are on. */
   modules?: Partial<Record<ProjectModule, boolean>>;
+  /** ISO 19650 CDE settings of new projects: code scheme, transitions, WIP policy (documents/cde.ts). */
+  cde?: TemplateCdeSettings;
   notes?: string[];
 }
 
@@ -493,6 +496,15 @@ export function checkProjectTemplate(
     const copyFolder = w.chain?.copyTarget?.folder;
     if (copyFolder && copyFolder.split("/").some((n) => !n.trim()))
       errors.push(sharedText(lang, "template.copyTargetInvalid", { name: w.name, folder: copyFolder }));
+  }
+
+  const transitions = new Set<string>();
+  for (const tr of template.cde?.transitions ?? []) {
+    const key = cdeTransitionKey(tr.from, tr.to);
+    if (transitions.has(key)) errors.push(sharedText(lang, "template.cdeDuplicateTransition", { transition: key }));
+    transitions.add(key);
+    if (tr.workflow && !workflowNames.has(tr.workflow))
+      errors.push(sharedText(lang, "template.cdeWorkflowUnknown", { transition: key, name: tr.workflow }));
   }
   return [...new Set(errors)];
 }

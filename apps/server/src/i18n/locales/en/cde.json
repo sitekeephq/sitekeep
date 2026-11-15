@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "archiveFolderUnknown": "The archive folder is not a folder of this project.",
+    "namingStandardUnknown": "The naming standard is not one of this project's.",
+    "duplicateTransition": "The transition {{transition}} is listed more than once.",
+    "sameState": "The transition {{transition}} does not change the state.",
+    "workflowOnlyForReview": "The transition {{transition}}: a workflow can only be set on a review transition.",
+    "workflowUnknown": "A transition names a workflow that is not one of this project's."
+  }
+}

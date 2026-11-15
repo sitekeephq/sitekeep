@@ -1,0 +1,63 @@
+{
+  "settings": {
+    "description": "How documents move between Work in Progress, Shared, Published and Archived in this project (ISO 19650). Read-only for now: editing arrives with the state transitions work.",
+    "general": {
+      "heading": "General",
+      "enforceTransitions": "Enforce Transitions",
+      "enforceOn": "On: uploads and moves follow the transition table.",
+      "enforceOff": "Off: the transition table is stored but not enforced.",
+      "archiveFolder": "Archive Folder",
+      "notSet": "Not set"
+    },
+    "codes": {
+      "heading": "Revision and Suitability Codes",
+      "scheme": "Code Scheme",
+      "pending": "Codes per version are added in a later update."
+    },
+    "transitions": {
+      "heading": "State Transitions",
+      "from": "From",
+      "to": "To",
+      "mode": "How",
+      "workflow": "Workflow",
+      "reason": "Reason Required",
+      "upload": "New upload",
+      "empty": "No transitions defined. When enforcement is on, a missing transition is forbidden.",
+      "anyReview": "Any approved review"
+    },
+    "teams": {
+      "heading": "Task Teams",
+      "wipPolicy": "Who Sees WIP",
+      "adminSeesWip": "Project Administrators See All WIP",
+      "pending": "Task teams are added in a later update."
+    },
+    "yes": "Yes",
+    "no": "No"
+  },
+  "states": {
+    "wip": "Work in Progress",
+    "shared": "Shared",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "modes": {
+    "direct": "Direct",
+    "review": "Through Review",
+    "auto": "Automatic",
+    "forbidden": "Forbidden"
+  },
+  "schemes": {
+    "iso_uk_na": "ISO 19650 (UK National Annex)",
+    "legacy_r": "Legacy (R00)",
+    "custom": "Custom"
+  },
+  "wipPolicies": {
+    "grants": "Folder Permissions",
+    "team_only": "Owning Task Team Only"
+  },
+  "statuses": {
+    "returned": "Returned",
+    "superseded": "Superseded",
+    "withdrawn": "Withdrawn"
+  }
+}

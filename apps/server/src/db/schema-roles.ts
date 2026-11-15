@@ -6,8 +6,9 @@
  * workflow step assignee ({ type: "role", id: roleId }).
  */
 import { sql } from "drizzle-orm";
-import { foreignKey, index, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
-import { projectMembers, projects } from "./schema.js";
+import { boolean, foreignKey, index, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import type { ProjectRoleKind } from "@sitekeep/shared";
+import { companies, projectMembers, projects } from "./schema.js";
 
 export const projectRoles = pgTable(
   "project_roles",
@@ -20,6 +21,14 @@ export const projectRoles = pgTable(
     description: text("description"),
     /** Chip colour, #rrggbb. */
     color: text("color"),
+    /** 'role' or an ISO 19650 task team ('task_team', D-4: one per company in the project). */
+    kind: text("kind").$type<ProjectRoleKind>().notNull().default("role"),
+    /** Task team: the company it stands for. */
+    companyId: uuid("company_id").references(() => companies.id, { onDelete: "set null" }),
+    /** Task team: short code used in document names ("ARC"). */
+    code: text("code"),
+    /** Task team: the lead appointed party's team. */
+    isLead: boolean("is_lead").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("project_roles_name").on(t.projectId, t.name)],

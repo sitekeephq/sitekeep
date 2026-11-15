@@ -25,6 +25,8 @@ export function toVersionDto(v: VersionRow, names: Map<string, string>): FileVer
     derivativeStatus: v.derivativeStatus,
     derivativeError: v.derivativeError,
     ifcSummary: v.ifcSummary,
+    suitabilityCode: v.suitabilityCode ?? null,
+    revisionCode: v.revisionCode ?? null,
   };
 }
 
@@ -40,5 +42,8 @@ export function toFileDto(f: FileRow, v: VersionRow, names: Map<string, string>)
     createdAt: f.createdAt.toISOString(),
     createdBy: f.createdBy ?? "",
     latest: toVersionDto(v, names),
+    containerId: f.containerId,
+    documentCode: f.documentCode ?? null,
+    cdeStatus: f.cdeStatus ?? null,
   };
 }

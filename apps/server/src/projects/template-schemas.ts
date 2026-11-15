@@ -11,6 +11,7 @@ import {
   type TemplateFolder,
 } from "@sitekeep/shared";
 import { chainBaseShape, chainStepFields } from "../workflow/chain-template.js";
+import { templateCdeSchema } from "../cde/settings.js";
 
 const FOLDER_STATES = ["wip", "shared", "published", "archived"] as const;
 const name200 = z.string().min(1).max(200);
@@ -133,6 +134,7 @@ export const projectTemplateSchema = z.object({
   issueTypes: z.array(z.unknown()).max(200).optional(),
   notes: z.array(z.string().max(1000)).max(50).optional(),
   modules: z.partialRecord(z.enum(PROJECT_MODULES), z.boolean()).optional(),
+  cde: templateCdeSchema.optional(),
 });
 
 export function parseProjectTemplate(input: unknown): ProjectTemplate {

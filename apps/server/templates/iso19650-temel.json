@@ -3,6 +3,20 @@
   "name": "ISO 19650 Temel",
   "description": "Taraf başına çalışma (WIP) alanı, ortak paylaşılan alan (inceleme / onay), yayınlanan ve arşivlenen. Kodlama paylaşılan ve yayınlanan alanlarda zorunlu; dosyalar bu alanlara yalnız onaylı inceleme ile girer.",
   "modules": { "correspondence": true, "rfi": false, "submittals": false, "meetings": false, "transmittals": false, "issues": true, "reviews": true, "forms": false, "coordination": false, "schedule": false, "spec": false, "reports": true },
+  "cde": {
+    "codeScheme": "iso_uk_na",
+    "enforceTransitions": true,
+    "wipPolicy": "grants",
+    "adminSeesWip": true,
+    "archiveFolder": "04-ARCHIVED (Arşiv)",
+    "transitions": [
+      { "from": null, "to": "wip", "mode": "direct" },
+      { "from": "wip", "to": "shared", "mode": "review", "workflow": "Ekip İçi Kontrol" },
+      { "from": "shared", "to": "wip", "mode": "auto" },
+      { "from": "shared", "to": "published", "mode": "review", "workflow": "Tasarımcı → Müşavir → İdare" },
+      { "from": "published", "to": "archived", "mode": "auto" }
+    ]
+  },
   "slots": [
     {
       "key": "idare",

@@ -28,6 +28,7 @@ import { versionPreviews, versionTexts } from "../db/schema.js";
 import { HttpError, badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
 import { officePdfAvailable, previewsOf, queuePreview, registerPreviewJobs, sceneWanted } from "../previews/service.js";
 import { loadVersion, requireView } from "../modules/documents/files.js";
+import { clientInfo, recordView } from "../cde/events.js";
 import { msg, requestLanguage } from "../i18n/index.js";
 
 const MEDIA_TYPES: Record<string, string> = {
@@ -127,9 +128,18 @@ export async function previewRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     };
   }
 
-  api.get<{ Params: { pid: string; vid: string } }>("/projects/:pid/versions/:vid/preview", async (req) =>
-    dto(req.params.pid, req.params.vid, req.user!, requestLanguage(req)),
-  );
+  api.get<{ Params: { pid: string; vid: string } }>("/projects/:pid/versions/:vid/preview", async (req) => {
+    const out = await dto(req.params.pid, req.params.vid, req.user!, requestLanguage(req));
+    await recordView(db, {
+      projectId: req.params.pid,
+      userId: req.user!.id,
+      fileId: out.fileId,
+      versionId: out.versionId,
+      kind: "preview",
+      client: clientInfo(req),
+    });
+    return out;
+  });
 
   api.post<{ Params: { pid: string; vid: string; kind: string } }>("/projects/:pid/versions/:vid/preview/:kind", async (req) => {
     const kind = parseKind(req.params.kind);
@@ -196,6 +206,7 @@ export async function previewRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   api.get<{ Params: { pid: string; vid: string } }>("/projects/:pid/versions/:vid/pdf", async (req, reply) => {
     const { a, file, version, tree } = await loadVersion(db, req.params.pid, req.params.vid, req.user!);
     requireView(tree, a, file);
+    await recordView(db, { projectId: a.project.id, userId: a.user.id, fileId: file.id, versionId: version.id, kind: "pdf", client: clientInfo(req) });
     const ext = splitExtension(file.name).extension.toLowerCase();
     if (ext === "pdf") {
       inlineHeaders(reply, file.name, "application/pdf");
@@ -220,6 +231,7 @@ export async function previewRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     const ext = splitExtension(file.name).extension.toLowerCase();
     const spec = viewerFor(file.name);
     if (!MEDIA_VIEWERS.has(spec.kind)) throw new HttpError(415, "unsupported", msg("previews:errors.unsupportedType"));
+    await recordView(db, { projectId: a.project.id, userId: a.user.id, fileId: file.id, versionId: version.id, kind: "media", client: clientInfo(req) });
     const binary = spec.kind === "cad" || spec.kind === "sheet" || spec.kind === "document" || spec.kind === "slides";
     const type = MEDIA_TYPES[ext] ?? (binary ? "application/octet-stream" : "text/plain; charset=utf-8");
     inlineHeaders(reply, file.name, type);
