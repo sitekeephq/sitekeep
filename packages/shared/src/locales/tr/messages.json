@@ -170,7 +170,10 @@
       "S3": "S3 · İnceleme ve Yorum İçin",
       "S4": "S4 · Onay İçin",
       "A": "A · Onaylı (Yayınlanan)",
-      "B": "B · Kısmen Onaylı"
+      "B": "B · Kısmen Onaylı",
+      "A1": "A1 · Onaylı (Yayınlanan)",
+      "B1": "B1 · Kısmen Onaylı",
+      "CR": "CR · Yapıldığı Gibi Kaydı"
     }
   },
   "forms": {

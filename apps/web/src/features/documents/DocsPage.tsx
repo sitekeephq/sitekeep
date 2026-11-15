@@ -25,6 +25,7 @@ import { useLoad, useProject } from "../../app/context/project";
 import { Dialog } from "../../shared/ui/Dialog";
 import { FolderTree } from "./components/FolderTree";
 import { UploadDialog } from "./components/UploadDialog";
+import { CodeChips } from "./components/cde/CodeChips";
 import { FileDrawer } from "./components/FileDrawer";
 import { VersionHistoryDrawer } from "./components/VersionHistoryDrawer";
 import { Icon } from "../../shared/ui/Icon";
@@ -820,6 +821,7 @@ export function DocsPage() {
                       >
                         V{f.currentVersion}
                       </button>
+                      <CodeChips suitability={f.latest.suitabilityCode} revision={f.latest.revisionCode} />
                     </td>
                     {defs.map((d) => (
                       <td key={d.id} className="small">

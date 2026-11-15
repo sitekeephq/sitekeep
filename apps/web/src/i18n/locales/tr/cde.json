@@ -29,8 +29,7 @@
     },
     "codes": {
       "heading": "Revizyon ve Uygunluk Kodları",
-      "scheme": "Kod Düzeni",
-      "pending": "Versiyon başına kodlar sonraki bir güncellemeyle gelecek."
+      "scheme": "Kod Düzeni"
     },
     "transitions": {
       "heading": "Durum Geçişleri",
@@ -138,6 +137,64 @@
     "whoCanSee": {
       "via": "görev ekibi çalışma kuralı",
       "note": "\"{{team}}\" görev ekibinin çalışma alanı (\"{{folder}}\" klasörü): istisna yetkileri dışında ekip dışındaki herkese kapalı."
+    }
+  },
+  "codes": {
+    "suitability": "Uygunluk",
+    "revision": "Revizyon",
+    "chipSuitability": "Uygunluk kodu: {{code}}",
+    "chipRevision": "Revizyon: {{code}}",
+    "warning": "Uyarı",
+    "panel": {
+      "heading": "Kodlar",
+      "current": "V{{version}}",
+      "none": "Bu versiyonda kod yok.",
+      "edit": "Kodları Düzenle",
+      "override": "Kodları Değiştir (Yönetici)"
+    },
+    "editor": {
+      "title": "V{{version}} Kodları",
+      "stateHelp": "{{state}}: kullanılabilen uygunluk kodları {{codes}}; revizyon biçimi {{revision}}.",
+      "noStateHelp": "Bu klasörün CDE durumu yok: projenin düzenindeki her kod kabul edilir.",
+      "nextRevision": "Sonraki revizyon: {{revision}}",
+      "useNext": "Kullan",
+      "reason": "Gerekçe",
+      "reasonHelp": "Bu versiyon {{state}} durumunda. Kodlarını değiştirmek yönetici müdahalesidir ve gerekçesiyle denetim kaydına yazılır.",
+      "reasonRequired": "Gerekçe yazın.",
+      "save": "Kodları Kaydet",
+      "clear": "Boş"
+    },
+    "upload": {
+      "heading": "ISO 19650 Kodları",
+      "help": "Bu yüklemedeki her dosyaya uygulanır. {{state}}: uygunluk {{codes}}, revizyon biçimi {{revision}}.",
+      "noStateHelp": "Bu klasörün CDE durumu yok: projenin düzenindeki her kod kabul edilir ya da boş bırakılabilir.",
+      "autoFill": "Boş bırakılırsa proje her dosyanın uygunluğunu ve sonraki revizyonunu kendisi verir.",
+      "multipleVersions": "Birden fazla dosya yeni versiyon alıyor: her dosya kendi sonraki revizyonunu alsın diye revizyonu boş bırakın."
+    },
+    "errors": {
+      "suitabilityUnknown": "{{value}} bu projenin uygunluk kodlarından değil. Burada kullanılabilenler: {{allowed}}.",
+      "suitabilityState": "{{value}} {{state}} durumunda kullanılamaz. Burada kullanılabilenler: {{allowed}}.",
+      "revisionFormat": "{{value}} revizyonu projenin revizyon düzenine uymuyor. Burada beklenen: {{allowed}}.",
+      "revisionState": "{{value}} revizyonu {{state}} durumunda kullanılamaz. Burada beklenen: {{allowed}}."
+    },
+    "settings": {
+      "schemeHelp": {
+        "iso_uk_na": "Çalışma: S0 ile P01.01, P01.02 …; Paylaşılan: S1–S4 ile P01, P02 …; Yayınlanan: A1…An, B1…Bn, CR ile C01, C02 …",
+        "legacy_r": "Her durumda R00, R01 … revizyonları; uygunluk kodları duruma bağlı değil.",
+        "custom": "ISO revizyonları ve projenin kendi uygunluk kodları."
+      },
+      "save": "Düzeni Kaydet",
+      "saved": "Kaydedildi.",
+      "allowedHeading": "Durumlara Göre Kullanılabilen Kodlar",
+      "state": "Durum",
+      "ownList": "Projenin kendi uygunluk listesi kullanılıyor.",
+      "unmappedHeading": "Dönüştürülemeyen Değerler",
+      "unmappedHelp": "Eski serbest özniteliklerdeki, bu düzenin kodu olmayan uygunluk ve revizyon değerleri. Özniteliklerde kalırlar; bu versiyonların kodlarını elle verin.",
+      "unmappedEmpty": "Eski değerlerin hepsi dönüştürüldü.",
+      "unmappedTruncated": "Yalnız ilk {{count}} tanesi listeleniyor.",
+      "file": "Dosya",
+      "field": "Alan",
+      "value": "Değer"
     }
   }
 }

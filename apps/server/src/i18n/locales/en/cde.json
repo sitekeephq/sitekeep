@@ -20,5 +20,32 @@
     "entities": {
       "team": "Task team"
     }
+  },
+  "codes": {
+    "errors": {
+      "suitabilityUnknown": "Suitability code {{value}} is not one of this project's codes ({{scheme}}). Allowed here: {{allowed}}.",
+      "suitabilityState": "Suitability code {{value}} cannot be used in {{state}}. Allowed here: {{allowed}}.",
+      "revisionFormat": "Revision {{value}} does not follow the project's revision scheme ({{scheme}}). Expected here: {{allowed}}.",
+      "revisionState": "Revision {{value}} cannot be used in {{state}}. Expected here: {{allowed}}.",
+      "reasonRequired": "Changing the codes of a version in {{state}} needs a reason.",
+      "adminRequired": "Only project administrators can change the codes of a version in {{state}}.",
+      "noEditPermission": "You need edit permission on the folder to change the codes of this version."
+    },
+    "states": {
+      "wip": "Work in Progress",
+      "shared": "Shared",
+      "published": "Published",
+      "archived": "Archived",
+      "none": "a folder without a state"
+    },
+    "schemes": {
+      "iso_uk_na": "ISO 19650 UK NA",
+      "legacy_r": "legacy R00",
+      "custom": "custom"
+    },
+    "fields": {
+      "suitability": "Suitability",
+      "revision": "Revision"
+    }
   }
 }

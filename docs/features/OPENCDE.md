@@ -60,13 +60,16 @@ https://github.com/buildingSMART/documents-API). Field names match `swagger.yaml
 
 - `/opencde/upload?key=…` → **Upload from an External Application**: the requesting application (OAuth application name), incoming files, project and
   only the folders with write permission, a "Name in the CDE" per file (checked instantly against the naming standard),
-  **Revision**, **Status / Suitability** (S0–S4, A, B), **Description**, project attributes tied to the folder. **Cancel** or
+  **Revision**, **Status / Suitability** (S0–S4, A1, B1, CR), **Description**, project attributes tied to the folder. **Cancel** or
   **Start Upload**. The server checks everything again; errors are shown on the file row.
 - `/opencde/select?key=…` → **Select Documents for an External Application**: project, folder tree, search by name, multiple selection, filter for the requested
   extensions (e.g. only `.ifc`). **Cancel** or **Send Selection**.
 - If the user is not signed in, the sign-in page comes first, then the same page opens.
-- Revision and Status / Suitability are written to the file's `Revizyon` and `Uygunluk` attributes. If the project defines attributes with these names,
-  the fixed field is hidden and the project's definition (list, required) is used. Description is the version description.
+- Revision and Status / Suitability are the version's ISO 19650 codes ([codes](CDE_STATES.md#codes)): normalised (`A` / `B` → `A1` / `B1`),
+  checked against the state of the target folder before any byte is sent (refused when the project enforces the ISO 19650 rules,
+  otherwise accepted with `warnings` in the page response), stored as the version's codes and, as before, in the file's
+  `Revizyon` and `Uygunluk` attributes. `document_version_metadata` returns the version's codes under these names. If the project defines
+  attributes with these names, the fixed field is hidden and the project's definition (list, required) is used. Description is the version description.
 
 **Built-in OAuth2 authorization server:**
 

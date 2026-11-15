@@ -170,7 +170,10 @@
       "S3": "S3 · For Review and Comment",
       "S4": "S4 · For Approval",
       "A": "A · Approved (Published)",
-      "B": "B · Partially Approved"
+      "B": "B · Partially Approved",
+      "A1": "A1 · Approved (Published)",
+      "B1": "B1 · Partially Approved",
+      "CR": "CR · As Constructed Record"
     }
   },
   "forms": {

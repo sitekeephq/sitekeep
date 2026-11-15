@@ -29,8 +29,7 @@
     },
     "codes": {
       "heading": "Revision and Suitability Codes",
-      "scheme": "Code Scheme",
-      "pending": "Codes per version are added in a later update."
+      "scheme": "Code Scheme"
     },
     "transitions": {
       "heading": "State Transitions",
@@ -138,6 +137,64 @@
     "whoCanSee": {
       "via": "task team WIP rule",
       "note": "Work in progress of task team \"{{team}}\" (folder \"{{folder}}\"): closed to everyone outside the team except exception permissions."
+    }
+  },
+  "codes": {
+    "suitability": "Suitability",
+    "revision": "Revision",
+    "chipSuitability": "Suitability code: {{code}}",
+    "chipRevision": "Revision: {{code}}",
+    "warning": "Warning",
+    "panel": {
+      "heading": "Codes",
+      "current": "V{{version}}",
+      "none": "No codes on this version.",
+      "edit": "Edit Codes",
+      "override": "Override Codes"
+    },
+    "editor": {
+      "title": "Codes of V{{version}}",
+      "stateHelp": "{{state}}: allowed suitability codes {{codes}}; revision form {{revision}}.",
+      "noStateHelp": "This folder has no CDE state: any code of the project's profile is accepted.",
+      "nextRevision": "Next revision: {{revision}}",
+      "useNext": "Use",
+      "reason": "Reason",
+      "reasonHelp": "This version is in {{state}}. Changing its codes is an administrator override and is recorded in the audit log with the reason.",
+      "reasonRequired": "Write a reason.",
+      "save": "Save Codes",
+      "clear": "Empty"
+    },
+    "upload": {
+      "heading": "ISO 19650 Codes",
+      "help": "Applied to every file of this upload. {{state}}: suitability {{codes}}, revision form {{revision}}.",
+      "noStateHelp": "This folder has no CDE state: any code of the project's profile is accepted, or leave them empty.",
+      "autoFill": "Left empty, the project fills in the suitability and the next revision of each file.",
+      "multipleVersions": "Several files get new versions: leave the revision empty so each file gets its own next revision."
+    },
+    "errors": {
+      "suitabilityUnknown": "{{value}} is not a suitability code of this project. Allowed here: {{allowed}}.",
+      "suitabilityState": "{{value}} cannot be used in {{state}}. Allowed here: {{allowed}}.",
+      "revisionFormat": "Revision {{value}} does not follow the project's revision scheme. Expected here: {{allowed}}.",
+      "revisionState": "Revision {{value}} cannot be used in {{state}}. Expected here: {{allowed}}."
+    },
+    "settings": {
+      "schemeHelp": {
+        "iso_uk_na": "WIP: S0 with P01.01, P01.02 …; Shared: S1–S4 with P01, P02 …; Published: A1…An, B1…Bn, CR with C01, C02 …",
+        "legacy_r": "Revisions R00, R01 … in every state; suitability codes are not tied to a state.",
+        "custom": "ISO revisions with the project's own suitability codes."
+      },
+      "save": "Save Scheme",
+      "saved": "Saved.",
+      "allowedHeading": "Allowed Codes per State",
+      "state": "State",
+      "ownList": "The project's own suitability list is used.",
+      "unmappedHeading": "Values Not Converted",
+      "unmappedHelp": "Suitability and revision values from the older free attributes that are not codes of this profile. They stay in the attributes; set the codes of these versions by hand.",
+      "unmappedEmpty": "Every older value was converted.",
+      "unmappedTruncated": "Only the first {{count}} are listed.",
+      "file": "File",
+      "field": "Field",
+      "value": "Value"
     }
   }
 }

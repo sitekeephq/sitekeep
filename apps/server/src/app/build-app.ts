@@ -58,6 +58,7 @@ import { privacyRoutes } from "../privacy/routes.js";
 import { cdeRoutes } from "../cde/routes.js";
 import { auditRoutes } from "../audit/routes.js";
 import { taskTeamRoutes } from "../cde/team-routes.js";
+import { cdeCodesRoutes } from "../cde/codes-routes.js";
 import { loadPrivacyState } from "../privacy/settings.js";
 import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
@@ -201,6 +202,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await cdeRoutes(api, deps);
       await auditRoutes(api, deps);
       await taskTeamRoutes(api, deps);
+      await cdeCodesRoutes(api, deps);
       // Developer tools: registered only on a development server (CDE_DEV_TOOLS=1, not production).
       if (deps.devTools) await devRoutes(api, deps);
     },

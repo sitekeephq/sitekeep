@@ -850,6 +850,10 @@ tr:hover .project-delete { opacity: 1; }
   background: var(--surface-3); color: var(--primary); font-size: 12px; font-weight: 650;
 }
 .version-link:hover:not(:disabled) { border-color: #b7cee8; background: var(--primary-soft); }
+/* ISO 19650 suitability / revision chips (features/documents/components/cde/CodeChips.tsx). */
+.code-chips { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
+.code-chip { padding: 1px 6px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11px; }
+.file-codes > * + * { margin-top: 6px; }
 .version-history-drawer { width: min(620px, 100%); padding: 0; overflow: auto; }
 .version-history-head {
   position: sticky; top: 0; z-index: 3; display: flex; align-items: flex-start; gap: 16px;

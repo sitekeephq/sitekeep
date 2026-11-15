@@ -47,12 +47,6 @@
       "description": "Yüklenici: kendi alanında düzenler, tasarımı kontrol eder, idareye sunar."
     }
   ],
-  "root": {
-    "attributes": [
-      "Revizyon",
-      "Uygunluk Kodu"
-    ]
-  },
   "folders": [
     {
       "name": "01-WIP (Çalışmada)",
@@ -304,28 +298,6 @@
           "type": "number",
           "digits": 4
         }
-      ]
-    }
-  ],
-  "attributes": [
-    {
-      "name": "Revizyon",
-      "type": "text"
-    },
-    {
-      "name": "Uygunluk Kodu",
-      "type": "list",
-      "options": [
-        "S0",
-        "S1",
-        "S2",
-        "S3",
-        "S4",
-        "A1",
-        "A2",
-        "A3",
-        "B1",
-        "CR"
       ]
     }
   ],

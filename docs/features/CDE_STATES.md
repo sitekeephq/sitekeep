@@ -74,6 +74,84 @@ A template may carry a `"cde"` block, applied when a project is created from it 
 `workflow` names a workflow of the same template; `archiveFolder` is a folder path from the project
 root. The template check refuses unknown workflows and duplicate transitions.
 
+## Codes
+
+Every version carries a **suitability** (status) code and a **revision** code (ISO 19650-2 §5.1.7,
+UK National Annex): `file_versions.suitability_code`, `revision_code`, with who set them and when
+(`codes_set_by`, `codes_set_at`). The rules are pure functions in
+`packages/shared/src/documents/cde-codes.ts`, shared by the server and the web app.
+
+### Profiles
+
+The project's `code_scheme` picks the profile; `suitability_codes` (a list of `{ code, description,
+states }`) replaces the built-in suitability list in any profile (an entry without states is allowed
+everywhere).
+
+| State | `iso_uk_na` (default) suitability | `iso_uk_na` revision | `legacy_r` |
+|---|---|---|---|
+| WIP | S0 | P01.01, P01.02 … | R00, R01 … in every state; every suitability code in every state |
+| Shared | S1, S2, S3, S4 | P01, P02 … | |
+| Published | A1…An, B1…Bn, CR | C01, C02 … | |
+| Archived | any of the above (what the publication had) | any of the above | |
+| (folder without a state) | any code of the profile | any form of the profile | |
+
+`custom` uses the ISO revisions with the project's own suitability list. S5–S7 are not used.
+
+Input is normalised: `s2` → `S2`, `S2 · For information` → `S2`, `A` / `B` (OpenCDE and older
+attribute values) → `A1` / `B1`, `p1.2` → `P01.02`, `Rev 3` / `r3` → `R03`.
+
+Revision sequence (`nextRevision`): P01.01 → P01.02 in WIP; WIP → Shared P01.03 → P01, or the next
+free P0n when P01 was shared already; Shared → Shared P01 → P02; → Published C01, then C02 …; back
+to WIP from P0n or C0n starts the next preliminary revision (P02.01); Archived keeps the revision.
+Legacy: R00 for a new document, R00 → R01 for a new version, a state change keeps the revision.
+
+### Where the codes are checked
+
+| Path | Behaviour |
+|---|---|
+| `addVersion` (upload route, OpenCDE completion, modules) | `checkCodes` → `apps/server/src/cde/codes.ts`. Codes given (`AddVersionOptions.codes`, the upload fields `suitabilityCode` / `revisionCode`) are normalised and checked against the profile in the folder's state (`cdeStateOf`). A code that does not fit is refused with 400 and the allowed codes **only when the project enforces the rules** (`enforce_transitions`, D-8). Otherwise it is stored as given (normalised) and returned as a non-blocking `warnings` entry (`field`, `kind`, `value`, `state`, `allowed`, `message`) on the upload result, so existing projects and clients (AEC Pilot sending S2/C01 into WIP) keep working. A code equal to the previous version's is not checked again (existing data is grandfathered) |
+| Legacy attributes | Uploads, OpenCDE and modules that still write the free attributes `Uygunluk Kodu`, `Uygunluk` or a revision attribute (`Revizyon`, `Rev`, `Revision` …) get them as codes: any code of the profile when the project does not enforce the rules (with a warning when it does not fit the state), only codes that fit the state when it does. Other values stay attributes only and never refuse the upload. Attributes are never removed |
+| Enforcement on (`enforce_transitions`) | A version stored without codes in a folder with a state gets them: the previous suitability when it still fits, else the state's default (WIP: S0); the next revision of the sequence |
+| Approved review copy | Carries the source version's codes unchanged (system work); the transition work decides what a copy becomes |
+| OpenCDE upload page | The revision and suitability fields are checked against the target folder's state before any byte is sent: refused when the project enforces the rules, else returned as `warnings` beside `redirectTo`; `document_version_metadata` returns the version's codes as `Revizyon` / `Uygunluk` |
+
+### API
+
+| Method | Path | Who | Notes |
+|---|---|---|---|
+| GET | `/api/v1/projects/:pid/folders/:fid/cde/codes` | members who see the folder | `CdeFolderCodesDto`: scheme, own suitability list, enforcement, the folder's state |
+| PATCH | `/api/v1/projects/:pid/versions/:vid/codes` | WIP (or no state): folder editors and the uploader; Shared / Published / Archived: project administrators with a `reason` | `{ suitabilityCode?, revisionCode?, reason? }`, null clears. A code that does not fit: 400 when the project enforces the rules, else stored and returned with `warnings`. Audit `file.codes_changed`; outside WIP also `cde.override` |
+| GET | `/api/v1/projects/:pid/cde/codes/unmapped` | project administrators | Older attribute values that are not codes of the profile (first 500) |
+
+The code scheme is changed with `PUT /cde/settings` (`codeScheme`, `suitabilityCodes`).
+
+### Web
+
+Suitability and revision chips beside the version in the documents list, under the title of the file
+drawer and per version in the version history; a **Codes** block in the file drawer with the editor
+(the rules are checked while typing: an error when the project enforces them, else a warning); code
+inputs in the upload dialog (WIP: S0 and the proposed revision filled in; the same error or warning,
+and the server's warnings on the result); **Project Settings → CDE → Revision and Suitability Codes**: scheme, the codes
+each state allows, the values the migration could not convert. The ISO 19650 template no longer
+defines the free attributes "Revizyon" and "Uygunluk Kodu"; projects created earlier keep them.
+
+### Live-data migration
+
+`migrateLegacyCodes` (`apps/server/src/cde/codes-migration.ts`) runs at server start (after the
+database migrations) and from `apps/server/src/scripts/cde-backfill.ts`. Idempotent and batched:
+
+1. For the current version of each file without codes, the attribute values are read
+   (`Uygunluk Kodu`, else `Uygunluk`; the first revision attribute).
+2. Code scheme per project, chosen once (audit `cde.codes_migrated` is the marker): a project with
+   any R revision (`R01`, `Rev 2`) gets `legacy_r`, others keep `iso_uk_na`. A project whose scheme is
+   not the default, or whose CDE settings were saved by a person (`cde.settings_updated`), keeps it.
+3. Values that are codes of the profile (in any state) are copied, normalised, into the version;
+   `codes_set_at` is set, `codes_set_by` stays empty. A version whose codes were set is never
+   touched again.
+4. Values that are not codes stay in the attributes and are reported: audit
+   `cde.migration_unmapped` (written again only when the list changes) and the unmapped endpoint /
+   settings list.
+
 ## Where the rules run
 
 Every write path calls the guards in `apps/server/src/cde/guards.ts` once, and the view routes
@@ -83,7 +161,7 @@ call the events in `apps/server/src/cde/events.ts`:
 |---|---|
 | `checkUpload` | `addVersion` (`apps/server/src/files/new-version.ts`: upload route, OpenCDE completion, modules), manual copy (`modules/documents/files.ts`), approved review copy (`workflow/review-finalization.ts`), OpenCDE upload page (`opencde/pages.ts`) |
 | `checkMove` | moving a file (`PATCH /projects/:pid/files/:id`) |
-| `checkCodes` | `addVersion` (codes from `AddVersionOptions.codes`), approved review copy (codes carried from the source version) |
+| `checkCodes` | `addVersion` (codes from `AddVersionOptions.codes` or the legacy attributes), approved review copy (codes carried from the source version); rules in `apps/server/src/cde/codes.ts` |
 | `checkDocumentCode` | `addVersion`, manual copy, rename / move, approved review copy |
 | `recordView` | preview, PDF and media routes (`previews/routes.ts`), model route (`files.ts`) |
 | `recordTransition` | move to another folder, approved review copy |
@@ -100,7 +178,7 @@ migration 0042): `DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.
 |---|---|
 | Data model, settings, template block, seams (this page) | done; no behaviour change |
 | Transitions enforced, archive on publication, returned / withdrawn on rejection | planned |
-| Suitability and revision codes per version | planned |
+| Suitability and revision codes per version ([codes](#codes)) | done |
 | Unique document codes ([details](DOCUMENT_CODES.md)) | done |
 | Task teams and WIP visibility ([task teams](TASK_TEAMS.md)) | done |
-| Audit trail: view events, hash chain, CSV | planned |
+| Audit trail: view events, hash chain, CSV ([details](AUDIT_LOG.md)) | done |

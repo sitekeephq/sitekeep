@@ -42,7 +42,8 @@
         "purged": "File permanently deleted",
         "attributes_updated": "File attributes changed",
         "viewed": "File viewed",
-        "moved": "File moved"
+        "moved": "File moved",
+        "codes_changed": "Codes changed"
       },
       "attribute": {
         "created": "Attribute added",
@@ -186,7 +187,9 @@
         "settings_updated": "CDE settings changed",
         "transition": "State changed",
         "override": "Rule exception (with reason)",
-        "teams_seeded": "Task teams created"
+        "teams_seeded": "Task teams created",
+        "codes_migrated": "Codes taken over from attributes",
+        "migration_unmapped": "Attribute values not converted to codes"
       },
       "audit": {
         "exported": "Audit log exported",

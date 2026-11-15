@@ -1,5 +1,6 @@
 import type {
   AttributeDefinition,
+  CdeCodeWarningDto,
   AttributeDefinitionDto,
   EffectiveAttributeDto,
   FileDto,
@@ -71,7 +72,21 @@ export interface DocumentCodeConflict {
 }
 export interface UploadResult {
   standard: string | null;
-  results: { name: string; ok: boolean; errors: string[]; fileId?: string; version?: number; conflict?: DocumentCodeConflict; warning?: DocumentCodeConflict }[];
+  /**
+   * `warning`: the document code is held by another document (ISO-3); `warnings`: suitability /
+   * revision codes stored although they do not fit the folder's state (ISO-2). Both only when the
+   * project does not enforce the rules.
+   */
+  results: {
+    name: string;
+    ok: boolean;
+    errors: string[];
+    fileId?: string;
+    version?: number;
+    conflict?: DocumentCodeConflict;
+    warning?: DocumentCodeConflict;
+    warnings?: CdeCodeWarningDto[];
+  }[];
 }
 export interface DocIntelSuggestResult {
   standard: NamingStandard | null;
@@ -133,10 +148,14 @@ export const documentsApi = {
     files: File[],
     comment?: string,
     attributes?: Record<string, string>,
+    /** ISO 19650 codes of the new versions (checked against the folder's state). */
+    codes?: { suitabilityCode?: string | null; revisionCode?: string | null },
   ) => {
     const form = new FormData();
     if (comment) form.append("comment", comment);
     if (attributes && Object.keys(attributes).length) form.append("attributes", JSON.stringify(attributes));
+    if (codes?.suitabilityCode) form.append("suitabilityCode", codes.suitabilityCode);
+    if (codes?.revisionCode) form.append("revisionCode", codes.revisionCode);
     for (const file of files) form.append("file", file, file.name);
     return request<UploadResult>("POST", `/projects/${projectId}/folders/${folderId}/files`, form);
   },

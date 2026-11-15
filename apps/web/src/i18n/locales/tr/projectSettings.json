@@ -42,7 +42,8 @@
         "purged": "Dosya kalıcı silindi",
         "attributes_updated": "Dosya öznitelikleri değişti",
         "viewed": "Dosya görüntülendi",
-        "moved": "Dosya taşındı"
+        "moved": "Dosya taşındı",
+        "codes_changed": "Kodlar değişti"
       },
       "attribute": {
         "created": "Öznitelik eklendi",
@@ -186,7 +187,9 @@
         "settings_updated": "CDE ayarları değişti",
         "transition": "Durum değişti",
         "override": "Kural istisnası (gerekçeli)",
-        "teams_seeded": "Görev ekipleri oluşturuldu"
+        "teams_seeded": "Görev ekipleri oluşturuldu",
+        "codes_migrated": "Kodlar özniteliklerden aktarıldı",
+        "migration_unmapped": "Koda dönüştürülemeyen öznitelik değerleri"
       },
       "audit": {
         "exported": "Denetim kaydı dışa aktarıldı",

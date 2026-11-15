@@ -16,16 +16,19 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import {
   can,
+  codeProfile,
   foldTr,
   OPENCDE_DOCS_LIMITS,
   OPENCDE_REVISION_KEY,
   OPENCDE_SUITABILITY_KEY,
   splitExtension,
   validateAttributes,
+  validateCodes,
   validateName,
   type OpenCdeDocumentRowDto,
   type OpenCdeFolderDto,
   type OpenCdeRedirectDto,
+  type CdeCodeWarningDto,
   type OpenCdeSessionDto,
   type OpenCdeUploadRulesDto,
 } from "@sitekeep/shared";
@@ -42,6 +45,8 @@ import { effectiveDefinitions } from "../modules/documents/attributes.js";
 import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, folderGate } from "../workflow/service.js";
 import { checkUpload } from "../cde/guards.js";
+import { codeErrorMsg, loadCodeSettings } from "../cde/codes.js";
+import { cdeStateOf } from "../cde/state.js";
 import { callbackTarget, documentsBase, dropParts, expired, type DocSessionRow } from "./common.js";
 import { msg, render, requestLanguage, tReq } from "../i18n/index.js";
 
@@ -291,8 +296,28 @@ export async function opencdePageRoutes(api: FastifyInstance, deps: ResolvedDeps
 
     const attributes: Record<string, string> = {};
     for (const [k, v] of Object.entries(body.attributes ?? {})) if (k.trim() && v.trim()) attributes[k.trim()] = v.trim();
-    if (body.revision?.trim()) attributes[OPENCDE_REVISION_KEY] = body.revision.trim();
-    if (body.suitability?.trim()) attributes[OPENCDE_SUITABILITY_KEY] = body.suitability.trim();
+    // ISO 19650 codes (cde/codes.ts): normalised ("A" → "A1") and checked against the state of
+    // the folder each document goes to; addVersion stores them as the version's codes.
+    const codeInput = { suitabilityCode: body.suitability?.trim() || null, revisionCode: body.revision?.trim() || null };
+    // A code that does not fit is refused only when the project enforces the ISO 19650 rules (D-8);
+    // otherwise it is stored and returned as a warning (AEC Pilot deliveries keep working).
+    const codeSettings = codeInput.suitabilityCode || codeInput.revisionCode ? await loadCodeSettings(db, a.project.id) : null;
+    const profile = codeSettings ? codeProfile(codeSettings) : null;
+    const codeWarnings: CdeCodeWarningDto[] = [];
+    const checkCodesIn = (folderId: string, ids: string[]) => {
+      if (!profile) return;
+      const state = cdeStateOf(tree, folderId);
+      const r = validateCodes(profile, state, codeInput);
+      for (const e of r.errors) {
+        const text = render(requestLanguage(req), codeErrorMsg(profile, state, e));
+        if (codeSettings!.enforceTransitions) for (const id of ids) push(id, text);
+        else if (!codeWarnings.some((w) => w.message === text)) codeWarnings.push({ ...e, state, message: text });
+      }
+    };
+    if (newFiles.length) checkCodesIn(body.folderId, [...names.keys()]);
+    const normalised = profile ? validateCodes(profile, null, codeInput).codes : null;
+    if (normalised?.revisionCode) attributes[OPENCDE_REVISION_KEY] = normalised.revisionCode;
+    if (normalised?.suitabilityCode) attributes[OPENCDE_SUITABILITY_KEY] = normalised.suitabilityCode;
 
     // Typed attributes of the target folder: valid values; required ones for new files.
     const defs = newFiles.length ? await effectiveDefinitions(db, tree, body.folderId) : [];
@@ -317,6 +342,7 @@ export async function opencdePageRoutes(api: FastifyInstance, deps: ResolvedDeps
       if (blocker) push(r.id, blocker);
       const fdefs = await effectiveDefinitions(db, tree, f.folderId);
       for (const e of validateAttributes(fdefs, attributes, { partial: true, lang: requestLanguage(req) })) push(r.id, e.message);
+      checkCodesIn(f.folderId, [r.id]);
       names.set(r.id, f.name);
       existingFolderId ??= f.folderId;
     }
@@ -350,7 +376,7 @@ export async function opencdePageRoutes(api: FastifyInstance, deps: ResolvedDeps
       details: { client: s.clientName, folderId: body.folderId, files: [...names.values()] },
     });
     const url = `${documentsBase(opts, req)}/upload-sessions/${s.id}`;
-    return { redirectTo: withParams(s.callbackUrl, { upload_documents_url: url }) };
+    return { redirectTo: withParams(s.callbackUrl, { upload_documents_url: url }), ...(codeWarnings.length ? { warnings: codeWarnings } : {}) };
   });
 
   /** "Seçimi Gönder" on the select page. */

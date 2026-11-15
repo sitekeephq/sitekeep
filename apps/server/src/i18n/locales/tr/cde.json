@@ -20,5 +20,32 @@
     "entities": {
       "team": "Görev ekibi"
     }
+  },
+  "codes": {
+    "errors": {
+      "suitabilityUnknown": "{{value}} uygunluk kodu bu projenin kodlarından değil ({{scheme}}). Burada kullanılabilenler: {{allowed}}.",
+      "suitabilityState": "{{value}} uygunluk kodu {{state}} durumunda kullanılamaz. Burada kullanılabilenler: {{allowed}}.",
+      "revisionFormat": "{{value}} revizyonu projenin revizyon düzenine uymuyor ({{scheme}}). Burada beklenen: {{allowed}}.",
+      "revisionState": "{{value}} revizyonu {{state}} durumunda kullanılamaz. Burada beklenen: {{allowed}}.",
+      "reasonRequired": "{{state}} durumundaki bir versiyonun kodlarını değiştirmek için gerekçe yazın.",
+      "adminRequired": "{{state}} durumundaki bir versiyonun kodlarını yalnız proje yöneticileri değiştirebilir.",
+      "noEditPermission": "Bu versiyonun kodlarını değiştirmek için klasörde düzenleme yetkiniz olmalı."
+    },
+    "states": {
+      "wip": "Çalışma",
+      "shared": "Paylaşılan",
+      "published": "Yayınlanan",
+      "archived": "Arşivlenen",
+      "none": "durumu olmayan klasör"
+    },
+    "schemes": {
+      "iso_uk_na": "ISO 19650 UK NA",
+      "legacy_r": "eski R00 düzeni",
+      "custom": "özel"
+    },
+    "fields": {
+      "suitability": "Uygunluk",
+      "revision": "Revizyon"
+    }
   }
 }

@@ -5,6 +5,7 @@ import { buildApp } from "./app/build-app.js";
 import { activeModules } from "./app/modules.js";
 import { hashPassword, passwordProblem } from "./core/security/auth.js";
 import { openDb } from "./db/index.js";
+import { migrateLegacyCodes } from "./cde/codes-migration.js";
 import { recordServerError } from "./core/platform/error-ring.js";
 import { users } from "./db/schema.js";
 import { JobQueue } from "./jobs/queue.js";
@@ -85,6 +86,12 @@ await backfillDocumentCodesAtStart(db, (m, e) => (e ? console.error(m, e) : cons
 await upgradeSeededLabels(db);
 // ISO 19650 task teams: one per company in projects that have none yet (idempotent, batched).
 await seedTaskTeams(db).catch((e) => console.error("task team seeding failed", e));
+// ISO 19650 codes from the older free attributes (idempotent, batched; docs/features/CDE_STATES.md).
+try {
+  await migrateLegacyCodes(db, { log: (line) => console.log(line) });
+} catch (err) {
+  console.error("ISO 19650 codes migration failed; it runs again at the next start.", err);
+}
 
 const converters = new Converters();
 const app = await buildApp({

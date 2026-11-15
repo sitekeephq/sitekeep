@@ -43,6 +43,7 @@ export * from "./works/record-intake.js";
 export * from "./platform/oauth.js";
 export * from "./documents/opencde-documents.js";
 export * from "./documents/cde.js";
+export * from "./documents/cde-codes.js";
 export * from "./coordination/param-change.js";
 export * from "./coordination/bcf.js";
 export * from "./platform/privacy.js";

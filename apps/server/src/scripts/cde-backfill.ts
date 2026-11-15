@@ -1,5 +1,6 @@
 /**
- * Re-runs the CDE foundation backfill (src/cde/backfill.ts) against a database:
+ * Re-runs the CDE foundation backfill (src/cde/backfill.ts) and the ISO 19650 codes migration
+ * (src/cde/codes-migration.ts; also run at server start) against a database:
  *
  *   DATABASE_URL=postgres://… npx tsx src/scripts/cde-backfill.ts [batchSize]
  *
@@ -8,6 +9,7 @@
 import { runCdeBackfill } from "../cde/backfill.js";
 import { runDocumentCodeBackfill } from "../cde/document-code.js";
 import { seedTaskTeams } from "../cde/teams.js";
+import { migrateLegacyCodes } from "../cde/codes-migration.js";
 import { openDb } from "../db/index.js";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -24,6 +26,8 @@ try {
   console.log(JSON.stringify(await runDocumentCodeBackfill(handle.db, { batchSize, log: (line) => console.log(line) })));
   // ISO-5 task teams: one per company in projects that have none (also run at server start).
   console.log(JSON.stringify(await seedTaskTeams(handle.db, { batchSize, log: (line) => console.log(line) })));
+  const codes = await migrateLegacyCodes(handle.db, { batchSize, log: (line) => console.log(line) });
+  console.log(JSON.stringify(codes));
 } finally {
   await handle.close();
 }

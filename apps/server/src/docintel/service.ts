@@ -66,7 +66,8 @@ export async function processVersion(db: Db, storage: Storage, versionId: string
     const out = await extractPdfText({ filePath: storage.localPath(v.storageKey) }, { maxPages: 1, timeoutMs: 120_000 });
     const antet = analyzeAntet(out);
     const isCurrent = v.version === f.currentVersion;
-    const attr = isCurrent ? revisionAttribute(f.attributes) : null;
+    // The version's revision code (ISO 19650 codes), else the file's revision attribute.
+    const attr = v.revisionCode ?? (isCurrent ? revisionAttribute(f.attributes) : null);
     const revision = detectRevision(antet, f.name);
     const prev = await previousVersion(db, f, v);
     const warnings = revisionWarnings(revision, { sha256: v.sha256, version: v.version }, prev, attr);
@@ -161,7 +162,7 @@ export async function versionDocIntel(
   if (!x || x.status !== "done") return base;
   const isCurrent = version.version === file.currentVersion;
   // Warnings are recomputed so that later attribute edits are reflected.
-  const attr = isCurrent ? revisionAttribute(file.attributes) : null;
+  const attr = version.revisionCode ?? (isCurrent ? revisionAttribute(file.attributes) : null);
   const prev = await previousVersion(db, file, version);
   const revision = x.revision ?? detectRevision(x.antet, file.name);
   base.warnings = revisionWarnings(revision, { sha256: version.sha256, version: version.version }, prev, attr, lang);

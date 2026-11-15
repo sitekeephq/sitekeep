@@ -287,6 +287,22 @@ describe("OpenCDE Documents API 1.0", () => {
     const sid = (await handle.db.select().from(opencdeDocSessions).where(eq(opencdeDocSessions.kind, "upload"))).find((r) => r.status === "pending" && r.claimedAt)!.id;
     expect((await client(writeToken, "POST", `/upload-sessions/${sid}`, { files: [{ size_in_bytes: 10, session_file_id: "f-ifc" }] })).status).toBe(409);
 
+    // ISO19650-2 5.1.7 / UK NA suitability: codes that do not fit the WIP state are refused on the
+    // page when the project enforces the ISO 19650 rules ...
+    const settingsUrl = `/projects/${projectId}/cde/settings`;
+    expect((await web(adminCookie).put(settingsUrl, { enforceTransitions: true })).status).toBe(200);
+    const wrongCodes = await page.post(`/opencde/sessions/${key}/upload`, {
+      projectId,
+      folderId: designId,
+      revision: "C01",
+      suitability: "S2",
+      names: { [ifcRow!.id]: "DOCS-A-0001.ifc", [pdfRow!.id]: "DOCS-A-0002.pdf" },
+    });
+    expect(wrongCodes.status).toBe(400);
+    expect(wrongCodes.body.details.files[ifcRow!.id].join(" ")).toMatch(/S2 uygunluk kodu Çalışma durumunda kullanılamaz/);
+    // ... and accepted with a warning when it does not (D-8: existing projects, AEC Pilot deliveries).
+    expect((await web(adminCookie).put(settingsUrl, { enforceTransitions: false })).status).toBe(200);
+
     const ok = await page.post(`/opencde/sessions/${key}/upload`, {
       projectId,
       folderId: designId,
@@ -296,6 +312,10 @@ describe("OpenCDE Documents API 1.0", () => {
       names: { [ifcRow!.id]: "DOCS-A-0001.ifc", [pdfRow!.id]: "DOCS-A-0002.pdf" },
     });
     expect(ok.status, JSON.stringify(ok.body)).toBe(200);
+    expect(ok.body.warnings.map((w: { kind: string; value: string; state: string }) => [w.kind, w.value, w.state])).toEqual([
+      ["suitabilityState", "S2", "wip"],
+      ["revisionState", "C01", "wip"],
+    ]);
     const redirect = new URL(ok.body.redirectTo);
     expect(redirect.origin + redirect.pathname).toBe(CB);
     const uploadUrl = redirect.searchParams.get("upload_documents_url")!;
@@ -361,6 +381,8 @@ describe("OpenCDE Documents API 1.0", () => {
     const [file] = await handle.db.select().from(files).where(eq(files.id, ifcFileId));
     expect(file).toMatchObject({ folderId: designId, name: "DOCS-A-0001.ifc", attributes: { Revizyon: "C01", Uygunluk: "S2" } });
     const [version] = await handle.db.select().from(fileVersions).where(eq(fileVersions.fileId, ifcFileId));
+    // Stored as the version's structured codes too (normalised).
+    expect(version).toMatchObject({ suitabilityCode: "S2", revisionCode: "C01" });
     expect(version).toMatchObject({ comment: "AEC Pilot'tan gönderildi", size: IFC.length, derivativeStatus: "pending" });
     expect(version!.sha256).toBe(createHash("sha256").update(IFC).digest("hex"));
     const queued = await handle.db.select().from(jobs).where(eq(jobs.kind, "ifc_to_frag"));
@@ -407,6 +429,8 @@ describe("OpenCDE Documents API 1.0", () => {
     expect(done.body).toMatchObject({ document_id: ifcFileId, version_index: 2, version_number: "v2", file_description: { name: "DOCS-A-0001.ifc", size_in_bytes: data.length } });
     const [file] = await handle.db.select().from(files).where(eq(files.id, ifcFileId));
     expect(file!.attributes).toMatchObject({ Revizyon: "C02", Uygunluk: "S2" });
+    const v2 = (await handle.db.select().from(fileVersions).where(eq(fileVersions.fileId, ifcFileId))).find((v) => v.version === 2);
+    expect(v2).toMatchObject({ revisionCode: "C02" });
     // An unknown document_id is refused at the start.
     const unknown = await client(writeToken, "POST", "/upload-documents", {
       callback: { url: CB, expires_in: 60 },

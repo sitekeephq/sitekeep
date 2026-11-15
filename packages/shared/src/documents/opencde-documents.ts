@@ -40,10 +40,11 @@ export type OpenCdeSessionKind = "upload" | "select";
 export type OpenCdeSessionStatus = "pending" | "ready" | "completed" | "cancelled";
 
 /**
- * ISO 19650 suitability codes for "Durum / Uygunluk" (stored as the file attribute "Uygunluk"
- * unless the project defines its own attribute of that name). The code is stored, not the label.
+ * ISO 19650 suitability codes for "Durum / Uygunluk" (stored as the version's suitability code,
+ * cde-codes.ts, and the file attribute "Uygunluk" unless the project defines its own attribute of
+ * that name). The code is stored, not the label. Older clients send "A" / "B": read as A1 / B1.
  */
-export const SUITABILITY_CODES = ["S0", "S1", "S2", "S3", "S4", "A", "B"] as const;
+export const SUITABILITY_CODES = ["S0", "S1", "S2", "S3", "S4", "A1", "B1", "CR"] as const;
 
 /** Suitability choices with their labels in the reader's language ("S2 · Bilgi İçin"). */
 export function suitabilityOptions(lang: string = SHARED_DEFAULT_LANGUAGE): { code: string; label: string }[] {
@@ -133,6 +134,8 @@ export interface OpenCdeDocumentRowDto {
 /** After the page: the browser goes to the application's callback with the result parameter. */
 export interface OpenCdeRedirectDto {
   redirectTo: string;
+  /** Upload page: codes that do not fit the target folder's state, stored anyway (project does not enforce the rules). */
+  warnings?: import("./cde-codes.js").CdeCodeWarningDto[];
 }
 
 /**

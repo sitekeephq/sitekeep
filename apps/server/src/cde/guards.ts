@@ -19,6 +19,7 @@
 import type { CdeState } from "@sitekeep/shared";
 import type { FolderTree, ProjectAccess } from "../core/security/access.js";
 import type { Db } from "../db/index.js";
+import { checkVersionCodes } from "./codes.js";
 
 /** Which write path is asking. */
 export type CdeWriteSource =
@@ -90,12 +91,8 @@ export interface CodesCheck extends GuardBase {
 }
 
 /** Checks (and normalises) the codes of a new version; the result is stored on the version. */
-export async function checkCodes(_db: Db, input: CodesCheck): Promise<CdeCodes> {
-  // ISO-2: profile of the project (iso_uk_na / legacy_r / custom), state rules, revision order.
-  return {
-    suitabilityCode: input.requested.suitabilityCode ?? null,
-    revisionCode: input.requested.revisionCode ?? null,
-  };
+export async function checkCodes(db: Db, input: CodesCheck): Promise<CdeCodes> {
+  return checkVersionCodes(db, input); // ISO-2: codes.ts
 }
 
 export interface DocumentCodeCheck extends GuardBase {

@@ -5,7 +5,7 @@
 import { randomBytes } from "node:crypto";
 import type { FastifyRequest } from "fastify";
 import { and, eq, inArray, lt } from "drizzle-orm";
-import { documentsScopeAccess, splitExtension, type DocumentsAccess, projectPath } from "@sitekeep/shared";
+import { OPENCDE_REVISION_KEY, OPENCDE_SUITABILITY_KEY, documentsScopeAccess, splitExtension, type DocumentsAccess, projectPath } from "@sitekeep/shared";
 import type { AuthUser, FolderTree } from "../core/security/access.js";
 import type { Db } from "../db/index.js";
 import { oauthClients, opencdeDocSessionFiles, opencdeDocSessions, opencdeUploadParts } from "../db/schema.js";
@@ -180,7 +180,15 @@ export function metadataEntries(
   add(label("size"), String(version.size), "integer64");
   add("SHA-256", version.sha256);
   add(label("description"), version.comment);
-  for (const [k, v] of Object.entries(file.attributes)) {
+  // The version's ISO 19650 codes (cde/codes.ts) under the keys the upload page writes; they win
+  // over the file attributes of the same name, which hold the latest upload's values.
+  const attributes = { ...file.attributes };
+  if (version.revisionCode) attributes[OPENCDE_REVISION_KEY] = version.revisionCode;
+  if (version.suitabilityCode) {
+    attributes[OPENCDE_SUITABILITY_KEY] = version.suitabilityCode;
+    delete attributes["Uygunluk Kodu"]; // i18n-ok: attribute name (data)
+  }
+  for (const [k, v] of Object.entries(attributes)) {
     const t = extras.attributeTypes.get(k);
     add(k, v, t === "date" ? "date" : t === "number" ? "number" : "string");
   }

@@ -19,6 +19,7 @@ import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, folderGate } from "../workflow/service.js";
 import { checkCodes, checkDocumentCode, checkUpload, type CdeCodes, type CdeWriteSource } from "../cde/guards.js";
 import { registerNewFileCode } from "../cde/document-code.js";
+import { acceptedLegacyCodes, type CheckedCodes, type CodeWarning } from "../cde/codes.js";
 
 export type FileRow = typeof files.$inferSelect;
 export type VersionRow = typeof fileVersions.$inferSelect;
@@ -58,7 +59,7 @@ export async function addVersion(
   canEdit: boolean,
   defs: readonly AttributeDefinition[] = [],
   opts: AddVersionOptions = {},
-): Promise<{ file: FileRow; version: VersionRow }> {
+): Promise<{ file: FileRow; version: VersionRow; codeWarnings?: CodeWarning[] }> {
   const requireAttributes = (values: Record<string, string>) => {
     const missing = validateAttributes(
       defs.filter((d) => d.required),
@@ -85,7 +86,13 @@ export async function addVersion(
         .where(and(eq(fileVersions.fileId, existing.id), eq(fileVersions.version, existing.currentVersion)));
       previous = current ?? null;
     }
-    const codes = await checkCodes(txDb, { ...guard, folderId, fileId: existing?.id ?? null, requested: opts.codes ?? {}, previous });
+    // Codes: the ones asked for, else the legacy attributes ("Uygunluk", "Revizyon") that fit.
+    const asked = Object.fromEntries(Object.entries(opts.codes ?? {}).filter(([, v]) => v !== undefined && v !== null && v !== ""));
+    const legacy = await acceptedLegacyCodes(txDb, { projectId: a.project.id, folderId }, attributes);
+    const checked = (await checkCodes(txDb, { ...guard, folderId, fileId: existing?.id ?? null, requested: { ...legacy, ...asked }, previous })) as Partial<CheckedCodes>;
+    // Codes that do not fit the state of a project that does not enforce the rules: kept, warned about.
+    const codeWarnings = checked.warnings ?? [];
+    const codes: CdeCodes = { suitabilityCode: checked.suitabilityCode ?? null, revisionCode: checked.revisionCode ?? null };
     const codeColumns =
       codes.suitabilityCode || codes.revisionCode ? { ...codes, codesSetBy: a.user.id, codesSetAt: new Date() } : {};
     const { documentCode } = await checkDocumentCode(txDb, {
@@ -130,7 +137,7 @@ export async function addVersion(
         })
         .where(eq(files.id, existing.id))
         .returning();
-      return { file: file!, version: version! };
+      return { file: file!, version: version!, codeWarnings };
     }
     requireAttributes(attributes);
     const [inserted] = await tx
@@ -153,7 +160,7 @@ export async function addVersion(
         ...codeColumns,
       })
       .returning();
-    return { file, version: version! };
+    return { file, version: version!, codeWarnings };
   });
 }
 
@@ -181,7 +188,15 @@ export async function afterVersionAdded(
     action: r.version.version === 1 ? "file.uploaded" : "file.version_added",
     targetType: "file",
     targetId: r.file.id,
-    details: { name, version: r.version.version, size: r.version.size, folderId: r.file.folderId, ...details },
+    details: {
+      name,
+      version: r.version.version,
+      size: r.version.size,
+      folderId: r.file.folderId,
+      // ISO 19650 codes of the version, when it has any.
+      ...(r.version.suitabilityCode || r.version.revisionCode ? { suitabilityCode: r.version.suitabilityCode, revisionCode: r.version.revisionCode } : {}),
+      ...details,
+    },
   });
 }
 

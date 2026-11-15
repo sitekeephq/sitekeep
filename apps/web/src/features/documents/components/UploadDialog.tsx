@@ -1,7 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import {
+  allowedSuitability,
+  defaultSuitability,
+  initialRevision,
+  nextRevision,
   validateAttributes,
+  validateCodes,
   validateName,
   type EffectiveAttributeDto,
   type FolderDto,
@@ -14,6 +19,7 @@ import { AttributeInput } from "../../../shared/ui/AttributeInput";
 import { ConfidenceBadge } from "./AntetPanel";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { LoadingSpinner } from "../../../shared/ui/LoadingIndicator";
+import { codeErrorText, codeHints, useFolderCodes } from "./cde/CodeChips";
 
 /** PDFs up to this size are sent for a title-block suggestion (server limit, nothing is stored). */
 const SUGGEST_MAX_BYTES = 30 * 1024 * 1024;
@@ -48,11 +54,12 @@ export function UploadDialog({
   attributes?: EffectiveAttributeDto[];
   files: File[];
   /** Files already in the folder: an upload with the same name becomes their next version. */
-  existing?: { name: string; currentVersion: number }[];
+  existing?: { name: string; currentVersion: number; latest?: { revisionCode?: string | null } }[];
   onClose(): void;
   onDone(): void;
 }) {
   const { t, i18n } = useTranslation(["documents", "common"]);
+  const { t: tc } = useTranslation("cde");
   const [checks, setChecks] = useState<Record<string, string[]> | null>(null);
   const [standard, setStandard] = useState<string | null>(null);
   const [comment, setComment] = useState("");
@@ -67,6 +74,11 @@ export function UploadDialog({
   const [intelBusy, setIntelBusy] = useState<"read" | "ai" | null>(null);
   const [intelError, setIntelError] = useState<string | null>(null);
   const [plans, setPlans] = useState<Record<string, Plan>>({});
+  // ISO 19650 codes of the new versions (docs/features/CDE_STATES.md "Codes").
+  const codeRules = useFolderCodes(projectId, folder.id);
+  const [suitability, setSuitability] = useState("");
+  const [revision, setRevision] = useState("");
+  const [codesPrefilled, setCodesPrefilled] = useState(false);
 
   useEffect(() => {
     documentsApi
@@ -143,6 +155,25 @@ export function UploadDialog({
     return validateAttributes(attributes, own, { partial: true, lang: i18n.language }).map((e) => `${f.name}: ${e.message}`);
   });
   const missingRequired = attributes.filter((d) => d.required && !filled[d.name]);
+  const codeState = codeRules?.state ?? null;
+  const priorOf = (f: File) => prior(effectiveName(f));
+  const newVersions = files.filter((f) => priorOf(f));
+  // WIP: S0 and the proposed revision (P01.01 for new documents, the next one for a single new version).
+  useEffect(() => {
+    if (!codeRules || codesPrefilled || codeState !== "wip") return;
+    setCodesPrefilled(true);
+    setSuitability(defaultSuitability(codeRules.profile, codeState) ?? "");
+    if (!newVersions.length) setRevision(initialRevision(codeRules.profile, codeState) ?? "");
+    else if (files.length === 1)
+      setRevision(nextRevision(codeRules.profile, newVersions[0] ? priorOf(newVersions[0])?.latest?.revisionCode : null, codeState, codeState) ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeRules, codeState]);
+  const codeCheck = codeRules ? validateCodes(codeRules.profile, codeState, { suitabilityCode: suitability, revisionCode: revision }) : null;
+  // Codes that do not fit block the upload only when the project enforces the ISO 19650 rules (D-8);
+  // otherwise they are stored and shown as a warning.
+  const codeProblems = codeCheck?.errors ?? [];
+  const codeEnforced = !!codeRules?.dto.enforceTransitions;
+  const codeErrors = codeEnforced ? codeProblems : [];
   const suggestable = files.filter((f) => {
     const s = intelOf(f)?.suggestion;
     return !!s?.name && !s.unchanged;
@@ -155,7 +186,7 @@ export function UploadDialog({
 
   async function upload() {
     setTouched(true);
-    if (attrErrors.length || planAttrErrors.length) return;
+    if (attrErrors.length || planAttrErrors.length || codeErrors.length) return;
     setBusy(true);
     setError(null);
     setFailed({});
@@ -165,7 +196,7 @@ export function UploadDialog({
       const all: UploadResult["results"] = [];
       let std: string | null = null;
       if (plain.length) {
-        const r = await documentsApi.upload(projectId, folder.id, plain, comment || undefined, filled);
+        const r = await documentsApi.upload(projectId, folder.id, plain, comment || undefined, filled, codeCheck?.codes);
         std = r.standard;
         all.push(...(r.results ?? []));
       }
@@ -175,7 +206,7 @@ export function UploadDialog({
         const p = planOf(f)!;
         const own = Object.fromEntries(Object.entries(p.attrs).filter(([, v]) => v.trim()));
         const renamed = new File([f], p.name, { type: f.type, lastModified: f.lastModified });
-        const r = await documentsApi.upload(projectId, folder.id, [renamed], comment || undefined, { ...own, ...filled });
+        const r = await documentsApi.upload(projectId, folder.id, [renamed], comment || undefined, { ...own, ...filled }, codeCheck?.codes);
         std = r.standard;
         all.push(...(r.results ?? []));
       }
@@ -272,6 +303,11 @@ export function UploadDialog({
                         <>
                           <span className="badge ok">{t("upload.uploadedVersion", { version: res.version })}</span>
                           {res.warning && <DocumentCodeConflictNote conflict={res.warning} warning />}
+                          {res.warnings?.map((w) => (
+                            <div key={w.field} className="small" data-testid="upload-code-warning">
+                              <span className="badge warn">{tc("codes.warning")}</span> {w.message}
+                            </div>
+                          ))}
                         </>
                       ) : res.conflict ? (
                         <DocumentCodeConflictNote conflict={res.conflict} />
@@ -342,6 +378,36 @@ export function UploadDialog({
         </div>
       )}
       {planAttrErrors.length > 0 && <p className="error small">{planAttrErrors.join(" ")}</p>}
+      {!result && codeRules && codeState && (
+        <div className="card" style={{ padding: 12, marginTop: 12 }} data-testid="upload-codes">
+          <h3>{tc("codes.upload.heading")}</h3>
+          <p className="muted small" style={{ marginTop: 0 }}>
+            {tc("codes.upload.help", { state: tc(`states.${codeState}`), ...codeHints(codeRules.profile, codeState) })}
+            {codeRules.dto.enforceTransitions && ` ${tc("codes.upload.autoFill")}`}
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0 12px" }}>
+            <div>
+              <label htmlFor="upload-suitability">{tc("codes.suitability")}</label>
+              <input id="upload-suitability" list="upload-suitability-list" value={suitability} onChange={(e) => setSuitability(e.target.value)} />
+              <datalist id="upload-suitability-list">
+                {allowedSuitability(codeRules.profile, codeState).map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+            </div>
+            <div>
+              <label htmlFor="upload-revision">{tc("codes.revision")}</label>
+              <input id="upload-revision" value={revision} onChange={(e) => setRevision(e.target.value)} />
+            </div>
+          </div>
+          {newVersions.length > 1 && revision.trim() && <p className="muted small">{tc("codes.upload.multipleVersions")}</p>}
+          {codeProblems.length > 0 && (
+            <p className={codeEnforced ? "error small" : "small"} data-testid={codeEnforced ? "upload-codes-error" : "upload-codes-warning"}>
+              {!codeEnforced && <span className="badge warn">{tc("codes.warning")}</span>} {codeProblems.map((e) => codeErrorText(tc, e, codeState)).join(" ")}
+            </p>
+          )}
+        </div>
+      )}
       {!result && (
         <>
           <label>{t("upload.fields.comment")}</label>
@@ -359,7 +425,7 @@ export function UploadDialog({
             <button onClick={onClose}>{t("common:actions.cancel")}</button>
             <button
               className="primary"
-              disabled={busy || !valid.length || attrErrors.length > 0 || planAttrErrors.length > 0}
+              disabled={busy || !valid.length || attrErrors.length > 0 || planAttrErrors.length > 0 || codeErrors.length > 0}
               onClick={() => void upload()}
             >
               {busy ? <LoadingSpinner className="small" /> : t("upload.actions.upload", { count: valid.length })}

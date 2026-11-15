@@ -5,11 +5,12 @@ import { cdeApi } from "../../../shared/api/api-cde";
 import { useLoad, useProject } from "../../../app/context/project";
 import { CdeCodeConflicts } from "../components/CdeCodeConflicts";
 import { TaskTeamsSection } from "./TaskTeamsSection";
+import { CdeCodesSettings } from "./CdeCodesSettings";
 
 /**
  * Proje Ayarları → CDE: the project's ISO 19650 settings (docs/features/CDE_STATES.md). Read-only
- * for now; the sections are where the follow-up work adds editing: codes (ISO-2), transitions
- * (ISO-1); task teams (ISO-5) live in TaskTeamsSection.
+ * for now except the codes (ISO-2, CdeCodesSettings) and task teams (ISO-5, TaskTeamsSection); the
+ * sections are where the follow-up work adds editing: transitions (ISO-1).
  */
 export function CdeSettings() {
   const { t } = useTranslation("cde");
@@ -46,20 +47,7 @@ export function CdeSettings() {
         </table>
       </section>
 
-      <section className="card stack" data-section="codes">
-        <h3 style={{ margin: 0 }}>{t("settings.codes.heading")}</h3>
-        <table className="props-table">
-          <tbody>
-            <tr>
-              <td>{t("settings.codes.scheme")}</td>
-              <td>{t(`schemes.${s.codeScheme}`)}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p className="muted small" style={{ margin: 0 }}>
-          {t("settings.codes.pending")}
-        </p>
-      </section>
+      <CdeCodesSettings settings={s} onSaved={setSettings} />
 
       <section className="card stack" data-section="transitions">
         <h3 style={{ margin: 0 }}>{t("settings.transitions.heading")}</h3>

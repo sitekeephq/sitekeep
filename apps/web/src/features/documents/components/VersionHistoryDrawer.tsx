@@ -6,6 +6,7 @@ import { formatDate, formatSize } from "../../../shared/api/api";
 import { documentsApi } from "../api";
 import { useLoad } from "../../../app/context/project";
 import { ApprovalBadge } from "./ApprovalBadge";
+import { CodeChips } from "./cde/CodeChips";
 import { Icon } from "../../../shared/ui/Icon";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 
@@ -117,7 +118,10 @@ export function VersionHistoryDrawer({
                   </span>
                   <span className="version-number">V{version.version}</span>
                   <div className="version-history-main">
-                    <strong title={file.name}>{file.name}</strong>
+                    <strong title={file.name}>
+                      {file.name}
+                      <CodeChips suitability={version.suitabilityCode} revision={version.revisionCode} />
+                    </strong>
                     <span className="muted small">
                       {t("history.uploadedBy", { user: version.uploadedByName ?? t("history.unknownUser"), date: formatDate(version.uploadedAt) })}
                     </span>

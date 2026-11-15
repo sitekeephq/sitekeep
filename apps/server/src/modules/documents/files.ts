@@ -1,7 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
-import { can, splitExtension, validateAttributes, validateName } from "@sitekeep/shared";
+import { can, splitExtension, validateAttributes, validateName, type CdeCodeWarningDto } from "@sitekeep/shared";
 import type { AppDeps } from "../../app/deps.js";
 import { FolderTree, isUuid, projectAccess, requireAction, userNames, type ProjectAccess } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
@@ -18,6 +18,7 @@ import { checkDocumentCode, checkMove, checkUpload } from "../../cde/guards.js";
 import { documentCodeWarning, registerNewFileCode } from "../../cde/document-code.js";
 import { clientInfo, recordTransition, recordView } from "../../cde/events.js";
 import { cdeStateOf } from "../../cde/state.js";
+import { warningDtos } from "../../cde/codes.js";
 import { cleanFileName, toFileDto, toVersionDto } from "./mapper.js";
 import { ensureGeometryUpgrade } from "../../model/service.js";
 
@@ -26,7 +27,8 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
 
   /**
    * Upload one or more files into a folder. A file with the same name in the folder gets a
-   * new version. Fields (send before the files): comment, attributes (JSON object).
+   * new version. Fields (send before the files): comment, attributes (JSON object),
+   * suitabilityCode and revisionCode (ISO 19650 codes of the new versions, cde/codes.ts).
    * Names are checked against the folder's naming standard before anything is stored.
    */
   api.post<{ Params: { pid: string; fid: string } }>("/projects/:pid/folders/:fid/files", async (req, reply) => {
@@ -42,7 +44,18 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
 
     const fields: Record<string, string> = {};
     const stored: { name: string; obj: StoredObject }[] = [];
-    const results: { name: string; ok: boolean; errors: string[]; fileId?: string; version?: number; conflict?: unknown; warning?: unknown }[] = [];
+    const results: {
+      name: string;
+      ok: boolean;
+      errors: string[];
+      fileId?: string;
+      version?: number;
+      conflict?: unknown;
+      /** ISO-3: the document code is held by another document (enforcement off). */
+      warning?: unknown;
+      /** ISO-2: suitability / revision codes that do not fit the folder's state (enforcement off). */
+      warnings?: CdeCodeWarningDto[];
+    }[] = [];
     const seen = new Set<string>();
 
     for await (const part of req.parts()) {
@@ -86,6 +99,8 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       }
     }
     const comment = fields.comment?.trim() || null;
+    // ISO 19650 codes of the new versions (checked against the folder's state in addVersion).
+    const codes = { suitabilityCode: fields.suitabilityCode?.trim() || null, revisionCode: fields.revisionCode?.trim() || null };
 
     // Typed attributes bound to this folder (or an ancestor): values must be valid; required
     // ones are checked per file in addVersion (a new version keeps the file's earlier values).
@@ -101,10 +116,20 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
 
     for (const s of stored) {
       try {
-        const r = await addVersion(db, a, folderId, s.name, s.obj, comment, attributes, can(perm.level, "edit"), defs, { lang });
-        // Enforcement off (D-8): a code held by another document is stored with a warning (ISO-3).
+        const r = await addVersion(db, a, folderId, s.name, s.obj, comment, attributes, can(perm.level, "edit"), defs, { lang, codes });
+        // Enforcement off (D-8): a code held by another document (ISO-3) and suitability / revision
+        // codes that do not fit the state (ISO-2) are stored with warnings.
         const warning = await documentCodeWarning(db, r.file, a.principal);
-        results.push({ name: s.name, ok: true, errors: [], fileId: r.file.id, version: r.version.version, ...(warning ? { warning } : {}) });
+        const warnings = warningDtos(lang, r.codeWarnings);
+        results.push({
+          name: s.name,
+          ok: true,
+          errors: [],
+          fileId: r.file.id,
+          version: r.version.version,
+          ...(warning ? { warning } : {}),
+          ...(warnings.length ? { warnings } : {}),
+        });
         await afterVersionAdded(db, jobs, a, r);
       } catch (err) {
         await storage.remove(s.obj.key);
