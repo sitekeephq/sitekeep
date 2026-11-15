@@ -52,13 +52,19 @@ You confirm that:
    material under terms that conflict with this Agreement;
 4. You will tell 7Dimensions if any of these promises stops being true.
 
-## 5. No other obligations
+## 5. Trademarks
+
+This Agreement does not give You any right to the SiteKeep name, logos or other trademarks of 7Dimensions,
+and You do not grant 7Dimensions any right to Your own trademarks. The use of the SiteKeep marks is governed by
+the [trademark policy](TRADEMARKS.md).
+
+## 6. No other obligations
 
 7Dimensions is not obliged to use any Contribution. You are not expected to provide support for Your
 Contributions. Unless required by law or agreed in writing, Contributions are provided "as is", without
 warranties or conditions of any kind.
 
-## 6. General
+## 7. General
 
 This Agreement is governed by the laws of the Republic of Estonia. If a provision is invalid, the rest of
 the Agreement stays in force. 7Dimensions may publish new versions of this Agreement; a new version applies

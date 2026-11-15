@@ -121,3 +121,6 @@ Report security problems privately as described in [SECURITY.md](SECURITY.md), n
 SiteKeep Community is licensed under the [GNU Affero General Public License v3.0](LICENSE). The module SDK
 (`packages/sdk`) is MIT. Third-party components keep their own licences (That Open Components / Fragments: MIT,
 web-ifc: MPL-2.0; the rest are listed in `package-lock.json`).
+
+The SiteKeep name and logos are trademarks of 7Dimensions OÜ and are not covered by the AGPL; see
+[TRADEMARKS.md](TRADEMARKS.md).

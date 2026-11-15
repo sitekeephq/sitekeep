@@ -25,7 +25,7 @@ const ROUTES: { route: string; label: string; module?: ModuleId }[] = [
   { route: "quantities?mode=approvals", label: "Metraj", module: "cost" },
   { route: "locations", label: "Konumlar" },
   { route: "reports", label: "Raporlar" },
-  { route: "spec", label: "Şartname Analizi" },
+  { route: "spec", label: "Şartname Analizi", module: "manage" },
   { route: "deleted", label: "Silinenler" },
   { route: "settings", label: "Proje Ayarları" },
 ];

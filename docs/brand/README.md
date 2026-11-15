@@ -1,5 +1,8 @@
 # SiteKeep brand files
 
+The SiteKeep name, logo and mark are trademarks of 7Dimensions OÜ. The code is AGPL-3.0; the brand is not.
+How others may use them: [trademark policy](../../TRADEMARKS.md).
+
 The product name is always written **SiteKeep**: capital S, capital K, no space. Domain, package and command names use lower case: `sitekeep.org`, `@sitekeep/sdk`, `sitekeep`.
 
 ![Preview](preview.png)
