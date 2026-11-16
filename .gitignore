@@ -17,3 +17,6 @@ playwright-report/
 test-results/playwright/
 dist-bundle/
 packages/sdk/types/
+
+# Claude Code agent worktrees
+.claude/worktrees/

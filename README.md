@@ -12,7 +12,7 @@ It follows ISO 19650 and implements the buildingSMART OpenCDE and BCF standards.
 
 | Edition | What it is |
 |---|---|
-| **SiteKeep Community** | This repository, free under the [AGPL-3.0](LICENSE): documents, folder permissions, versions, naming standards, review workflows, issues and BCF, model viewer, transmittals and correspondence, report lists with CSV export, OpenCDE APIs. No licence, no limits. |
+| **SiteKeep Community** | This repository, free under the [AGPL-3.0](LICENSE): documents, folder permissions, versions, naming standards, review workflows, ISO 19650 rules and audit log, drawing sheets, comparison and markup, issues and BCF, model viewer, transmittals and correspondence, report lists with CSV export, OpenCDE APIs. No licence, no limits. |
 | **SiteKeep Enterprise** | Community plus paid modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect, Platform ([modules](docs/modules/README.md)). Licensed per installation; the modules are not in this repository. |
 
 The user interface is available in English and Turkish.
@@ -32,7 +32,7 @@ The user interface is available in English and Turkish.
 | ISO 19650 | Per-project rules: state transitions only through review, archive on publication, suitability and revision codes, unique document codes, task-team WIP; clause map and test pack in [ISO 19650 conformance](docs/compliance/ISO19650.md) |
 | Audit | Every write, view and download is recorded in an append-only, hash-chained audit log with CSV export |
 | Reports | A list per area (documents, issues, works, reviews …) with the viewer's permissions and CSV export; report dashboards (templates, AI, sharing, versions) come with the Enterprise Platform module |
-| Integrations | REST API (`/api/v1`), OpenCDE, an MCP endpoint (`/mcp`) for AI assistants, office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora) |
+| Integrations | REST API (`/api/v1`), OpenCDE, a local stdio MCP server for AI assistants (`apps/mcp`), office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora); a hosted MCP endpoint (`/mcp`) comes with the Enterprise AI module |
 | Privacy | The server sends nothing out on its own; every outbound connection is listed in the Privacy Centre, logged and can be switched off |
 
 ## Quick start (Docker)
@@ -79,7 +79,7 @@ Without `DATABASE_URL` the server uses an embedded PostgreSQL (PGlite) under `DA
 packages/shared     permission levels and inheritance, naming validation, shared types
 packages/bim-viewer 3D viewer engine and React integration (That Open Components)
 packages/sdk        module SDK (MIT): how SiteKeep Enterprise modules plug into the core
-packages/cde-tools  cde_* MCP tools (the /mcp endpoint and the stdio server share them)
+packages/cde-tools  cde_* MCP tools (the stdio server and the AI module's /mcp endpoint share them)
 apps/server         Fastify + Drizzle ORM (PostgreSQL / PGlite), local disk storage, IFC conversion queue
 apps/web            React + That Open Components viewer
 apps/mcp            stdio MCP server, with local file upload / download tools
@@ -89,17 +89,28 @@ Permission and naming rules live in one place (`packages/shared`); the server, t
 
 ## Connecting AI assistants (MCP)
 
-SiteKeep serves an MCP endpoint at `https://your-server/mcp` (Streamable HTTP). Any MCP client (Claude Code,
-Claude Desktop, Cline, Open WebUI, LibreChat …) can connect with an API access key created under
-**My account → API access keys**. Every tool call runs with the user's own permissions and is written to the
-activity log.
+SiteKeep Community includes a local MCP server (`apps/mcp`, stdio) that runs on the user's computer and talks to
+the server's REST API. Any MCP client (Claude Code, Claude Desktop, Cline, Open WebUI, LibreChat …) can start it.
+It uses an API access key created under **My account → API access keys**; every call runs with the user's own
+permissions and is written to the audit log. Local file upload and download tools are available here only.
 
-```bash
-claude mcp add --transport http sitekeep https://your-server/mcp --header "Authorization: Bearer <access key>"
+```json
+{
+  "mcpServers": {
+    "sitekeep": {
+      "command": "node",
+      "args": ["/path/to/sitekeep/apps/mcp/dist/index.js"],
+      "env": { "CDE_URL": "https://your-server", "CDE_TOKEN": "<access key>" }
+    }
+  }
+}
 ```
 
-Keys are read-only by default; read-write keys need the administrator's permission and can be limited to projects
-and to a lifetime. Administrators can switch the endpoint off.
+`CDE_READ_ONLY=1` switches the write tools off. Keys are read-only by default; read-write keys need the
+administrator's permission and can be limited to projects and to a lifetime.
+
+A hosted MCP endpoint on the server (`https://your-server/mcp`, Streamable HTTP, no local install) is part of the
+Enterprise [AI module](docs/modules/ai.md).
 
 ## Documentation
 
@@ -121,7 +132,7 @@ Report security problems privately as described in [SECURITY.md](SECURITY.md), n
 
 SiteKeep Community is licensed under the [GNU Affero General Public License v3.0](LICENSE). The module SDK
 (`packages/sdk`) is MIT. Third-party components keep their own licences (That Open Components / Fragments: MIT,
-web-ifc: MPL-2.0; the rest are listed in `package-lock.json`).
+web-ifc: MPL-2.0); all of them are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 The SiteKeep name and logos are trademarks of 7Dimensions OÜ and are not covered by the AGPL; see
 [TRADEMARKS.md](TRADEMARKS.md).
