@@ -11,5 +11,6 @@ export function toProjectDto(p: typeof projects.$inferSelect, isProjectAdmin: bo
     createdAt: p.createdAt.toISOString(),
     isProjectAdmin,
     modules: projectModules(p),
+    ...(p.settings?.issueTypes?.length ? { issueTypes: p.settings.issueTypes } : {}),
   };
 }

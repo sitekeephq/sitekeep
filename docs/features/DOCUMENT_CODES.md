@@ -11,8 +11,9 @@ standards. Part of the [CDE states](CDE_STATES.md) work; conformance:
   standard: the folder's own (or the nearest ancestor's), otherwise the project's container
   standard (`project_cde_settings.container_standard_id`, Project Settings → CDE → **Document Code
   Standard**). With `allowSuffix`, the free text after the last field is not part of the code. The
-  ISO 19650 template puts its standard on Shared and Published only; choose it as the document code
-  standard to check codes from WIP on.
+  ISO 19650 templates put their standard on Shared and Published and choose it as the document code
+  standard (template `cde.containerStandard`), so codes are checked from WIP on; in other projects
+  choose it in Project Settings → CDE.
 - A name that parses against no standard has no code and is not checked (D-5).
 - `files.document_code` keeps the code as written; the register `document_codes` keys it
   upper-cased (`code_norm`) per project.

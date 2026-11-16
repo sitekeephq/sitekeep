@@ -49,6 +49,8 @@ export interface ProjectDto {
   isProjectAdmin?: boolean;
   /** Module switches (Proje Ayarları → Modüller); missing = every module on. */
   modules?: ProjectModuleState;
+  /** Issue types of the project by category (from its template); missing = the built-in types. */
+  issueTypes?: { category: string; types: string[] }[];
 }
 
 export interface MemberDto {

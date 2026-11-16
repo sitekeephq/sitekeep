@@ -468,7 +468,15 @@
     "stepSlotUnknown": "\"{{name}}\" step {{step}}: role \"{{slot}}\" is not defined.",
     "copyTargetInvalid": "\"{{name}}\": the copy target folder path is invalid (\"{{folder}}\").",
     "cdeWorkflowUnknown": "CDE transition {{transition}}: no workflow named \"{{name}}\" in the template.",
-    "cdeDuplicateTransition": "CDE transition {{transition}} is listed more than once."
+    "cdeDuplicateTransition": "CDE transition {{transition}} is listed more than once.",
+    "partSlotUnknown": "{{where}}: \"{{slot}}\" is neither a role (slot) nor a project role of the template.",
+    "duplicateTaskTeam": "cde.taskTeams: role \"{{slot}}\" is listed more than once.",
+    "duplicateProjectRole": "Project role \"{{key}}\" is defined twice.",
+    "stepProjectRoleUnknown": "\"{{name}}\" step {{step}}: project role \"{{role}}\" is not defined in roles.",
+    "partWorkflowUnknown": "{{where}}: no workflow named \"{{name}}\" in the template.",
+    "rfiDefaultTypeUnknown": "rfi.defaultType: \"{{code}}\" is not one of the RFI types.",
+    "duplicateMeeting": "Meeting template \"{{name}}\" is defined twice.",
+    "duplicateForm": "Form template \"{{key}}\" is defined twice."
   },
   "viewers": {
     "kinds": {

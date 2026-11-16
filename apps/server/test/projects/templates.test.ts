@@ -107,18 +107,18 @@ describe("project templates", () => {
 
   it("sets up companies and users", async () => {
     admin = api(await login("admin@7d.test"));
-    for (const name of ["Poyraz", "CNS", "Hilal", "Zirve"]) co[name] = (await admin.post("/companies", { name })).body.id;
-    await admin.post("/users", { email: "cns@7d.test", name: "Ceren", password: PW, companyId: co.CNS });
-    await admin.post("/users", { email: "pas@7d.test", name: "Pelin", password: PW, companyId: co.Poyraz });
-    designer = api(await login("cns@7d.test"));
-    contractor = api(await login("pas@7d.test"));
-    slotCompanies = { yuklenici: co.Poyraz!, tasarimci: co.CNS!, musavir: co.Hilal!, idare: co.Zirve! };
+    for (const name of ["Kaya", "Atlas", "Mert", "Vadi"]) co[name] = (await admin.post("/companies", { name })).body.id;
+    await admin.post("/users", { email: "atlas@7d.test", name: "Ceren", password: PW, companyId: co.Atlas });
+    await admin.post("/users", { email: "kaya@7d.test", name: "Pelin", password: PW, companyId: co.Kaya });
+    designer = api(await login("atlas@7d.test"));
+    contractor = api(await login("kaya@7d.test"));
+    slotCompanies = { yuklenici: co.Kaya!, tasarimci: co.Atlas!, musavir: co.Mert!, idare: co.Vadi! };
   });
 
   it("ships valid built-in templates", async () => {
     const list = await admin.get("/templates");
     expect(list.status).toBe(200);
-    expect(list.body.map((t: { id: string }) => t.id).sort()).toEqual(["bina-veri-merkezi", "iso19650-temel", "metro-ibb"]);
+    expect(list.body.map((t: { id: string }) => t.id).sort()).toEqual(["bina-veri-merkezi", "iso19650-temel", "iso19650-yapim-en", "iso19650-yapim-tr", "metro-ibb"]);
     for (const [id, t] of builtInTemplates()) {
       expect(checkProjectTemplate(t), id).toEqual([]);
       const p = await admin.post("/templates/preview", { templateId: id, code: "TST", slotCompanies });
@@ -160,21 +160,21 @@ describe("project templates", () => {
     expect(r.status).toBe(403);
   });
 
-  let zavm: { id: string; rootFolderId: string };
+  let dvm: { id: string; rootFolderId: string };
 
   it("creates a building project and resolves slots to companies", async () => {
     const r = await admin.post("/projects/from-template", {
-      code: "ZAVM",
-      name: "Zirve Veri Merkezi",
+      code: "DVM",
+      name: "Demo Veri Merkezi",
       templateId: "bina-veri-merkezi",
       slotCompanies,
     });
     expect(r.status, JSON.stringify(r.body)).toBe(200);
     expect(r.body.warnings).toEqual([]);
-    zavm = r.body;
-    expect(await liveFolderCount(zavm.id)).toBe(r.body.counts.folders);
+    dvm = r.body;
+    expect(await liveFolderCount(dvm.id)).toBe(r.body.counts.folders);
 
-    const root = await admin.get(`/projects/${zavm.id}/folders/${zavm.rootFolderId}/contents`);
+    const root = await admin.get(`/projects/${dvm.id}/folders/${dvm.rootFolderId}/contents`);
     expect(root.body.folders.map((f: { name: string }) => f.name)).toEqual([
       "01-WIP (Çalışmada)",
       "02-SHARED (Paylaşılan)",
@@ -183,7 +183,7 @@ describe("project templates", () => {
     ]);
     const sharedId = root.body.folders[1].id;
     type Grant = { subjectId: string; subjectName: string; level: string; inherited: boolean };
-    const grants: Grant[] = (await admin.get(`/projects/${zavm.id}/folders/${sharedId}/permissions`)).body;
+    const grants: Grant[] = (await admin.get(`/projects/${dvm.id}/folders/${sharedId}/permissions`)).body;
     // The template grants the slot companies on SHARED; the default roles come from the root folder.
     expect(grants.filter((g) => !g.inherited).map((g) => [g.subjectId, g.level]).sort()).toEqual(
       Object.values(slotCompanies)
@@ -195,38 +195,38 @@ describe("project templates", () => {
       ["Düzenleyici", "edit"],
       ["Yönetici", "manage"],
     ]);
-    expect((await admin.get(`/projects/${zavm.id}/folders/${sharedId}/settings`)).body.gated).toBe(true);
+    expect((await admin.get(`/projects/${dvm.id}/folders/${sharedId}/settings`)).body.gated).toBe(true);
 
-    const wf = (await admin.get(`/projects/${zavm.id}/workflow-templates`)).body;
+    const wf = (await admin.get(`/projects/${dvm.id}/workflow-templates`)).body;
     expect(wf).toHaveLength(1);
     expect(wf[0].steps.map((s: { assignees: { type: string; id: string }[] }) => s.assignees)).toEqual(
-      [co.Poyraz, co.CNS, co.Hilal, co.Zirve].map((id) => [{ type: "company", id }]),
+      [co.Kaya, co.Atlas, co.Mert, co.Vadi].map((id) => [{ type: "company", id }]),
     );
 
-    const std = (await admin.get(`/projects/${zavm.id}/naming-standards`)).body[0].definition;
-    expect(std.fields[0].values.map((v: { code: string }) => v.code)).toEqual(["ZAVM"]);
+    const std = (await admin.get(`/projects/${dvm.id}/naming-standards`)).body[0].definition;
+    expect(std.fields[0].values.map((v: { code: string }) => v.code)).toEqual(["DVM"]);
     expect(std.fields[1].values).toEqual([
-      { code: "PAS", description: "Poyraz" },
-      { code: "CNS", description: "CNS" },
-      { code: "HLL", description: "Hilal" },
-      { code: "ZRT", description: "Zirve" },
+      { code: "KYA", description: "Kaya" },
+      { code: "ATL", description: "Atlas" },
+      { code: "MRT", description: "Mert" },
+      { code: "VDT", description: "Vadi" },
     ]);
 
     // The designer company edits WIP; the contractor only views it.
-    await admin.post(`/projects/${zavm.id}/members`, { email: "cns@7d.test" });
-    await admin.post(`/projects/${zavm.id}/members`, { email: "pas@7d.test" });
-    const statik = await walk(designer, zavm.id, zavm.rootFolderId, ["01-WIP (Çalışmada)", "Statik"]);
-    const up = await designer.upload(`/projects/${zavm.id}/folders/${statik}/files`, "ZAVM-CNS-ZZ-S-00-0101-RP-SD-0001.pdf", "x");
+    await admin.post(`/projects/${dvm.id}/members`, { email: "atlas@7d.test" });
+    await admin.post(`/projects/${dvm.id}/members`, { email: "kaya@7d.test" });
+    const statik = await walk(designer, dvm.id, dvm.rootFolderId, ["01-WIP (Çalışmada)", "Statik"]);
+    const up = await designer.upload(`/projects/${dvm.id}/folders/${statik}/files`, "DVM-ATL-ZZ-S-00-0101-RP-SD-0001.pdf", "x");
     expect(up.body.results[0].ok, JSON.stringify(up.body)).toBe(true);
-    expect((await contractor.get(`/projects/${zavm.id}/folders/${statik}`)).body.myLevel).toBe("view_download");
+    expect((await contractor.get(`/projects/${dvm.id}/folders/${statik}`)).body.myLevel).toBe("view_download");
   });
 
   it("leaves unmapped slots empty and hands their steps to project admins", async () => {
     const r = await admin.post("/projects/from-template", {
-      code: "ZAVMB",
+      code: "DVMB",
       name: "Eksik roller",
       templateId: "bina-veri-merkezi",
-      slotCompanies: { yuklenici: co.Poyraz, tasarimci: co.CNS },
+      slotCompanies: { yuklenici: co.Kaya, tasarimci: co.Atlas },
     });
     expect(r.status, JSON.stringify(r.body)).toBe(200);
     expect(r.body.warnings.join(" ")).toContain("Müşavir");
@@ -234,8 +234,8 @@ describe("project templates", () => {
     expect(wf.steps[2].assignees).toEqual([{ type: "role", id: "project_admin" }]);
     const std = (await admin.get(`/projects/${r.body.id}/naming-standards`)).body[0].definition;
     // Slot codes are template defaults even without a company.
-    expect(std.fields[1].values.map((v: { code: string }) => v.code)).toEqual(["PAS", "CNS", "HLL", "ZRT"]);
-    expect((await admin.post("/projects/from-template", { code: "ZAVM", name: "x", templateId: "iso19650-temel" })).status).toBe(409);
+    expect(std.fields[1].values.map((v: { code: string }) => v.code)).toEqual(["KYA", "ATL", "MRT", "VDT"]);
+    expect((await admin.post("/projects/from-template", { code: "DVM", name: "x", templateId: "iso19650-temel" })).status).toBe(409);
   });
 
   let pkf: { id: string; rootFolderId: string; counts: { folders: number; virtualFolders: number } };
@@ -253,8 +253,8 @@ describe("project templates", () => {
     pkf = r.body;
     expect(await liveFolderCount(pkf.id)).toBe(pkf.counts.folders);
     expect(pkf.counts.virtualFolders).toBeGreaterThan(pkf.counts.folders);
-    await admin.post(`/projects/${pkf.id}/members`, { email: "cns@7d.test" });
-    await admin.post(`/projects/${pkf.id}/members`, { email: "pas@7d.test" });
+    await admin.post(`/projects/${pkf.id}/members`, { email: "atlas@7d.test" });
+    await admin.post(`/projects/${pkf.id}/members`, { email: "kaya@7d.test" });
 
     const mimari = await walk(designer, pkf.id, pkf.rootFolderId, [
       "99-TASARIMCI ORTAK ALAN",
@@ -301,6 +301,19 @@ describe("project templates", () => {
     expect(std.fields[11]).toMatchObject({ type: "number", digits: 3, minDigits: 2, maxDigits: 3 });
   });
 
+  it("creates ISO 19650 construction projects in Turkish and English with all workflows", async () => {
+    for (const [code, id, shared] of [
+      ["ISOTR", "iso19650-yapim-tr", "20-PAYLAŞILAN (Shared)"],
+      ["ISOEN", "iso19650-yapim-en", "20-SHARED"],
+    ] as const) {
+      const r = await admin.post("/projects/from-template", { code, name: id, templateId: id, slotCompanies });
+      expect(r.status, JSON.stringify(r.body)).toBe(200);
+      expect(r.body.counts.workflows).toBe(8);
+      expect(r.body.counts.namingStandards).toBe(2);
+      expect(await child(admin, r.body.id, r.body.rootFolderId, shared)).toBeTruthy();
+    }
+  });
+
   it("exports a project as a template and round-trips it", async () => {
     expect((await contractor.get(`/projects/${pkf.id}/export-template`)).status).toBe(403);
     const e1 = await admin.get(`/projects/${pkf.id}/export-template`);
@@ -320,8 +333,8 @@ describe("project templates", () => {
     expect(body(t2)).toEqual(body(t1));
 
     // The building project round-trips too (company grants → slots → the same companies).
-    const z1 = (await admin.get(`/projects/${zavm.id}/export-template`)).body;
-    const z = await admin.post("/projects/from-template", { code: "ZAVM2", name: "Kopya", template: z1, slotCompanies });
+    const z1 = (await admin.get(`/projects/${dvm.id}/export-template`)).body;
+    const z = await admin.post("/projects/from-template", { code: "DVM2", name: "Kopya", template: z1, slotCompanies });
     expect(z.status, JSON.stringify(z.body)).toBe(200);
     expect(body((await admin.get(`/projects/${z.body.id}/export-template`)).body)).toEqual(body(z1));
   });
@@ -347,7 +360,7 @@ describe("project templates", () => {
     const wf = await admin.post(`/projects/${pid}/workflow-templates`, {
       name: "Kademeli onay",
       steps: [
-        { name: "Yüklenici kontrolü", assignees: [{ type: "company", id: co.Poyraz }], rule: "any", days: 3, outcomeOptions: options, stage: 0, requiredAttributes: ["Durum"] },
+        { name: "Yüklenici kontrolü", assignees: [{ type: "company", id: co.Kaya }], rule: "any", days: 3, outcomeOptions: options, stage: 0, requiredAttributes: ["Durum"] },
         {
           name: "Disiplin müşaviri",
           assignees: [],
@@ -358,8 +371,8 @@ describe("project templates", () => {
           assigneeRule: {
             type: "by_attribute",
             attribute: "Disiplin",
-            map: { S: [{ type: "company", id: co.Hilal }], M: [{ type: "company", id: co.Zirve }, { type: "role", id: "project_admin" }] },
-            fallback: [{ type: "company", id: co.Hilal }],
+            map: { S: [{ type: "company", id: co.Mert }], M: [{ type: "company", id: co.Vadi }, { type: "role", id: "project_admin" }] },
+            fallback: [{ type: "company", id: co.Mert }],
           },
         },
       ],
@@ -389,20 +402,20 @@ describe("project templates", () => {
     });
 
     // Import with other companies in the slots: assignees follow the slots, the folder its path.
-    const swapped = { ...slotCompanies, musavir: co.Zirve!, idare: co.Hilal! };
+    const swapped = { ...slotCompanies, musavir: co.Vadi!, idare: co.Mert! };
     const c = await admin.post("/projects/from-template", { code: "ZCH2", name: "Zincir kopya", template: t1, slotCompanies: swapped });
     expect(c.status, JSON.stringify(c.body)).toBe(200);
     expect(c.body.warnings).toEqual([]);
     const copyPublished = await child(admin, c.body.id, c.body.rootFolderId, "03-PUBLISHED (Yayınlanan)");
     const imported = (await admin.get(`/projects/${c.body.id}/workflow-templates`)).body.find((w: { name: string }) => w.name === "Kademeli onay");
     expect(imported.chain).toEqual({ ...chain, copyTarget: { ...chain.copyTarget, folderId: copyPublished } });
-    expect(imported.steps[0]).toMatchObject({ assignees: [{ type: "company", id: co.Poyraz }], outcomeOptions: options, stage: 0, requiredAttributes: ["Durum"] });
+    expect(imported.steps[0]).toMatchObject({ assignees: [{ type: "company", id: co.Kaya }], outcomeOptions: options, stage: 0, requiredAttributes: ["Durum"] });
     expect(imported.steps[1].assignees).toEqual([]);
     expect(imported.steps[1].assigneeRule).toEqual({
       type: "by_attribute",
       attribute: "Disiplin",
-      map: { S: [{ type: "company", id: co.Zirve }], M: [{ type: "company", id: co.Hilal }, { type: "role", id: "project_admin" }] },
-      fallback: [{ type: "company", id: co.Zirve }],
+      map: { S: [{ type: "company", id: co.Vadi }], M: [{ type: "company", id: co.Mert }, { type: "role", id: "project_admin" }] },
+      fallback: [{ type: "company", id: co.Vadi }],
     });
     // Exported again it is the same template.
     expect(body((await admin.get(`/projects/${c.body.id}/export-template`)).body)).toEqual(body(t1));

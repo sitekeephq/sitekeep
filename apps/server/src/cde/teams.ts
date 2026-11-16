@@ -20,6 +20,8 @@ export interface TeamSeedCompany {
   companyId: string;
   /** Team code; else the company's code. */
   code?: string | null;
+  /** The lead appointed party's team (project template `cde.taskTeams[].lead`). */
+  lead?: boolean;
 }
 
 /** Task team id of every company that has one in the project. */
@@ -84,7 +86,7 @@ export async function ensureCompanyTeams(
     taken.add(name.toLocaleLowerCase("tr"));
     const [row] = await db
       .insert(projectRoles)
-      .values({ projectId, name, kind: "task_team", companyId: company.id, code, color: TEAM_COLOR })
+      .values({ projectId, name, kind: "task_team", companyId: company.id, code, color: TEAM_COLOR, isLead: !!c.lead })
       .onConflictDoNothing({ target: [projectRoles.projectId, projectRoles.name] })
       .returning({ id: projectRoles.id });
     if (!row) continue;

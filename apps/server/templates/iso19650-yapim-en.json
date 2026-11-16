@@ -1,0 +1,1917 @@
+{
+  "format": "7d-cde/project-template@2",
+  "name": {
+    "en": "ISO 19650 Construction Project (multi-party, English names)",
+    "tr": "ISO 19650 Yapım Projesi (çok taraflı, İngilizce adlarla)"
+  },
+  "description": {
+    "en": "ISO 19650-1/-2 set-up for client, consultant, designer and contractor: a WIP area per party, internal check → review → authorize, shared areas for coordination and approval, publishing after consultant + designer review and client acceptance, archive. State transitions, task teams and unique document codes on. Document and correspondence naming, suitability and revision codes (S0–S4, A, B, CR; P01 / C01), roles, issue types, transmittals, RFI, material/method approval, meeting and form templates. Generalized from a live data-centre construction project.",
+    "tr": "İdare, müşavir, tasarımcı ve yüklenici için ISO 19650-1/-2 düzeni: taraf başına çalışma alanı (WIP), iç kontrol (kontrol → gözden geçirme → yetkilendirme), koordinasyon ve onay için paylaşılan alanlar, müşavir + tasarımcı → idare kabulüyle yayınlama, arşiv. Durum geçişleri, görev ekipleri ve tekil doküman kodu açık. Doküman ve yazışma kodlaması, uygunluk ve revizyon kodları (S0–S4, A, B, CR; P01 / C01), roller, sorun tipleri, gönderim formu, RFI, malzeme/yöntem onayı, toplantı ve form şablonları. Canlıda çalışan bir veri merkezi yapım projesinin düzeninden genelleştirildi."
+  },
+  "language": "en",
+  "family": "iso19650-yapim",
+  "modules": {
+    "correspondence": true,
+    "rfi": true,
+    "submittals": true,
+    "meetings": true,
+    "transmittals": true,
+    "issues": true,
+    "reviews": true,
+    "forms": true,
+    "coordination": true,
+    "schedule": true,
+    "spec": true,
+    "reports": true
+  },
+  "cde": {
+    "codeScheme": "iso_uk_na",
+    "enforceTransitions": true,
+    "wipPolicy": "team_only",
+    "adminSeesWip": true,
+    "archiveFolder": "40-ARCHIVED",
+    "containerStandard": "ISO 19650 Document Naming",
+    "taskTeams": [
+      {
+        "slot": "idare"
+      },
+      {
+        "slot": "musavir"
+      },
+      {
+        "slot": "tasarimci"
+      },
+      {
+        "slot": "yuklenici",
+        "lead": true
+      }
+    ],
+    "transitions": [
+      {
+        "from": null,
+        "to": "wip",
+        "mode": "direct"
+      },
+      {
+        "from": "wip",
+        "to": "shared",
+        "mode": "review"
+      },
+      {
+        "from": "shared",
+        "to": "wip",
+        "mode": "auto"
+      },
+      {
+        "from": "shared",
+        "to": "published",
+        "mode": "review",
+        "workflow": "Approval: Consultant + Designer → Client acceptance → Publish"
+      },
+      {
+        "from": "published",
+        "to": "archived",
+        "mode": "auto"
+      }
+    ]
+  },
+  "slots": [
+    {
+      "key": "idare",
+      "label": {
+        "en": "Client / Appointing party",
+        "tr": "İdare / İşveren"
+      },
+      "party": "client",
+      "code": "CLI",
+      "description": {
+        "en": "Appointing party; accepts information before it is published.",
+        "tr": "Bilgiyi kabul eden taraf (appointing party). Yayınlamayı onaylar."
+      }
+    },
+    {
+      "key": "musavir",
+      "label": {
+        "en": "Consultant / Project manager",
+        "tr": "Müşavir / Proje Yönetimi"
+      },
+      "party": "consultant",
+      "code": "CON",
+      "description": {
+        "en": "Coordinates and checks on behalf of the client; RFI coordinator.",
+        "tr": "İdare adına koordinasyon ve teknik kontrol; RFI koordinatörü."
+      }
+    },
+    {
+      "key": "tasarimci",
+      "label": {
+        "en": "Designer",
+        "tr": "Tasarımcı"
+      },
+      "party": "designer",
+      "code": "DES",
+      "description": {
+        "en": "Design and engineering team; answers RFIs and gives technical opinion on submittals.",
+        "tr": "Tasarım ve mühendislik ekibi; RFI ve malzeme onaylarında teknik görüş verir."
+      }
+    },
+    {
+      "key": "yuklenici",
+      "label": {
+        "en": "Contractor",
+        "tr": "Yüklenici"
+      },
+      "party": "contractor",
+      "code": "CTR",
+      "description": {
+        "en": "Lead appointed party; authorizes and shares information.",
+        "tr": "Baş yüklenici (lead appointed party); yetkilendirir ve paylaşır."
+      }
+    }
+  ],
+  "dimensions": {
+    "Discipline": [
+      "A",
+      "S",
+      "M",
+      "E",
+      "C",
+      "L",
+      "G",
+      "I",
+      "P",
+      "Q",
+      "Y"
+    ],
+    "Construction topic": [
+      "01-Quality control",
+      "02-Method statements",
+      "03-Material submittals",
+      "04-Programme",
+      "05-Testing and commissioning",
+      "06-HSE"
+    ]
+  },
+  "folders": [
+    {
+      "name": "00-GENERAL",
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        },
+        {
+          "slot": "idare",
+          "level": "edit"
+        },
+        {
+          "slot": "musavir",
+          "level": "edit"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-Tender and Contract Documents",
+          "children": [
+            "Contract",
+            "Tender Submission",
+            "Technical Specifications",
+            "Tender Drawings and Reports"
+          ]
+        },
+        {
+          "name": "02-Information Requirements (OIR, AIR, PIR, EIR)",
+          "grants": [
+            {
+              "slot": "idare",
+              "level": "manage"
+            }
+          ]
+        },
+        {
+          "name": "03-BIM Execution Plan and Delivery Plans (BEP, MIDP, TIDP)",
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "04-Standards and Templates",
+          "children": [
+            "Title Blocks and Templates",
+            "BIM Standards",
+            "Design Standards",
+            "Construction Standards"
+          ]
+        },
+        "05-User Guides",
+        {
+          "name": "06-Meeting Minutes",
+          "children": [
+            "01-Client",
+            "02-Design",
+            "03-Site coordination",
+            "04-Quality control",
+            "05-MEP",
+            "06-Programme",
+            "07-BIM coordination",
+            "08-HSE"
+          ]
+        },
+        {
+          "name": "07-Correspondence",
+          "naming": "Correspondence Naming",
+          "attributes": [
+            "Letter Date"
+          ],
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            },
+            {
+              "slot": "tasarimci",
+              "level": "edit"
+            }
+          ],
+          "children": [
+            "01-Incoming",
+            "02-Outgoing",
+            "03-Change Requests",
+            "04-Subcontractor Approvals",
+            "05-Engineer's Instructions",
+            "06-Transmittals"
+          ]
+        },
+        "08-Site Handover Records"
+      ]
+    },
+    {
+      "name": "10-WORK IN PROGRESS (WIP)",
+      "state": "wip",
+      "children": [
+        {
+          "name": "Client",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "idare",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Consultant",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "musavir",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Designer",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "tasarimci",
+              "level": "edit"
+            }
+          ],
+          "skeleton": {
+            "order": [
+              "Discipline"
+            ]
+          }
+        },
+        {
+          "name": "Contractor",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            }
+          ],
+          "skeleton": {
+            "order": [
+              "Discipline"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20-SHARED",
+      "state": "shared",
+      "naming": "ISO 19650 Document Naming",
+      "attributes": [
+        "Sheet / Document Title"
+      ],
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download_markup"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-For Review",
+          "state": "shared",
+          "stateLabel": "For review",
+          "skeleton": {
+            "order": [
+              "Discipline"
+            ]
+          }
+        },
+        {
+          "name": "02-For Approval",
+          "state": "shared",
+          "stateLabel": "For approval",
+          "skeleton": {
+            "order": [
+              "Discipline"
+            ]
+          }
+        },
+        {
+          "name": "03-Construction Documents",
+          "state": "shared",
+          "stateLabel": "For approval",
+          "skeleton": {
+            "order": [
+              "Construction topic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30-PUBLISHED",
+      "state": "published",
+      "naming": "ISO 19650 Document Naming",
+      "attributes": [
+        "Sheet / Document Title"
+      ],
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        }
+      ],
+      "skeleton": {
+        "order": [
+          "Discipline"
+        ]
+      },
+      "children": [
+        {
+          "name": "Construction Documents",
+          "state": "published",
+          "skeleton": {
+            "order": [
+              "Construction topic"
+            ]
+          }
+        },
+        {
+          "name": "As-Built",
+          "state": "published",
+          "stateLabel": "As-built",
+          "lazy": true
+        }
+      ]
+    },
+    {
+      "name": "40-ARCHIVED",
+      "state": "archived",
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view"
+        },
+        {
+          "slot": "idare",
+          "level": "view_download"
+        }
+      ]
+    }
+  ],
+  "namingStandards": [
+    {
+      "name": "ISO 19650 Document Naming",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "Project",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Project code"
+            }
+          ]
+        },
+        {
+          "name": "Originator",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Volume",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ",
+              "description": "All volumes / systems"
+            },
+            {
+              "code": "XX",
+              "description": "No volume / system applicable"
+            }
+          ]
+        },
+        {
+          "name": "Level",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ",
+              "description": "Multiple levels"
+            },
+            {
+              "code": "XX",
+              "description": "No level applicable"
+            },
+            {
+              "code": "B2",
+              "description": "Basement level 2"
+            },
+            {
+              "code": "B1",
+              "description": "Basement level 1"
+            },
+            {
+              "code": "00",
+              "description": "Ground level"
+            },
+            {
+              "code": "01",
+              "description": "Level 01"
+            },
+            {
+              "code": "02",
+              "description": "Level 02"
+            },
+            {
+              "code": "03",
+              "description": "Level 03"
+            },
+            {
+              "code": "M1",
+              "description": "Mezzanine above level 01"
+            },
+            {
+              "code": "RF",
+              "description": "Roof level"
+            }
+          ]
+        },
+        {
+          "name": "Type",
+          "type": "list",
+          "values": [
+            {
+              "code": "AF",
+              "description": "Animation file"
+            },
+            {
+              "code": "BQ",
+              "description": "Bill of quantities"
+            },
+            {
+              "code": "CA",
+              "description": "Calculations"
+            },
+            {
+              "code": "CM",
+              "description": "Combined model"
+            },
+            {
+              "code": "CO",
+              "description": "Correspondence"
+            },
+            {
+              "code": "CP",
+              "description": "Cost plan"
+            },
+            {
+              "code": "CR",
+              "description": "Clash rendition"
+            },
+            {
+              "code": "DB",
+              "description": "Database"
+            },
+            {
+              "code": "DR",
+              "description": "Drawing rendition"
+            },
+            {
+              "code": "FN",
+              "description": "File note"
+            },
+            {
+              "code": "HS",
+              "description": "Health and safety"
+            },
+            {
+              "code": "IE",
+              "description": "Information exchange file"
+            },
+            {
+              "code": "M2",
+              "description": "2D model"
+            },
+            {
+              "code": "M3",
+              "description": "3D model"
+            },
+            {
+              "code": "MI",
+              "description": "Minutes / action notes"
+            },
+            {
+              "code": "MR",
+              "description": "Model rendition"
+            },
+            {
+              "code": "MS",
+              "description": "Method statement"
+            },
+            {
+              "code": "PP",
+              "description": "Presentation"
+            },
+            {
+              "code": "PR",
+              "description": "Programme"
+            },
+            {
+              "code": "RD",
+              "description": "Room data sheet"
+            },
+            {
+              "code": "RI",
+              "description": "Request for information"
+            },
+            {
+              "code": "RP",
+              "description": "Report"
+            },
+            {
+              "code": "SA",
+              "description": "Schedule of accommodation"
+            },
+            {
+              "code": "SH",
+              "description": "Schedule"
+            },
+            {
+              "code": "SN",
+              "description": "Snagging list"
+            },
+            {
+              "code": "SP",
+              "description": "Specification"
+            },
+            {
+              "code": "SU",
+              "description": "Survey"
+            },
+            {
+              "code": "VS",
+              "description": "Visualization"
+            }
+          ]
+        },
+        {
+          "name": "Role",
+          "type": "list",
+          "values": [
+            {
+              "code": "A",
+              "description": "Architect"
+            },
+            {
+              "code": "S",
+              "description": "Structural engineer"
+            },
+            {
+              "code": "M",
+              "description": "Mechanical engineer"
+            },
+            {
+              "code": "E",
+              "description": "Electrical engineer"
+            },
+            {
+              "code": "C",
+              "description": "Civil engineer"
+            },
+            {
+              "code": "L",
+              "description": "Landscape architect"
+            },
+            {
+              "code": "G",
+              "description": "Geographical and land surveyor"
+            },
+            {
+              "code": "I",
+              "description": "Interior designer"
+            },
+            {
+              "code": "P",
+              "description": "Public health engineer"
+            },
+            {
+              "code": "Q",
+              "description": "Quantity surveyor"
+            },
+            {
+              "code": "K",
+              "description": "Client"
+            },
+            {
+              "code": "W",
+              "description": "Contractor"
+            },
+            {
+              "code": "X",
+              "description": "Subcontractor"
+            },
+            {
+              "code": "Y",
+              "description": "Specialist designer"
+            },
+            {
+              "code": "Z",
+              "description": "General (non-disciplinary)"
+            }
+          ]
+        },
+        {
+          "name": "Number",
+          "type": "number",
+          "digits": 4
+        }
+      ]
+    },
+    {
+      "name": "Correspondence Naming",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "Project",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Project code"
+            }
+          ]
+        },
+        {
+          "name": "Sender",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Recipient",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Kind",
+          "type": "list",
+          "values": [
+            {
+              "code": "RFI",
+              "description": "Request for information"
+            },
+            {
+              "code": "NCR",
+              "description": "Non-conformance report"
+            },
+            {
+              "code": "CAR",
+              "description": "Corrective action request"
+            },
+            {
+              "code": "MAR",
+              "description": "Material approval request"
+            },
+            {
+              "code": "MST",
+              "description": "Method statement"
+            },
+            {
+              "code": "INR",
+              "description": "Inspection request"
+            },
+            {
+              "code": "MCF",
+              "description": "Material conformity form"
+            },
+            {
+              "code": "CRQ",
+              "description": "Change request"
+            },
+            {
+              "code": "SCA",
+              "description": "Subcontractor approval"
+            },
+            {
+              "code": "EIN",
+              "description": "Engineer's instruction"
+            },
+            {
+              "code": "LTR",
+              "description": "Letter"
+            },
+            {
+              "code": "TRN",
+              "description": "Transmittal"
+            },
+            {
+              "code": "MOM",
+              "description": "Minutes of meeting"
+            }
+          ]
+        },
+        {
+          "name": "Discipline",
+          "type": "list",
+          "values": [
+            {
+              "code": "A",
+              "description": "Architect"
+            },
+            {
+              "code": "S",
+              "description": "Structural engineer"
+            },
+            {
+              "code": "M",
+              "description": "Mechanical engineer"
+            },
+            {
+              "code": "E",
+              "description": "Electrical engineer"
+            },
+            {
+              "code": "C",
+              "description": "Civil engineer"
+            },
+            {
+              "code": "L",
+              "description": "Landscape architect"
+            },
+            {
+              "code": "G",
+              "description": "Geographical and land surveyor"
+            },
+            {
+              "code": "I",
+              "description": "Interior designer"
+            },
+            {
+              "code": "P",
+              "description": "Public health engineer"
+            },
+            {
+              "code": "Q",
+              "description": "Quantity surveyor"
+            },
+            {
+              "code": "K",
+              "description": "Client"
+            },
+            {
+              "code": "W",
+              "description": "Contractor"
+            },
+            {
+              "code": "X",
+              "description": "Subcontractor"
+            },
+            {
+              "code": "Y",
+              "description": "Specialist designer"
+            },
+            {
+              "code": "Z",
+              "description": "General (non-disciplinary)"
+            }
+          ]
+        },
+        {
+          "name": "Number",
+          "type": "number",
+          "digits": 4
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Sheet / Document Title",
+      "type": "text"
+    },
+    {
+      "name": "Letter Date",
+      "type": "date"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Contractor internal check → share for approval",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Check",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ],
+          "requiredAttributes": [
+            "Sheet / Document Title"
+          ]
+        },
+        {
+          "name": "Review",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Authorize",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        }
+      ],
+      "chain": {
+        "originParty": "contractor",
+        "namePattern": "{Project}-IC-{0000}",
+        "copyTarget": {
+          "folder": "20-SHARED/02-For Approval",
+          "pattern": "{Role}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "Designer internal check → share for approval",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Check",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ],
+          "requiredAttributes": [
+            "Sheet / Document Title"
+          ]
+        },
+        {
+          "name": "Review",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Authorize",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        }
+      ],
+      "chain": {
+        "originParty": "designer",
+        "namePattern": "{Project}-IC-{0000}",
+        "copyTarget": {
+          "folder": "20-SHARED/02-For Approval",
+          "pattern": "{Role}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "Share for coordination (S1–S3)",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Task team lead authorizes",
+          "assignees": [
+            {
+              "role": "project_admin"
+            },
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "revise_resubmit",
+            "rejected"
+          ],
+          "requiredAttributes": [
+            "Sheet / Document Title"
+          ]
+        }
+      ],
+      "chain": {
+        "copyTarget": {
+          "folder": "20-SHARED/01-For Review",
+          "pattern": "{Role}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "Approval: Consultant + Designer → Client acceptance → Publish",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Consultant and designer review",
+          "assignees": [
+            {
+              "slot": "musavir"
+            },
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "all",
+          "days": 5,
+          "outcomes": [],
+          "outcomeOptions": [
+            {
+              "code": "MUS-A",
+              "label": "CONSULTANT APPROVED",
+              "kind": "approved"
+            },
+            {
+              "code": "MUS-B",
+              "label": "CONSULTANT APPROVED WITH COMMENTS",
+              "kind": "approved_with_comments"
+            },
+            {
+              "code": "MUS-C",
+              "label": "CONSULTANT REVISE AND RESUBMIT",
+              "kind": "revise"
+            },
+            {
+              "code": "MUS-D",
+              "label": "CONSULTANT REJECTED",
+              "kind": "rejected"
+            }
+          ],
+          "stage": 0,
+          "requiredAttributes": [
+            "Sheet / Document Title"
+          ]
+        },
+        {
+          "name": "Client acceptance",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [],
+          "outcomeOptions": [
+            {
+              "code": "IDR-A",
+              "label": "CLIENT APPROVED",
+              "kind": "approved"
+            },
+            {
+              "code": "IDR-B",
+              "label": "CLIENT APPROVED WITH COMMENTS",
+              "kind": "approved_with_comments"
+            },
+            {
+              "code": "IDR-C",
+              "label": "CLIENT REVISE AND RESUBMIT",
+              "kind": "revise"
+            },
+            {
+              "code": "IDR-D",
+              "label": "CLIENT REJECTED",
+              "kind": "rejected"
+            }
+          ],
+          "stage": 1
+        }
+      ],
+      "chain": {
+        "stages": [
+          {
+            "name": "Consultant and designer",
+            "party": "consultant",
+            "days": 5,
+            "onRevise": "stop"
+          },
+          {
+            "name": "Client",
+            "party": "client",
+            "days": 3,
+            "onRevise": "stop"
+          }
+        ],
+        "originParty": "contractor",
+        "namePattern": "{Project}-APR-{0000}",
+        "copyTarget": {
+          "folder": "30-PUBLISHED",
+          "pattern": "{Role}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "RFI: Consultant coordinates → Designer answers → Consultant formal answer → Client closes",
+      "kind": "rfi",
+      "steps": [
+        {
+          "name": "Consultant coordination",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "reviewed",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Designer answer",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "reviewed"
+          ]
+        },
+        {
+          "name": "Consultant formal answer",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "reviewed",
+            "revise_resubmit"
+          ]
+        },
+        {
+          "name": "Client closes",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "revise_resubmit"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Material / method approval: Consultant (+ designer opinion) → Client",
+      "kind": "submittal",
+      "steps": [
+        {
+          "name": "Designer technical opinion",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "reviewed",
+            "approved_with_comments",
+            "revise_resubmit"
+          ]
+        },
+        {
+          "name": "Consultant evaluation",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Client final decision",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Change request: Consultant → Client",
+      "kind": "form",
+      "steps": [
+        {
+          "name": "Consultant evaluation",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Client decision",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ],
+          "returnTo": 0
+        }
+      ]
+    },
+    {
+      "name": "Subcontractor approval: Consultant → Client",
+      "kind": "form",
+      "steps": [
+        {
+          "name": "Consultant evaluation",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Client decision",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ],
+          "returnTo": 0
+        }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "key": "yuklenici-kontrol",
+      "slot": "yuklenici",
+      "name": "Contractor - Checker"
+    },
+    {
+      "key": "yuklenici-gozden",
+      "slot": "yuklenici",
+      "name": "Contractor - Reviewer"
+    },
+    {
+      "key": "yuklenici-yetki",
+      "slot": "yuklenici",
+      "name": "Contractor - Authorizer"
+    },
+    {
+      "key": "tasarimci-kontrol",
+      "slot": "tasarimci",
+      "name": "Designer - Checker"
+    },
+    {
+      "key": "tasarimci-gozden",
+      "slot": "tasarimci",
+      "name": "Designer - Reviewer"
+    },
+    {
+      "key": "tasarimci-yetki",
+      "slot": "tasarimci",
+      "name": "Designer - Authorizer"
+    },
+    {
+      "key": "musavir-disiplin",
+      "slot": "musavir",
+      "name": "Consultant - Discipline Approval"
+    },
+    {
+      "key": "tasarimci-disiplin",
+      "slot": "tasarimci",
+      "name": "Designer - Discipline Opinion"
+    },
+    {
+      "key": "idare-onay",
+      "slot": "idare",
+      "name": "Client - Acceptance"
+    },
+    {
+      "key": "idare-gozlemci",
+      "slot": "idare",
+      "name": "Client - Watcher"
+    },
+    {
+      "key": "bim-yoneticisi",
+      "slot": "yuklenici",
+      "name": "Information Manager"
+    }
+  ],
+  "issues": {
+    "categories": [
+      {
+        "category": "Design coordination",
+        "types": [
+          "Design error / omission",
+          "Inter-discipline clash",
+          "Document / drawing mismatch"
+        ]
+      },
+      {
+        "category": "Site observation",
+        "types": [
+          "Site observation",
+          "Workmanship defect"
+        ]
+      },
+      {
+        "category": "Quality",
+        "types": [
+          "NCR - Non-conformance",
+          "CAR - Corrective action",
+          "Material inspection finding"
+        ]
+      },
+      {
+        "category": "HSE",
+        "types": [
+          "Safety non-conformance",
+          "Near miss / incident",
+          "Environmental non-conformance"
+        ]
+      },
+      {
+        "category": "Testing and commissioning",
+        "types": [
+          "Test finding",
+          "Punch / snag"
+        ]
+      }
+    ],
+    "customFields": [
+      {
+        "name": "Discipline",
+        "type": "list",
+        "options": [
+          "A",
+          "S",
+          "M",
+          "E",
+          "C",
+          "L",
+          "G",
+          "I",
+          "P",
+          "Q",
+          "Y"
+        ]
+      },
+      {
+        "name": "Responsible Company",
+        "type": "list",
+        "options": [
+          "Client",
+          "Consultant",
+          "Designer",
+          "Contractor"
+        ]
+      },
+      {
+        "name": "Cost Impact",
+        "type": "list",
+        "options": [
+          "Yes",
+          "No",
+          "Under evaluation"
+        ]
+      },
+      {
+        "name": "Time Impact",
+        "type": "list",
+        "options": [
+          "Yes",
+          "No",
+          "Under evaluation"
+        ]
+      }
+    ]
+  },
+  "transmittal": {
+    "numbering": "{Proje}-{Gönderen}-{Alıcı}-TRN-{0000}",
+    "attributes": [
+      "Originator",
+      "Role",
+      "Type",
+      "Level",
+      "Number",
+      "Status",
+      "Revision",
+      "Sheet / Document Title"
+    ]
+  },
+  "rfi": {
+    "types": [
+      {
+        "code": "A",
+        "name": "A - Architect"
+      },
+      {
+        "code": "S",
+        "name": "S - Structural engineer"
+      },
+      {
+        "code": "M",
+        "name": "M - Mechanical engineer"
+      },
+      {
+        "code": "E",
+        "name": "E - Electrical engineer"
+      },
+      {
+        "code": "C",
+        "name": "C - Civil engineer"
+      },
+      {
+        "code": "L",
+        "name": "L - Landscape architect"
+      },
+      {
+        "code": "G",
+        "name": "G - Geographical and land surveyor"
+      },
+      {
+        "code": "I",
+        "name": "I - Interior designer"
+      },
+      {
+        "code": "P",
+        "name": "P - Public health engineer"
+      },
+      {
+        "code": "Q",
+        "name": "Q - Quantity surveyor"
+      },
+      {
+        "code": "Y",
+        "name": "Y - Specialist designer"
+      },
+      {
+        "code": "Z",
+        "name": "Z - General"
+      }
+    ],
+    "defaultType": "Z",
+    "categories": [
+      "Design Coordination",
+      "Site Execution",
+      "Material",
+      "Other"
+    ],
+    "responseDays": 7,
+    "numbering": "{Proje}-{Gönderen}-{Alıcı}-RFI-{Disiplin}-{0000}",
+    "workflow": "RFI: Consultant coordinates → Designer answers → Consultant formal answer → Client closes",
+    "permissions": {
+      "creator": [
+        "yuklenici"
+      ],
+      "coordinator": [
+        "musavir"
+      ],
+      "reviewer": [
+        "tasarimci"
+      ],
+      "manager": [
+        "idare"
+      ],
+      "watcher": [
+        "idare-gozlemci"
+      ]
+    }
+  },
+  "submittals": {
+    "itemTypes": [
+      "MAR - Material Approval Request",
+      "MST - Method Statement",
+      "SHD - Shop Drawing",
+      "PDT - Product Data",
+      "SMP - Sample",
+      "TRP - Test Report",
+      "CRT - Certificate",
+      "OMM - O&M Manual",
+      "WAR - Warranty",
+      "MCK - Mock-up",
+      "PRG - Programme",
+      "OTH - Other"
+    ],
+    "responses": [
+      {
+        "label": "Approved",
+        "code": "approved"
+      },
+      {
+        "label": "Approved with comments",
+        "code": "approved_with_comments"
+      },
+      {
+        "label": "For information",
+        "code": "reviewed"
+      },
+      {
+        "label": "Revise and resubmit",
+        "code": "revise_resubmit"
+      },
+      {
+        "label": "Rejected",
+        "code": "rejected"
+      }
+    ],
+    "specSections": [
+      {
+        "code": "A",
+        "name": "Architect"
+      },
+      {
+        "code": "S",
+        "name": "Structural engineer"
+      },
+      {
+        "code": "M",
+        "name": "Mechanical engineer"
+      },
+      {
+        "code": "E",
+        "name": "Electrical engineer"
+      },
+      {
+        "code": "C",
+        "name": "Civil engineer"
+      },
+      {
+        "code": "L",
+        "name": "Landscape architect"
+      },
+      {
+        "code": "G",
+        "name": "Geographical and land surveyor"
+      },
+      {
+        "code": "I",
+        "name": "Interior designer"
+      },
+      {
+        "code": "P",
+        "name": "Public health engineer"
+      },
+      {
+        "code": "Q",
+        "name": "Quantity surveyor"
+      },
+      {
+        "code": "Y",
+        "name": "Specialist designer"
+      }
+    ],
+    "responseDays": 14,
+    "workflow": "Material / method approval: Consultant (+ designer opinion) → Client",
+    "watchers": [
+      "musavir",
+      "idare-gozlemci"
+    ]
+  },
+  "meetings": [
+    {
+      "name": "Client",
+      "agenda": [
+        "Review of previous actions",
+        "Overall status and progress",
+        "Contract and payment matters",
+        "Items for client decision",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "idare",
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/01-Client"
+    },
+    {
+      "name": "Design",
+      "agenda": [
+        "Review of previous actions",
+        "Delivery plan (MIDP) status",
+        "Open RFIs and design changes",
+        "Documents awaiting review and approval",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "tasarimci",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/02-Design"
+    },
+    {
+      "name": "Site coordination",
+      "agenda": [
+        "Review of previous actions",
+        "Weekly site programme",
+        "Interfaces and trade coordination",
+        "Site observations and open issues",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/03-Site coordination"
+    },
+    {
+      "name": "Quality control",
+      "agenda": [
+        "Review of previous actions",
+        "Open NCRs and CARs",
+        "Material approvals and tests",
+        "Inspection requests",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/04-Quality control"
+    },
+    {
+      "name": "MEP",
+      "agenda": [
+        "Review of previous actions",
+        "MEP design and installation status",
+        "Testing and commissioning plan",
+        "Procurement lead times",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/05-MEP"
+    },
+    {
+      "name": "Programme",
+      "agenda": [
+        "Review of previous actions",
+        "Programme variances and critical path",
+        "Delays and recovery measures",
+        "Look-ahead plan",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/06-Programme"
+    },
+    {
+      "name": "BIM coordination",
+      "agenda": [
+        "Review of previous actions",
+        "Model deliveries and quality checks",
+        "Clash report and resolutions",
+        "Naming and CDE compliance",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "tasarimci",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/07-BIM coordination"
+    },
+    {
+      "name": "HSE",
+      "agenda": [
+        "Review of previous actions",
+        "Incidents and near misses",
+        "Site inspection findings",
+        "Environment and waste",
+        "Decisions and new actions"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENERAL/06-Meeting Minutes/08-HSE"
+    }
+  ],
+  "forms": [
+    {
+      "key": "DTF",
+      "name": "Change Request",
+      "workflow": "Change request: Consultant → Client",
+      "sections": [
+        {
+          "name": "General",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Description of change",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Impact (cost, time)",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Consultant evaluation",
+          "editor": "musavir"
+        },
+        {
+          "name": "Client decision",
+          "editor": "idare"
+        }
+      ]
+    },
+    {
+      "key": "AYF",
+      "name": "Subcontractor Approval",
+      "workflow": "Subcontractor approval: Consultant → Client",
+      "sections": [
+        {
+          "name": "Form details",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Company details",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Attachments checklist",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Consultant evaluation",
+          "editor": "musavir"
+        },
+        {
+          "name": "Client decision",
+          "editor": "idare"
+        }
+      ]
+    },
+    {
+      "key": "EIN",
+      "name": "Engineer's Instruction",
+      "sections": [
+        {
+          "name": "General",
+          "editor": "musavir"
+        },
+        {
+          "name": "Instruction",
+          "editor": "musavir"
+        },
+        {
+          "name": "Contractor acknowledgement",
+          "editor": "yuklenici"
+        }
+      ]
+    },
+    {
+      "key": "DR",
+      "name": "Daily Report",
+      "sections": [
+        {
+          "name": "Weather",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Labour",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Plant and equipment",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "HSE",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Work done",
+          "editor": "yuklenici"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Company codes (Originator, Sender, Recipient) are asked for each party when the project is created.",
+    "The discipline list and naming fields are examples; the setup wizard adapts them to the client's coding (e.g. adds Sub-discipline or Stage).",
+    "Files enter the shared and published areas only through an approved review (ISO 19650-2 §5.6.4, §5.7.4); the transition rules are enforced.",
+    "Suitability and revision codes follow ISO 19650 (S0–S4, A, B, CR; P01 / C01). The R00 scheme can be chosen in Project Settings → CDE → Code Scheme.",
+    "RFI, submittal and meeting settings are applied when the Manage module is installed, form templates when Field is; otherwise they are skipped."
+  ]
+}

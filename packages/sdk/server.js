@@ -171,6 +171,7 @@ export const {
   parseTemplateBody,
   parseXml,
   participantWorkIds,
+  patchWorkType,
   pdfDrawing,
   pdfFontBytes,
   pdfFonts,

@@ -38,7 +38,7 @@ export const AI_EVAL_FEATURES = [
 
 export const SAMPLE_KINDS = ["pdf_drawing", "pdf_form", "docx", "xlsx", "pptx", "dxf", "ifc", "ifc_v2"] as const;
 
-export const PROJECT_TEMPLATES = ["empty", "iso19650", "iso19650-temel", "bina-veri-merkezi", "metro-ibb"] as const;
+export const PROJECT_TEMPLATES = ["empty", "iso19650", "iso19650-temel", "bina-veri-merkezi", "metro-ibb", "iso19650-yapim-tr", "iso19650-yapim-en"] as const;
 
 const projectRef = z.string().min(1).max(64).describe("Project id or code, e.g. PKF-DEMO.");
 const confirm = z.boolean().optional().describe("Must be true for destructive actions (test/demo projects only).");

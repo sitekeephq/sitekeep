@@ -8,7 +8,15 @@ import "../app/fastify-types.js";
 
 // Module contract and cross-module capabilities
 export { defineServerModule, type DevRunner, type ReminderCounts, type ServerModule, type TaskSource } from "./module.js";
-export { capability, provideCapability, type Capabilities, type FormSummary, type PlanningSchedule } from "./capabilities.js";
+export {
+  capability,
+  provideCapability,
+  type Capabilities,
+  type FormSummary,
+  type PlanningSchedule,
+  type TemplateApplyContext,
+  type TemplatePartHandler,
+} from "./capabilities.js";
 
 // App, database, storage
 export type { AppDeps, ResolvedDeps } from "../app/deps.js";
@@ -167,6 +175,8 @@ export { aiProviderFor } from "../docintel/service.js";
 // Connect: Autodesk import (files, versions, records), office editing (WOPI, discovery, proof)
 export { assertDirectWriteAllowed } from "../workflow/service.js";
 export { ensureBuiltInTypes } from "../works/service.js";
+// Project templates (format v2): Manage sets its RFI, submittal and meeting work types
+export { patchWorkType, type WorkTypePatch, type WorkTypePatchResult } from "../works/service.js";
 export { standardForFolder } from "../modules/documents/naming-routes.js";
 export { hashPassword, hashToken } from "../core/security/auth.js";
 export { outboundRefusal, withOutboundContext } from "../privacy/outbound.js";

@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import {
   DEFAULT_CDE_SETTINGS,
+  DEFAULT_PROJECT_ROLES,
   PROJECT_MODULES,
   TEMPLATE_FORMAT,
   WORKFLOW_ROLES,
@@ -15,6 +16,7 @@ import {
   type TemplateChainConfig,
   type TemplateFolder,
   type TemplateGrant,
+  type TemplateRole,
   type TemplateRootSettings,
   type TemplateSlot,
   type TemplateWorkflow,
@@ -34,6 +36,7 @@ import {
   folderSettings,
   folderVirtualChildren,
   namingStandards,
+  projectRoles,
   projectSlots,
   projects,
   workflowTemplates,
@@ -78,6 +81,23 @@ export async function exportProjectTemplate(db: Db, projectId: string, lang: str
       .orderBy(asc(workflowTemplates.name)),
     db.select().from(projectSlots).where(eq(projectSlots.projectId, projectId)).orderBy(asc(projectSlots.position)),
   ]);
+  // Project roles (kind "role", not the default ones) become the template's roles; workflow steps
+  // assigned to them keep the assignment as { projectRole } (template format v2).
+  const defaultRoleNames = new Set<string>(DEFAULT_PROJECT_ROLES.map((r) => r.name));
+  const roleRows = (
+    await db
+      .select()
+      .from(projectRoles)
+      .where(and(eq(projectRoles.projectId, projectId), eq(projectRoles.kind, "role")))
+      .orderBy(asc(projectRoles.createdAt), asc(projectRoles.name))
+  ).filter((r) => !defaultRoleNames.has(r.name));
+  const roleKeys = new Map<string, string>();
+  const rolesOut: TemplateRole[] = roleRows.map((r) => {
+    let key = slugify(r.name);
+    for (let i = 2; [...roleKeys.values()].includes(key); i++) key = `${slugify(r.name)}-${i}`;
+    roleKeys.set(r.id, key);
+    return { key, name: r.name, ...(r.description ? { description: r.description } : {}), ...(r.color ? { color: r.color } : {}) };
+  });
   const notes: string[] = [];
 
   const slots: TemplateSlot[] = slotRows.map((row) => {
@@ -215,6 +235,8 @@ export async function exportProjectTemplate(db: Db, projectId: string, lang: str
       let resolved: TemplateAssignee | null = null;
       if (assignee.type === "role" && (WORKFLOW_ROLES as readonly string[]).includes(assignee.id)) {
         resolved = { role: assignee.id as WorkflowRole };
+      } else if (assignee.type === "role" && roleKeys.has(assignee.id)) {
+        resolved = { projectRole: roleKeys.get(assignee.id)! };
       } else if (assignee.type === "company" && companyToSlot.has(assignee.id)) {
         resolved = { slot: companyToSlot.get(assignee.id)! };
       }
@@ -310,10 +332,17 @@ export async function exportProjectTemplate(db: Db, projectId: string, lang: str
       return attribute;
     });
   }
+  if (rolesOut.length) template.roles = rolesOut;
   if (workflowsOut.length) template.workflows = workflowsOut;
   const modules = resolveModules(project.settings?.modules);
   if (PROJECT_MODULES.some((module) => !modules[module])) template.modules = modules;
-  const cde = await exportCde(db, projectId, folderPath, new Map(workflowRows.map((w) => [w.id, w.name])));
+  const cde = await exportCde(
+    db,
+    projectId,
+    folderPath,
+    new Map(workflowRows.map((w) => [w.id, w.name])),
+    standardName,
+  );
   if (cde) template.cde = cde;
   if (notes.length) template.notes = notes;
   return template;
@@ -328,6 +357,7 @@ async function exportCde(
   projectId: string,
   folderPath: (id: string) => string | null,
   workflowNames: ReadonlyMap<string, string>,
+  standardNames: ReadonlyMap<string, string>,
 ): Promise<TemplateCdeSettings | undefined> {
   const settings = await loadCdeSettings(db, projectId);
   const defaults = DEFAULT_CDE_SETTINGS;
@@ -337,7 +367,8 @@ async function exportCde(
     settings.codeScheme !== defaults.codeScheme ||
     settings.wipPolicy !== defaults.wipPolicy ||
     settings.adminSeesWip !== defaults.adminSeesWip ||
-    settings.archiveFolderId !== null;
+    settings.archiveFolderId !== null ||
+    settings.containerStandardId !== null;
   if (!changed) return undefined;
   const out: TemplateCdeSettings = {
     codeScheme: settings.codeScheme,
@@ -347,6 +378,8 @@ async function exportCde(
   };
   const archive = settings.archiveFolderId ? folderPath(settings.archiveFolderId) : null;
   if (archive) out.archiveFolder = archive;
+  const containerStandard = settings.containerStandardId ? standardNames.get(settings.containerStandardId) : undefined;
+  if (containerStandard) out.containerStandard = containerStandard;
   if (settings.transitions.length)
     out.transitions = settings.transitions.map((t) => {
       const workflow = t.workflowTemplateId ? workflowNames.get(t.workflowTemplateId) : undefined;

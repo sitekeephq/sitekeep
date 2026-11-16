@@ -56,7 +56,8 @@ import { normaliseChainTemplate, withRuleAssignees } from "../workflow/chain-tem
 import { checkTemplate as checkWorkflowSteps } from "../workflow/engine.js";
 import { templateFromRequest } from "./template-built-ins.js";
 import { applyTemplateCde } from "../cde/settings.js";
-import { assignWipOwnerTeams, ensureCompanyTeams } from "../cde/teams.js";
+import { assignWipOwnerTeams, ensureCompanyTeams, type TeamSeedCompany } from "../cde/teams.js";
+import { applyTemplateParts, insertTemplateRoles, templatePartAvailabilityOf } from "./template-parts.js";
 import {
   createRequestSchema,
   previewRequestSchema,
@@ -81,6 +82,8 @@ interface Prepared {
   mappedSlots: string[];
   naming: NamingStandard[];
   attributes: { name: string; type: AttributeDefinition["type"]; options: string[]; required: boolean }[];
+  /** Ids of the template's project roles (`roles[].key`), chosen before creation. */
+  roleIds: Map<string, string>;
   workflows: {
     name: string;
     kind: WorkflowKind;
@@ -158,12 +161,20 @@ async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, p
   });
 
   const expanded = expandProjectTemplate(template, req.dimensions, lang);
+  const roleIds = new Map((template.roles ?? []).map((role) => [role.key, randomUUID()]));
   const toAssignees = (list: readonly TemplateAssignee[]): WorkflowAssignee[] => {
     const out: WorkflowAssignee[] = [];
     for (const assignee of list) {
       const companyId = "slot" in assignee ? slots.get(assignee.slot)?.companyId : null;
+      const projectRoleId = "projectRole" in assignee ? roleIds.get(assignee.projectRole) : undefined;
       const resolved: WorkflowAssignee | null =
-        "role" in assignee ? { type: "role", id: assignee.role } : companyId ? { type: "company", id: companyId } : null;
+        "role" in assignee
+          ? { type: "role", id: assignee.role }
+          : projectRoleId
+            ? { type: "role", id: projectRoleId }
+            : companyId
+              ? { type: "company", id: companyId }
+              : null;
       if (resolved && !out.some((item) => item.type === resolved.type && item.id === resolved.id)) out.push(resolved);
     }
     return out;
@@ -260,6 +271,7 @@ async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, p
     mappedSlots,
     naming,
     attributes,
+    roleIds,
     workflows,
     dimensions: Object.fromEntries(
       Object.entries(dimensions).map(([key, values]) => [key, values.map((value) => (typeof value === "string" ? value : value.name))]),
@@ -267,10 +279,13 @@ async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, p
   };
 }
 
-/** `lang`: the requester's language, for the errors and warnings of the preview. */
+/**
+ * `lang`: the requester's language, for the errors and warnings of the preview. The template's
+ * per-language values are read in the project language (`language` of the request, else `lang`).
+ */
 export async function previewProjectTemplate(db: Db, body: unknown, lang: string = DEFAULT_LANGUAGE): Promise<TemplatePreviewDto> {
   const req = previewRequestSchema.parse(body);
-  const { template } = templateFromRequest(req);
+  const { template } = templateFromRequest(req, req.language ?? lang);
   const prepared = await prepare(db, template, req, req.code || "PROJE", lang);
   const { dimensions } = templateDimensions(template, req.dimensions);
   return {
@@ -283,6 +298,7 @@ export async function previewProjectTemplate(db: Db, body: unknown, lang: string
     dimensions: dimensionDtos(dimensions),
     counts: prepared.counts,
     tree: previewTree(prepared.folders),
+    parts: templatePartAvailabilityOf(template),
   };
 }
 
@@ -301,9 +317,15 @@ export async function assertProjectCodeFree(db: Db, code: string, selfId?: strin
   if (taken && taken.id !== selfId) throw conflict(msg("projects:errors.codeTaken", { code }));
 }
 
+/**
+ * Creates a project from a template. `lang`: the requester's language (errors, warnings, part notes);
+ * the project language (`language` of the request, else `lang`) picks the template's per-language values.
+ * The v2 parts are applied after the project exists; `parts` reports each one (applied, skipped …).
+ */
 export async function createProjectFromTemplate(db: Db, user: AuthUser, body: unknown, lang: string = DEFAULT_LANGUAGE) {
   const req: CreateRequest = createRequestSchema.parse(body);
-  const { template, templateId } = templateFromRequest(req);
+  const language = req.language ?? lang;
+  const { template, templateId } = templateFromRequest(req, language);
   const prepared = await prepare(db, template, req, req.code, lang);
   if (prepared.errors.length) throw badRequest(prepared.errors.join(" "), prepared.errors);
   await assertProjectCodeFree(db, req.code);
@@ -379,7 +401,7 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
   applySettings(rootId, template.root);
   walk(prepared.folders, rootId);
 
-  const project = await db.transaction(async (tx) => {
+  const { row: project, workflowIds } = await db.transaction(async (tx) => {
     const [row] = await tx
       .insert(projects)
       .values({
@@ -389,7 +411,16 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
         description: req.description ?? null,
         rootFolderId: rootId,
         createdBy: user.id,
-        settings: { modules: resolveModules(template.modules) },
+        settings: {
+          modules: resolveModules(template.modules),
+          language,
+          ...(template.issues && resolveModules(template.modules).issues
+            ? {
+                issueTypes: template.issues.categories,
+                ...(template.issues.customFields?.length ? { issueFields: template.issues.customFields } : {}),
+              }
+            : {}),
+        },
       })
       .returning();
     await tx.insert(projectMembers).values({ projectId, userId: user.id, companyId: user.companyId, isProjectAdmin: true });
@@ -408,6 +439,8 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
     for (const chunk of chunks(bindingRows)) await tx.insert(folderAttributeBindings).values(chunk);
     for (const chunk of chunks(gateRows)) await tx.insert(folderSettings).values(chunk);
     for (const chunk of chunks(virtualRows, 100)) await tx.insert(folderVirtualChildren).values(chunk);
+    // Template project roles first: workflow steps may name them ({ projectRole }).
+    await insertTemplateRoles(tx as unknown as Db, projectId, template, prepared.roleIds, prepared.slots);
     const workflowIds = new Map<string, string>();
     if (prepared.workflows.length) {
       const inserted = await tx.insert(workflowTemplates).values(
@@ -427,7 +460,7 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
       for (const w of inserted) if (!workflowIds.has(w.name)) workflowIds.set(w.name, w.id);
     }
     // ISO 19650 CDE settings: the template's "cde" block, or the defaults (enforcement off).
-    await applyTemplateCde(tx as unknown as Db, projectId, template.cde, workflowIds, realPaths);
+    await applyTemplateCde(tx as unknown as Db, projectId, template.cde, workflowIds, realPaths, namingIds);
     if (template.slots.length) {
       await tx.insert(projectSlots).values(
         template.slots.map((slot, position) => {
@@ -451,18 +484,37 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
       templateName: template.name,
       dimensions: Object.keys(req.dimensions).length ? prepared.dimensions : null,
     });
-    return row!;
+    return { row: row!, workflowIds };
   });
   const roleIds = await ensureDefaultProjectRoles(db, projectId, rootId);
   const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
   if (adminRoleId) await ensureProjectAdminsHoldAdminRole(db, projectId, adminRoleId);
-  // ISO 19650 task teams (ISO-5): one per slot company (code from the slot) and the creator's
-  // company; WIP folders granted to one slot company belong to its team.
-  const { teams } = await ensureCompanyTeams(db, projectId, [
-    ...[...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code })),
-    ...(user.companyId ? [{ companyId: user.companyId }] : []),
-  ]);
+  // ISO 19650 task teams (ISO-5): one per slot company (code from the slot), or per slot listed in
+  // the template's cde.taskTeams (with the lead flag), and the creator's company; WIP folders
+  // granted to one slot company belong to its team.
+  const teamSlots = template.cde?.taskTeams;
+  const slotTeams: TeamSeedCompany[] = teamSlots
+    ? teamSlots.flatMap((team) => {
+        const slot = prepared.slots.get(team.slot);
+        return slot?.companyId ? [{ companyId: slot.companyId, code: slot.code, lead: !!team.lead }] : [];
+      })
+    : [...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code }));
+  const { teams } = await ensureCompanyTeams(db, projectId, [...slotTeams, ...(user.companyId ? [{ companyId: user.companyId }] : [])]);
   await assignWipOwnerTeams(db, projectId, teams);
+  // Template format v2 parts: transmittal (core), RFI, submittals, meetings (Manage), forms (Field).
+  const parts = await applyTemplateParts(db, template, {
+    projectId,
+    projectCode: req.code,
+    userId: user.id,
+    language,
+    requesterLanguage: lang,
+    slots: new Map(
+      [...prepared.slots].map(([key, s]) => [key, { label: s.slot.label, companyId: s.companyId, code: s.code }]),
+    ),
+    workflowIds,
+    roleIds: prepared.roleIds,
+    folderIds: realPaths,
+  });
   await audit(db, {
     projectId,
     userId: user.id,
@@ -474,7 +526,9 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
       templateName: template.name,
       slotCompanies: req.slotCompanies,
       counts: prepared.counts,
+      language,
+      parts: parts.map((p) => ({ part: p.part, status: p.status, ...(p.reason ? { reason: p.reason } : {}) })),
     },
   });
-  return { project, warnings: prepared.warnings, counts: prepared.counts };
+  return { project, warnings: prepared.warnings, counts: prepared.counts, parts };
 }

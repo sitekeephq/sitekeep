@@ -1,36 +1,40 @@
 {
-  "format": "7d-cde/project-template@1",
-  "name": "Bina (veri merkezi tipi)",
-  "description": "ZAVM demo projesinin yapısı: ISO 19650 durum klasörleri, çalışma alanında (01-WIP) disiplin klasörleri, Data Center kodlama sistemi ve Yüklenici → Tasarımcı → Müşavir → İdare onay sırası.",
+  "format": "7d-cde/project-template@2",
+  "name": { "tr": "Bina (veri merkezi tipi)", "en": "Building (data-centre type)" },
+  "description": {
+    "tr": "Örnek veri merkezi yapısı (demo): ISO 19650 durum klasörleri, çalışma alanında (01-WIP) disiplin klasörleri, Data Center kodlama sistemi ve Yüklenici → Tasarımcı → Müşavir → İdare onay sırası. Firma kodları örnektir.",
+    "en": "Sample data-centre structure (demo): ISO 19650 state folders, discipline folders in the work area (01-WIP), a data-centre naming system and the Contractor → Designer → Consultant → Client approval order. Company codes are examples. Folder names are Turkish."
+  },
+  "language": "tr",
   "modules": { "correspondence": true, "rfi": true, "submittals": true, "meetings": true, "transmittals": true, "issues": true, "reviews": true, "forms": true, "coordination": true, "schedule": true, "spec": true, "reports": true },
   "slots": [
     {
       "key": "yuklenici",
       "label": "Yüklenici",
       "party": "contractor",
-      "code": "PAS",
-      "description": "Ana yüklenici (ör. Poyraz İnşaat)."
+      "code": "KYA",
+      "description": "Ana yüklenici (ör. Kaya Yapı)."
     },
     {
       "key": "tasarimci",
       "label": "Tasarımcı",
       "party": "designer",
-      "code": "CNS",
-      "description": "Tasarım ve mühendislik firması (ör. Çınar Tasarım)."
+      "code": "ATL",
+      "description": "Tasarım ve mühendislik firması (ör. Atlas Tasarım)."
     },
     {
       "key": "musavir",
       "label": "Müşavir",
       "party": "consultant",
-      "code": "HLL",
-      "description": "Proje yönetimi / müşavir (ör. Hilal Müşavirlik)."
+      "code": "MRT",
+      "description": "Proje yönetimi / müşavir (ör. Mert Müşavirlik)."
     },
     {
       "key": "idare",
       "label": "İdare",
       "party": "client",
-      "code": "ZRT",
-      "description": "İşveren (ör. Zirve Teknoloji)."
+      "code": "VDT",
+      "description": "İşveren (ör. Vadi Teknoloji)."
     }
   ],
   "root": {

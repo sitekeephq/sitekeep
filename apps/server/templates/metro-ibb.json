@@ -1,7 +1,11 @@
 {
-  "format": "7d-cde/project-template@1",
-  "name": "Metro / Raylı Sistem (İBB tipi)",
-  "description": "İBB Raylı Sistemler CDE esasları (PKF ve MBE projelerinden, yalnız yapı): 00-Genel, durum alanları (Tasarım / Yapım), taraf WIP alanları 96–99 ve bölge × disiplin × doküman tipi iskeleti. Boş kalan yaprak klasörler ilk dosya geldiğinde oluşur.",
+  "format": "7d-cde/project-template@2",
+  "name": { "tr": "Metro / Raylı Sistem (İBB tipi)", "en": "Metro / Rail System (İBB type)" },
+  "description": {
+    "tr": "İBB Raylı Sistemler CDE esasları (PKF ve MBE projelerinden, yalnız yapı): 00-Genel, durum alanları (Tasarım / Yapım), taraf WIP alanları 96–99 ve bölge × disiplin × doküman tipi iskeleti. Boş kalan yaprak klasörler ilk dosya geldiğinde oluşur.",
+    "en": "CDE rules of the Istanbul Metropolitan Municipality rail systems (structure only): 00-General, state areas (design / construction), party WIP areas 96–99 and a zone × discipline × document type skeleton. Empty leaf folders are created when the first file arrives. Folder names are Turkish."
+  },
+  "language": "tr",
   "modules": { "correspondence": true, "rfi": true, "submittals": true, "meetings": true, "transmittals": true, "issues": true, "reviews": true, "forms": true, "coordination": true, "schedule": true, "spec": true, "reports": true },
   "slots": [
     {

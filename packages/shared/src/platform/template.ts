@@ -28,6 +28,9 @@ import type { ProjectModule } from "../core/modules.js";
 import { cdeTransitionKey, type TemplateCdeSettings } from "../documents/cde.js";
 import type { OutcomeOption, ReviewParty, ReviewStage } from "../workflow/review-chains.js";
 import type { FinalOutcomeMap, OutcomeCode, StepRule, WorkflowKind, WorkflowRole } from "../workflow/workflow.js";
+import { TEMPLATE_PARTS, templatePartsOf, type TemplatePart, type TemplatePartAvailabilityDto, type TemplatePartModule, type TemplateParts } from "./template-v2.js";
+
+const TEMPLATE_PART_MODULE = Object.fromEntries(TEMPLATE_PARTS.map((p) => [p.part, p.module])) as Record<TemplatePart, TemplatePartModule | null>;
 
 // Kept from the product's former name: exported template files carry it, renaming would reject them.
 export const TEMPLATE_FORMAT = "7d-cde/project-template@1";
@@ -111,7 +114,8 @@ export interface TemplateFolder {
 
 export type TemplateRootSettings = Pick<TemplateFolder, "naming" | "attributes" | "grants" | "gate">;
 
-export type TemplateAssignee = { slot: string } | { role: WorkflowRole };
+/** A slot (its company), a built-in workflow role, or a project role of the template (`roles[].key`, v2). */
+export type TemplateAssignee = { slot: string } | { role: WorkflowRole } | { projectRole: string };
 
 /** Attribute-resolved assignees (review chains) with slots instead of companies. */
 export interface TemplateAssigneeRule {
@@ -156,10 +160,19 @@ export interface TemplateWorkflow {
   chain?: TemplateChainConfig;
 }
 
-export interface ProjectTemplate {
+/**
+ * A project template. v2 parts (roles, issues, transmittal, rfi, submittals, meetings, forms) come
+ * from `TemplateParts` (template-v2.ts). Per-language values are resolved before this type
+ * applies (`localizeTemplate`).
+ */
+export interface ProjectTemplate extends TemplateParts {
   format?: string;
   name: string;
   description?: string;
+  /** Language of the template's content (folder names, codes): "tr", "en". */
+  language?: string;
+  /** Templates of one family in different languages share it ("iso19650-yapim"). */
+  family?: string;
   slots: TemplateSlot[];
   dimensions?: Record<string, DimensionValue[]>;
   /** Settings of the project root folder ("Proje Dosyaları"). */
@@ -240,6 +253,12 @@ export interface TemplateSummaryDto {
   id: string;
   name: string;
   description: string;
+  /** Language of the content (folder names, codes), when the template states it. */
+  language?: string;
+  /** Family of templates that differ only in language. */
+  family?: string;
+  /** v2 parts the template carries (roles, issues, rfi …). */
+  parts: TemplatePart[];
   builtIn: boolean;
   slots: TemplateSlot[];
   dimensions: TemplateDimensionDto[];
@@ -270,6 +289,8 @@ export interface TemplatePreviewDto {
   dimensions: TemplateDimensionDto[];
   counts: TemplateCounts;
   tree: PreviewFolderDto[];
+  /** v2 parts and whether this server can apply them (a missing module skips its parts). */
+  parts: TemplatePartAvailabilityDto[];
 }
 
 export interface CreateFromTemplateRequest {
@@ -284,6 +305,8 @@ export interface CreateFromTemplateRequest {
   slotCodes?: Record<string, string>;
   /** dimension name → values (replaces the template's values). */
   dimensions?: Record<string, string[]>;
+  /** Project language: picks the per-language values of the template (default: the requester's). */
+  language?: string;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -506,7 +529,80 @@ export function checkProjectTemplate(
     if (tr.workflow && !workflowNames.has(tr.workflow))
       errors.push(sharedText(lang, "template.cdeWorkflowUnknown", { transition: key, name: tr.workflow }));
   }
+  const cde = template.cde;
+  if (cde?.containerStandard && !standards.has(cde.containerStandard))
+    errors.push(sharedText(lang, "template.standardUnknown", { where: "cde.containerStandard", name: cde.containerStandard }));
+  const teamSlots = new Set<string>();
+  for (const team of cde?.taskTeams ?? []) {
+    if (!slotKeys.has(team.slot)) errors.push(sharedText(lang, "template.partSlotUnknown", { where: "cde.taskTeams", slot: team.slot }));
+    if (teamSlots.has(team.slot)) errors.push(sharedText(lang, "template.duplicateTaskTeam", { slot: team.slot }));
+    teamSlots.add(team.slot);
+  }
+  errors.push(...checkTemplateParts(template, slotKeys, workflowNames, lang));
   return [...new Set(errors)];
+}
+
+/** Checks of the v2 parts: unique keys, known slots, project roles and workflows. */
+function checkTemplateParts(template: ProjectTemplate, slotKeys: ReadonlySet<string>, workflowNames: ReadonlySet<string>, lang: string): string[] {
+  const errors: string[] = [];
+  const roleKeys = new Set<string>();
+  const roleNames = new Set<string>();
+  for (const r of template.roles ?? []) {
+    if (roleKeys.has(r.key)) errors.push(sharedText(lang, "template.duplicateProjectRole", { key: r.key }));
+    roleKeys.add(r.key);
+    const folded = r.name.trim().toLocaleLowerCase("tr");
+    if (roleNames.has(folded)) errors.push(sharedText(lang, "template.duplicateProjectRole", { key: r.name }));
+    roleNames.add(folded);
+    if (r.slot && !slotKeys.has(r.slot)) errors.push(sharedText(lang, "template.partSlotUnknown", { where: `roles.${r.key}`, slot: r.slot }));
+  }
+  for (const w of template.workflows ?? [])
+    w.steps.forEach((s, i) => {
+      const rule = s.assigneeRule;
+      const all = [...s.assignees, ...(rule ? [...Object.values(rule.map).flat(), ...(rule.fallback ?? [])] : [])];
+      for (const a of all)
+        if ("projectRole" in a && !roleKeys.has(a.projectRole))
+          errors.push(sharedText(lang, "template.stepProjectRoleUnknown", { name: w.name, step: i + 1, role: a.projectRole }));
+    });
+  const party = (where: string, key: string) => {
+    if (!slotKeys.has(key) && !roleKeys.has(key)) errors.push(sharedText(lang, "template.partSlotUnknown", { where, slot: key }));
+  };
+  const workflow = (where: string, name: string | undefined) => {
+    if (name && !workflowNames.has(name)) errors.push(sharedText(lang, "template.partWorkflowUnknown", { where, name }));
+  };
+  const rfi = template.rfi;
+  if (rfi) {
+    workflow("rfi", rfi.workflow);
+    for (const [role, keys] of Object.entries(rfi.permissions ?? {})) for (const k of keys ?? []) party(`rfi.permissions.${role}`, k);
+    if (rfi.defaultType && rfi.types && !rfi.types.some((t) => t.code === rfi.defaultType))
+      errors.push(sharedText(lang, "template.rfiDefaultTypeUnknown", { code: rfi.defaultType }));
+  }
+  const submittals = template.submittals;
+  if (submittals) {
+    workflow("submittals", submittals.workflow);
+    for (const k of submittals.watchers ?? []) party("submittals.watchers", k);
+  }
+  const meetings = new Set<string>();
+  for (const m of template.meetings ?? []) {
+    if (meetings.has(m.name)) errors.push(sharedText(lang, "template.duplicateMeeting", { name: m.name }));
+    meetings.add(m.name);
+    for (const k of m.attendees ?? []) party(`meetings.${m.name}`, k);
+  }
+  const forms = new Set<string>();
+  for (const f of template.forms ?? []) {
+    if (forms.has(f.key)) errors.push(sharedText(lang, "template.duplicateForm", { key: f.key }));
+    forms.add(f.key);
+    workflow(`forms.${f.key}`, f.workflow);
+    for (const s of f.sections) if (s.editor) party(`forms.${f.key}`, s.editor);
+  }
+  return errors;
+}
+
+/** The v2 parts of a template with whether each can be applied (`installed`: module ids on this server). */
+export function templatePartAvailability(template: ProjectTemplate, installed: readonly string[]): TemplatePartAvailabilityDto[] {
+  return templatePartsOf(template).map((part) => {
+    const module = TEMPLATE_PART_MODULE[part];
+    return { part, module, available: !module || installed.includes(module) };
+  });
 }
 
 /** Grants on a folder with "*" expanded to the given slots. */

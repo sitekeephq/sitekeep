@@ -73,6 +73,11 @@ export const templateCdeSchema = z.object({
     )
     .max(40)
     .optional(),
+  containerStandard: z.string().trim().min(1).max(200).optional(),
+  taskTeams: z
+    .array(z.object({ slot: z.string().trim().min(1).max(64), lead: z.boolean().optional() }))
+    .max(30)
+    .optional(),
 });
 
 function transitionDto(t: TransitionRow): CdeTransitionDto {
@@ -195,8 +200,9 @@ export async function ensureCdeSettings(db: Db, projectId: string): Promise<void
 
 /**
  * Applies a template's "cde" block to a new project. Workflows are resolved by name (`workflowIds`,
- * name → id of the project's workflow template) and the archive folder by path (`folderIds`).
- * Unknown names are dropped (the template check reports them before creation).
+ * name → id of the project's workflow template), the archive folder by path (`folderIds`) and the
+ * document code standard by name (`standardIds`). Unknown names are dropped (the template check
+ * reports them before creation). Task teams (`taskTeams`) are created by the caller (cde/teams.ts).
  */
 export async function applyTemplateCde(
   db: Db,
@@ -204,6 +210,7 @@ export async function applyTemplateCde(
   cde: TemplateCdeSettings | undefined,
   workflowIds: ReadonlyMap<string, string>,
   folderIds: ReadonlyMap<string, string>,
+  standardIds: ReadonlyMap<string, string> = new Map(),
 ): Promise<void> {
   if (!cde) {
     await ensureCdeSettings(db, projectId);
@@ -215,6 +222,7 @@ export async function applyTemplateCde(
   if (cde.wipPolicy) input.wipPolicy = cde.wipPolicy;
   if (cde.adminSeesWip !== undefined) input.adminSeesWip = cde.adminSeesWip;
   if (cde.archiveFolder) input.archiveFolderId = folderIds.get(cde.archiveFolder.replace(/^\/+|\/+$/g, "")) ?? null;
+  if (cde.containerStandard) input.containerStandardId = standardIds.get(cde.containerStandard) ?? null;
   if (cde.transitions) {
     // The template check refuses duplicates; anything still invalid is dropped, not fatal.
     const seen = new Set<string>();

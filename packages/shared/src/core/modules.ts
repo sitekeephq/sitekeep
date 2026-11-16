@@ -9,6 +9,7 @@
 import type { ParamChangeSettings } from "../coordination/param-change.js";
 import type { ReportModule } from "../reports/reports.js";
 import type { WorkCategory } from "../works/work-catalog.js";
+import type { TemplateIssueCategory, TemplateIssueField } from "../platform/template-v2.js";
 import { type ProjectModule, type ProjectModuleState } from "./module-state.js";
 import { SHARED_DEFAULT_LANGUAGE, labelText, sharedText } from "../platform/i18n.js";
 
@@ -38,6 +39,12 @@ export function projectModuleHelp(m: ProjectModule, lang: string = SHARED_DEFAUL
 /** Stored in projects.settings (jsonb). Missing modules count as on. */
 export interface ProjectSettings {
   modules?: Partial<Record<ProjectModule, boolean>>;
+  /** Language the project was set up in (project template v2: picks the template's per-language values). */
+  language?: string;
+  /** Issue types offered for new issues, by category (project template v2 `issues`); missing = the built-in types. */
+  issueTypes?: TemplateIssueCategory[];
+  /** Issue fields the template asked for; kept for later (issues have no custom fields yet). */
+  issueFields?: TemplateIssueField[];
   /** Parameter change requests (Değişiklik Talebi): approval switch and approver role. */
   paramChange?: Partial<ParamChangeSettings>;
 }

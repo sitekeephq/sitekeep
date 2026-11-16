@@ -14,7 +14,7 @@ import { DEFAULT_CDE_SETTINGS, type CdeSettingsDto } from "@sitekeep/shared";
 import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
-import { auditLog, fileVersions, files, folders, projects, reviewFiles, reviews, users, workflowTemplates } from "../../src/db/schema.js";
+import { auditLog, fileVersions, files, folders, namingStandards, projects, reviewFiles, reviews, users, workflowTemplates } from "../../src/db/schema.js";
 import { JobQueue } from "../../src/jobs/queue.js";
 import { LocalStorage } from "../../src/core/platform/storage.js";
 import { copyApprovedFiles } from "../../src/workflow/review-finalization.js";
@@ -189,6 +189,9 @@ describe("ISO19650-2 5.1.7(c) CDE settings: project template cde block", () => {
     ]);
     const [archive] = await handle.db.select().from(folders).where(eq(folders.id, s.archiveFolderId!));
     expect(archive!.name).toBe("04-ARCHIVED (Arşiv)");
+    // The template's naming standard is the Document Code Standard (codes unique from WIP on).
+    const [standard] = await handle.db.select().from(namingStandards).where(eq(namingStandards.projectId, pid));
+    expect(s.containerStandardId).toBe(standard!.id);
   });
 
   it("exports the block and creates the same settings from the export", async () => {
@@ -199,6 +202,7 @@ describe("ISO19650-2 5.1.7(c) CDE settings: project template cde block", () => {
       wipPolicy: "team_only",
       adminSeesWip: true,
       archiveFolder: "04-ARCHIVED (Arşiv)",
+      containerStandard: "ISO 19650 Kodlama",
       transitions: [
         { from: null, to: "wip", mode: "direct" },
         { from: "wip", to: "shared", mode: "review", workflow: "Ekip İçi Kontrol" },

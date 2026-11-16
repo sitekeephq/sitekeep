@@ -14,7 +14,8 @@ revision codes per version ([codes](#codes)), a transition table enforced on eve
 ([transitions](#transitions)), unique document codes ([document codes](DOCUMENT_CODES.md)), task-team
 WIP ([task teams](TASK_TEAMS.md)) and a hash-chained audit log ([audit log](AUDIT_LOG.md)). The rules
 are per project: existing projects keep working as before until an administrator switches them on, and
-projects created from the template **ISO 19650 Temel** start with them on. The clause-by-clause
+projects created from the ISO 19650 templates (**ISO 19650 Temel** / ISO 19650 Basic and the
+construction templates, [project templates](PROJECT_TEMPLATES.md)) start with them on. The clause-by-clause
 mapping, the steps to switch the rules on and the conformance test pack (`npm run test:iso`) are in
 [ISO 19650 conformance](../compliance/ISO19650.md).
 
@@ -55,8 +56,12 @@ The ISO 19650 template (`apps/server/templates/iso19650-temel.json`) sets `enfor
 `codeScheme: "iso_uk_na"`, `wipPolicy: "team_only"`, `adminSeesWip: true`, the archive folder
 `04-ARCHIVED (Arşiv)` and this table. Its Shared and Published folders also carry the naming standard
 "ISO 19650 Kodlama" and the folder review gate (`gate`), so a direct upload there is refused by the gate
-first. It does not set `container_standard_id`: choose it in Project Settings → CDE (**Document Code
-Standard**) to make document codes unique from WIP on ([document codes](DOCUMENT_CODES.md)).
+first. It sets `container_standard_id` to that standard (`containerStandard`), so document codes are
+unique from WIP on ([document codes](DOCUMENT_CODES.md)), and one task team per party (`taskTeams`).
+The construction templates (`iso19650-yapim-tr`, `iso19650-yapim-en`) set the same rules with their own
+workflows: WIP → Shared through any approved review (three workflows share), Shared → Published through
+"Approval: Consultant + Designer → Client acceptance → Publish", the archive folder `40-ARCHIVED`, and the
+contractor's team as the lead.
 
 | From | To | Mode |
 |---|---|---|
@@ -94,7 +99,10 @@ A template may carry a `"cde"` block, applied when a project is created from it 
 ```
 
 `workflow` names a workflow of the same template; `archiveFolder` is a folder path from the project
-root. The template check refuses unknown workflows and duplicate transitions.
+root; `containerStandard` names a naming standard of the template (the Document Code Standard);
+`taskTeams` lists the slots that get a task team, with the lead (`[{ "slot": "yuklenici", "lead": true }]`).
+The template check refuses unknown workflows, naming standards and slots, and duplicate transitions.
+The other keys of a template: [project templates](PROJECT_TEMPLATES.md).
 
 ## Codes
 

@@ -123,6 +123,23 @@ export interface TemplateCdeSettings {
   /** Path of the archive folder, e.g. "04-ARCHIVED (Arşiv)". */
   archiveFolder?: string;
   transitions?: TemplateCdeTransition[];
+  /**
+   * Name of a naming standard of the template: the project's Document Code Standard
+   * (`container_standard_id`), so document codes are unique from WIP on.
+   */
+  containerStandard?: string;
+  /**
+   * Task teams by slot (ISO-5, D-4). When given, exactly these slots get a task team (when a company
+   * is mapped to them); `lead` marks the lead appointed party's team. Absent: one team per mapped slot.
+   */
+  taskTeams?: TemplateTaskTeam[];
+}
+
+/** A task team of a project template: the team of the company mapped to `slot`. */
+export interface TemplateTaskTeam {
+  slot: string;
+  /** The lead appointed party's team. */
+  lead?: boolean;
 }
 
 /** Key of a transition (the null state written as "upload"), e.g. "upload>wip", "wip>shared". */

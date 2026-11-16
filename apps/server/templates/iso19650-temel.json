@@ -1,7 +1,11 @@
 {
-  "format": "7d-cde/project-template@1",
-  "name": "ISO 19650 Temel",
-  "description": "Taraf başına çalışma (WIP) alanı, ortak paylaşılan alan (inceleme / onay), yayınlanan ve arşivlenen. Kodlama paylaşılan ve yayınlanan alanlarda zorunlu; dosyalar bu alanlara yalnız onaylı inceleme ile girer.",
+  "format": "7d-cde/project-template@2",
+  "name": { "tr": "ISO 19650 Temel", "en": "ISO 19650 Basic" },
+  "description": {
+    "tr": "Taraf başına çalışma (WIP) alanı, ortak paylaşılan alan (inceleme / onay), yayınlanan ve arşivlenen. Kodlama paylaşılan ve yayınlanan alanlarda zorunlu; dosyalar bu alanlara yalnız onaylı inceleme ile girer.",
+    "en": "A work in progress (WIP) area per party, a common shared area (review / approval), published and archived. Naming is required in the shared and published areas; files enter them only through an approved review. Folder names are Turkish."
+  },
+  "language": "tr",
   "modules": { "correspondence": true, "rfi": false, "submittals": false, "meetings": false, "transmittals": false, "issues": true, "reviews": true, "forms": false, "coordination": false, "schedule": false, "spec": false, "reports": true },
   "cde": {
     "codeScheme": "iso_uk_na",
@@ -9,6 +13,8 @@
     "wipPolicy": "team_only",
     "adminSeesWip": true,
     "archiveFolder": "04-ARCHIVED (Arşiv)",
+    "containerStandard": "ISO 19650 Kodlama",
+    "taskTeams": [{ "slot": "idare" }, { "slot": "musavir" }, { "slot": "tasarimci" }, { "slot": "yuklenici" }],
     "transitions": [
       { "from": null, "to": "wip", "mode": "direct" },
       { "from": "wip", "to": "shared", "mode": "review", "workflow": "Ekip İçi Kontrol" },

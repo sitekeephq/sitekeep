@@ -39,8 +39,8 @@ The signatures of `FolderTree`, `effectivePermission` and `requireAction` are un
 `FolderTree.load` reads the policy itself, and a `FolderTree` built without it behaves as `grants`.
 
 The rule does not change existing projects. Their policy stays `grants` until an administrator
-switches it on. New projects from the ISO 19650 template (`apps/server/templates/iso19650-temel.json`)
-start with `wipPolicy: "team_only"`.
+switches it on. New projects from the ISO 19650 templates (`iso19650-temel`, `iso19650-yapim-tr`,
+`iso19650-yapim-en`) start with `wipPolicy: "team_only"`.
 
 ## Exception grants (D-3)
 
@@ -77,7 +77,10 @@ adds the reason `task_team_wip` for members outside the team, and the explanatio
 `apps/server/src/cde/teams.ts`. Seeding is idempotent and never undoes an administrator's choice:
 
 - **New project from a template.** One team per slot company, with the slot's code (else the
-  company code), plus a team for the creator's company. A WIP folder whose direct grants name
+  company code), plus a team for the creator's company. A template's `cde.taskTeams`
+  (`[{ "slot": "yuklenici", "lead": true }]`, [project templates](PROJECT_TEMPLATES.md#cde-block))
+  limits the teams to the listed slots and marks the lead appointed party's team (`is_lead`); the
+  construction templates make the contractor's team the lead. A WIP folder whose direct grants name
   exactly one slot company is owned by that company's team; its subfolders inherit the owner.
 - **New member, or a member's company changed.** The member joins their company's team if the
   project has one.

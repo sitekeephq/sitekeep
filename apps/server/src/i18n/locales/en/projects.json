@@ -32,5 +32,11 @@
     "droppedAssignees_other": "{{count}} person- or team-based workflow assignments were not included in the Template.",
     "lostCopyFolders_one": "The copy target folder of {{count}} workflow was not found; the target folder is empty in the Template.",
     "lostCopyFolders_other": "The copy target folder of {{count}} workflows was not found; the target folder is empty in the Template."
+  },
+  "parts": {
+    "transmittalMissing": "The project has no transmittal work type; the transmittal settings were not applied.",
+    "numberingRefused": "Number pattern not applied: {{problem}}",
+    "transmittalAttributes": "The columns of the transmittal cover sheet are fixed; the template's attribute list was not applied.",
+    "issueFields": "Issue custom fields are kept with the project settings; issues do not have custom fields yet."
   }
 }

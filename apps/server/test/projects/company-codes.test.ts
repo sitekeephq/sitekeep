@@ -123,17 +123,19 @@ describe("company short codes", () => {
   });
 
   it("defaults template slot codes to the company code", async () => {
+    // Hilal's code (also set by the Manage-only step above), so the test does not depend on it.
+    await admin.patch(`/companies/${co.HILL}`, { code: "HLL" });
     const r = await admin.post("/projects/from-template", {
       code: "CC2",
       name: "Şablon kodları",
       templateId: "bina-veri-merkezi",
-      // Poyraz has code PSF (template default PAS); Hilal now HLL; İBB has IBB1 but the typed code wins.
+      // Poyraz has code PSF (template default KYA); Hilal now HLL; İBB has IBB1 but the typed code wins.
       slotCompanies: { yuklenici: co.PAS, musavir: co.HILL, idare: co.IBB },
       slotCodes: { idare: "IDR" },
     });
     expect(r.status, JSON.stringify(r.body)).toBe(200);
     const std = (await admin.get(`/projects/${r.body.id}/naming-standards`)).body[0].definition;
-    // Unmapped "tasarimci" keeps the template default (CNS).
-    expect(std.fields[1].values.map((v: { code: string }) => v.code)).toEqual(["PSF", "CNS", "HLL", "IDR"]);
+    // Unmapped "tasarimci" keeps the template default (ATL).
+    expect(std.fields[1].values.map((v: { code: string }) => v.code)).toEqual(["PSF", "ATL", "HLL", "IDR"]);
   });
 });

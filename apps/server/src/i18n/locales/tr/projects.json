@@ -32,5 +32,11 @@
     "droppedAssignees_other": "{{count}} kişi veya ekip bazlı akış ataması şablona alınmadı.",
     "lostCopyFolders_one": "{{count}} akışın kopya hedef klasörü bulunamadı; şablonda hedef klasör boş.",
     "lostCopyFolders_other": "{{count}} akışın kopya hedef klasörü bulunamadı; şablonda hedef klasör boş."
+  },
+  "parts": {
+    "transmittalMissing": "Projede gönderim formu iş tipi yok; gönderim formu ayarları uygulanmadı.",
+    "numberingRefused": "Numara düzeni uygulanmadı: {{problem}}",
+    "transmittalAttributes": "Gönderim formu kapak sayfasının sütunları sabittir; şablondaki öznitelik listesi uygulanmadı.",
+    "issueFields": "Sorun özel alanları proje ayarlarında saklandı; sorunlarda henüz özel alan yok."
   }
 }

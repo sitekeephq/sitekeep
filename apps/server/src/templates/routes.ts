@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { AppDeps } from "../app/deps.js";
 import { FolderTree, projectAccess, requireProjectAdmin } from "../core/security/access.js";
@@ -15,13 +15,24 @@ import {
 import { toFolderDto } from "../modules/documents/public.js";
 import { toProjectDto } from "../projects/dto.js";
 
-export async function templateRoutes(api: FastifyInstance, { db }: AppDeps) {
-  /** Built-in project templates with slots, editable dimensions and counts. */
-  api.get("/templates", async () => templateSummaries());
+const languageQuery = z.string().regex(/^[a-z]{2}$/);
 
-  /** The template JSON itself. */
-  api.get<{ Params: { id: string } }>("/templates/:id", async (req) => {
-    const t = builtInTemplates().get(req.params.id);
+/** `?language=` when it is a language code, else the requester's language. */
+function templateLanguage(req: FastifyRequest<{ Querystring: { language?: string } }>): string {
+  const q = languageQuery.safeParse(req.query.language);
+  return q.success ? q.data : requestLanguage(req);
+}
+
+export async function templateRoutes(api: FastifyInstance, { db }: AppDeps) {
+  /**
+   * Built-in project templates with slots, editable dimensions, counts and v2 parts; per-language
+   * names in `?language=` (the project language), else the requester's language.
+   */
+  api.get<{ Querystring: { language?: string } }>("/templates", async (req) => templateSummaries(templateLanguage(req)));
+
+  /** The template JSON itself, per-language values resolved as for the list. */
+  api.get<{ Params: { id: string }; Querystring: { language?: string } }>("/templates/:id", async (req) => {
+    const t = builtInTemplates(templateLanguage(req)).get(req.params.id);
     if (!t) throw notFound(msg("templates:entities.template"));
     return t;
   });
@@ -33,7 +44,7 @@ export async function templateRoutes(api: FastifyInstance, { db }: AppDeps) {
   api.post("/projects/from-template", async (req) => {
     if (!req.user!.isAdmin) throw forbidden(msg("templates:errors.adminRequired"));
     const r = await createProjectFromTemplate(db, req.user!, req.body, requestLanguage(req));
-    return { ...toProjectDto(r.project, true), warnings: r.warnings, counts: r.counts };
+    return { ...toProjectDto(r.project, true), warnings: r.warnings, counts: r.counts, parts: r.parts };
   });
 
   /** The project's structure as a template JSON (no files, records or people). */

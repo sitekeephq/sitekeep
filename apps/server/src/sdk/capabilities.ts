@@ -3,7 +3,15 @@
  * capability and must work without it: the provider may not be installed (Community, or a
  * licence without that module).
  */
-import type { ActivityDto, FormStatus } from "@sitekeep/shared";
+import type {
+  ActivityDto,
+  FormStatus,
+  TemplateForm,
+  TemplateMeeting,
+  TemplatePartResult,
+  TemplateRfiSettings,
+  TemplateSubmittalSettings,
+} from "@sitekeep/shared";
 import type { ProjectAccess } from "../core/security/access.js";
 import type { Db } from "../db/index.js";
 import type { AuthUser } from "../core/security/access.js";
@@ -35,7 +43,45 @@ export interface FormSummary {
   updatedAt: Date;
 }
 
+/**
+ * What a module's project-template handler gets (template format v2, docs/features/PROJECT_TEMPLATES.md):
+ * the new project and what the core created from the template. Called once per part after the project
+ * exists; a throw is reported as a failed part, the project stays.
+ */
+export interface TemplateApplyContext {
+  db: Db;
+  projectId: string;
+  projectCode: string;
+  /** The user creating the project. */
+  userId: string;
+  /** Project language: names the handler writes are in it. */
+  language: string;
+  /** Language of the person creating the project: notes the handler returns are in it. */
+  requesterLanguage: string;
+  /** Template slots by key: label, mapped company (null: none) and code. */
+  slots: ReadonlyMap<string, { label: string; companyId: string | null; code: string | null }>;
+  /** Workflow templates created from the template, by name. */
+  workflowIds: ReadonlyMap<string, string>;
+  /** Project roles created from the template, by `roles[].key`. */
+  roleIds: ReadonlyMap<string, string>;
+  /** Folders created with the project, by path from the root ("00-GENERAL/06-Meeting Minutes"). */
+  folderIds: ReadonlyMap<string, string>;
+}
+
+/** A module's handler of one template part. */
+export type TemplatePartHandler<T> = (ctx: TemplateApplyContext, value: T) => Promise<TemplatePartResult>;
+
 export interface Capabilities {
+  /** Manage: applies a project template's RFI, submittal and meeting settings (template format v2). */
+  "manage.templateApply": {
+    rfi?: TemplatePartHandler<TemplateRfiSettings>;
+    submittals?: TemplatePartHandler<TemplateSubmittalSettings>;
+    meetings?: TemplatePartHandler<TemplateMeeting[]>;
+  };
+  /** Field: applies a project template's form templates (template format v2). */
+  "field.templateApply": {
+    forms?: TemplatePartHandler<TemplateForm[]>;
+  };
   /** Manage: is `workId` a work (iş) of `projectId`? */
   "manage.workExists": (db: Db, projectId: string, workId: string) => Promise<boolean>;
   /** Manage: number and title of works (labels next to linked records). */

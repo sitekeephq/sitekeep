@@ -65,13 +65,32 @@ It has no tables or migrations of its own; the records are in the core's `works`
 | New work item: RFI draft; "+ New": record from file, dropping a file onto Works | `manage.ui.RfiDraftBox`, `FileRecordDialog`, `FileDropZone` |
 | Project Settings → Modules | Manage switches are visible only when installed |
 | `manage.workExists`, `manage.workLabels` | Provided by the core's Works engine (used by Cost, Coordinate) |
+| Project templates: the template's `rfi`, `submittals`, `meetings` | `manage.templateApply` ([below](#project-templates)) |
+
+## Project templates
+
+A project template (format v2, [project templates](../features/PROJECT_TEMPLATES.md#module-hook)) may carry
+RFI, submittal and meeting settings. The core hands them to Manage through the `manage.templateApply`
+capability after the project is created; without Manage, or with a version without the handler, they are
+skipped and reported (`module_not_installed` / `unsupported`).
+
+| Part | Applied (branch `feat/template-apply` of `sitekeep-manage`, `server/template-apply.ts`) | Not applied yet (reported as a note) |
+|---|---|---|
+| `rfi` | On the project's RFI work type through the SDK's `patchWorkType`: `types` → options of the `disiplin` field (the `defaultType` first), `categories` → `kategori`, `responseDays` → `dueDays`, `numbering` → number pattern (checked), `workflow` → the default workflow | `permissions` (creator, coordinator, reviewer, manager, watcher): RFI roles follow the steps of the RFI workflow; a per-type role list needs a place on the work type and checks in the Works engine |
+| `submittals` | On the submittal item type: `itemTypes` → `tur`, `specSections` → `disiplin` (also on the package type), `responseDays`, `numbering`, `workflow` | `responses` (the answers come from the workflow steps' outcome options), `watchers` |
+| `meetings` | The meeting kinds: names → options of the meeting type's `tur` field | Standard agenda per kind, invited parties and the minutes folder: Manage has no meeting templates yet. Needed: store them per kind (for example on the meeting type's settings), fill the agenda and attendees of a new meeting of that kind, and file the minutes PDF in `minutesFolder` when the minutes are published |
+
+Release: the handler needs SDK 0.13.0 (`patchWorkType`, `TemplateApplyContext`). Publish the SDK
+(`sdk-v0.13.0`), raise the module's SDK `devDependencies` to `0.13.0` and `peerDependencies` to
+`>=0.13.0 <1.0.0`, release the module and pin it here. `apps/server/test/modules/manage/template-apply.test.ts`
+runs once the installed version has the handler.
 
 ## Tests
 
 | Location | What |
 |---|---|
 | `sitekeep-manage`: `npm test` | Boundary check, matching for record from file |
-| `apps/server/test/modules/manage/` | Registers, meetings, workflow steps, "Drop and save", formal correspondence |
+| `apps/server/test/modules/manage/` | Registers, meetings, workflow steps, "Drop and save", formal correspondence, project template settings (`template-apply.test.ts`, skipped while the installed version has no handler) |
 | Cross-cutting tests | Steps that create RFIs / correspondence / meetings run with `hasManage` |
 
 ## What stays in the core

@@ -674,7 +674,9 @@ function NewIssueDialog({
   const [priority, setPriority] = useState<IssuePriority>("normal");
   const [assignee, setAssignee] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [type, setType] = useState(ISSUE_TYPES[0]!.value);
+  // The project's issue types (from its template), else the built-in ones.
+  const projectTypes = project.issueTypes?.filter((g) => g.types.length);
+  const [type, setType] = useState(projectTypes?.[0]?.types[0] ?? ISSUE_TYPES[0]!.value);
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<IssueDto | null>(null);
@@ -729,11 +731,21 @@ function NewIssueDialog({
               <div style={{ flex: 1 }}>
                 <label>{t("common:fields.type")}</label>
                 <select value={type} onChange={(e) => setType(e.target.value)}>
-                  {ISSUE_TYPES.map((x) => (
-                    <option key={x.value} value={x.value}>
-                      {t(`newIssue.types.${x.key}`)}
-                    </option>
-                  ))}
+                  {projectTypes?.length
+                    ? projectTypes.map((g) => (
+                        <optgroup key={g.category} label={g.category}>
+                          {g.types.map((x) => (
+                            <option key={x} value={x}>
+                              {x}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))
+                    : ISSUE_TYPES.map((x) => (
+                        <option key={x.value} value={x.value}>
+                          {t(`newIssue.types.${x.key}`)}
+                        </option>
+                      ))}
                 </select>
               </div>
               <div style={{ flex: 1 }}>

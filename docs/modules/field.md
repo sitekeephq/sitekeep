@@ -53,13 +53,33 @@ shared types (`packages/shared`), the contracts above. Strings are in the module
 | Menu, pages, the "Forms" view in Works, legacy addresses | `WebModule.projectNav`, `projectRoutes`; `HubView.webModule`, `LEGACY_URLS.module` |
 | "+ New" → Form | `field.newFormDialog` |
 | PDF fonts | SDK `pdfFontBytes()` |
+| Project templates: the template's `forms` | `field.templateApply` ([below](#project-templates)) |
+
+## Project templates
+
+A project template (format v2, [project templates](../features/PROJECT_TEMPLATES.md#module-hook)) may carry
+form templates. The core hands them to Field through the `field.templateApply` capability after the
+project is created; without Field, or with a version without the handler, they are skipped and reported.
+
+Applied (branch `feat/template-apply` of `sitekeep-field`, `server/template-apply.ts`): each entry of
+`forms` becomes a form template with the entry's `key` as code, its name and category, one section per
+template section with a multi-line text item, the party filling the section (`editor`, a slot) as the
+item's help ("Filled by: Contractor"), and the template's workflow (`workflow`, by name) as the approval
+flow. A code the project already uses is skipped and reported.
+
+Not applied yet: enforcing the section editor (only that party may fill the section). Needed: an
+editor per section in `FormTemplateSchema` and a check in the fill and submit routes.
+
+Release: the handler needs SDK 0.13.0 (`TemplateApplyContext`). Publish the SDK, raise the module's SDK
+`devDependencies` / `peerDependencies`, release the module and pin it here.
+`apps/server/test/modules/field/template-apply.test.ts` runs once the installed version has the handler.
 
 ## Tests
 
 | Location | What |
 |---|---|
 | `sitekeep-field`: `npm test` | Boundary check, PDF field ID unit test (test copies instead of the SDK) |
-| `apps/server/test/modules/field/` | Forms API, PDF templates, field detection, writing to PDF, workflow |
+| `apps/server/test/modules/field/` | Forms API, PDF templates, field detection, writing to PDF, workflow, project template forms (`template-apply.test.ts`, skipped while the installed version has no handler) |
 | Cross-cutting tests (AI, MCP, reports, hub, developer tools) | Form steps with `hasField` (`test/helpers/modules.ts`) |
 | `e2e/specs/` | form scenarios |
 

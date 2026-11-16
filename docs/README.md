@@ -42,6 +42,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 
 ## Features
 
+- [Project templates](features/PROJECT_TEMPLATES.md)
 - [CDE states (ISO 19650)](features/CDE_STATES.md)
 - [Audit log](features/AUDIT_LOG.md)
 - [OpenCDE](features/OPENCDE.md)

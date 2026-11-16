@@ -12,17 +12,17 @@ published as a versioned package and pulled into the application at a pinned ver
 
 | Module | Repository | Package | Version in this repository | Status |
 |---|---|---|---|---|
-| **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/7Dimensions-Project/sitekeep-cost) (private) | `@7dimensions-project/sitekeep-ee-cost` | `0.6.1` | Separate repository, GitHub Packages. [Details](cost.md) |
-| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (private) | `@7dimensions-project/sitekeep-ee-field` | `0.3.2` | Separate repository, GitHub Packages. [Details](field.md) |
-| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/7Dimensions-Project/sitekeep-coordinate) (private) | `@7dimensions-project/sitekeep-ee-coordinate` | `0.3.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
-| **Planning**: Schedule (P6, MS Project, Excel), versions, 4D | [sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private) | `@7dimensions-project/sitekeep-ee-planning` | `0.3.0` | Separate repository, GitHub Packages. [Details](planning.md) |
-| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/7Dimensions-Project/sitekeep-ai) (private) | `@7dimensions-project/sitekeep-ee-ai` | `0.4.0` | Separate repository, GitHub Packages. [Details](ai.md) |
-| **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (private) | `@7dimensions-project/sitekeep-ee-manage` | `0.3.1` | Separate repository; the Works engine is in the core. [Details](manage.md) |
-| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/7Dimensions-Project/sitekeep-connect) (private) | `@7dimensions-project/sitekeep-ee-connect` | `0.3.2` | Separate repository; Office conversion is in the core. [Details](connect.md) |
+| **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/7Dimensions-Project/sitekeep-cost) (private) | `@7dimensions-project/sitekeep-ee-cost` | `0.6.2` | Separate repository, GitHub Packages. [Details](cost.md) |
+| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (private) | `@7dimensions-project/sitekeep-ee-field` | `0.4.0` | Separate repository, GitHub Packages. [Details](field.md) |
+| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/7Dimensions-Project/sitekeep-coordinate) (private) | `@7dimensions-project/sitekeep-ee-coordinate` | `0.3.1` | Separate repository, GitHub Packages. [Details](coordinate.md) |
+| **Planning**: Schedule (P6, MS Project, Excel), versions, 4D | [sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private) | `@7dimensions-project/sitekeep-ee-planning` | `0.3.1` | Separate repository, GitHub Packages. [Details](planning.md) |
+| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/7Dimensions-Project/sitekeep-ai) (private) | `@7dimensions-project/sitekeep-ee-ai` | `0.4.1` | Separate repository, GitHub Packages. [Details](ai.md) |
+| **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (private) | `@7dimensions-project/sitekeep-ee-manage` | `0.4.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
+| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/7Dimensions-Project/sitekeep-connect) (private) | `@7dimensions-project/sitekeep-ee-connect` | `0.3.3` | Separate repository; Office conversion is in the core. [Details](connect.md) |
 
 | Package | Source | Version |
 |---|---|---|
-| `@7dimensions-project/sitekeep-sdk` | this repository, `packages/sdk` | `0.12.0` |
+| `@7dimensions-project/sitekeep-sdk` | this repository, `packages/sdk` | `0.13.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 
@@ -150,6 +150,8 @@ the consumer hides the feature; the provider may not be installed.
 | `field.newFormDialog` (web) | Field | Works "+ New" → Form | Option hidden |
 | `cost` (web) | Cost | 4D panel (cost colour mode, cash flow, element cost), Schedule "Cost" dialog | Cost buttons and colour mode hidden |
 | `cost.takeoff` (web) | Cost | PDF viewer "2D Take-off", saving a DWG measurement to the take-off | Button hidden, measurement only measures |
+| `manage.templateApply` (server) | Manage | Project from a template (format v2): the template's `rfi`, `submittals`, `meetings` ([project templates](../features/PROJECT_TEMPLATES.md#module-hook)) | The part is skipped and reported (`module_not_installed`, or `unsupported` for a version without the handler) |
+| `field.templateApply` (server) | Field | Project from a template (format v2): the template's `forms` | As above |
 
 New capability: add the type to `sdk/capabilities.ts`, the providing module registers it, and the consumer requests it with `capability(...)`
 / `webCapability(...)`.

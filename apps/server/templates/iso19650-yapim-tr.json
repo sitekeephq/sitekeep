@@ -1,0 +1,1893 @@
+{
+  "format": "7d-cde/project-template@2",
+  "name": {
+    "tr": "ISO 19650 Yapım Projesi (çok taraflı, Türkçe adlarla)",
+    "en": "ISO 19650 Construction Project (multi-party, Turkish names)"
+  },
+  "description": {
+    "tr": "İdare, müşavir, tasarımcı ve yüklenici için ISO 19650-1/-2 düzeni: taraf başına çalışma alanı (WIP), iç kontrol (kontrol → gözden geçirme → yetkilendirme), koordinasyon ve onay için paylaşılan alanlar, müşavir + tasarımcı → idare kabulüyle yayınlama, arşiv. Durum geçişleri, görev ekipleri ve tekil doküman kodu açık. Doküman ve yazışma kodlaması, uygunluk ve revizyon kodları (S0–S4, A, B, CR; P01 / C01), roller, sorun tipleri, gönderim formu, RFI, malzeme/yöntem onayı, toplantı ve form şablonları. Canlıda çalışan bir veri merkezi yapım projesinin düzeninden genelleştirildi.",
+    "en": "ISO 19650-1/-2 set-up for client, consultant, designer and contractor: a WIP area per party, internal check → review → authorize, shared areas for coordination and approval, publishing after consultant + designer review and client acceptance, archive. State transitions, task teams and unique document codes on. Document and correspondence naming, suitability and revision codes (S0–S4, A, B, CR; P01 / C01), roles, issue types, transmittals, RFI, material/method approval, meeting and form templates. Generalized from a live data-centre construction project."
+  },
+  "language": "tr",
+  "family": "iso19650-yapim",
+  "modules": {
+    "correspondence": true,
+    "rfi": true,
+    "submittals": true,
+    "meetings": true,
+    "transmittals": true,
+    "issues": true,
+    "reviews": true,
+    "forms": true,
+    "coordination": true,
+    "schedule": true,
+    "spec": true,
+    "reports": true
+  },
+  "cde": {
+    "codeScheme": "iso_uk_na",
+    "enforceTransitions": true,
+    "wipPolicy": "team_only",
+    "adminSeesWip": true,
+    "archiveFolder": "40-ARŞİV (Archived)",
+    "containerStandard": "ISO 19650 Doküman Kodlama",
+    "taskTeams": [
+      {
+        "slot": "idare"
+      },
+      {
+        "slot": "musavir"
+      },
+      {
+        "slot": "tasarimci"
+      },
+      {
+        "slot": "yuklenici",
+        "lead": true
+      }
+    ],
+    "transitions": [
+      {
+        "from": null,
+        "to": "wip",
+        "mode": "direct"
+      },
+      {
+        "from": "wip",
+        "to": "shared",
+        "mode": "review"
+      },
+      {
+        "from": "shared",
+        "to": "wip",
+        "mode": "auto"
+      },
+      {
+        "from": "shared",
+        "to": "published",
+        "mode": "review",
+        "workflow": "Onay: Müşavir + Tasarımcı → İdare kabul → Yayınla"
+      },
+      {
+        "from": "published",
+        "to": "archived",
+        "mode": "auto"
+      }
+    ]
+  },
+  "slots": [
+    {
+      "key": "idare",
+      "label": {
+        "tr": "İdare / İşveren",
+        "en": "Client / Appointing party"
+      },
+      "party": "client",
+      "code": "IDR",
+      "description": {
+        "tr": "Bilgiyi kabul eden taraf (appointing party). Yayınlamayı onaylar.",
+        "en": "Appointing party; accepts information before it is published."
+      }
+    },
+    {
+      "key": "musavir",
+      "label": {
+        "tr": "Müşavir / Proje Yönetimi",
+        "en": "Consultant / Project manager"
+      },
+      "party": "consultant",
+      "code": "MSV",
+      "description": {
+        "tr": "İdare adına koordinasyon ve teknik kontrol; RFI koordinatörü.",
+        "en": "Coordinates and checks on behalf of the client; RFI coordinator."
+      }
+    },
+    {
+      "key": "tasarimci",
+      "label": {
+        "tr": "Tasarımcı",
+        "en": "Designer"
+      },
+      "party": "designer",
+      "code": "TSR",
+      "description": {
+        "tr": "Tasarım ve mühendislik ekibi; RFI ve malzeme onaylarında teknik görüş verir.",
+        "en": "Design and engineering team; answers RFIs and gives technical opinion on submittals."
+      }
+    },
+    {
+      "key": "yuklenici",
+      "label": {
+        "tr": "Yüklenici",
+        "en": "Contractor"
+      },
+      "party": "contractor",
+      "code": "YKL",
+      "description": {
+        "tr": "Baş yüklenici (lead appointed party); yetkilendirir ve paylaşır.",
+        "en": "Lead appointed party; authorizes and shares information."
+      }
+    }
+  ],
+  "dimensions": {
+    "Disiplin": [
+      "MIM",
+      "INS",
+      "MEK",
+      "ELK",
+      "ALT",
+      "PEY",
+      "GEO",
+      "HRT",
+      "ICM",
+      "YNG",
+      "KRD"
+    ],
+    "Yapım konusu": [
+      "01-Kalite Kontrol",
+      "02-Yapım Yöntemleri",
+      "03-Malzeme Sunumları",
+      "04-İş Programı",
+      "05-Test ve Devreye Alma",
+      "06-İSG-Ç"
+    ]
+  },
+  "folders": [
+    {
+      "name": "00-GENEL",
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        },
+        {
+          "slot": "idare",
+          "level": "edit"
+        },
+        {
+          "slot": "musavir",
+          "level": "edit"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-İhale ve Sözleşme Dokümanları",
+          "children": [
+            "Sözleşme",
+            "Teklif Dosyası",
+            "Teknik Şartnameler",
+            "İhale Projeleri ve Raporları"
+          ]
+        },
+        {
+          "name": "02-Bilgi Gereksinimleri (OIR, AIR, PIR, EIR)",
+          "grants": [
+            {
+              "slot": "idare",
+              "level": "manage"
+            }
+          ]
+        },
+        {
+          "name": "03-BIM Uygulama Planı ve Teslim Planları (BEP, MIDP, TIDP)",
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "04-Standartlar ve Şablonlar",
+          "children": [
+            "Antet ve Şablonlar",
+            "BIM Standartları",
+            "Tasarım Standartları",
+            "Yapım Standartları"
+          ]
+        },
+        "05-Kullanım Kılavuzları",
+        {
+          "name": "06-Toplantı Tutanakları",
+          "children": [
+            "01-İdare",
+            "02-Tasarım",
+            "03-Saha Koordinasyon",
+            "04-Kalite Kontrol",
+            "05-Elektromekanik",
+            "06-İş Programı",
+            "07-BIM Koordinasyon",
+            "08-İSG-Ç"
+          ]
+        },
+        {
+          "name": "07-Yazışmalar",
+          "naming": "Yazışma Kodlama",
+          "attributes": [
+            "Yazı Tarihi"
+          ],
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            },
+            {
+              "slot": "tasarimci",
+              "level": "edit"
+            }
+          ],
+          "children": [
+            "01-Gelen",
+            "02-Giden",
+            "03-Değişiklik Talep Formları",
+            "04-Alt Yüklenici Onay Formları",
+            "05-Mühendis Talimatları",
+            "06-Gönderim Formları (Transmittal)"
+          ]
+        },
+        "08-Yer Teslim Tutanakları"
+      ]
+    },
+    {
+      "name": "10-ÇALIŞMA ALANLARI (WIP)",
+      "state": "wip",
+      "children": [
+        {
+          "name": "İdare",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "idare",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Müşavir",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "musavir",
+              "level": "edit"
+            }
+          ]
+        },
+        {
+          "name": "Tasarımcı",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "tasarimci",
+              "level": "edit"
+            }
+          ],
+          "skeleton": {
+            "order": [
+              "Disiplin"
+            ]
+          }
+        },
+        {
+          "name": "Yüklenici",
+          "state": "wip",
+          "grants": [
+            {
+              "slot": "yuklenici",
+              "level": "edit"
+            }
+          ],
+          "skeleton": {
+            "order": [
+              "Disiplin"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20-PAYLAŞILAN (Shared)",
+      "state": "shared",
+      "naming": "ISO 19650 Doküman Kodlama",
+      "attributes": [
+        "Pafta / Doküman Adı"
+      ],
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download_markup"
+        }
+      ],
+      "children": [
+        {
+          "name": "01-İnceleme için",
+          "state": "shared",
+          "stateLabel": "İnceleme için",
+          "skeleton": {
+            "order": [
+              "Disiplin"
+            ]
+          }
+        },
+        {
+          "name": "02-Onay için",
+          "state": "shared",
+          "stateLabel": "Onay için",
+          "skeleton": {
+            "order": [
+              "Disiplin"
+            ]
+          }
+        },
+        {
+          "name": "03-Yapım Dokümanları",
+          "state": "shared",
+          "stateLabel": "Onay için",
+          "skeleton": {
+            "order": [
+              "Yapım konusu"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30-YAYINLANAN (Published)",
+      "state": "published",
+      "naming": "ISO 19650 Doküman Kodlama",
+      "attributes": [
+        "Pafta / Doküman Adı"
+      ],
+      "gate": true,
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view_download"
+        }
+      ],
+      "skeleton": {
+        "order": [
+          "Disiplin"
+        ]
+      },
+      "children": [
+        {
+          "name": "Yapım Dokümanları",
+          "state": "published",
+          "skeleton": {
+            "order": [
+              "Yapım konusu"
+            ]
+          }
+        },
+        {
+          "name": "İş Sonu (As-Built)",
+          "state": "published",
+          "stateLabel": "İş Sonu",
+          "lazy": true
+        }
+      ]
+    },
+    {
+      "name": "40-ARŞİV (Archived)",
+      "state": "archived",
+      "grants": [
+        {
+          "slot": "*",
+          "level": "view"
+        },
+        {
+          "slot": "idare",
+          "level": "view_download"
+        }
+      ]
+    }
+  ],
+  "namingStandards": [
+    {
+      "name": "ISO 19650 Doküman Kodlama",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "Proje",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Proje kodu"
+            }
+          ]
+        },
+        {
+          "name": "Kaynak",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Hacim",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ",
+              "description": "Tüm hacimler / sistemler"
+            },
+            {
+              "code": "XX",
+              "description": "Hacim yok"
+            }
+          ]
+        },
+        {
+          "name": "Seviye",
+          "type": "list",
+          "values": [
+            {
+              "code": "ZZ",
+              "description": "Birden çok seviye"
+            },
+            {
+              "code": "XX",
+              "description": "Seviye yok"
+            },
+            {
+              "code": "B2",
+              "description": "2. bodrum"
+            },
+            {
+              "code": "B1",
+              "description": "1. bodrum"
+            },
+            {
+              "code": "00",
+              "description": "Zemin"
+            },
+            {
+              "code": "01",
+              "description": "1. kat"
+            },
+            {
+              "code": "02",
+              "description": "2. kat"
+            },
+            {
+              "code": "03",
+              "description": "3. kat"
+            },
+            {
+              "code": "M1",
+              "description": "1. asma kat"
+            },
+            {
+              "code": "RF",
+              "description": "Çatı"
+            }
+          ]
+        },
+        {
+          "name": "Tip",
+          "type": "list",
+          "values": [
+            {
+              "code": "AF",
+              "description": "Animasyon"
+            },
+            {
+              "code": "BQ",
+              "description": "Metraj listesi"
+            },
+            {
+              "code": "CA",
+              "description": "Hesap"
+            },
+            {
+              "code": "CM",
+              "description": "Birleşik model"
+            },
+            {
+              "code": "CO",
+              "description": "Yazışma"
+            },
+            {
+              "code": "CP",
+              "description": "Maliyet planı"
+            },
+            {
+              "code": "CR",
+              "description": "Çakışma sunumu"
+            },
+            {
+              "code": "DB",
+              "description": "Veritabanı"
+            },
+            {
+              "code": "DR",
+              "description": "Çizim"
+            },
+            {
+              "code": "FN",
+              "description": "Dosya notu"
+            },
+            {
+              "code": "HS",
+              "description": "Sağlık ve güvenlik"
+            },
+            {
+              "code": "IE",
+              "description": "Bilgi değişim dosyası"
+            },
+            {
+              "code": "M2",
+              "description": "2B model"
+            },
+            {
+              "code": "M3",
+              "description": "3B model"
+            },
+            {
+              "code": "MI",
+              "description": "Tutanak / aksiyon notu"
+            },
+            {
+              "code": "MR",
+              "description": "Model sunumu"
+            },
+            {
+              "code": "MS",
+              "description": "Yapım yöntemi"
+            },
+            {
+              "code": "PP",
+              "description": "Sunum"
+            },
+            {
+              "code": "PR",
+              "description": "Program"
+            },
+            {
+              "code": "RD",
+              "description": "Mahal veri sayfası"
+            },
+            {
+              "code": "RI",
+              "description": "Bilgi talebi"
+            },
+            {
+              "code": "RP",
+              "description": "Rapor"
+            },
+            {
+              "code": "SA",
+              "description": "Mahal çizelgesi"
+            },
+            {
+              "code": "SH",
+              "description": "Çizelge"
+            },
+            {
+              "code": "SN",
+              "description": "Kroki"
+            },
+            {
+              "code": "SP",
+              "description": "Şartname"
+            },
+            {
+              "code": "SU",
+              "description": "Etüt / Ölçüm"
+            },
+            {
+              "code": "VS",
+              "description": "Görselleştirme"
+            }
+          ]
+        },
+        {
+          "name": "Rol",
+          "type": "list",
+          "values": [
+            {
+              "code": "MIM",
+              "description": "Mimari"
+            },
+            {
+              "code": "INS",
+              "description": "İnşaat / Statik"
+            },
+            {
+              "code": "MEK",
+              "description": "Mekanik"
+            },
+            {
+              "code": "ELK",
+              "description": "Elektrik"
+            },
+            {
+              "code": "ALT",
+              "description": "Altyapı"
+            },
+            {
+              "code": "PEY",
+              "description": "Peyzaj"
+            },
+            {
+              "code": "GEO",
+              "description": "Geoteknik / Zemin"
+            },
+            {
+              "code": "HRT",
+              "description": "Harita"
+            },
+            {
+              "code": "ICM",
+              "description": "İç Mimari"
+            },
+            {
+              "code": "YNG",
+              "description": "Yangın"
+            },
+            {
+              "code": "KRD",
+              "description": "Koordinasyon / BIM"
+            },
+            {
+              "code": "GNL",
+              "description": "Genel"
+            }
+          ]
+        },
+        {
+          "name": "Numara",
+          "type": "number",
+          "digits": 4
+        }
+      ]
+    },
+    {
+      "name": "Yazışma Kodlama",
+      "delimiter": "-",
+      "fields": [
+        {
+          "name": "Proje",
+          "type": "list",
+          "values": [
+            {
+              "code": "{PROJE}",
+              "description": "Proje kodu"
+            }
+          ]
+        },
+        {
+          "name": "Gönderen",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Alıcı",
+          "type": "list",
+          "values": [
+            {
+              "code": "{slot:idare}",
+              "description": "{firma:idare}"
+            },
+            {
+              "code": "{slot:musavir}",
+              "description": "{firma:musavir}"
+            },
+            {
+              "code": "{slot:tasarimci}",
+              "description": "{firma:tasarimci}"
+            },
+            {
+              "code": "{slot:yuklenici}",
+              "description": "{firma:yuklenici}"
+            }
+          ]
+        },
+        {
+          "name": "Tür",
+          "type": "list",
+          "values": [
+            {
+              "code": "RFI",
+              "description": "Bilgi talebi"
+            },
+            {
+              "code": "NCR",
+              "description": "Uygunsuzluk raporu"
+            },
+            {
+              "code": "CAR",
+              "description": "Düzeltici faaliyet"
+            },
+            {
+              "code": "MOF",
+              "description": "Malzeme onay formu"
+            },
+            {
+              "code": "IYY",
+              "description": "İş yapım yöntemi"
+            },
+            {
+              "code": "ITF",
+              "description": "İş teslim / muayene talebi"
+            },
+            {
+              "code": "MUF",
+              "description": "Malzeme uygunluk formu"
+            },
+            {
+              "code": "DTF",
+              "description": "Değişiklik talep formu"
+            },
+            {
+              "code": "AYF",
+              "description": "Alt yüklenici onay formu"
+            },
+            {
+              "code": "MTL",
+              "description": "Mühendis talimatı"
+            },
+            {
+              "code": "LTR",
+              "description": "Resmi yazı"
+            },
+            {
+              "code": "TRN",
+              "description": "Gönderim formu (transmittal)"
+            },
+            {
+              "code": "TUT",
+              "description": "Toplantı tutanağı"
+            }
+          ]
+        },
+        {
+          "name": "Disiplin",
+          "type": "list",
+          "values": [
+            {
+              "code": "MIM",
+              "description": "Mimari"
+            },
+            {
+              "code": "INS",
+              "description": "İnşaat / Statik"
+            },
+            {
+              "code": "MEK",
+              "description": "Mekanik"
+            },
+            {
+              "code": "ELK",
+              "description": "Elektrik"
+            },
+            {
+              "code": "ALT",
+              "description": "Altyapı"
+            },
+            {
+              "code": "PEY",
+              "description": "Peyzaj"
+            },
+            {
+              "code": "GEO",
+              "description": "Geoteknik / Zemin"
+            },
+            {
+              "code": "HRT",
+              "description": "Harita"
+            },
+            {
+              "code": "ICM",
+              "description": "İç Mimari"
+            },
+            {
+              "code": "YNG",
+              "description": "Yangın"
+            },
+            {
+              "code": "KRD",
+              "description": "Koordinasyon / BIM"
+            },
+            {
+              "code": "GNL",
+              "description": "Genel"
+            }
+          ]
+        },
+        {
+          "name": "Numara",
+          "type": "number",
+          "digits": 4
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Pafta / Doküman Adı",
+      "type": "text"
+    },
+    {
+      "name": "Yazı Tarihi",
+      "type": "date"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Yüklenici iç kontrol → Onay için paylaş",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Kontrol (check)",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ],
+          "requiredAttributes": [
+            "Pafta / Doküman Adı"
+          ]
+        },
+        {
+          "name": "Gözden geçirme (review)",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Yetkilendirme (authorize)",
+          "assignees": [
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        }
+      ],
+      "chain": {
+        "originParty": "contractor",
+        "namePattern": "{Proje}-IK-{0000}",
+        "copyTarget": {
+          "folder": "20-PAYLAŞILAN (Shared)/02-Onay için",
+          "pattern": "{Rol}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "Tasarımcı iç kontrol → Onay için paylaş",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Kontrol (check)",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ],
+          "requiredAttributes": [
+            "Pafta / Doküman Adı"
+          ]
+        },
+        {
+          "name": "Gözden geçirme (review)",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Yetkilendirme (authorize)",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        }
+      ],
+      "chain": {
+        "originParty": "designer",
+        "namePattern": "{Proje}-IK-{0000}",
+        "copyTarget": {
+          "folder": "20-PAYLAŞILAN (Shared)/02-Onay için",
+          "pattern": "{Rol}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "Koordinasyon için paylaş (S1–S3)",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Ekip lideri yetkilendirir",
+          "assignees": [
+            {
+              "role": "project_admin"
+            },
+            {
+              "slot": "yuklenici"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "revise_resubmit",
+            "rejected"
+          ],
+          "requiredAttributes": [
+            "Pafta / Doküman Adı"
+          ]
+        }
+      ],
+      "chain": {
+        "copyTarget": {
+          "folder": "20-PAYLAŞILAN (Shared)/01-İnceleme için",
+          "pattern": "{Rol}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "Onay: Müşavir + Tasarımcı → İdare kabul → Yayınla",
+      "kind": "review",
+      "steps": [
+        {
+          "name": "Müşavir ve tasarımcı incelemesi",
+          "assignees": [
+            {
+              "slot": "musavir"
+            },
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "all",
+          "days": 5,
+          "outcomes": [],
+          "outcomeOptions": [
+            {
+              "code": "MUS-A",
+              "label": "MÜŞAVİR ONAYLADI",
+              "kind": "approved"
+            },
+            {
+              "code": "MUS-B",
+              "label": "MÜŞAVİR ŞARTLI ONAYLADI",
+              "kind": "approved_with_comments"
+            },
+            {
+              "code": "MUS-C",
+              "label": "MÜŞAVİR REVİZE ET - TEKRAR SUN",
+              "kind": "revise"
+            },
+            {
+              "code": "MUS-D",
+              "label": "MÜŞAVİR REDDETTİ",
+              "kind": "rejected"
+            }
+          ],
+          "stage": 0,
+          "requiredAttributes": [
+            "Pafta / Doküman Adı"
+          ]
+        },
+        {
+          "name": "İdare kabulü (accept)",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [],
+          "outcomeOptions": [
+            {
+              "code": "IDR-A",
+              "label": "İDARE ONAYLADI",
+              "kind": "approved"
+            },
+            {
+              "code": "IDR-B",
+              "label": "İDARE ŞARTLI ONAYLADI",
+              "kind": "approved_with_comments"
+            },
+            {
+              "code": "IDR-C",
+              "label": "İDARE REVİZE ET - TEKRAR SUN",
+              "kind": "revise"
+            },
+            {
+              "code": "IDR-D",
+              "label": "İDARE REDDETTİ",
+              "kind": "rejected"
+            }
+          ],
+          "stage": 1
+        }
+      ],
+      "chain": {
+        "stages": [
+          {
+            "name": "Müşavir ve tasarımcı",
+            "party": "consultant",
+            "days": 5,
+            "onRevise": "stop"
+          },
+          {
+            "name": "İdare",
+            "party": "client",
+            "days": 3,
+            "onRevise": "stop"
+          }
+        ],
+        "originParty": "contractor",
+        "namePattern": "{Proje}-ONY-{0000}",
+        "copyTarget": {
+          "folder": "30-YAYINLANAN (Published)",
+          "pattern": "{Rol}",
+          "onUnresolved": "base"
+        }
+      }
+    },
+    {
+      "name": "RFI: Müşavir koordinasyon → Tasarımcı cevap → Müşavir resmi cevap → İdare kapatır",
+      "kind": "rfi",
+      "steps": [
+        {
+          "name": "Müşavir koordinasyon",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "reviewed",
+            "rejected"
+          ]
+        },
+        {
+          "name": "Tasarımcı cevabı",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "reviewed"
+          ]
+        },
+        {
+          "name": "Müşavir resmi cevabı",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 1,
+          "outcomes": [
+            "reviewed",
+            "revise_resubmit"
+          ]
+        },
+        {
+          "name": "İdare kapatır",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "revise_resubmit"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Malzeme / yöntem onayı: Müşavir (+ Tasarımcı görüşü) → İdare",
+      "kind": "submittal",
+      "steps": [
+        {
+          "name": "Tasarımcı teknik görüşü",
+          "assignees": [
+            {
+              "slot": "tasarimci"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "reviewed",
+            "approved_with_comments",
+            "revise_resubmit"
+          ]
+        },
+        {
+          "name": "Müşavir değerlendirmesi",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 2,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "İdare son karar",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 3,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "reviewed",
+            "revise_resubmit",
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Değişiklik talebi (DTF): Müşavir → İdare",
+      "kind": "form",
+      "steps": [
+        {
+          "name": "Müşavir değerlendirmesi",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "İdare kararı",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ],
+          "returnTo": 0
+        }
+      ]
+    },
+    {
+      "name": "Alt yüklenici onayı (AYF): Müşavir → İdare",
+      "kind": "form",
+      "steps": [
+        {
+          "name": "Müşavir değerlendirmesi",
+          "assignees": [
+            {
+              "slot": "musavir"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "revise_resubmit",
+            "rejected"
+          ]
+        },
+        {
+          "name": "İdare kararı",
+          "assignees": [
+            {
+              "slot": "idare"
+            }
+          ],
+          "rule": "any",
+          "days": 5,
+          "outcomes": [
+            "approved",
+            "approved_with_comments",
+            "rejected"
+          ],
+          "returnTo": 0
+        }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "key": "yuklenici-kontrol",
+      "slot": "yuklenici",
+      "name": "Yüklenici - Kontrol"
+    },
+    {
+      "key": "yuklenici-gozden",
+      "slot": "yuklenici",
+      "name": "Yüklenici - Gözden Geçiren"
+    },
+    {
+      "key": "yuklenici-yetki",
+      "slot": "yuklenici",
+      "name": "Yüklenici - Yetkilendiren"
+    },
+    {
+      "key": "tasarimci-kontrol",
+      "slot": "tasarimci",
+      "name": "Tasarımcı - Kontrol"
+    },
+    {
+      "key": "tasarimci-gozden",
+      "slot": "tasarimci",
+      "name": "Tasarımcı - Gözden Geçiren"
+    },
+    {
+      "key": "tasarimci-yetki",
+      "slot": "tasarimci",
+      "name": "Tasarımcı - Yetkilendiren"
+    },
+    {
+      "key": "musavir-disiplin",
+      "slot": "musavir",
+      "name": "Müşavir - Disiplin Onayı"
+    },
+    {
+      "key": "tasarimci-disiplin",
+      "slot": "tasarimci",
+      "name": "Tasarımcı - Disiplin Görüşü"
+    },
+    {
+      "key": "idare-onay",
+      "slot": "idare",
+      "name": "İdare - Kabul / Son Onay"
+    },
+    {
+      "key": "idare-gozlemci",
+      "slot": "idare",
+      "name": "İdare - Gözlemci"
+    },
+    {
+      "key": "bim-yoneticisi",
+      "slot": "yuklenici",
+      "name": "BIM / Bilgi Yöneticisi"
+    }
+  ],
+  "issues": {
+    "categories": [
+      {
+        "category": "Tasarım Koordinasyon",
+        "types": [
+          "Tasarım hatası / eksikliği",
+          "Disiplinler arası çakışma",
+          "Doküman / çizim uyumsuzluğu"
+        ]
+      },
+      {
+        "category": "Saha Gözlemi",
+        "types": [
+          "Saha gözlemi",
+          "İmalat hatası"
+        ]
+      },
+      {
+        "category": "Kalite",
+        "types": [
+          "NCR - Uygunsuzluk",
+          "CAR - Düzeltici faaliyet",
+          "Malzeme kabul bulgusu"
+        ]
+      },
+      {
+        "category": "İSG-Ç",
+        "types": [
+          "İSG uygunsuzluğu",
+          "Ramak kala / olay",
+          "Çevre uygunsuzluğu"
+        ]
+      },
+      {
+        "category": "Test ve Devreye Alma",
+        "types": [
+          "Test bulgusu",
+          "Punch / eksik iş"
+        ]
+      }
+    ],
+    "customFields": [
+      {
+        "name": "Disiplin",
+        "type": "list",
+        "options": [
+          "MIM",
+          "INS",
+          "MEK",
+          "ELK",
+          "ALT",
+          "PEY",
+          "GEO",
+          "HRT",
+          "ICM",
+          "YNG",
+          "KRD"
+        ]
+      },
+      {
+        "name": "Sorumlu Firma",
+        "type": "list",
+        "options": [
+          "İdare",
+          "Müşavir",
+          "Tasarımcı",
+          "Yüklenici"
+        ]
+      },
+      {
+        "name": "Maliyet Etkisi",
+        "type": "list",
+        "options": [
+          "Var",
+          "Yok",
+          "Değerlendiriliyor"
+        ]
+      },
+      {
+        "name": "Süre Etkisi",
+        "type": "list",
+        "options": [
+          "Var",
+          "Yok",
+          "Değerlendiriliyor"
+        ]
+      }
+    ]
+  },
+  "transmittal": {
+    "numbering": "{Proje}-{Gönderen}-{Alıcı}-TRN-{0000}",
+    "attributes": [
+      "Kaynak",
+      "Rol",
+      "Tip",
+      "Seviye",
+      "Numara",
+      "Uygunluk Kodu",
+      "Revizyon",
+      "Pafta / Doküman Adı"
+    ]
+  },
+  "rfi": {
+    "types": [
+      {
+        "code": "MIM",
+        "name": "MIM - Mimari"
+      },
+      {
+        "code": "INS",
+        "name": "INS - İnşaat / Statik"
+      },
+      {
+        "code": "MEK",
+        "name": "MEK - Mekanik"
+      },
+      {
+        "code": "ELK",
+        "name": "ELK - Elektrik"
+      },
+      {
+        "code": "ALT",
+        "name": "ALT - Altyapı"
+      },
+      {
+        "code": "PEY",
+        "name": "PEY - Peyzaj"
+      },
+      {
+        "code": "GEO",
+        "name": "GEO - Geoteknik / Zemin"
+      },
+      {
+        "code": "HRT",
+        "name": "HRT - Harita"
+      },
+      {
+        "code": "ICM",
+        "name": "ICM - İç Mimari"
+      },
+      {
+        "code": "YNG",
+        "name": "YNG - Yangın"
+      },
+      {
+        "code": "KRD",
+        "name": "KRD - Koordinasyon / BIM"
+      },
+      {
+        "code": "GNL",
+        "name": "GNL - Genel"
+      }
+    ],
+    "defaultType": "GNL",
+    "categories": [
+      "Tasarım Koordinasyonu",
+      "Saha Uygulaması",
+      "Malzeme",
+      "Diğer"
+    ],
+    "responseDays": 7,
+    "numbering": "{Proje}-{Gönderen}-{Alıcı}-RFI-{Disiplin}-{0000}",
+    "workflow": "RFI: Müşavir koordinasyon → Tasarımcı cevap → Müşavir resmi cevap → İdare kapatır",
+    "permissions": {
+      "creator": [
+        "yuklenici"
+      ],
+      "coordinator": [
+        "musavir"
+      ],
+      "reviewer": [
+        "tasarimci"
+      ],
+      "manager": [
+        "idare"
+      ],
+      "watcher": [
+        "idare-gozlemci"
+      ]
+    }
+  },
+  "submittals": {
+    "itemTypes": [
+      "MOF - Malzeme Onay Formu",
+      "IYY - İş Yapım Yöntemi",
+      "IMR - İmalat Resmi",
+      "UTD - Ürün Teknik Dokümanı",
+      "NUM - Numune",
+      "TRP - Test Raporu",
+      "SRT - Sertifika",
+      "IBK - İşletme ve Bakım Kılavuzu",
+      "GRB - Garanti Belgesi",
+      "MCK - Mock-up",
+      "IP - İş Programı",
+      "DGR - Diğer"
+    ],
+    "responses": [
+      {
+        "label": "Onaylandı",
+        "code": "approved"
+      },
+      {
+        "label": "Şartlı Onay",
+        "code": "approved_with_comments"
+      },
+      {
+        "label": "Bilgi İçin",
+        "code": "reviewed"
+      },
+      {
+        "label": "Revize Et - Tekrar Sun",
+        "code": "revise_resubmit"
+      },
+      {
+        "label": "Reddedildi",
+        "code": "rejected"
+      }
+    ],
+    "specSections": [
+      {
+        "code": "MIM",
+        "name": "Mimari"
+      },
+      {
+        "code": "INS",
+        "name": "İnşaat / Statik"
+      },
+      {
+        "code": "MEK",
+        "name": "Mekanik"
+      },
+      {
+        "code": "ELK",
+        "name": "Elektrik"
+      },
+      {
+        "code": "ALT",
+        "name": "Altyapı"
+      },
+      {
+        "code": "PEY",
+        "name": "Peyzaj"
+      },
+      {
+        "code": "GEO",
+        "name": "Geoteknik / Zemin"
+      },
+      {
+        "code": "HRT",
+        "name": "Harita"
+      },
+      {
+        "code": "ICM",
+        "name": "İç Mimari"
+      },
+      {
+        "code": "YNG",
+        "name": "Yangın"
+      },
+      {
+        "code": "KRD",
+        "name": "Koordinasyon / BIM"
+      }
+    ],
+    "responseDays": 14,
+    "workflow": "Malzeme / yöntem onayı: Müşavir (+ Tasarımcı görüşü) → İdare",
+    "watchers": [
+      "musavir",
+      "idare-gozlemci"
+    ]
+  },
+  "meetings": [
+    {
+      "name": "İdare",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Proje genel durumu ve ilerleme",
+        "Sözleşme ve hakediş konuları",
+        "İdare kararı gereken konular",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "idare",
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/01-İdare"
+    },
+    {
+      "name": "Tasarım",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Tasarım teslim planı (MIDP) durumu",
+        "Açık RFI'lar ve tasarım değişiklikleri",
+        "İnceleme ve onay bekleyen dokümanlar",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "tasarimci",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/02-Tasarım"
+    },
+    {
+      "name": "Saha Koordinasyon",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Haftalık saha programı",
+        "Arayüz ve ekip koordinasyonu",
+        "Saha gözlemleri ve açık sorunlar",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/03-Saha Koordinasyon"
+    },
+    {
+      "name": "Kalite Kontrol",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Açık NCR ve CAR'lar",
+        "Malzeme onayları ve testler",
+        "Muayene talepleri",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/04-Kalite Kontrol"
+    },
+    {
+      "name": "Elektromekanik",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Elektromekanik tasarım ve imalat durumu",
+        "Test ve devreye alma planı",
+        "Tedarik ve teslim süreleri",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/05-Elektromekanik"
+    },
+    {
+      "name": "İş Programı",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Program sapmaları ve kritik yol",
+        "Gecikme ve hızlandırma önlemleri",
+        "Gelecek dönem planı",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/06-İş Programı"
+    },
+    {
+      "name": "BIM Koordinasyon",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Model teslimleri ve kalite kontrol",
+        "Çakışma raporu ve çözümler",
+        "Kodlama ve CDE uyumu",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "tasarimci",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/07-BIM Koordinasyon"
+    },
+    {
+      "name": "İSG-Ç",
+      "agenda": [
+        "Önceki toplantı aksiyonlarının takibi",
+        "Olay ve ramak kala bildirimleri",
+        "Saha denetim bulguları",
+        "Çevre ve atık yönetimi",
+        "Kararlar ve yeni aksiyonlar"
+      ],
+      "attendees": [
+        "musavir",
+        "yuklenici"
+      ],
+      "minutesFolder": "00-GENEL/06-Toplantı Tutanakları/08-İSG-Ç"
+    }
+  ],
+  "forms": [
+    {
+      "key": "DTF",
+      "name": "Değişiklik Talep Formu",
+      "workflow": "Değişiklik talebi (DTF): Müşavir → İdare",
+      "sections": [
+        {
+          "name": "Genel bilgiler",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Değişiklik tanımı",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Etki analizi (maliyet, süre)",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Müşavir değerlendirmesi",
+          "editor": "musavir"
+        },
+        {
+          "name": "İdare kararı",
+          "editor": "idare"
+        }
+      ]
+    },
+    {
+      "key": "AYF",
+      "name": "Alt Yüklenici Onay Formu",
+      "workflow": "Alt yüklenici onayı (AYF): Müşavir → İdare",
+      "sections": [
+        {
+          "name": "Form bilgileri",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Firma bilgileri",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Ek belgeler (var / yok listesi)",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Müşavir değerlendirmesi",
+          "editor": "musavir"
+        },
+        {
+          "name": "İdare kararı",
+          "editor": "idare"
+        }
+      ]
+    },
+    {
+      "key": "MTL",
+      "name": "Mühendis Talimatı",
+      "sections": [
+        {
+          "name": "Genel bilgiler",
+          "editor": "musavir"
+        },
+        {
+          "name": "Talimat",
+          "editor": "musavir"
+        },
+        {
+          "name": "Yüklenici tebellüğü",
+          "editor": "yuklenici"
+        }
+      ]
+    },
+    {
+      "key": "GR",
+      "name": "Günlük Rapor",
+      "sections": [
+        {
+          "name": "Hava",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Personel",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Makine ve ekipman",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "İSG",
+          "editor": "yuklenici"
+        },
+        {
+          "name": "Yapılan imalatlar",
+          "editor": "yuklenici"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Firma kodları (Kaynak, Gönderen, Alıcı) proje oluştururken her taraf için sorulur.",
+    "Disiplin listesi ve kodlama alanları örnektir; kurulum sihirbazında müşterinin kodlamasına göre değiştirilir (ör. Alt Disiplin, Aşama alanı eklenir).",
+    "Paylaşılan ve yayınlanan alanlara dosya yalnız onaylı inceleme ile girer (ISO 19650-2 §5.6.4, §5.7.4); geçiş kuralları açık.",
+    "Uygunluk ve revizyon kodları ISO düzenindedir (S0–S4, A, B, CR; P01 / C01). Sahadaki R00 düzeni Proje Ayarları → CDE → Kod Düzeni'nden seçilebilir.",
+    "RFI, malzeme onayı ve toplantı ayarları Manage, form şablonları Field modülü kuruluysa uygulanır; değilse atlanır."
+  ]
+}

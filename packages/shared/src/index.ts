@@ -13,6 +13,7 @@ export * from "./reports/reports.js";
 export * from "./reports/report-frame.js";
 export * from "./workflow/roles.js";
 export * from "./platform/template.js";
+export * from "./platform/template-v2.js";
 export * from "./works/work-catalog.js";
 export * from "./works/company-code.js";
 export * from "./works/work-numbering.js";

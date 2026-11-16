@@ -5,6 +5,8 @@ import {
   PARTIES,
   PERMISSION_LEVELS,
   PROJECT_MODULES,
+  TEMPLATE_ISSUE_FIELD_TYPES,
+  TEMPLATE_RFI_PERMISSION_ROLES,
   WORKFLOW_KINDS,
   WORKFLOW_ROLES,
   type ProjectTemplate,
@@ -75,6 +77,7 @@ const attributeSchema = z.object({
 const assigneeSchema = z.union([
   z.object({ slot: z.string().trim().min(1).max(64) }),
   z.object({ role: z.enum(WORKFLOW_ROLES) }),
+  z.object({ projectRole: z.string().trim().min(1).max(64) }),
 ]);
 const outcome = z.enum(OUTCOME_CODES);
 const workflowSchema = z.object({
@@ -119,11 +122,72 @@ const slotSchema = z.object({
   description: z.string().max(500).optional(),
 });
 
-/** Unknown top-level keys are ignored (stripped). */
+// ---- Format v2 parts (template-v2.ts in @sitekeep/shared) ----
+const key64 = z.string().trim().min(1).max(64);
+const text200 = z.string().trim().min(1).max(200);
+const keyList = z.array(key64).max(50);
+const codeNameSchema = z.object({ code: z.string().trim().min(1).max(40), name: text200 });
+const pattern = z.string().trim().min(1).max(200);
+const roleSchema = z.object({
+  key: key64,
+  name: z.string().trim().min(1).max(100),
+  description: z.string().trim().max(500).optional(),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  slot: key64.optional(),
+});
+const issueSettingsSchema = z.object({
+  categories: z
+    .array(z.object({ category: text200, types: z.array(text200).max(100) }))
+    .max(50),
+  customFields: z
+    .array(z.object({ name: z.string().trim().min(1).max(100), type: z.enum(TEMPLATE_ISSUE_FIELD_TYPES), options: z.array(text200).max(200).optional() }))
+    .max(30)
+    .optional(),
+});
+const transmittalSchema = z.object({
+  name: z.string().trim().min(1).max(100).optional(),
+  numbering: pattern.optional(),
+  attributes: z.array(z.string().trim().min(1).max(100)).max(30).optional(),
+});
+const rfiSchema = z.object({
+  types: z.array(codeNameSchema).max(100).optional(),
+  defaultType: z.string().trim().min(1).max(40).optional(),
+  categories: z.array(text200).max(50).optional(),
+  responseDays: z.number().int().min(0).max(365).optional(),
+  numbering: pattern.optional(),
+  workflow: text200.optional(),
+  permissions: z.partialRecord(z.enum(TEMPLATE_RFI_PERMISSION_ROLES), keyList).optional(),
+});
+const submittalSchema = z.object({
+  itemTypes: z.array(text200).max(100).optional(),
+  responses: z.array(z.object({ label: text200, code: outcome })).max(OUTCOME_CODES.length * 2).optional(),
+  specSections: z.array(codeNameSchema).max(500).optional(),
+  responseDays: z.number().int().min(0).max(365).optional(),
+  numbering: pattern.optional(),
+  workflow: text200.optional(),
+  watchers: keyList.optional(),
+});
+const meetingSchema = z.object({
+  name: text200,
+  agenda: z.array(z.string().trim().min(1).max(500)).max(50),
+  attendees: keyList.optional(),
+  minutesFolder: z.string().trim().min(1).max(2000).optional(),
+});
+const formSchema = z.object({
+  key: z.string().trim().min(1).max(20),
+  name: text200,
+  category: z.string().trim().min(1).max(100).optional(),
+  workflow: text200.optional(),
+  sections: z.array(z.object({ name: text200, editor: key64.optional() })).min(1).max(50),
+});
+
+/** Unknown top-level keys are ignored (stripped). Per-language values are resolved before (localizeTemplate). */
 export const projectTemplateSchema = z.object({
   format: z.string().max(100).optional(),
   name: z.string().trim().min(1).max(200),
   description: z.string().max(4000).optional(),
+  language: z.string().trim().min(2).max(10).optional(),
+  family: z.string().trim().min(1).max(100).optional(),
   slots: z.array(slotSchema).max(30).default([]),
   dimensions: z.record(z.string().trim().min(1).max(100), z.array(dimensionValueSchema).max(2000)).optional(),
   root: z.object(settingsShape).optional(),
@@ -135,6 +199,13 @@ export const projectTemplateSchema = z.object({
   notes: z.array(z.string().max(1000)).max(50).optional(),
   modules: z.partialRecord(z.enum(PROJECT_MODULES), z.boolean()).optional(),
   cde: templateCdeSchema.optional(),
+  roles: z.array(roleSchema).max(200).optional(),
+  issues: issueSettingsSchema.optional(),
+  transmittal: transmittalSchema.optional(),
+  rfi: rfiSchema.optional(),
+  submittals: submittalSchema.optional(),
+  meetings: z.array(meetingSchema).max(50).optional(),
+  forms: z.array(formSchema).max(100).optional(),
 });
 
 export function parseProjectTemplate(input: unknown): ProjectTemplate {
@@ -152,6 +223,8 @@ export const previewRequestSchema = z.object({
   slotCompanies: slotMapSchema,
   slotCodes: slotCodeSchema,
   dimensions: dimensionOverrideSchema,
+  /** Project language: picks the template's per-language values (default: the requester's language). */
+  language: z.string().trim().min(2).max(10).optional(),
 });
 
 export const createRequestSchema = previewRequestSchema.extend({
