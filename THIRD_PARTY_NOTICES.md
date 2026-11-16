@@ -11,7 +11,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 3. Licence texts of the npm packages
 4. NOTICE files of the npm packages
 
-## 1. npm packages (275)
+## 1. npm packages (276)
 
 | Package | Version | Licence | Source |
 |---|---|---|---|
@@ -52,7 +52,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | @napi-rs/canvas-linux-x64-musl | 1.0.10 | MIT | https://www.npmjs.com/package/@napi-rs/canvas-linux-x64-musl |
 | @napi-rs/canvas-win32-arm64-msvc | 1.0.10 | MIT | https://www.npmjs.com/package/@napi-rs/canvas-win32-arm64-msvc |
 | @napi-rs/canvas-win32-x64-msvc | 1.0.10 | MIT | https://www.npmjs.com/package/@napi-rs/canvas-win32-x64-msvc |
-| @nodable/entities | 2.2.0 | MIT | https://github.com/nodable/val-parsers |
+| @nodable/entities | 3.1.0 | MIT | https://github.com/nodable/val-parsers |
 | @pdf-lib/fontkit | 1.1.1 | MIT | https://github.com/Hopding/fontkit |
 | @pdf-lib/standard-fonts | 1.0.0 | MIT | https://github.com/Hopding/standard-fonts |
 | @pdf-lib/upng | 1.0.1 | MIT | https://github.com/Hopding/upng |
@@ -122,8 +122,8 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | fast-querystring | 1.1.2 | MIT | https://github.com/anonrig/fast-querystring |
 | fast-uri | 3.1.9 | BSD-3-Clause | https://github.com/fastify/fast-uri |
 | fast-uri | 4.2.3 | BSD-3-Clause | https://github.com/fastify/fast-uri |
-| fast-xml-builder | 1.3.1 | MIT | https://github.com/NaturalIntelligence/fast-xml-builder |
-| fast-xml-parser | 5.7.2 | MIT | https://github.com/NaturalIntelligence/fast-xml-parser |
+| fast-xml-builder | 1.3.2 | MIT | https://github.com/NaturalIntelligence/fast-xml-builder |
+| fast-xml-parser | 5.12.1 | MIT | https://github.com/NaturalIntelligence/fast-xml-parser |
 | fastify | 5.12.8 | MIT | https://github.com/fastify/fastify |
 | fastify-plugin | 6.0.0 | MIT | https://github.com/fastify/fastify-plugin |
 | fastq | 1.20.3 | ISC | https://github.com/mcollina/fastq |
@@ -140,7 +140,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | gopd | 1.2.0 | MIT | https://github.com/ljharb/gopd |
 | has-symbols | 1.1.0 | MIT | https://github.com/inspect-js/has-symbols |
 | hasown | 2.0.4 | MIT | https://github.com/inspect-js/hasOwn |
-| hono | 4.13.13 | MIT | https://github.com/honojs/hono |
+| hono | 4.13.19 | MIT | https://github.com/honojs/hono |
 | html-parse-stringify | 4.0.1 | MIT | https://github.com/i18next/html-parse-stringify |
 | http-errors | 2.0.1 | MIT | https://github.com/jshttp/http-errors |
 | i18next | 26.4.2 | MIT | https://github.com/i18next/i18next |
@@ -152,6 +152,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | ipaddr.js | 1.9.1 | MIT | https://github.com/whitequark/ipaddr.js |
 | ipaddr.js | 2.5.0 | MIT | https://github.com/whitequark/ipaddr.js |
 | is-promise | 4.0.0 | MIT | https://github.com/then/is-promise |
+| is-unsafe | 2.0.3 | MIT | https://github.com/NaturalIntelligence/is-unsafe |
 | is-url | 1.2.4 | MIT | https://github.com/segmentio/is-url |
 | isarray | 1.0.0 | MIT | https://github.com/juliangruber/isarray |
 | isexe | 2.0.0 | ISC | https://github.com/isaacs/isexe |
@@ -257,7 +258,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | statuses | 2.0.2 | MIT | https://github.com/jshttp/statuses |
 | string.prototype.codepointat | 0.2.1 | MIT | https://github.com/mathiasbynens/String.prototype.codePointAt |
 | string_decoder | 1.1.1 | MIT | https://github.com/nodejs/string_decoder |
-| strnum | 2.4.2 | MIT | https://github.com/NaturalIntelligence/strnum |
+| strnum | 2.5.1 | MIT | https://github.com/NaturalIntelligence/strnum |
 | tesseract.js | 7.0.0 | Apache-2.0 | https://github.com/naptha/tesseract.js |
 | tesseract.js-core | 7.0.0 | Apache-2.0 | https://github.com/naptha/tesseract.js-core |
 | thread-stream | 4.2.0 | MIT | https://github.com/mcollina/thread-stream |
@@ -336,6 +337,8 @@ however, cannot be released under any other type of license.  The
 requirement for fonts to remain under this license does not apply to
 any document created using the fonts or their derivatives.
 
+
+
 DEFINITIONS
 "Font Software" refers to the set of files released by the Copyright
 Holder(s) under this license and clearly marked as such.
@@ -354,6 +357,7 @@ by porting the Font Software to a new environment.
 
 "Author" refers to any designer, engineer, programmer, technical writer
 or other person who contributed to the Font Software.
+
 
 PERMISSION & CONDITIONS
 
@@ -389,8 +393,12 @@ Software, subject to the following conditions:
    this license does not apply to any document created using the Font
    Software.
 
+
+
 TERMINATION
 This license becomes null and void if any of the above conditions are not met.
+
+
 
 DISCLAIMER
 THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -416,7 +424,7 @@ The image is based on the official `node:22-bookworm-slim` image (Debian GNU/Lin
 
 Packages with the same licence text share one copy of it; each package's copyright lines are listed with it.
 
-### 3.1 MIT (94 packages)
+### 3.1 MIT (95 packages)
 
 - @babel/runtime@7.29.10: Copyright (c) 2014-present Sebastian McKenzie and other contributors
 - @fastify/accept-negotiator@2.1.0: Copyright (c) 2022-present The Fastify team <https://github.com/fastify/fastify#team>
@@ -455,8 +463,8 @@ Packages with the same licence text share one copy of it; each package's copyrig
 - fast-decode-uri-component@1.0.1: Copyright (c) 2018 Tomas Della Vedova; Copyright (c) 2017 Justin Ridgewell; Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 - fast-deep-equal@3.1.3: Copyright (c) 2017 Evgeny Poberezkin
 - fast-json-stringify@7.0.1: Copyright (c) 2016-present Matteo Collina; Copyright (c) 2016-present The Fastify team <https://github.com/fastify/fastify#team>
-- fast-xml-builder@1.3.1: Copyright (c) 2026 Natural Intelligence
-- fast-xml-parser@5.7.2: Copyright (c) 2017 Amit Kumar Gupta
+- fast-xml-builder@1.3.2: Copyright (c) 2026 Natural Intelligence
+- fast-xml-parser@5.12.1: Copyright (c) 2017 Amit Kumar Gupta
 - fastify@5.12.8: Copyright (c) 2016-present The Fastify team <https://github.com/fastify/fastify#team>
 - fastify-plugin@6.0.0: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
 - fflate@0.8.3: Copyright (c) 2026 Arjun Barrett
@@ -466,8 +474,9 @@ Packages with the same licence text share one copy of it; each package's copyrig
 - gopd@1.2.0: Copyright (c) 2022 Jordan Harband
 - has-symbols@1.1.0: Copyright (c) 2016 Jordan Harband
 - hasown@2.0.4: Copyright (c) Jordan Harband and contributors
-- hono@4.13.13: Copyright (c) 2021 - present, Yusuke Wada and Hono contributors
+- hono@4.13.19: Copyright (c) 2021 - present, Yusuke Wada and Hono contributors
 - html-parse-stringify@4.0.1: Copyright (c) 2025 Henrik Joreteg <henrik@joreteg.com>; Copyright (c) 2026-present i18next (https://github.com/i18next)
+- is-unsafe@2.0.3: Copyright (c) 2026 Natural Intelligence
 - json-schema-ref-resolver@3.0.0: Copyright (c) 2023 Fastify
 - json-schema-traverse@1.0.0: Copyright (c) 2017 Evgeny Poberezkin
 - math-intrinsics@1.1.0: Copyright (c) 2024 ECMAScript Shims
@@ -503,7 +512,7 @@ Packages with the same licence text share one copy of it; each package's copyrig
 - side-channel-map@1.0.1: Copyright (c) 2024 Jordan Harband
 - side-channel-weakmap@1.0.2: Copyright (c) 2019 Jordan Harband
 - sonic-boom@4.2.1: Copyright (c) 2017 Matteo Collina
-- strnum@2.4.2: Copyright (c) 2021 Natural Intelligence
+- strnum@2.5.1: Copyright (c) 2021 Natural Intelligence
 - thread-stream@4.2.0: Copyright (c) 2021 Matteo Collina
 - three-mesh-bvh@0.9.9: Copyright (c) 2018 Garrett Johnson
 - tiny-inflate@1.0.3: Copyright (c) 2015-present Devon Govett
@@ -4135,7 +4144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 These packages declare their licence in package.json only; the standard text of that licence applies.
 
-- @nodable/entities@2.2.0: MIT, Amit Gupta (https://solothought.com)
+- @nodable/entities@3.1.0: MIT, Amit Gupta (https://solothought.com)
 - @pdf-lib/fontkit@1.1.1: MIT, Andrew Dillon <andrew.dillon.j@gmail.com>
 - @tesseract.js-data/eng@1.0.0: MIT, Balearica <admin@scribeocr.com>
 - @tesseract.js-data/tur@1.0.0: MIT, Balearica <admin@scribeocr.com>
