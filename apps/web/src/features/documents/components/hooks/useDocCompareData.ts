@@ -142,11 +142,14 @@ export function useDocCompareData({ projectId, from, to, page, setFrom, onMessag
 
   useEffect(() => {
     if (!dto || dto.status !== "done" || !dto.ai.available || dto.ai.status !== "none") return;
+    // Drawings and models (FP-1) have a rule-based summary only.
+    const kind = docCompareKind(extension);
+    if (kind === "dwg" || kind === "ifc") return;
     if (isPdf && !dto.regions && !pdfError && (analysis || !regions)) return;
     if (aiStarted.current === dto.id) return;
     aiStarted.current = dto.id;
     api.startCompareSummary(projectId, dto.id).then(setDto, (e: Error) => onMessage(e.message));
-  }, [dto, isPdf, analysis, regions, pdfError, projectId, onMessage]);
+  }, [dto, isPdf, extension, analysis, regions, pdfError, projectId, onMessage]);
 
   const nudge = useCallback(
     async (dx: number, dy: number) => {

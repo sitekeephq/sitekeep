@@ -45,6 +45,8 @@
     "changed_other": "{{where}}: {{count}} elemanda değişiklik var",
     "moved_one": "{{where}}: {{count}} elemanın konumu değişti",
     "moved_other": "{{where}}: {{count}} elemanın konumu değişti",
+    "reshaped_one": "{{where}}: {{count}} elemanın geometrisi değişti",
+    "reshaped_other": "{{where}}: {{count}} elemanın geometrisi değişti",
     "otherChanged_one": "{{where}}: {{count}} elemanda geometri / öznitelik değişti",
     "otherChanged_other": "{{where}}: {{count}} elemanda geometri / öznitelik değişti",
     "propChanged_one": "{{where}}: {{count}} elemanda {{label}} {{from}} → {{to}}",

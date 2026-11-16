@@ -121,7 +121,8 @@ IFC viewer limitations:
   Rows and columns are virtualised: 50 000+ rows scroll smoothly. Formulas are not calculated; the last value stored in the file is shown.
   Reading is done on the server with SheetJS; LibreOffice is not needed.
 - **DWG/DXF:** pan/zoom, **Fit** (the main body of the drawing; distant stray objects excluded) and **Show All**,
-  layer list (search, on/off, **Turn All On / Turn All Off**), "Model Space Only", dark/light background, measurement tools
+  layer list (search, on/off, **Turn All On / Turn All Off**; `?layer=NAME` opens with only that layer on, used by the
+  [version comparison](DOCUMENT_COMPARISON.md#drawings-and-models-dwg-dxf-ifc)), "Model Space Only", dark/light background, measurement tools
   and **Info** (below: "DWG/DXF measurement and inspection"). Noto Sans is embedded for Turkish characters. A separately loaded
   lazy chunk; parsing happens in a web worker. For old DXF files the code page (`$DWGCODEPAGE`, e.g. ANSI_1254) is read on the server.
   The server prepares the **2D scene** of each drawing once; if it is ready the browser opens it without parsing the DXF at all

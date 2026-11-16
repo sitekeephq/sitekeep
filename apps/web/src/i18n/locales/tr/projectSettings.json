@@ -211,6 +211,13 @@
         "items_removed": "Setten pafta çıkarıldı",
         "published": "Pafta seti yayınlandı",
         "downloaded": "Pafta seti indirildi"
+      },
+      "doc_compare": {
+        "run": "Versiyonlar karşılaştırıldı",
+        "export": "Karşılaştırma dışa aktarıldı",
+        "ai_summary": "Karşılaştırma özeti (yapay zekâ)",
+        "report": "Karşılaştırma raporu",
+        "review_note": "Karşılaştırma incelemeye eklendi"
       }
     },
     "columns": {

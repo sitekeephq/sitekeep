@@ -45,6 +45,8 @@
     "changed_other": "{{where}}: {{count}} elements have changes",
     "moved_one": "{{where}}: the position of {{count}} element changed",
     "moved_other": "{{where}}: the position of {{count}} elements changed",
+    "reshaped_one": "{{where}}: the shape of {{count}} element changed",
+    "reshaped_other": "{{where}}: the shape of {{count}} elements changed",
     "otherChanged_one": "{{where}}: geometry / attributes changed in {{count}} element",
     "otherChanged_other": "{{where}}: geometry / attributes changed in {{count}} elements",
     "propChanged_one": "{{where}}: {{label}} {{from}} → {{to}} in {{count}} element",

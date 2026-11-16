@@ -6,7 +6,8 @@
  * stray far-away entities do not shrink the drawing to a dot; "Tümünü Göster" for the full
  * extents), layers, model space only or all, dark/light background. Measuring, snapping, units
  * and "Bilgi" live in ./cad/ (CadMeasure.tsx). Text uses bundled Noto Sans (latin + latin-ext:
- * Turkish letters), so nothing is fetched from the internet.
+ * Turkish letters), so nothing is fetched from the internet. `?layer=NAME` opens with only that
+ * layer on (the version comparison links a layer's changes here).
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DxfViewer, type LayerInfo } from "dxf-viewer";
@@ -105,7 +106,15 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
       () => {
         if (disposed) return;
         setProgress(null);
-        setLayers([...v.GetLayers(true)].map((l) => ({ ...l, visible: true })).sort((a, b) => a.displayName.localeCompare(b.displayName, dataLocale())));
+        // `?layer=NAME` (version comparison): only that layer is shown at first.
+        const only = new URLSearchParams(window.location.search).get("layer");
+        const all = [...v.GetLayers(true)];
+        const isolate = only !== null && all.some((l) => l.name === only);
+        if (isolate) {
+          for (const l of all) if (l.name !== only) v.ShowLayer(l.name, false);
+          v.Render();
+        }
+        setLayers(all.map((l) => ({ ...l, visible: !isolate || l.name === only })).sort((a, b) => a.displayName.localeCompare(b.displayName, dataLocale())));
       },
       (e: unknown) => {
         if (disposed) return;

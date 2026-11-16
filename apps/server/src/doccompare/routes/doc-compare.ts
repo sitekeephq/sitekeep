@@ -6,13 +6,25 @@
  *   POST /projects/:pid/doc-compare/:cid/summary {force?}             start the AI "Değişiklik özeti" (async)
  *   POST /projects/:pid/doc-compare/:cid/report {thumbnails}          comparison report (PDF)
  *   POST /projects/:pid/doc-compare/:cid/review-note {reviewId}       summary as a note on a running review
+ *   GET  /projects/:pid/doc-compare/:cid/differences?kind=&group=&subgroup=&aspect=&q=&offset=&limit=
+ *                                                                     DWG / IFC: the list of differences, filtered and paged
+ *   GET  /projects/:pid/doc-compare/:cid/export?format=csv|xlsx       DWG / IFC: the differences as CSV or Excel
  *
+ * DWG / DXF drawings and IFC models (FP-1) are compared by the job queue (version-compare.ts).
  * The model only ever receives the compact difference description (see doccompare/ai.ts).
  */
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { can, type DocCompareDto, type DocCompareResult, type PageRegions, type SummaryBullet } from "@sitekeep/shared";
+import {
+  can,
+  filterDiffRows,
+  type DocCompareDto,
+  type DocCompareResult,
+  type PageRegions,
+  type SummaryBullet,
+  type VersionDiffPageDto,
+} from "@sitekeep/shared";
 import type { ResolvedDeps } from "../../app/deps.js";
 import { isUuid, type AuthUser } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
@@ -26,6 +38,9 @@ import { compareFlags, deterministicSummary, localizeAntetChanges } from "../../
 import { loadInstance } from "../../workflow/reviews.js";
 import { loadVersion, requireView } from "../../modules/documents/files.js";
 import { loadVisibleReview } from "../../workflow/review-access.js";
+import { writeXlsx } from "../../core/formats/xlsx.js";
+import { toCsv } from "../../docintel/export.js";
+import { VersionCompareRunner, exportSummary, exportTable, isVersionCompareKind, versionSummary } from "../../doccompare/version-compare.js";
 
 const nbox = z.object({ x0: z.number().min(0).max(1), y0: z.number().min(0).max(1), x1: z.number().min(0).max(1), y1: z.number().min(0).max(1) });
 const regionsSchema = z.object({
@@ -60,7 +75,18 @@ type Loaded = { a: Awaited<ReturnType<typeof loadVersion>>["a"]; from: Side; to:
 
 export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   const { db, storage, secretKey } = deps;
-  const service = new DocCompareService(db, storage, (m, x) => api.log.warn({ x }, m));
+  const versions = new VersionCompareRunner(db, storage, deps.jobs, (m, x) => api.log.warn({ x }, m));
+  versions.register();
+  const service = new DocCompareService(db, storage, (m, x) => api.log.warn({ x }, m), versions);
+  const diffQuery = z.object({
+    kind: z.enum(["added", "removed", "changed"]).optional(),
+    group: z.string().max(500).optional(),
+    subgroup: z.string().max(500).optional(),
+    aspect: z.string().max(40).optional(),
+    q: z.string().max(200).optional(),
+    offset: z.coerce.number().int().min(0).default(0),
+    limit: z.coerce.number().int().min(1).max(500).default(100),
+  });
 
   /** Both versions, each checked for view rights. */
   async function loadPair(pid: string, from: string, to: string, user: AuthUser): Promise<Loaded> {
@@ -89,12 +115,18 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
   async function toDto(row: ComparisonRow, l: Loaded, lang: string): Promise<DocCompareDto> {
     const t = tFor(lang);
     const { provider, note } = await providerOrNote(db, secretKey, l.a.project.id, lang);
-    const stored = row.result as DocCompareResult | null;
+    const { detailKey: _key, ...stored } = (row.result as DocCompareResult | null) ?? ({} as Partial<DocCompareResult>);
     // Texts written by the comparison run are shown in the reader's language.
-    const result = stored ? { ...stored, note: comparisonNote(stored, lang), antet: localizeAntetChanges(stored.antet, lang) } : null;
+    const result = row.result
+      ? { ...(stored as DocCompareResult), note: comparisonNote(stored as DocCompareResult, lang), antet: localizeAntetChanges((stored as DocCompareResult).antet, lang) }
+      : null;
     const regions = (row.regions as PageRegions[] | null) ?? null;
     const flags = result ? compareFlags(result, regions, lang) : [];
-    const summary: SummaryBullet[] = result ? deterministicSummary(result, regions, flags, lang) : [];
+    const summary: SummaryBullet[] = !result
+      ? []
+      : isVersionCompareKind(result.kind)
+        ? [...flags.filter((f) => f.code === "identical").map((f) => ({ text: f.message })), ...versionSummary(result, lang)]
+        : deterministicSummary(result, regions, flags, lang);
     const progress = service.aiProgress(row.id);
     let aiStatus = row.aiStatus;
     let aiError = row.aiError;
@@ -123,7 +155,8 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
       flags,
       summary,
       ai: {
-        available: !!provider,
+        // Drawings and models (FP-1) have a rule-based summary only.
+        available: !!provider && !(result && isVersionCompareKind(result.kind)),
         note: provider ? (provider.external ? t("doccompare:ai.externalProvider", { name: provider.name }) : null) : note,
         status: aiStatus,
         bullets: result && row.aiBullets ? linkBullets(row.aiBullets, result, regions) : [],
@@ -153,7 +186,16 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
       const l = await loadPair(req.params.pid, from, to, req.user!);
       const { error } = comparisonKind(l.from.file.name, l.to.file.name);
       if (error) throw badRequest(error);
-      const row = await service.ensure(l.a.project.id, l.from, l.to, l.a.user.id, req.query.rebuild === "1");
+      const row = await service.ensure(l.a.project.id, l.from, l.to, l.a.user.id, req.query.rebuild === "1", (started) =>
+        audit(db, {
+          projectId: l.a.project.id,
+          userId: l.a.user.id,
+          action: "doc_compare.run",
+          targetType: "file",
+          targetId: l.to.file.id,
+          details: { comparisonId: started.id, fileName: l.to.file.name, from: l.from.version.version, to: l.to.version.version, rebuild: req.query.rebuild === "1" },
+        }),
+      );
       await wait(row.id, Number(req.query.wait));
       return toDto((await service.get(row.id))!, l, requestLanguage(req));
     },
@@ -182,6 +224,7 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
     const l = await loadComparison(req.params.pid, req.params.cid, req.user!);
     const body = z.object({ force: z.boolean().optional() }).parse(req.body ?? {});
     if (l.row.status !== "done" || !l.row.result) throw new HttpError(409, "not_ready", msg("doccompare:errors.textNotReady"));
+    if (isVersionCompareKind((l.row.result as DocCompareResult).kind)) throw badRequest(msg("doccompare:versionDiff.errors.noAiSummary"));
     const { provider, note } = await providerOrNote(db, secretKey, l.a.project.id, requestLanguage(req));
     if (!provider) throw new HttpError(409, "ai_unavailable", note ?? msg("doccompare:errors.aiUnavailable"));
     const cached = l.row.aiStatus === "done" && !body.force;
@@ -219,6 +262,7 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
   api.post<{ Params: { pid: string; cid: string } }>("/projects/:pid/doc-compare/:cid/report", async (req, reply) => {
     const l = await loadComparison(req.params.pid, req.params.cid, req.user!);
     if (l.row.status !== "done" || !l.row.result) throw new HttpError(409, "not_ready", msg("doccompare:errors.notReady"));
+    if (isVersionCompareKind((l.row.result as DocCompareResult).kind)) throw badRequest(msg("doccompare:versionDiff.errors.useExport"));
     const body = reportSchema.parse(req.body ?? {});
     const lang = requestLanguage(req);
     const dto = await toDto(l.row, l, lang);
@@ -305,4 +349,57 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
     return { ok: true, actionId: action!.id };
   });
 
+  /** A finished DWG / IFC comparison (409 while it runs, 400 for a document comparison). */
+  function versionResult(row: ComparisonRow): DocCompareResult & { kind: "dwg" | "ifc" } {
+    const result = row.result as DocCompareResult | null;
+    if (row.status !== "done" || !result) throw new HttpError(409, "not_ready", msg("doccompare:versionDiff.errors.notReady"));
+    if (!isVersionCompareKind(result.kind)) throw badRequest(msg("doccompare:versionDiff.errors.notVersionComparison"));
+    return result as DocCompareResult & { kind: "dwg" | "ifc" };
+  }
+
+  api.get<{ Params: { pid: string; cid: string }; Querystring: Record<string, string | undefined> }>(
+    "/projects/:pid/doc-compare/:cid/differences",
+    async (req): Promise<VersionDiffPageDto> => {
+      const l = await loadComparison(req.params.pid, req.params.cid, req.user!);
+      versionResult(l.row);
+      const q = diffQuery.parse(req.query);
+      const rows = filterDiffRows(await versions.rows(l.row), q);
+      return { total: rows.length, offset: q.offset, limit: q.limit, rows: rows.slice(q.offset, q.offset + q.limit) };
+    },
+  );
+
+  api.get<{ Params: { pid: string; cid: string }; Querystring: Record<string, string | undefined> }>(
+    "/projects/:pid/doc-compare/:cid/export",
+    async (req, reply) => {
+      const l = await loadComparison(req.params.pid, req.params.cid, req.user!);
+      const result = versionResult(l.row);
+      const { format, ...filter } = z.object({ format: z.enum(["csv", "xlsx"]).default("xlsx") }).and(diffQuery.omit({ offset: true, limit: true })).parse(req.query);
+      const lang = requestLanguage(req);
+      const t = tFor(lang);
+      const rows = filterDiffRows(await versions.rows(l.row), filter);
+      const table = exportTable(result.kind, rows, lang);
+      const base = l.to.file.name.replace(/\.[^.]+$/, "");
+      const name = `${base}_V${l.from.version.version}-V${l.to.version.version}_${t("doccompare:versionDiff.fileSuffix")}.${format}`;
+      const ascii = name.replace(/[^\x20-\x7e]/g, "_").replace(/"/g, "");
+      await audit(db, {
+        projectId: l.a.project.id,
+        userId: l.a.user.id,
+        action: "doc_compare.export",
+        targetType: "file",
+        targetId: l.to.file.id,
+        details: { comparisonId: l.row.id, format, count: rows.length, from: l.from.version.version, to: l.to.version.version },
+      });
+      reply.header("Content-Disposition", `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(name)}`);
+      if (format === "csv") {
+        reply.header("Content-Type", "text/csv; charset=utf-8");
+        return reply.send(toCsv(table.columns, table.rows));
+      }
+      const xlsx = await writeXlsx([
+        ...exportSummary(result, lang).map((sheet) => ({ name: sheet.name, columns: sheet.columns.map((title) => ({ title })), rows: sheet.rows })),
+        { name: t("doccompare:versionDiff.sheets.differences"), columns: table.columns.map((title) => ({ title })), rows: table.rows },
+      ]);
+      reply.header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      return reply.send(xlsx);
+    },
+  );
 }

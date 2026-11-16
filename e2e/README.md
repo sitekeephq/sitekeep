@@ -29,6 +29,9 @@ coverage for critical browser journeys:
 - poz suggestions (Poz Öner): own projects with a fixture IFC and unit prices; keyword suggestions with model
   quantities, changing a poz, rejecting one, accepting into cost rules, the learned pair suggested first in the
   next project, and the 5D dialog with the rules and the learned mappings (delete via the confirm dialog);
+- version comparison (FP-1, Community): two IFC versions on the comparison page (changed elements by class and storey,
+  filters, search, the link into the 3D viewer's colours, the Excel link) and two DXF versions per layer (text change,
+  added layer, the layer link into the CAD viewer);
 - 2D take-off (2B Metraj): a fixture PDF (`fixtures/takeoff-plan.pdf`, 600 × 400 pt with a 10 m line) opened from
   the PDF viewer, page calibration, an area priced by a unit price, a deducted opening, a length and a count,
   editing and deleting (confirm dialog), the Excel download, **Metraja Ekle** in the CAD viewer for `tiny.dxf`

@@ -792,5 +792,123 @@
         "compare": "Compare"
       }
     }
+  },
+  "versionDiff": {
+    "summaryHeading": "Change Summary",
+    "ruleBased": "Rule-based summary of the differences.",
+    "running": "Comparing the versions in the background (the drawings or model indexes are prepared first)…",
+    "failed": "The comparison failed: {{error}}",
+    "noStorey": "No storey",
+    "truncated": "The drawing has very many differences; the list shows the first 200,000 (the counts are complete).",
+    "empty": "No differences match the filters.",
+    "more": "Show More ({{shown}} / {{total}})",
+    "listHeading_one": "Differences ({{count}})",
+    "listHeading_other": "Differences ({{count}})",
+    "yes": "yes",
+    "no": "no",
+    "kinds": {
+      "added": "Added",
+      "removed": "Removed",
+      "changed": "Changed",
+      "unchanged": "Unchanged"
+    },
+    "status": {
+      "added": "Added",
+      "removed": "Removed",
+      "changed": "Changed",
+      "same": "Unchanged"
+    },
+    "aspects": {
+      "layer": "Layer",
+      "geometry": "Geometry",
+      "text": "Text",
+      "style": "Style"
+    },
+    "categories": {
+      "attribute": "Attributes",
+      "property": "Properties",
+      "quantity": "Quantities",
+      "type": "Type",
+      "placement": "Placement",
+      "geometry": "Geometry"
+    },
+    "props": {
+      "layer": "Layer",
+      "geometry": "Geometry",
+      "text": "Text",
+      "color": "Colour",
+      "linetype": "Linetype",
+      "lineweight": "Lineweight",
+      "ltscale": "Linetype scale",
+      "visibility": "Visibility",
+      "trueColor": "True colour",
+      "colorName": "Colour name",
+      "transparency": "Transparency",
+      "textStyle": "Text style",
+      "class": "Class",
+      "name": "Name",
+      "storey": "Storey",
+      "material": "Material",
+      "type": "Type",
+      "placement": "Placement",
+      "other": "Other attributes"
+    },
+    "layerProps": {
+      "color": "Colour",
+      "linetype": "Linetype",
+      "lineweight": "Lineweight",
+      "frozen": "Frozen",
+      "off": "Off",
+      "locked": "Locked",
+      "plot": "Plot",
+      "trueColor": "True colour"
+    },
+    "columns": {
+      "kind": "Change",
+      "layer": "Layer",
+      "class": "Class",
+      "storey": "Storey",
+      "entityType": "Entity Type",
+      "handle": "Entity",
+      "element": "Element",
+      "entities": "Entities",
+      "types": "Entity Types",
+      "layerProps": "Layer Properties",
+      "changes": "Details"
+    },
+    "filters": {
+      "kind": "Change",
+      "allKinds": "All Changes",
+      "allLayers": "All Layers",
+      "allClasses": "All Classes",
+      "allTypes": "All Entity Types",
+      "allStoreys": "All Storeys",
+      "aspect": "What Changed",
+      "allAspects": "Everything",
+      "search": "Search name, ID or value",
+      "clear": "Clear Filters"
+    },
+    "export": {
+      "xlsx": "⬇ Excel",
+      "csv": "⬇ CSV"
+    },
+    "cad": {
+      "open": "Open the New Version",
+      "layersHeading": "Layers",
+      "showLayer": "Show Layer",
+      "showLayerHint": "Open the new version with only this layer on",
+      "matchedByGeometry": "The entity handles differ between the versions (the drawing was probably re-created). Entities were matched by geometry, so a changed entity shows as removed and added.",
+      "highlightNote": "The CAD viewer cannot highlight single entities; open a layer to see its changes on their own."
+    },
+    "model": {
+      "open": "Show in the Model",
+      "openHint": "Open the 3D viewer: added elements green, changed orange, removed red",
+      "show": "Show",
+      "showHint": "Open the 3D viewer with this element selected",
+      "classesHeading": "By Class",
+      "storeysHeading": "By Storey",
+      "noGeometry": "Shapes were not compared: the model index of a version predates shape fingerprints.",
+      "notDetailed": "Property-level details are missing: the model index of a version is old and could not be rebuilt."
+    }
   }
 }

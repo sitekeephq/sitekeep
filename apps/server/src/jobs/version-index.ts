@@ -50,6 +50,10 @@ export interface IndexFile {
    * solids [profile area m², profile width m, profile height m, extrusion height m]] (no solids: unmeasured).
    */
   openings?: Record<string, [string, string | null, [number, number, number, number][]][]>;
+  /** Version of the `geom` field (GEOMETRY_FORMAT); absent in older indexes. */
+  geomV?: number;
+  /** GlobalId → fingerprint of the element's shape representation (version comparison, FP-1). */
+  geom?: Record<string, string>;
 }
 
 /** Index format that "Modele sor" and property-level comparison need. */
@@ -57,6 +61,9 @@ export const MODEL_INDEX_FORMAT = 2;
 
 /** Openings format the quantity inventory needs (jobs/ifc-worker.ts writes the same number). */
 export const OPENINGS_FORMAT = 1;
+
+/** Shape fingerprint format the version comparison needs (jobs/ifc-worker.ts writes the same number). */
+export const GEOMETRY_FORMAT = 1;
 
 const cache = new Map<string, IndexFile>();
 const CACHE_SIZE = 8;

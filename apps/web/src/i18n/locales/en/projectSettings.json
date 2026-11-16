@@ -211,6 +211,13 @@
         "items_removed": "Sheets removed from set",
         "published": "Sheet set published",
         "downloaded": "Sheet set downloaded"
+      },
+      "doc_compare": {
+        "run": "Versions compared",
+        "export": "Comparison exported",
+        "ai_summary": "Comparison summary (AI)",
+        "report": "Comparison report",
+        "review_note": "Comparison added to a review"
       }
     },
     "columns": {

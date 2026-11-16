@@ -98,8 +98,17 @@ import type {
   DocCompareDto,
   PageRegions,
   ReviewCdePlanDto,
+  VersionDiffFilter,
+  VersionDiffPageDto,
 } from "@sitekeep/shared";
 import { ApiError, del, get, patch, post, put, request, safeJson } from "./client";
+
+/** Query string of a differences filter (unset values left out; "" is a value: no storey). */
+function diffQuery(params: Record<string, string | undefined>): string {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v !== undefined) qs.set(k, v);
+  return qs.toString();
+}
 
 export { ApiError, request } from "./client";
 
@@ -739,6 +748,11 @@ export const api = {
   docCompare: (pid: string, from: string, to: string, rebuild = false) =>
     get<DocCompareDto>(`/projects/${pid}/doc-compare?from=${from}&to=${to}${rebuild ? "&rebuild=1" : ""}`),
   docComparison: (pid: string, cid: string) => get<DocCompareDto>(`/projects/${pid}/doc-compare/${cid}`),
+  /** DWG / IFC comparison (FP-1): one page of the differences. */
+  versionDifferences: (pid: string, cid: string, filter: VersionDiffFilter, offset = 0, limit = 100) =>
+    get<VersionDiffPageDto>(`/projects/${pid}/doc-compare/${cid}/differences?${diffQuery({ ...filter, offset: String(offset), limit: String(limit) })}`),
+  versionDifferencesExportUrl: (pid: string, cid: string, format: "csv" | "xlsx", filter: VersionDiffFilter) =>
+    `/api/v1/projects/${pid}/doc-compare/${cid}/export?${diffQuery({ ...filter, format })}`,
   saveCompareRegions: (pid: string, cid: string, pages: PageRegions[]) =>
     put<DocCompareDto>(`/projects/${pid}/doc-compare/${cid}/regions`, { pages }),
   startCompareSummary: (pid: string, cid: string, force = false) =>

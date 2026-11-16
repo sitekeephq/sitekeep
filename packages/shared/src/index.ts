@@ -28,6 +28,7 @@ export * from "./schedule/sim.js";
 export * from "./coordination/coordination.js";
 export * from "./documents/docintel.js";
 export * from "./documents/doc-compare.js";
+export * from "./documents/version-compare.js";
 export * from "./coordination/model-query.js";
 export * from "./viewers/viewers.js";
 export * from "./coordination/cad-bounds.js";

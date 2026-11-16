@@ -6,8 +6,10 @@
  * so they do not depend on the render scale.
  */
 import type { AntetFieldKey } from "./docintel.js";
+import type { CadCompareSummary, ModelCompareSummary } from "./version-compare.js";
 
-export type DocCompareKind = "pdf" | "xlsx" | "csv" | "docx" | "text";
+/** "dwg" covers DWG and DXF drawings, "ifc" IFC models (FP-1, docs/features/DOCUMENT_COMPARISON.md). */
+export type DocCompareKind = "pdf" | "xlsx" | "csv" | "docx" | "text" | "dwg" | "ifc";
 export type DocCompareStatus = "running" | "done" | "failed";
 export type DocAiStatus = "none" | "running" | "done" | "failed";
 
@@ -106,6 +108,12 @@ export interface DocCompareResult {
   antetRegion: NBox | null;
   /** Text changes outside the title block. */
   contentChanged: boolean;
+  /** DWG / DXF: entity and layer differences per layer (the full list is read page by page). */
+  cad?: CadCompareSummary;
+  /** IFC: element differences per GlobalId, by class and storey. */
+  model?: ModelCompareSummary;
+  /** Server only: storage key of the full difference list (never sent to clients). */
+  detailKey?: string;
 }
 
 export type DiffRegionKind = "added" | "removed" | "changed";
@@ -197,6 +205,8 @@ export const DOC_COMPARE_EXTENSIONS: Record<DocCompareKind, string[]> = {
   csv: ["csv", "tsv"],
   docx: ["docx"],
   text: ["txt", "md"],
+  dwg: ["dwg", "dxf"],
+  ifc: ["ifc"],
 };
 
 export function docCompareKind(extension: string): DocCompareKind | null {

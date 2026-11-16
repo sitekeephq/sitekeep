@@ -29,6 +29,7 @@ export function errorText(err: unknown, lang: string = DEFAULT_LANGUAGE): string
   return err instanceof Error ? err.message : String(err);
 }
 import { summarize } from "./ai.js";
+import { isVersionCompareKind, type VersionCompareRunner } from "./version-compare.js";
 import { docxUnits, readCsv, readWorkbook, textUnits } from "./office.js";
 import {
   antetChanges,
@@ -65,10 +66,15 @@ export class DocCompareService {
     private readonly db: Db,
     private readonly storage: Storage,
     private readonly log: (msg: string, extra?: unknown) => void = () => {},
+    /** DWG / IFC comparisons run on the job queue (FP-1); without it only documents are compared. */
+    private readonly versions?: VersionCompareRunner,
   ) {}
 
-  /** The cached comparison of a pair, created (and started) when missing or stale. */
-  async ensure(projectId: string, from: Side, to: Side, userId: string, rebuild = false): Promise<ComparisonRow> {
+  /**
+   * The cached comparison of a pair, created (and started) when missing or stale. `onStart` is
+   * called when a run starts (new, rebuilt or redone after a restart).
+   */
+  async ensure(projectId: string, from: Side, to: Side, userId: string, rebuild = false, onStart?: (row: ComparisonRow) => Promise<void>): Promise<ComparisonRow> {
     const [existing] = await this.db
       .select()
       .from(docComparisons)
@@ -80,19 +86,30 @@ export class DocCompareService {
         .values({ projectId, fromVersionId: from.version.id, toVersionId: to.version.id, createdBy: userId })
         .onConflictDoNothing()
         .returning();
-      if (!row) return this.ensure(projectId, from, to, userId, false);
-      this.startText(row.id, from, to);
+      if (!row) return this.ensure(projectId, from, to, userId, false, onStart);
+      await this.begin(row.id, from, to);
+      await onStart?.(row);
       return row;
     }
-    const stale = row.status === "running" && !this.textRuns.has(row.id);
+    const stale = row.status === "running" && !this.textRuns.has(row.id) && !(await this.versions?.active(row.id));
     if (rebuild || stale) {
       const reset = rebuild
         ? { status: "running" as const, error: null, result: null, regions: null, regionsAt: null, aiStatus: "none" as const, aiBullets: null, aiError: null }
         : { status: "running" as const, error: null };
+      const previous = row.result as DocCompareResult | null;
       [row] = await this.db.update(docComparisons).set({ ...reset, updatedAt: new Date() }).where(eq(docComparisons.id, row.id)).returning();
-      this.startText(row!.id, from, to);
+      if (rebuild) await this.versions?.drop(previous);
+      await this.begin(row!.id, from, to);
+      await onStart?.(row!);
     }
     return row!;
+  }
+
+  /** Starts a run: DWG / IFC on the job queue, documents in-process. */
+  private async begin(id: string, from: Side, to: Side): Promise<void> {
+    const { kind } = comparisonKind(from.file.name, to.file.name);
+    if (isVersionCompareKind(kind) && this.versions) await this.versions.start(id);
+    else this.startText(id, from, to);
   }
 
   async get(id: string): Promise<ComparisonRow | undefined> {
@@ -100,11 +117,19 @@ export class DocCompareService {
     return row;
   }
 
-  /** Waits (at most `ms`) for a running text diff. */
+  /** Waits (at most `ms`) for a running text diff (or a DWG / IFC comparison job). */
   async waitText(id: string, ms: number): Promise<void> {
     const run = this.textRuns.get(id);
-    if (!run) return;
-    await Promise.race([run.catch(() => {}), new Promise((r) => setTimeout(r, ms))]);
+    if (run) {
+      await Promise.race([run.catch(() => {}), new Promise((r) => setTimeout(r, ms))]);
+      return;
+    }
+    const end = Date.now() + ms;
+    while (Date.now() < end) {
+      const [row] = await this.db.select({ status: docComparisons.status }).from(docComparisons).where(eq(docComparisons.id, id));
+      if (row?.status !== "running") return;
+      await new Promise((r) => setTimeout(r, 100));
+    }
   }
 
   /** Waits (at most `ms`) for a running AI summary (tests, MCP). */
@@ -209,7 +234,6 @@ export function comparisonKind(nameA: string, nameB: string): { kind: ReturnType
   const eb = splitExtension(nameB).extension.toLowerCase();
   const ka = docCompareKind(ea);
   const kb = docCompareKind(eb);
-  if (ea === "ifc" || eb === "ifc") return { kind: null, error: msg("doccompare:errors.ifcInViewer") };
   if (!ka || !kb) return { kind: null, error: msg("doccompare:errors.unsupportedType", { extension: !ka ? ea : eb }) };
   if (ka !== kb) return { kind: null, error: msg("doccompare:errors.mixedTypes") };
   return { kind: ka };
@@ -235,6 +259,8 @@ async function bytesOf(storage: Storage, v: VersionRow): Promise<Buffer> {
 export async function computeComparison(storage: Storage, from: Side, to: Side): Promise<DocCompareResult> {
   const { kind, error } = comparisonKind(from.file.name, to.file.name);
   if (!kind) throw new Error(error ? render(DEFAULT_LANGUAGE, error) : undefined);
+  // Drawings and models are compared by the job queue (version-compare.ts).
+  if (isVersionCompareKind(kind)) throw new Error(render(DEFAULT_LANGUAGE, msg("doccompare:versionDiff.errors.needsQueue")));
   const identical = from.version.sha256 === to.version.sha256;
   const base: DocCompareResult = {
     kind,

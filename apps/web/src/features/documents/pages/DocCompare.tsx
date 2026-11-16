@@ -6,6 +6,8 @@ import { useCallback, useState, type ReactNode } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import {
+  docCompareKind,
+  splitExtension,
   type DiffRegion,
   type MarkupDto,
   type MarkupShape,
@@ -21,6 +23,7 @@ import { MarkupIssueDialog } from "../components/MarkupIssueDialog";
 import { DocCompareHeader } from "../components/DocCompareHeader";
 import { AiComparePanel, AntetTable, RegionList, TextDiffList } from "../components/DocComparePanels";
 import { DocCompareVisualStage } from "../components/DocCompareVisualStage";
+import { VersionDiffView } from "../components/VersionDiffView";
 import {
   comparisonThumbnail,
   MAX_ANALYZE,
@@ -64,6 +67,9 @@ export function DocComparePage() {
     onMessage: onDataMessage,
   });
 
+  // DWG / IFC (FP-1): differences per layer / GlobalId instead of pages.
+  const kind = dto ? docCompareKind(splitExtension(dto.to.fileName).extension) : null;
+  const versionDiff = kind === "dwg" || kind === "ifc";
   const [selected, setSelected] = useState<{ page: number; index: number } | null>(null);
   const [focus, setFocus] = useState<{ page: number; box: NBox; seq: number } | null>(null);
   const [issueFor, setIssueFor] = useState<{
@@ -232,9 +238,11 @@ export function DocComparePage() {
                 {t("docCompare.actions.saveMarkups")}
               </button>
             )}
-            <button className="small" disabled={dto.status !== "done" || !!working} onClick={() => void report()}>
-              {working === "report" ? <span className="spin" /> : "⬇"} {t("modelCompare.summary.report")}
-            </button>
+            {!versionDiff && (
+              <button className="small" disabled={dto.status !== "done" || !!working} onClick={() => void report()}>
+                {working === "report" ? <span className="spin" /> : "⬇"} {t("modelCompare.summary.report")}
+              </button>
+            )}
             <button className="small ghost" title={t("docCompare.rebuildHint")} onClick={() => void act("rebuild", rebuild)}>↻</button>
           </>
         )}
@@ -243,6 +251,8 @@ export function DocComparePage() {
       <div className="doccmp-main">
         {!dto ? (
           <p className="muted" style={{ margin: 16 }}>{t("docCompare.preparing")}</p>
+        ) : versionDiff ? (
+          <div className="doccmp-text"><VersionDiffView dto={dto} /></div>
         ) : isPdf ? (
           <DocCompareVisualStage
             docs={docs}
@@ -269,7 +279,19 @@ export function DocComparePage() {
         {message && <p className={typeof message === "string" ? "error small" : "small"}>{message}</p>}
         {dto && (
           <>
-            <AiComparePanel dto={dto} onDto={setDto} onBullet={(bullet) => bullet.page && focusOn(bullet.page, regionBox(regions, bullet), bullet.region)} onIssue={issueFromBullet} />
+            {versionDiff ? (
+              <div className="doccmp-ai">
+                <strong>{t("versionDiff.summaryHeading")}</strong>
+                {dto.status === "done" ? (
+                  <ul>{dto.summary.map((bullet, index) => <li key={index} className={bullet.severity === "warn" ? "warn" : undefined}>{bullet.text}</li>)}</ul>
+                ) : (
+                  <p className="small muted">{dto.status === "running" ? t("versionDiff.running") : dto.error}</p>
+                )}
+                <p className="muted small" style={{ margin: "6px 0 0" }}>{t("versionDiff.ruleBased")}</p>
+              </div>
+            ) : (
+              <AiComparePanel dto={dto} onDto={setDto} onBullet={(bullet) => bullet.page && focusOn(bullet.page, regionBox(regions, bullet), bullet.region)} onIssue={issueFromBullet} />
+            )}
             {dto.activeReviews.length > 0 && (
               <div className="notice small" style={{ marginTop: 10 }}>
                 {dto.activeReviews.map((review) => (

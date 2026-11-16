@@ -9,8 +9,7 @@
     "notReady": "Karşılaştırma henüz bitmedi.",
     "aiUnavailable": "Bu projede yapay zekâ kullanılamıyor.",
     "notInReview": "Bu versiyon bu incelemede değil ya da inceleme sürmüyor.",
-    "ifcInViewer": "IFC modelleri model görüntüleyicide karşılaştırılır (Modelde aç → Karşılaştır).",
-    "unsupportedType": "Bu dosya türü karşılaştırılamıyor (.{{extension}}). Desteklenen: PDF, XLSX, CSV, DOCX, TXT.",
+    "unsupportedType": "Bu dosya türü karşılaştırılamıyor (.{{extension}}). Desteklenen: PDF, XLSX, CSV, DOCX, TXT, DWG, DXF, IFC.",
     "mixedTypes": "İki dosya aynı türde olmalı (ör. PDF ile PDF).",
     "fileTooLarge": "Dosya çok büyük ({{mb}} MB); sınır {{limit}} MB.",
     "preparing": "Karşılaştırma hazırlanıyor; model indeksi oluşturuluyor. Biraz sonra tekrar deneyin.",
@@ -145,5 +144,115 @@
       "count": "Adet",
       "elements": "Elemanlar"
     }
+  },
+  "versionDiff": {
+    "errors": {
+      "timeout": "Çizim karşılaştırması çok uzun sürdü ve durduruldu.",
+      "binaryDxf": "İkili (binary) DXF dosyaları karşılaştırılamaz; çizimi ASCII DXF ya da DWG olarak kaydedin.",
+      "workerExit": "Çizim karşılaştırması beklenmedik biçimde durdu (kod {{code}}).",
+      "versionGone": "Versiyonlardan biri silinmiş.",
+      "notPrepared": "Versiyonlar zamanında karşılaştırmaya hazırlanamadı. ↻ ile yeniden deneyin.",
+      "dxfFailed": "Çizim okunamadı: {{error}}",
+      "needsQueue": "Çizimler ve modeller arka plan iş kuyruğunda karşılaştırılır.",
+      "notVersionComparison": "Bu karşılaştırmanın fark listesi yok (DWG ya da IFC karşılaştırması değil).",
+      "notReady": "Karşılaştırma henüz bitmedi.",
+      "noAiSummary": "Çizim ve modellerin yalnızca kurallı özeti var.",
+      "useExport": "Çizim ve modeller fark listesi olarak dışa aktarılır (CSV / Excel)."
+    },
+    "summary": {
+      "cadTotals": "Nesneler: {{added}} eklendi, {{removed}} silindi, {{changed}} değişti, {{unchanged}} aynı.",
+      "matchedByGeometry": "Nesne tanıtıcıları (handle) iki versiyonda farklı (çizim büyük olasılıkla yeniden oluşturulmuş); nesneler geometriye göre eşleştirildi, değişiklikler silinen + eklenen olarak görünür.",
+      "layer_added_one": "{{layer}} katmanı eklendi ({{count}} nesne).",
+      "layer_added_other": "{{layer}} katmanı eklendi ({{count}} nesne).",
+      "layer_removed_one": "{{layer}} katmanı silindi ({{count}} nesne).",
+      "layer_removed_other": "{{layer}} katmanı silindi ({{count}} nesne).",
+      "layerChanged": "{{layer}} katmanı: {{parts}}.",
+      "modelTotals": "Elemanlar: {{added}} eklendi, {{removed}} silindi, {{changed}} değişti, {{unchanged}} aynı.",
+      "classChanged": "{{cls}}: {{parts}}.",
+      "noGeometry": "Şekiller karşılaştırılmadı: bir versiyonun model dizini şekil parmak izlerinden eski ve yeniden oluşturulamadı."
+    },
+    "kinds": {
+      "added": "Eklenen",
+      "removed": "Silinen",
+      "changed": "Değişen",
+      "unchanged": "Aynı"
+    },
+    "status": {
+      "added": "Eklendi",
+      "removed": "Silindi",
+      "changed": "Değişti",
+      "same": "Aynı"
+    },
+    "aspects": {
+      "layer": "Katman",
+      "geometry": "Geometri",
+      "text": "Metin",
+      "style": "Görünüm"
+    },
+    "categories": {
+      "attribute": "Öznitelikler",
+      "property": "Özellikler",
+      "quantity": "Metrajlar",
+      "type": "Tip",
+      "placement": "Konum",
+      "geometry": "Geometri"
+    },
+    "props": {
+      "layer": "Katman",
+      "geometry": "Geometri",
+      "text": "Metin",
+      "color": "Renk",
+      "linetype": "Çizgi tipi",
+      "lineweight": "Çizgi kalınlığı",
+      "ltscale": "Çizgi tipi ölçeği",
+      "visibility": "Görünürlük",
+      "trueColor": "Gerçek renk",
+      "colorName": "Renk adı",
+      "transparency": "Saydamlık",
+      "textStyle": "Yazı stili",
+      "class": "Sınıf",
+      "name": "Ad",
+      "storey": "Kat",
+      "material": "Malzeme",
+      "type": "Tip",
+      "placement": "Konum",
+      "other": "Diğer öznitelikler"
+    },
+    "layerProps": {
+      "color": "Renk",
+      "linetype": "Çizgi tipi",
+      "lineweight": "Çizgi kalınlığı",
+      "frozen": "Dondurulmuş",
+      "off": "Kapalı",
+      "locked": "Kilitli",
+      "plot": "Çizdirilir",
+      "trueColor": "Gerçek renk"
+    },
+    "columns": {
+      "kind": "Değişiklik",
+      "layer": "Katman",
+      "class": "Sınıf",
+      "entityType": "Nesne tipi",
+      "storey": "Kat",
+      "handle": "Tanıtıcı (handle)",
+      "globalId": "GlobalId",
+      "content": "Metin / blok",
+      "name": "Ad",
+      "aspects": "Ne değişti",
+      "changes": "Ayrıntılar",
+      "status": "Durum",
+      "entitiesA": "Nesne (eski)",
+      "entitiesB": "Nesne (yeni)",
+      "types": "Nesne tipleri (eski → yeni)",
+      "layerProps": "Katman özellikleri"
+    },
+    "sheets": {
+      "differences": "Farklar",
+      "layers": "Katmanlar",
+      "classes": "Sınıflar",
+      "storeys": "Katlar"
+    },
+    "noStorey": "Katsız",
+    "fileSuffix": "farklar"
   }
 }

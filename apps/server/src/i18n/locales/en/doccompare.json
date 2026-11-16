@@ -9,8 +9,7 @@
     "notReady": "The comparison has not finished yet.",
     "aiUnavailable": "AI is not available in this project.",
     "notInReview": "This version is not in this review, or the review is not running.",
-    "ifcInViewer": "IFC models are compared in the model viewer (Open in Model → Compare).",
-    "unsupportedType": "This file type cannot be compared (.{{extension}}). Supported: PDF, XLSX, CSV, DOCX, TXT.",
+    "unsupportedType": "This file type cannot be compared (.{{extension}}). Supported: PDF, XLSX, CSV, DOCX, TXT, DWG, DXF, IFC.",
     "mixedTypes": "Both files must be of the same type (e.g. PDF and PDF).",
     "fileTooLarge": "The file is too large ({{mb}} MB); the limit is {{limit}} MB.",
     "preparing": "Preparing the comparison; the model index is being built. Try again shortly.",
@@ -145,5 +144,115 @@
       "count": "Count",
       "elements": "Elements"
     }
+  },
+  "versionDiff": {
+    "errors": {
+      "timeout": "The drawing comparison took too long and was stopped.",
+      "binaryDxf": "Binary DXF files cannot be compared; save the drawing as an ASCII DXF or DWG.",
+      "workerExit": "The drawing comparison stopped unexpectedly (code {{code}}).",
+      "versionGone": "One of the versions was deleted.",
+      "notPrepared": "The versions could not be prepared for comparison in time. Try again with ↻.",
+      "dxfFailed": "The drawing could not be read: {{error}}",
+      "needsQueue": "Drawings and models are compared in the background job queue.",
+      "notVersionComparison": "This comparison has no list of differences (it is not a DWG or IFC comparison).",
+      "notReady": "The comparison has not finished yet.",
+      "noAiSummary": "Drawings and models have a rule-based summary only.",
+      "useExport": "Drawings and models are exported as a list of differences (CSV / Excel)."
+    },
+    "summary": {
+      "cadTotals": "Entities: {{added}} added, {{removed}} removed, {{changed}} changed, {{unchanged}} unchanged.",
+      "matchedByGeometry": "The entity handles differ between the versions (the drawing was probably re-created); entities were matched by geometry, so changes show as removed + added.",
+      "layer_added_one": "Layer {{layer}} was added ({{count}} entity).",
+      "layer_added_other": "Layer {{layer}} was added ({{count}} entities).",
+      "layer_removed_one": "Layer {{layer}} was removed ({{count}} entity).",
+      "layer_removed_other": "Layer {{layer}} was removed ({{count}} entities).",
+      "layerChanged": "Layer {{layer}}: {{parts}}.",
+      "modelTotals": "Elements: {{added}} added, {{removed}} removed, {{changed}} changed, {{unchanged}} unchanged.",
+      "classChanged": "{{cls}}: {{parts}}.",
+      "noGeometry": "Shapes were not compared: the model index of a version predates shape fingerprints and could not be rebuilt."
+    },
+    "kinds": {
+      "added": "Added",
+      "removed": "Removed",
+      "changed": "Changed",
+      "unchanged": "Unchanged"
+    },
+    "status": {
+      "added": "Added",
+      "removed": "Removed",
+      "changed": "Changed",
+      "same": "Unchanged"
+    },
+    "aspects": {
+      "layer": "Layer",
+      "geometry": "Geometry",
+      "text": "Text",
+      "style": "Style"
+    },
+    "categories": {
+      "attribute": "Attributes",
+      "property": "Properties",
+      "quantity": "Quantities",
+      "type": "Type",
+      "placement": "Placement",
+      "geometry": "Geometry"
+    },
+    "props": {
+      "layer": "Layer",
+      "geometry": "Geometry",
+      "text": "Text",
+      "color": "Colour",
+      "linetype": "Linetype",
+      "lineweight": "Lineweight",
+      "ltscale": "Linetype scale",
+      "visibility": "Visibility",
+      "trueColor": "True colour",
+      "colorName": "Colour name",
+      "transparency": "Transparency",
+      "textStyle": "Text style",
+      "class": "Class",
+      "name": "Name",
+      "storey": "Storey",
+      "material": "Material",
+      "type": "Type",
+      "placement": "Placement",
+      "other": "Other attributes"
+    },
+    "layerProps": {
+      "color": "Colour",
+      "linetype": "Linetype",
+      "lineweight": "Lineweight",
+      "frozen": "Frozen",
+      "off": "Off",
+      "locked": "Locked",
+      "plot": "Plot",
+      "trueColor": "True colour"
+    },
+    "columns": {
+      "kind": "Change",
+      "layer": "Layer",
+      "class": "Class",
+      "entityType": "Entity type",
+      "storey": "Storey",
+      "handle": "Handle",
+      "globalId": "GlobalId",
+      "content": "Text / block",
+      "name": "Name",
+      "aspects": "What changed",
+      "changes": "Details",
+      "status": "Status",
+      "entitiesA": "Entities (old)",
+      "entitiesB": "Entities (new)",
+      "types": "Entity types (old → new)",
+      "layerProps": "Layer properties"
+    },
+    "sheets": {
+      "differences": "Differences",
+      "layers": "Layers",
+      "classes": "Classes",
+      "storeys": "Storeys"
+    },
+    "noStorey": "No storey",
+    "fileSuffix": "differences"
   }
 }

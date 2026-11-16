@@ -268,6 +268,29 @@ async function buildIndex(path: string) {
       return typeSets.get(typeId)!;
     };
     const details: Record<string, [number, number, number, number, string, number[], number[], number]> = {};
+    // Shape fingerprint per element (FP-1 version comparison): the representation tree, references
+    // replaced by the fingerprints of what they point at (express ids left out), memoised per entity.
+    const geom: Record<string, string> = {};
+    const shapeMemo = new Map<number, string>();
+    const shapeOf = (id: number, depth = 0): string => {
+      const hit = shapeMemo.get(id);
+      if (hit !== undefined) return hit;
+      if (depth > 64 || id <= 0) return "";
+      const norm = (v: unknown): unknown => {
+        const r = ref(v);
+        if (r !== null) return shapeOf(r, depth + 1);
+        if (Array.isArray(v)) return v.map(norm);
+        const p = primitive(v);
+        if (p !== undefined) return p;
+        const out: Record<string, unknown> = {};
+        for (const [k, val] of Object.entries(v as Record<string, unknown>)) if (!SKIP_KEYS.has(k)) out[k] = norm(val);
+        return out;
+      };
+      const h = hash(`${api.GetLineType(modelId, id)}:${stableStringify(norm(api.GetLine(modelId, id, false)))}`);
+      if (shapeMemo.size > 500_000) shapeMemo.clear();
+      shapeMemo.set(id, h);
+      return h;
+    };
     const typeGuids = new Map<number, string | null>();
     const typeGuid = (typeId: number) => {
       if (!typeGuids.has(typeId)) {
@@ -313,6 +336,14 @@ async function buildIndex(path: string) {
         };
         const name = primitive(line.Name);
         elements[guid] = [t.typeName, typeof name === "string" ? name : null, hash(stableStringify(content))];
+        const shapeId = ref(line.Representation);
+        if (shapeId !== null) {
+          try {
+            geom[guid] = shapeOf(shapeId);
+          } catch {
+            /* an unreadable shape is not compared */
+          }
+        }
         elementCount++;
 
         const props = new Map<string, unknown>();
@@ -378,6 +409,8 @@ async function buildIndex(path: string) {
         keys,
         vals,
         details,
+        geomV: GEOMETRY_FORMAT,
+        geom,
         ...(units && { units }),
         ...(openings && { openingsV: OPENINGS_FORMAT, openings }),
       }),
@@ -390,6 +423,8 @@ async function buildIndex(path: string) {
 
 /** Same as OPENINGS_FORMAT in version-index.ts (this file has no relative imports). */
 const OPENINGS_FORMAT = 1;
+/** Same as GEOMETRY_FORMAT in version-index.ts. */
+const GEOMETRY_FORMAT = 1;
 
 const SI_PREFIX: Record<string, number> = { EXA: 1e18, PETA: 1e15, TERA: 1e12, GIGA: 1e9, MEGA: 1e6, KILO: 1e3, HECTO: 1e2, DECA: 10, DECI: 0.1, CENTI: 0.01, MILLI: 1e-3, MICRO: 1e-6, NANO: 1e-9 };
 

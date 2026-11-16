@@ -21,6 +21,7 @@ export const PROP_CLASS = "Sınıf"; // i18n-ok: change key (data), shown throug
 export const PROP_MATERIAL = "Malzeme";
 export const PROP_PLACEMENT = "Konum";
 export const PROP_OTHER = "Diğer"; // i18n-ok: change key (data), shown through modelFieldLabel
+export const PROP_GEOMETRY = "Geometri"; // i18n-ok: change key (data), shown through modelFieldLabel
 
 const MAX_CHANGES_PER_ELEMENT = 30;
 const MAX_GROUP_GUIDS = 5000;
@@ -56,8 +57,11 @@ export function elementChanges(oldIdx: ModelIndex, newIdx: ModelIndex, guid: str
       if (out.length >= MAX_CHANGES_PER_ELEMENT) break;
       push(k, pa.get(k), pb.get(k));
     }
-    if (!out.length) out.push({ prop: a.placementHash !== b.placementHash ? PROP_PLACEMENT : PROP_OTHER, from: null, to: null });
   }
+  const sa = oldIdx.shape(guid);
+  const sb = newIdx.shape(guid);
+  if (oldIdx.hasGeometry && newIdx.hasGeometry && sa !== sb) out.push({ prop: PROP_GEOMETRY, from: null, to: null });
+  if (oldIdx.detailed && newIdx.detailed && !out.length) out.push({ prop: a.placementHash !== b.placementHash ? PROP_PLACEMENT : PROP_OTHER, from: null, to: null });
   return out;
 }
 
@@ -149,12 +153,13 @@ export function groupChanges(
       continue;
     }
     const label = modelFieldLabel(b.prop, lang);
-    const propWeight = IMPORTANT.test(label) ? 2.5 : b.prop === PROP_PLACEMENT ? 1.2 : b.prop === PROP_OTHER ? 0.6 : 1;
+    const propWeight = IMPORTANT.test(label) ? 2.5 : b.prop === PROP_PLACEMENT || b.prop === PROP_GEOMETRY ? 1.2 : b.prop === PROP_OTHER ? 0.6 : 1;
     if (b.pairs.size <= MAX_PAIRS) {
       for (const p of b.pairs.values()) {
         const n = p.guids.length;
         const text =
           b.prop === PROP_PLACEMENT ? t("model:diff.moved", { where, count: n })
+          : b.prop === PROP_GEOMETRY ? t("model:diff.reshaped", { where, count: n })
           : b.prop === PROP_OTHER ? t("model:diff.otherChanged", { where, count: n })
           : t("model:diff.propChanged", { where, count: n, label, from: p.from ?? "—", to: p.to ?? "—" });
         groups.push({ ...base, count: n, guids: p.guids.slice(0, MAX_GROUP_GUIDS), prop: b.prop, from: p.from, to: p.to, text, score: kindWeight * propWeight * (1 + Math.log2(n)) });

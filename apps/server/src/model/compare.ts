@@ -46,7 +46,7 @@ export function compareOf(p: ComparePair): VersionCompareDto {
   const key = `${p.a.version.id}|${p.b.version.id}`;
   let hit = diffCache.get(key);
   if (!hit || hit.oldIdx !== p.oldIdx || hit.newIdx !== p.newIdx) {
-    const base = diffIndexes(p.oldIdx.file.elements, p.newIdx.file.elements);
+    const base = diffIndexes(p.oldIdx.file.elements, p.newIdx.file.elements, shapesOf(p.oldIdx, p.newIdx));
     const d = detailDiff(p.oldIdx, p.newIdx, base);
     const result: Omit<VersionCompareDto, "from" | "to"> = { ...base, detailed: d.detailed, storeys: d.storeys, groups: d.groups };
     if (d.detailed) result.changes = d.changes;
@@ -71,7 +71,20 @@ export function abortOnClose(reply: FastifyReply): { signal: AbortSignal; done()
   return { signal: ac.signal, done: () => reply.raw.off("close", onClose) };
 }
 
-export function diffIndexes(oldIdx: ElementIndex, newIdx: ElementIndex): Omit<VersionCompareDto, "from" | "to"> {
+/** Shape fingerprints of both indexes, when both recorded them (else shapes are not compared). */
+export function shapesOf(oldIdx: ModelIndex, newIdx: ModelIndex): { old: Record<string, string>; new: Record<string, string> } | undefined {
+  return oldIdx.hasGeometry && newIdx.hasGeometry ? { old: oldIdx.file.geom!, new: newIdx.file.geom! } : undefined;
+}
+
+/**
+ * GlobalId diff of two element indexes. With `shapes` (both indexes have shape fingerprints) an
+ * element whose shape changed counts as changed too.
+ */
+export function diffIndexes(
+  oldIdx: ElementIndex,
+  newIdx: ElementIndex,
+  shapes?: { old: Record<string, string>; new: Record<string, string> },
+): Omit<VersionCompareDto, "from" | "to"> {
   const added: string[] = [];
   const removed: string[] = [];
   const changed: string[] = [];
@@ -86,7 +99,7 @@ export function diffIndexes(oldIdx: ElementIndex, newIdx: ElementIndex): Omit<Ve
     const old = oldIdx[guid];
     if (!old) {
       added.push(guid); elements[guid] = [cls, name]; bump(cls, "added");
-    } else if (old[2] !== hash || old[0] !== cls) {
+    } else if (old[2] !== hash || old[0] !== cls || (shapes && (shapes.old[guid] ?? null) !== (shapes.new[guid] ?? null))) {
       changed.push(guid); elements[guid] = [cls, name]; bump(cls, "changed");
     } else {
       unchanged++; bump(cls, "unchanged");

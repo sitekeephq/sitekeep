@@ -1598,6 +1598,22 @@ ins.diff-new { background: var(--diff-new-soft); text-decoration: none; }
 .doccmp-ai li { margin: 4px 0; }
 .doccmp-ai li.warn { color: var(--warn); }
 .doccmp-text { padding: 16px; overflow: auto; flex: 1; }
+/* DWG / IFC version comparison (FP-1) */
+.vdiff h3 { margin: 16px 0 6px; font-size: 14px; }
+.vdiff-kpis { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.vdiff-kpi { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); color: var(--text); font: inherit; }
+button.vdiff-kpi { cursor: pointer; }
+.vdiff-kpi b { font-size: 20px; line-height: 1.1; }
+.vdiff-kpi.diff-added b { color: var(--diff-new); }
+.vdiff-kpi.diff-removed b { color: var(--diff-old); }
+.vdiff-kpi.diff-changed b { color: var(--warn); }
+.vdiff-tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.vdiff-table tr.active td { background: var(--primary-soft); }
+.vdiff-table td { vertical-align: top; overflow-wrap: anywhere; }
+.vdiff-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.vdiff-filters select, .vdiff-filters input { width: auto; max-width: 220px; }
+.vdiff-changes { margin: 0; padding-left: 16px; }
+.vdiff-changes li { margin: 2px 0; }
 .spin { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -2px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 900px) {

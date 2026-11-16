@@ -3,7 +3,7 @@
  * material and flattened properties per GlobalId, plus the field resolution used by queries.
  */
 import { foldPlain, ifcClassLabel, type ModelVocabDto, type OpeningSolid } from "@sitekeep/shared";
-import { MODEL_INDEX_FORMAT, OPENINGS_FORMAT, type IndexFile } from "../jobs/version-index.js";
+import { GEOMETRY_FORMAT, MODEL_INDEX_FORMAT, OPENINGS_FORMAT, type IndexFile } from "../jobs/version-index.js";
 
 export interface OpeningView {
   guid: string;
@@ -85,6 +85,16 @@ export class ModelIndex {
   /** Openings are read from the geometry (newer indexes; see OPENINGS_FORMAT). */
   get hasOpenings(): boolean {
     return (this.file.openingsV ?? 0) >= OPENINGS_FORMAT && !!this.file.openings;
+  }
+
+  /** Shape fingerprints are recorded (newer indexes; see GEOMETRY_FORMAT). */
+  get hasGeometry(): boolean {
+    return (this.file.geomV ?? 0) >= GEOMETRY_FORMAT && !!this.file.geom;
+  }
+
+  /** Fingerprint of an element's shape; null without a shape or in older indexes. */
+  shape(guid: string): string | null {
+    return this.file.geom?.[guid] ?? null;
   }
 
   /** Metres, m² and m³ per model unit; null when the index predates the field. */

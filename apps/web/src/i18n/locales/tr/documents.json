@@ -792,5 +792,123 @@
         "compare": "Karşılaştır"
       }
     }
+  },
+  "versionDiff": {
+    "summaryHeading": "Değişiklik Özeti",
+    "ruleBased": "Farkların kurallı özeti.",
+    "running": "Versiyonlar arka planda karşılaştırılıyor (önce çizimler ya da model dizinleri hazırlanıyor)…",
+    "failed": "Karşılaştırma yapılamadı: {{error}}",
+    "noStorey": "Katsız",
+    "truncated": "Çizimde çok fazla fark var; listede ilk 200.000 fark görünür (sayılar eksiksizdir).",
+    "empty": "Filtrelere uyan fark yok.",
+    "more": "Daha Fazla Göster ({{shown}} / {{total}})",
+    "listHeading_one": "Farklar ({{count}})",
+    "listHeading_other": "Farklar ({{count}})",
+    "yes": "evet",
+    "no": "hayır",
+    "kinds": {
+      "added": "Eklenen",
+      "removed": "Silinen",
+      "changed": "Değişen",
+      "unchanged": "Aynı"
+    },
+    "status": {
+      "added": "Eklendi",
+      "removed": "Silindi",
+      "changed": "Değişti",
+      "same": "Aynı"
+    },
+    "aspects": {
+      "layer": "Katman",
+      "geometry": "Geometri",
+      "text": "Metin",
+      "style": "Görünüm"
+    },
+    "categories": {
+      "attribute": "Öznitelikler",
+      "property": "Özellikler",
+      "quantity": "Metrajlar",
+      "type": "Tip",
+      "placement": "Konum",
+      "geometry": "Geometri"
+    },
+    "props": {
+      "layer": "Katman",
+      "geometry": "Geometri",
+      "text": "Metin",
+      "color": "Renk",
+      "linetype": "Çizgi tipi",
+      "lineweight": "Çizgi kalınlığı",
+      "ltscale": "Çizgi tipi ölçeği",
+      "visibility": "Görünürlük",
+      "trueColor": "Gerçek renk",
+      "colorName": "Renk adı",
+      "transparency": "Saydamlık",
+      "textStyle": "Yazı stili",
+      "class": "Sınıf",
+      "name": "Ad",
+      "storey": "Kat",
+      "material": "Malzeme",
+      "type": "Tip",
+      "placement": "Konum",
+      "other": "Diğer öznitelikler"
+    },
+    "layerProps": {
+      "color": "Renk",
+      "linetype": "Çizgi tipi",
+      "lineweight": "Çizgi kalınlığı",
+      "frozen": "Dondurulmuş",
+      "off": "Kapalı",
+      "locked": "Kilitli",
+      "plot": "Çizdirilir",
+      "trueColor": "Gerçek renk"
+    },
+    "columns": {
+      "kind": "Değişiklik",
+      "layer": "Katman",
+      "class": "Sınıf",
+      "storey": "Kat",
+      "entityType": "Nesne Tipi",
+      "handle": "Nesne",
+      "element": "Eleman",
+      "entities": "Nesne",
+      "types": "Nesne Tipleri",
+      "layerProps": "Katman Özellikleri",
+      "changes": "Ayrıntılar"
+    },
+    "filters": {
+      "kind": "Değişiklik",
+      "allKinds": "Tüm Değişiklikler",
+      "allLayers": "Tüm Katmanlar",
+      "allClasses": "Tüm Sınıflar",
+      "allTypes": "Tüm Nesne Tipleri",
+      "allStoreys": "Tüm Katlar",
+      "aspect": "Ne Değişti",
+      "allAspects": "Hepsi",
+      "search": "Ad, kimlik ya da değer ara",
+      "clear": "Filtreleri Temizle"
+    },
+    "export": {
+      "xlsx": "⬇ Excel",
+      "csv": "⬇ CSV"
+    },
+    "cad": {
+      "open": "Yeni Versiyonu Aç",
+      "layersHeading": "Katmanlar",
+      "showLayer": "Katmanı Göster",
+      "showLayerHint": "Yeni versiyonu yalnızca bu katman açık olarak aç",
+      "matchedByGeometry": "Nesne tanıtıcıları (handle) iki versiyonda farklı (çizim büyük olasılıkla yeniden oluşturulmuş). Nesneler geometriye göre eşleştirildi; değişen bir nesne silinen ve eklenen olarak görünür.",
+      "highlightNote": "CAD görüntüleyici tek tek nesneleri vurgulayamaz; değişiklikleri ayrı görmek için katmanı açın."
+    },
+    "model": {
+      "open": "Modelde Göster",
+      "openHint": "3B görüntüleyiciyi aç: eklenen elemanlar yeşil, değişenler turuncu, silinenler kırmızı",
+      "show": "Göster",
+      "showHint": "3B görüntüleyiciyi bu eleman seçili olarak aç",
+      "classesHeading": "Sınıfa Göre",
+      "storeysHeading": "Kata Göre",
+      "noGeometry": "Şekiller karşılaştırılmadı: bir versiyonun model dizini şekil parmak izlerinden eski.",
+      "notDetailed": "Özellik düzeyinde ayrıntı yok: bir versiyonun model dizini eski ve yeniden oluşturulamadı."
+    }
   }
 }
