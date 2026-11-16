@@ -57,6 +57,10 @@ sunucusu", a tool server for AI clients).
 | Forma / ACC file sync | Forma Eşitleme (en: Forma Sync) | Project → Administration. ACC project connection, registration and file fetching on one page. [Forma sync](../features/FORMA_SYNC.md) |
 | Upload / download | Yükle / indir (en: Upload / Download) | |
 | WIP / Shared / Published / Archived | Çalışma / Paylaşılan / Yayınlanan / Arşivlenen (en: Work in Progress / Shared / Published / Archived) | ISO 19650 status labels |
+| Sheet, Sheets (drawing sheet) | Pafta, Paftalar (en: Sheet, Sheets) | One page of a drawing (PDF page, DWG). Menu "Paftalar" (Sheets). [Sheets](../features/SHEETS.md) |
+| Sheet set | Pafta seti (en: Sheet Set) | "İhale Seti" (Tender Set), "Uygulama Yayını 03" (Construction Issue 03) |
+| Sheet list | Pafta listesi (en: Sheet List) | Excel/CSV export: `…-pafta-listesi.xlsx` |
+| Issue (of a sheet set) | Yayın (en: Issue) | "Seti Yayınla" (Publish Set), "Yayın 03" (Issue 03); not "Sorun", which is an issue in the issue tracker |
 | CDE (Common Data Environment) | CDE (en: CDE) | Project Settings tab; the abbreviation stays. [CDE states](../features/CDE_STATES.md) |
 | Suitability code / revision code | Uygunluk kodu / Revizyon kodu (en: Suitability Code / Revision Code) | Per version (ISO 19650) |
 | Task team | Görev ekibi (en: Task Team) | A kind of project role |

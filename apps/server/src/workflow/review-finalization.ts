@@ -1,4 +1,5 @@
 import { isApprovedOutcome, pathSegments, renderPattern, splitExtension, validateName } from "@sitekeep/shared";
+import { queueSheetsFor } from "../sheets/service.js";
 import { and, eq, isNull } from "drizzle-orm";
 import { audit } from "../core/platform/audit.js";
 import { FolderTree } from "../core/security/access.js";
@@ -260,6 +261,8 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
         .where(eq(reviewFiles.id, rf.id));
       if (out.created && out.version.derivativeStatus === "pending")
         await jobs.enqueue("ifc_to_frag", { versionId: out.version.id });
+      // Drawing sheets of the approved copy (FP-2): Shared and Published are scanned by default.
+      if (out.created) await queueSheetsFor(jobs, out.version.id, out.file.name);
       report.copied++;
       report.results.push({
         name,

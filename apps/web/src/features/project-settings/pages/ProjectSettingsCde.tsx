@@ -6,11 +6,13 @@ import { CdeCodeConflicts } from "../components/CdeCodeConflicts";
 import { TaskTeamsSection } from "./TaskTeamsSection";
 import { CdeCodesSettings } from "./CdeCodesSettings";
 import { CdeTransitionsEditor } from "./CdeTransitionsEditor";
+import { SheetSettingsSection } from "./SheetSettingsSection";
 
 /**
  * Proje Ayarları → CDE: the project's ISO 19650 settings (docs/features/CDE_STATES.md): the codes
  * (ISO-2, CdeCodesSettings), the transitions with the enforcement switch and the archive folder
- * (ISO-1, CdeTransitionsEditor) and task teams (ISO-5, TaskTeamsSection).
+ * (ISO-1, CdeTransitionsEditor), task teams (ISO-5, TaskTeamsSection) and the folders scanned for
+ * drawing sheets (FP-2, SheetSettingsSection).
  */
 export function CdeSettings() {
   const { t } = useTranslation("cde");
@@ -31,6 +33,8 @@ export function CdeSettings() {
       <CdeTransitionsEditor key={s.updatedAt ?? "new"} settings={s} workflows={workflows} onSaved={setSettings} />
 
       <TaskTeamsSection settings={s} onSettings={setSettings} />
+
+      <SheetSettingsSection />
 
       <CdeCodeConflicts projectId={project.id} settings={s} onSaved={setSettings} />
     </div>

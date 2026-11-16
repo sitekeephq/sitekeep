@@ -13,6 +13,7 @@ import { badRequest, conflict, forbidden } from "../core/platform/http.js";
 import { DEFAULT_LANGUAGE, msg, render } from "../i18n/index.js";
 import type { JobQueue } from "../jobs/queue.js";
 import { queuePreviewsFor } from "../previews/service.js";
+import { queueSheetsFor } from "../sheets/service.js";
 import type { StoredObject } from "../core/platform/storage.js";
 import { effectiveDefinitions } from "../modules/documents/attributes.js";
 import { standardForFolder } from "../modules/documents/naming-routes.js";
@@ -182,6 +183,8 @@ export async function afterVersionAdded(
   if (VIEWABLE.has(ext)) await jobs.enqueue("ifc_to_frag", { versionId: r.version.id });
   // Title block and revision check (document intelligence), in the background.
   if (ext === "pdf") await jobs.enqueue("docintel_extract", { versionId: r.version.id });
+  // Drawing sheets (FP-2): PDF/DWG/DXF in the folders of the sheet settings.
+  await queueSheetsFor(jobs, r.version.id, name);
   // In-browser viewers: office PDF, sheet JSON, DXF, search text.
   await queuePreviewsFor(db, jobs, r.version.id, name);
   await audit(db, {

@@ -78,6 +78,7 @@ test("main project navigation routes render without browser or API errors", asyn
     { route: "today", label: "Bugün" },
     { route: "works", label: "İşler" },
     { route: "files", label: "Dokümanlar" },
+    { route: "sheets", label: "Paftalar" },
     { route: "reviews", label: "İncelemeler" },
     { route: "forms", label: "Formlar", module: "field" },
     { route: "issues", label: "Sorunlar" },

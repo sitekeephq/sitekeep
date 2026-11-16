@@ -55,7 +55,8 @@ interface Entry {
   version: VersionRow;
 }
 
-async function sendZip(
+/** Streams a zip of the given files, folders and versions (also used by sheet sets). */
+export async function sendZip(
   { db, storage }: AppDeps,
   pid: string,
   user: NonNullable<import("fastify").FastifyRequest["user"]>,

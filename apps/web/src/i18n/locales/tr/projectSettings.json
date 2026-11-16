@@ -197,6 +197,20 @@
       "audit": {
         "exported": "Denetim kaydı dışa aktarıldı",
         "chain_started": "Denetim zinciri başladı"
+      },
+      "sheet": {
+        "updated": "Pafta bilgileri düzenlendi",
+        "settings_updated": "Pafta ayarları değişti",
+        "rescanned": "Paftalar yeniden okundu"
+      },
+      "sheet_set": {
+        "created": "Pafta seti oluşturuldu",
+        "updated": "Pafta seti güncellendi",
+        "deleted": "Pafta seti silindi",
+        "items_added": "Sete pafta eklendi",
+        "items_removed": "Setten pafta çıkarıldı",
+        "published": "Pafta seti yayınlandı",
+        "downloaded": "Pafta seti indirildi"
       }
     },
     "columns": {

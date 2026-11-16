@@ -23,6 +23,7 @@ import projects from "./locales/en/projects.json";
 import reports from "./locales/en/reports.json";
 import reviews from "./locales/en/reviews.json";
 import schedule from "./locales/en/schedule.json";
+import sheets from "./locales/en/sheets.json";
 import shell from "./locales/en/shell.json";
 import sim from "./locales/en/sim.json";
 import viewers from "./locales/en/viewers.json";
@@ -46,6 +47,7 @@ export const en = {
   reports,
   reviews,
   schedule,
+  sheets,
   shell,
   sim,
   viewers,

@@ -39,6 +39,7 @@ import { idsRoutes } from "../coordination/routes/ids.js";
 import { enforceTokenScope } from "../core/security/token-scope.js";
 import { reportRoutes } from "../reports/routes.js";
 import { docIntelRoutes } from "../docintel/routes.js";
+import { sheetRoutes } from "../sheets/routes.js";
 import { docCompareRoutes } from "../doccompare/routes/doc-compare.js";
 import { previewRoutes } from "../previews/routes.js";
 import { Converters } from "../previews/converters.js";
@@ -192,6 +193,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await coordinationRoutes(api, deps);
       await idsRoutes(api, deps);
       await docIntelRoutes(api, deps);
+      await sheetRoutes(api, deps);
       await docCompareRoutes(api, deps);
       await previewRoutes(api, deps);
       await officeRoutes(api, deps);

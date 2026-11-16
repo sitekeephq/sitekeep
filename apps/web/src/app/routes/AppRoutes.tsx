@@ -9,6 +9,7 @@ import { CoordinationPage } from "../../features/coordination/pages/Coordination
 import { DocsPage } from "../../features/documents/DocsPage";
 import { DeletedPage } from "../../features/documents/pages/Deleted";
 import { PdfViewerPage } from "../../features/documents/pages/PdfViewer";
+import { SheetsPage } from "../../features/sheets/SheetsPage";
 import { DocComparePage } from "../../features/documents/pages/DocCompare";
 import { AfterLoginPage, OAuthConsentPage } from "../../features/integrations/pages/OAuthConsent";
 import { OpenCdeSelectPage, OpenCdeUploadPage } from "../../features/integrations/pages/OpenCdeDocuments";
@@ -74,6 +75,8 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
           <Route path="deleted" element={<DeletedPage />} />
           <Route path="view/:versionId" element={<PdfViewerPage />} />
           <Route path="compare" element={<DocComparePage />} />
+          <Route path="sheets" element={<SheetsPage />} />
+          <Route path="sheets/:sheetId" element={<SheetsPage />} />
           <Route
             path="open/:versionId"
             element={

@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "sheet": "Sheet",
+    "set": "Sheet set",
+    "issue": "Set issue",
+    "version": "Version"
+  },
+  "errors": {
+    "editDenied": "You need edit permission on the folder to change this sheet.",
+    "setManageDenied": "Only the creator of the set or a project administrator can change it.",
+    "setNameTaken": "A sheet set named {{name}} already exists.",
+    "emptySet": "The set has no sheets you can see.",
+    "notDrawing": "Sheets are read from PDF, DWG and DXF files only.",
+    "unknownFolder": "A chosen folder is not in this project.",
+    "badFormat": "format must be csv or xlsx."
+  },
+  "export": {
+    "listName": "sheet-list",
+    "sheetName": "Sheet List"
+  },
+  "columns": {
+    "no": "No.",
+    "number": "Sheet Number",
+    "title": "Title",
+    "discipline": "Discipline",
+    "revision": "Revision",
+    "suitability": "Suitability",
+    "date": "Date",
+    "status": "Status",
+    "file": "File",
+    "page": "Page"
+  },
+  "states": {
+    "wip": "Work in Progress",
+    "shared": "Shared",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "flags": {
+    "returned": "Returned",
+    "superseded": "Superseded",
+    "withdrawn": "Withdrawn"
+  }
+}

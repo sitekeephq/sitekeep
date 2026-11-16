@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "sheet": "Pafta",
+    "set": "Pafta seti",
+    "issue": "Set yayını",
+    "version": "Versiyon"
+  },
+  "errors": {
+    "editDenied": "Bu paftayı değiştirmek için klasörde düzenleme yetkisi gerekir.",
+    "setManageDenied": "Seti yalnız oluşturan kişi ya da proje yöneticisi değiştirebilir.",
+    "setNameTaken": "{{name}} adlı bir pafta seti zaten var.",
+    "emptySet": "Sette görebileceğiniz pafta yok.",
+    "notDrawing": "Paftalar yalnız PDF, DWG ve DXF dosyalarından okunur.",
+    "unknownFolder": "Seçilen klasörlerden biri bu projede değil.",
+    "badFormat": "format csv ya da xlsx olmalı."
+  },
+  "export": {
+    "listName": "pafta-listesi",
+    "sheetName": "Pafta Listesi"
+  },
+  "columns": {
+    "no": "Sıra",
+    "number": "Pafta No",
+    "title": "Pafta Adı",
+    "discipline": "Disiplin",
+    "revision": "Revizyon",
+    "suitability": "Uygunluk",
+    "date": "Tarih",
+    "status": "Durum",
+    "file": "Dosya",
+    "page": "Sayfa"
+  },
+  "states": {
+    "wip": "Çalışma",
+    "shared": "Paylaşılan",
+    "published": "Yayınlanan",
+    "archived": "Arşivlenen"
+  },
+  "flags": {
+    "returned": "Geri Döndü",
+    "superseded": "Yenisi Yayınlandı",
+    "withdrawn": "Geri Çekildi"
+  }
+}

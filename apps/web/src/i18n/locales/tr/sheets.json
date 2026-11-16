@@ -1,0 +1,115 @@
+{
+  "title": "Paftalar",
+  "description": "Projenin paftaları: Paylaşılan ve Yayınlanan klasörlerdeki PDF ve DWG çizimlerinin her sayfası; numara, ad ve revizyon antetten okunur. Paftaları pafta setlerinde toplayıp yayın yapın.",
+  "count_one": "{{count}} pafta",
+  "count_other": "{{count}} pafta",
+  "noTitle": "Adsız",
+  "pageOf": "sayfa {{page}}/{{count}}",
+  "rescan": "Yeniden Oku",
+  "rescanHint": "Proje Ayarları → CDE'de seçilen klasörlerdeki tüm çizimlerin paftalarını yeniden okur.",
+  "rescanQueued_one": "{{count}} çizim sıraya alındı; paftalar birazdan görünür.",
+  "rescanQueued_other": "{{count}} çizim sıraya alındı; paftalar birazdan görünür.",
+  "export": {
+    "xlsx": "Pafta Listesi (Excel)",
+    "csv": "CSV",
+    "zip": "PDF'leri İndir"
+  },
+  "filters": {
+    "search": "Numara, ad ya da dosya ara",
+    "discipline": "Disiplin",
+    "allDisciplines": "Tüm Disiplinler",
+    "revision": "Revizyon",
+    "allRevisions": "Tüm Revizyonlar",
+    "state": "Durum",
+    "allStates": "Tüm Durumlar"
+  },
+  "view": {
+    "label": "Görünüm",
+    "grid": "Kart",
+    "list": "Liste"
+  },
+  "columns": {
+    "number": "Pafta No",
+    "title": "Pafta Adı",
+    "discipline": "Disiplin",
+    "revision": "Revizyon",
+    "suitability": "Uygunluk",
+    "date": "Tarih",
+    "state": "Durum",
+    "file": "Dosya",
+    "version": "Versiyon"
+  },
+  "numberSource": {
+    "titleblock": "antetten",
+    "code": "doküman kodundan",
+    "filename": "dosya adından",
+    "manual": "elle girildi"
+  },
+  "selection": {
+    "count_one": "{{count}} pafta seçildi",
+    "count_other": "{{count}} pafta seçildi",
+    "all": "Tümünü Seç",
+    "newSet": "Seçimden Yeni Set",
+    "addTo": "Sete Ekle…",
+    "remove": "Setten Çıkar",
+    "clear": "Seçimi Temizle"
+  },
+  "empty": {
+    "title": "Henüz pafta yok",
+    "set": "Bu sette görebileceğiniz pafta yok",
+    "hint": "PDF ya da DWG çizimlerini Paylaşılan ya da Yayınlanan bir klasöre yükleyin; her sayfa bir pafta olur. Klasörleri proje yöneticileri Proje Ayarları → CDE'de seçer."
+  },
+  "sets": {
+    "title": "Pafta Setleri",
+    "all": "Tüm Paftalar",
+    "new": "Yeni Set",
+    "namePrompt": "Setin adı, örneğin \"İhale Seti\" ya da \"Uygulama Yayını 03\".",
+    "create": "Oluştur",
+    "created": "{{name}} pafta seti oluşturuldu.",
+    "added_one": "{{count}} pafta {{name}} setine eklendi.",
+    "added_other": "{{count}} pafta {{name}} setine eklendi.",
+    "removed_one": "{{count}} pafta setten çıkarıldı.",
+    "removed_other": "{{count}} pafta setten çıkarıldı.",
+    "rename": "Yeniden Adlandır",
+    "delete": "Seti Sil",
+    "deleteConfirm": "{{name}} pafta seti ve yayınları silinsin mi? Çizimlerin kendisi silinmez.",
+    "none": "Henüz pafta seti yok.",
+    "notPublished": "yayınlanmadı",
+    "issueShort": "yayın {{no}}",
+    "lastIssue": "Yayın {{no}}, {{date}}",
+    "count_one": "{{count}} pafta",
+    "count_other": "{{count}} pafta",
+    "hidden_one": "görmediğiniz {{count}} pafta",
+    "hidden_other": "görmediğiniz {{count}} pafta"
+  },
+  "publish": {
+    "action": "Seti Yayınla",
+    "title": "Seti Yayınla: {{name}}",
+    "explain_one": "Yayın {{no}}, {{count}} paftanın şimdiki revizyonunu kaydeder. Sonraki revizyonlar yayınlanmış bir yayını değiştirmez.",
+    "explain_other": "Yayın {{no}}, {{count}} paftanın şimdiki revizyonunu kaydeder. Sonraki revizyonlar yayınlanmış bir yayını değiştirmez.",
+    "note": "Not",
+    "confirm": "Yayınla",
+    "done": "{{name}} yayın {{no}} yayınlandı.",
+    "issues_one": "{{count}} yayın",
+    "issues_other": "{{count}} yayın",
+    "issue": "Yayın",
+    "date": "Tarih",
+    "by": "Yayınlayan"
+  },
+  "detail": {
+    "title": "Pafta",
+    "open": "Görüntüleyicide Aç",
+    "edit": "Pafta Bilgilerini Düzenle",
+    "edited": "Elle düzenlendi: çizim yeniden okunduğunda bu bilgiler korunur.",
+    "history": "Geçmiş"
+  },
+  "settings": {
+    "title": "Paftalar",
+    "description": "Bu klasörlere yüklenen PDF ve DWG çizimleri paftalara (her sayfa bir pafta) ayrılır ve antetleri okunur.",
+    "states": "Bu Durumlardaki Klasörler",
+    "folders": "Ayrıca Bu Klasörler (Alt Klasörleriyle)",
+    "addFolder": "Klasör Ekle…",
+    "removeFolder": "Çıkar",
+    "saved": "Pafta ayarları kaydedildi. Önceden yüklenen çizimler için Paftalar sayfasında Yeniden Oku'yu kullanın."
+  }
+}

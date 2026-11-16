@@ -197,6 +197,20 @@
       "audit": {
         "exported": "Audit log exported",
         "chain_started": "Audit chain started"
+      },
+      "sheet": {
+        "updated": "Sheet details edited",
+        "settings_updated": "Sheet settings changed",
+        "rescanned": "Sheets read again"
+      },
+      "sheet_set": {
+        "created": "Sheet set created",
+        "updated": "Sheet set updated",
+        "deleted": "Sheet set deleted",
+        "items_added": "Sheets added to set",
+        "items_removed": "Sheets removed from set",
+        "published": "Sheet set published",
+        "downloaded": "Sheet set downloaded"
       }
     },
     "columns": {

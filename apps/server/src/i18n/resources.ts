@@ -30,6 +30,7 @@ import type privacy from "./locales/en/privacy.json";
 import type projects from "./locales/en/projects.json";
 import type reports from "./locales/en/reports.json";
 import type schedule from "./locales/en/schedule.json";
+import type sheets from "./locales/en/sheets.json";
 import type sim from "./locales/en/sim.json";
 import type templates from "./locales/en/templates.json";
 import type today from "./locales/en/today.json";
@@ -77,6 +78,7 @@ export interface CoreServerResources {
   projects: typeof projects;
   reports: typeof reports;
   schedule: typeof schedule;
+  sheets: typeof sheets;
   sim: typeof sim;
   templates: typeof templates;
   today: typeof today;

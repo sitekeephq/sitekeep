@@ -45,6 +45,7 @@ export function placeOf(rest: string, search = ""): NavPlace | null {
     case "edit":
     case "compare":
     case "spec":
+    case "sheets":
       return { nav: "dokumanlar" };
     case "viewer":
       return { nav: "model", modelTab: "viewer" };

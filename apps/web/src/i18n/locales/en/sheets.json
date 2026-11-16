@@ -1,0 +1,115 @@
+{
+  "title": "Sheets",
+  "description": "Drawing sheets of the project: every page of the PDFs and DWGs in the Shared and Published folders, with number, title and revision read from the title block. Group them into sheet sets and publish an issue.",
+  "count_one": "{{count}} sheet",
+  "count_other": "{{count}} sheets",
+  "noTitle": "No title",
+  "pageOf": "page {{page}} of {{count}}",
+  "rescan": "Read Again",
+  "rescanHint": "Reads the sheets of every drawing in the folders chosen in Project Settings → CDE again.",
+  "rescanQueued_one": "{{count}} drawing queued; the sheets appear in a moment.",
+  "rescanQueued_other": "{{count}} drawings queued; the sheets appear in a moment.",
+  "export": {
+    "xlsx": "Sheet List (Excel)",
+    "csv": "CSV",
+    "zip": "Download PDFs"
+  },
+  "filters": {
+    "search": "Search number, title or file",
+    "discipline": "Discipline",
+    "allDisciplines": "All Disciplines",
+    "revision": "Revision",
+    "allRevisions": "All Revisions",
+    "state": "State",
+    "allStates": "All States"
+  },
+  "view": {
+    "label": "View",
+    "grid": "Grid",
+    "list": "List"
+  },
+  "columns": {
+    "number": "Sheet Number",
+    "title": "Title",
+    "discipline": "Discipline",
+    "revision": "Revision",
+    "suitability": "Suitability",
+    "date": "Date",
+    "state": "State",
+    "file": "File",
+    "version": "Version"
+  },
+  "numberSource": {
+    "titleblock": "from the title block",
+    "code": "from the document code",
+    "filename": "from the file name",
+    "manual": "entered by hand"
+  },
+  "selection": {
+    "count_one": "{{count}} sheet selected",
+    "count_other": "{{count}} sheets selected",
+    "all": "Select All",
+    "newSet": "New Set from Selection",
+    "addTo": "Add to Set…",
+    "remove": "Remove from Set",
+    "clear": "Clear Selection"
+  },
+  "empty": {
+    "title": "No sheets yet",
+    "set": "This set has no sheets you can see",
+    "hint": "Upload PDF or DWG drawings into a Shared or Published folder; each page becomes a sheet. Project administrators choose the folders in Project Settings → CDE."
+  },
+  "sets": {
+    "title": "Sheet Sets",
+    "all": "All Sheets",
+    "new": "New Set",
+    "namePrompt": "Name of the set, for example \"Tender Set\" or \"Construction Issue 03\".",
+    "create": "Create",
+    "created": "Sheet set {{name}} created.",
+    "added_one": "{{count}} sheet added to {{name}}.",
+    "added_other": "{{count}} sheets added to {{name}}.",
+    "removed_one": "{{count}} sheet removed from the set.",
+    "removed_other": "{{count}} sheets removed from the set.",
+    "rename": "Rename",
+    "delete": "Delete Set",
+    "deleteConfirm": "Delete the sheet set {{name}} and its published issues? The drawings themselves are not deleted.",
+    "none": "No sheet sets yet.",
+    "notPublished": "not published",
+    "issueShort": "issue {{no}}",
+    "lastIssue": "Issue {{no}} published on {{date}}",
+    "count_one": "{{count}} sheet",
+    "count_other": "{{count}} sheets",
+    "hidden_one": "{{count}} sheet you cannot see",
+    "hidden_other": "{{count}} sheets you cannot see"
+  },
+  "publish": {
+    "action": "Publish Set",
+    "title": "Publish {{name}}",
+    "explain_one": "Issue {{no}} records the current revision of {{count}} sheet. Later revisions do not change a published issue.",
+    "explain_other": "Issue {{no}} records the current revision of {{count}} sheets. Later revisions do not change a published issue.",
+    "note": "Note",
+    "confirm": "Publish",
+    "done": "{{name}} issue {{no}} published.",
+    "issues_one": "{{count}} published issue",
+    "issues_other": "{{count}} published issues",
+    "issue": "Issue",
+    "date": "Date",
+    "by": "Published By"
+  },
+  "detail": {
+    "title": "Sheet",
+    "open": "Open in Viewer",
+    "edit": "Edit Sheet Details",
+    "edited": "Edited by hand: reading the drawing again keeps these details.",
+    "history": "History"
+  },
+  "settings": {
+    "title": "Sheets",
+    "description": "PDF and DWG drawings uploaded into these folders are split into sheets (one per page) and their title blocks are read.",
+    "states": "Folders in These States",
+    "folders": "Also These Folders (with Subfolders)",
+    "addFolder": "Add Folder…",
+    "removeFolder": "Remove",
+    "saved": "Sheet settings saved. Use Read Again on the Sheets page for drawings already uploaded."
+  }
+}

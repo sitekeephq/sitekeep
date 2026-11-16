@@ -414,3 +414,4 @@ export * from "./schema-opencde-docs.js";
 export * from "./schema-integrations.js";
 export * from "./schema-cde.js";
 
+export * from "./schema-sheets.js";
