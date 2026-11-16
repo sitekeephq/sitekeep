@@ -9,11 +9,15 @@
  *                                                 "file.codes_changed", plus "cde.override")
  *   GET   /projects/:pid/cde/codes/unmapped        legacy attribute values that could not become
  *                                                 codes (project administrators)
+ *   POST  /projects/:pid/cde/codes/apply           map the legacy attribute values of the current
+ *                                                 versions into empty codes under the project's
+ *                                                 current scheme ("Apply to existing files";
+ *                                                 project administrators; audit "cde.codes_applied")
  */
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { can, codeProfile, validateCodes, type CdeCodeWarningDto, type CdeFolderCodesDto, type CdeUnmappedCodeDto, type FileVersionDto } from "@sitekeep/shared";
+import { can, codeProfile, validateCodes, type CdeApplyCodesReportDto, type CdeCodeWarningDto, type CdeFolderCodesDto, type CdeUnmappedCodeDto, type FileVersionDto } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { FolderTree, projectAccess, requireProjectAdmin, userNames } from "../core/security/access.js";
 import { audit } from "../core/platform/audit.js";
@@ -23,7 +27,7 @@ import { fileVersions } from "../db/schema.js";
 import { loadVersion, requireView } from "../modules/documents/files.js";
 import { toVersionDto } from "../modules/documents/mapper.js";
 import { codeError, codeErrorMsg, loadCodeSettings, warningDtos } from "./codes.js";
-import { unmappedLegacyCodes } from "./codes-migration.js";
+import { applyLegacyCodes, unmappedLegacyCodes } from "./codes-migration.js";
 import { cdeStateOf } from "./state.js";
 
 const patchBody = z
@@ -111,5 +115,11 @@ export async function cdeCodesRoutes(api: FastifyInstance, deps: AppDeps) {
     const a = await projectAccess(db, req.params.pid, req.user!);
     requireProjectAdmin(a);
     return unmappedLegacyCodes(db, a.project.id);
+  });
+
+  api.post<{ Params: { pid: string } }>("/projects/:pid/cde/codes/apply", async (req): Promise<CdeApplyCodesReportDto> => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireProjectAdmin(a);
+    return applyLegacyCodes(db, a.project.id, { actorId: a.user.id });
   });
 }

@@ -451,3 +451,144 @@ describe("ISO19650-2 5.1.7(b) / UK NA suitability: live-data migration", () => {
     expect(await scheme(leg)).toBe("iso_uk_na");
   });
 });
+
+describe("ISO19650-2 5.1.7(b) / letter revisions: Forma / ACC projects", () => {
+  /** A file imported from Forma: free attributes, no codes yet. */
+  async function formaFile(project: string, folder: string, name: string, attributes: Record<string, string>) {
+    const r = await admin.upload(`/projects/${project}/folders/${folder}/files`, name, { attributes: JSON.stringify(attributes) });
+    expect(r.status, JSON.stringify(r.body)).toBe(200);
+    const id = r.body.results[0].fileId as string;
+    await handle.db.update(fileVersions).set({ suitabilityCode: null, revisionCode: null, codesSetAt: null, codesSetBy: null }).where(eq(fileVersions.fileId, id));
+    return id;
+  }
+  const actions = async (project: string, action: string) =>
+    handle.db.select().from(auditLog).where(and(eq(auditLog.projectId, project), eq(auditLog.action, action))).orderBy(auditLog.id);
+  const scheme = async (p: string) => (await handle.db.select().from(projectCdeSettings).where(eq(projectCdeSettings.projectId, p)))[0]!.codeScheme;
+  const unmappedOf = async (p: string) =>
+    ((await admin.get(`/projects/${p}/cde/codes/unmapped`)).body.items as { name: string; field: string; value: string }[]).map((i) => [i.name, i.field, i.value]).sort();
+
+  let frm: string;
+  let ff: Awaited<ReturnType<typeof stateFolders>>;
+  const ids: Record<string, string> = {};
+
+  it("lifts REVİZYON / STATUS like the other attribute names; the server-start run never switches the scheme", async () => {
+    frm = (await admin.post("/projects", { code: "FRM", name: "Forma import", template: "iso19650" })).body.id;
+    ff = await stateFolders(frm);
+    ids.a = await formaFile(frm, ff.wip, "F-1.pdf", { REVİZYON: "A", STATUS: "S2" });
+    ids.b = await formaFile(frm, ff.shared, "F-2.pdf", { REVİZYON: "B", STATUS: "Approved" });
+    ids.c = await formaFile(frm, ff.published, "F-3.pdf", { Revision: "rev c", durum: "s0" });
+    ids.d = await formaFile(frm, ff.wip, "F-4.pdf", { rev: "D", Uygunluk: "A" });
+    // A code set by a person is never overwritten.
+    ids.e = await formaFile(frm, ff.wip, "F-5.pdf", { REVIZYON: "E", Suitability: "S3" });
+    await handle.db.update(fileVersions).set({ revisionCode: "C" }).where(eq(fileVersions.fileId, ids.e));
+
+    await migrateLegacyCodes(handle.db);
+    expect(await scheme(frm)).toBe("iso_uk_na");
+    // Known suitability codes are kept from STATUS / Durum / Suitability; letters are not ISO revisions.
+    expect(await latest(ids.a)).toMatchObject({ suitabilityCode: "S2", revisionCode: null });
+    expect(await latest(ids.b)).toMatchObject({ suitabilityCode: null, revisionCode: null });
+    expect(await latest(ids.c)).toMatchObject({ suitabilityCode: "S0", revisionCode: null });
+    expect(await latest(ids.d)).toMatchObject({ suitabilityCode: "A1", revisionCode: null });
+    expect(await unmappedOf(frm)).toEqual([
+      ["F-1.pdf", "revisionCode", "A"],
+      ["F-2.pdf", "revisionCode", "B"],
+      ["F-2.pdf", "suitabilityCode", "Approved"],
+      ["F-3.pdf", "revisionCode", "rev c"],
+      ["F-4.pdf", "revisionCode", "D"],
+    ]);
+    const [first] = await actions(frm, "cde.migration_unmapped");
+    expect(first!.details).toMatchObject({ count: 5 });
+  });
+
+  it("switching to letter_rev and applying to existing files maps the letters; idempotent; audited", async () => {
+    const eda = api(await login("eda@7d.test"));
+    expect((await eda.post(`/projects/${frm}/cde/codes/apply`)).status).not.toBe(200);
+    expect((await admin.put(`/projects/${frm}/cde/settings`, { codeScheme: "letter_rev" })).status).toBe(200);
+    expect(await scheme(frm)).toBe("letter_rev");
+
+    const r = await admin.post(`/projects/${frm}/cde/codes/apply`);
+    expect(r.status, JSON.stringify(r.body)).toBe(200);
+    expect(r.body).toMatchObject({ scheme: "letter_rev", versionsMapped: 4, codesMapped: 4, outOfState: 0, unmapped: 1, resolved: 4, truncated: false });
+    expect(await latest(ids.a)).toMatchObject({ suitabilityCode: "S2", revisionCode: "A" });
+    expect(await latest(ids.b)).toMatchObject({ suitabilityCode: null, revisionCode: "B" });
+    expect(await latest(ids.c)).toMatchObject({ suitabilityCode: "S0", revisionCode: "C" });
+    expect(await latest(ids.d)).toMatchObject({ suitabilityCode: "A1", revisionCode: "D" });
+    // F-5 had a revision set by hand: kept; only its empty suitability is filled.
+    expect(await latest(ids.e)).toMatchObject({ suitabilityCode: "S3", revisionCode: "C" });
+    expect((await latest(ids.b)).codesSetAt).toBeTruthy();
+    // Attributes stay.
+    const [fb] = await handle.db.select().from(files).where(eq(files.id, ids.b));
+    expect(fb!.attributes).toEqual({ REVİZYON: "B", STATUS: "Approved" });
+
+    // Only the STATUS value that is not a suitability code is left, and the audit list says so.
+    expect(await unmappedOf(frm)).toEqual([["F-2.pdf", "suitabilityCode", "Approved"]]);
+    const lists = await actions(frm, "cde.migration_unmapped");
+    expect(lists.at(-1)!.details).toMatchObject({ count: 1, previousCount: 5, resolved: 4 });
+    const [applied] = await actions(frm, "cde.codes_applied");
+    expect(applied!.userId).toBeTruthy();
+    expect(applied!.details).toMatchObject({ scheme: "letter_rev", versionsMapped: 4, enforced: false });
+
+    // A second run maps nothing and writes no new unmapped list.
+    const again = await admin.post(`/projects/${frm}/cde/codes/apply`);
+    expect(again.body).toMatchObject({ versionsMapped: 0, unmapped: 1, resolved: 0 });
+    expect((await actions(frm, "cde.migration_unmapped")).length).toBe(lists.length);
+    expect((await actions(frm, "cde.codes_applied")).length).toBe(2);
+    // The server-start run leaves the project's scheme alone.
+    await migrateLegacyCodes(handle.db);
+    expect(await scheme(frm)).toBe("letter_rev");
+  });
+
+  it("new versions count A → B; a code of another scheme is a warning, refused when the project enforces the rules", async () => {
+    const up = await admin.upload(`/projects/${frm}/folders/${ff.wip}/files`, "F-6.pdf", { revisionCode: "rev b" });
+    expect(up.status, JSON.stringify(up.body)).toBe(200);
+    const f6 = up.body.results[0].fileId as string;
+    expect(await latest(f6)).toMatchObject({ revisionCode: "B" });
+
+    // Not enforced: stored with a warning.
+    const warn = await admin.patch(`/projects/${frm}/versions/${(await latest(f6)).id}/codes`, { revisionCode: "P01" });
+    expect(warn.status, JSON.stringify(warn.body)).toBe(200);
+    expect(warn.body.revisionCode).toBe("P01");
+    expect(warn.body.warnings[0]).toMatchObject({ field: "revisionCode", kind: "revisionFormat", value: "P01", allowed: "A" });
+    expect(warn.body.warnings[0].message).toMatch(/does not follow the project's revision scheme \(letter revisions\)/);
+
+    // Enforced: refused; a version without codes gets the next letter.
+    await enforce(frm, true);
+    const no = await admin.patch(`/projects/${frm}/versions/${(await latest(ids.a)).id}/codes`, { revisionCode: "P02" });
+    expect(no.status).toBe(400);
+    expect(no.body.message).toMatch(/Revision P02 does not follow the project's revision scheme \(letter revisions\)\. Expected here: A/);
+    const bad = await admin.upload(`/projects/${frm}/folders/${ff.wip}/files`, "F-7.pdf", { revisionCode: "C01" });
+    expect(bad.body.results[0].errors[0]).toMatch(/letter revisions/);
+    await admin.patch(`/projects/${frm}/versions/${(await latest(f6)).id}/codes`, { revisionCode: "B" });
+    await admin.upload(`/projects/${frm}/folders/${ff.wip}/files`, "F-6.pdf");
+    expect(await latest(f6)).toMatchObject({ suitabilityCode: "S0", revisionCode: "C" });
+    const first = await admin.upload(`/projects/${frm}/folders/${ff.shared}/files`, "F-8.pdf");
+    expect(await latest(first.body.results[0].fileId)).toMatchObject({ revisionCode: "A" });
+    await enforce(frm, false);
+  });
+
+  it("applying under enforcement stores only codes that fit the folder's state; without it, stores and counts them", async () => {
+    const p = (await admin.post("/projects", { code: "FRM2", name: "Forma import 2", template: "iso19650" })).body.id;
+    const fs = await stateFolders(p);
+    const s = await admin.put(`/projects/${p}/cde/settings`, {
+      codeScheme: "letter_rev",
+      suitabilityCodes: [{ code: "S2", states: ["shared"] }, { code: "S0" }],
+      enforceTransitions: true,
+      transitions: DIRECT_EVERYWHERE,
+    });
+    expect(s.status, JSON.stringify(s.body)).toBe(200);
+    const g = await formaFile(p, fs.wip, "G-1.pdf", { REVİZYON: "A", STATUS: "S2" });
+
+    const strict = await admin.post(`/projects/${p}/cde/codes/apply`);
+    expect(strict.body).toMatchObject({ versionsMapped: 1, codesMapped: 1, unmapped: 1 });
+    expect(await latest(g)).toMatchObject({ suitabilityCode: null, revisionCode: "A" });
+    const list = (await admin.get(`/projects/${p}/cde/codes/unmapped`)).body.items;
+    expect(list).toEqual([expect.objectContaining({ name: "G-1.pdf", field: "suitabilityCode", value: "S2", reason: "state" })]);
+    expect((await actions(p, "cde.codes_applied"))[0]!.details).toMatchObject({ enforced: true });
+
+    await enforce(p, false);
+    const loose = await admin.post(`/projects/${p}/cde/codes/apply`);
+    expect(loose.body).toMatchObject({ versionsMapped: 1, codesMapped: 1, outOfState: 1, unmapped: 0, resolved: 1 });
+    expect(await latest(g)).toMatchObject({ suitabilityCode: "S2", revisionCode: "A" });
+    expect((await actions(p, "cde.migration_unmapped")).at(-1)!.details).toMatchObject({ count: 0, resolved: 1 });
+  });
+});

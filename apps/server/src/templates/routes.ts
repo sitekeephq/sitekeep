@@ -1,8 +1,12 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
-import type { AppDeps } from "../app/deps.js";
+import { parseCsvTable } from "@sitekeep/shared";
+import type { ResolvedDeps } from "../app/deps.js";
+import { publicBaseUrl } from "../oauth/config.js";
+import { decodeText } from "../core/formats/text.js";
+import { readXlsx } from "../core/formats/xlsx.js";
 import { FolderTree, projectAccess, requireProjectAdmin } from "../core/security/access.js";
-import { forbidden, notFound } from "../core/platform/http.js";
+import { badRequest, forbidden, notFound } from "../core/platform/http.js";
 import { msg, requestLanguage } from "../i18n/index.js";
 import {
   builtInTemplates,
@@ -24,7 +28,8 @@ function templateLanguage(req: FastifyRequest<{ Querystring: { language?: string
   return q.success ? q.data : requestLanguage(req);
 }
 
-export async function templateRoutes(api: FastifyInstance, { db }: AppDeps) {
+export async function templateRoutes(api: FastifyInstance, deps: ResolvedDeps) {
+  const { db } = deps;
   /**
    * Built-in project templates with slots, editable dimensions, counts and v2 parts; per-language
    * names in `?language=` (the project language), else the requester's language.
@@ -52,12 +57,38 @@ export async function templateRoutes(api: FastifyInstance, { db }: AppDeps) {
   });
 
   /**
+   * People of the wizard from a CSV or Excel file: the first sheet (or the CSV, in any common
+   * encoding) as a table of strings. The wizard matches the columns (people-import.ts in shared).
+   */
+  api.post("/projects/setup/people-file", async (req) => {
+    if (!req.user!.isAdmin) throw forbidden(msg("templates:errors.adminRequired"));
+    const body = z
+      .object({ fileName: z.string().trim().min(1).max(255), content: z.string().min(1).max(4_000_000) })
+      .parse(req.body);
+    const data = Buffer.from(body.content, "base64");
+    const lang = requestLanguage(req);
+    let table: string[][];
+    if (/\.xlsx$/i.test(body.fileName)) {
+      try {
+        table = readXlsx(data, lang);
+      } catch {
+        throw badRequest(msg("templates:errors.peopleFileUnreadable"));
+      }
+    } else if (/\.(csv|txt|tsv)$/i.test(body.fileName)) table = parseCsvTable(decodeText(data));
+    else throw badRequest(msg("templates:errors.peopleFileType"));
+    return { table: table.slice(0, 1001).map((row) => row.slice(0, 20).map((cell) => String(cell ?? "").slice(0, 500))) };
+  });
+
+  /**
    * Creates a project with folders, grants, naming, attributes, workflows, task teams and the
    * wizard's people in one transaction; the v2 parts are applied after it and reported.
    */
   api.post("/projects/from-template", async (req) => {
     if (!req.user!.isAdmin) throw forbidden(msg("templates:errors.adminRequired"));
-    const r = await createProjectFromTemplate(db, req.user!, req.body, requestLanguage(req));
+    const r = await createProjectFromTemplate(db, req.user!, req.body, requestLanguage(req), {
+      mailer: deps.mailer,
+      baseUrl: publicBaseUrl(deps.oauth, req),
+    });
     return { ...toProjectDto(r.project, true), warnings: r.warnings, counts: r.counts, parts: r.parts, people: r.people };
   });
 

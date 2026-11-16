@@ -252,7 +252,7 @@
       "emails": "E-mail Addresses",
       "emailsPlaceholder": "one or more addresses, separated by commas or new lines",
       "add": "Add",
-      "hint": "People without an account are listed but not added; shared mailboxes (info@, noreply@ …) are not added.",
+      "hint": "Existing accounts are added; people without an account are invited (below); shared mailboxes (info@, noreply@ …) are not added.",
       "empty": "Nobody added yet. You can add people later in Project Settings → Members.",
       "email": "E-mail",
       "party": "Party",
@@ -265,8 +265,40 @@
       "admin": "Administrator",
       "isAdmin": "Project Administrator",
       "ownCompany": "Their own company",
-      "noAccount": "No SiteKeep account with this address: not added.",
-      "groupAddress": "A shared mailbox: not added."
+      "noAccount": "No SiteKeep account with this address: not added (invitations are off).",
+      "groupAddress": "A shared mailbox: not added.",
+      "invite": "Invite People Without an Account",
+      "inviteLanguage": "Invitation language",
+      "inviteLanguageDefault": "Installation language",
+      "languages": {
+        "en": "English",
+        "tr": "Turkish"
+      },
+      "inviteHint": "They join the project as invited members and get an e-mail (or you get a link to hand over) valid for 14 days.",
+      "noInviteHint": "People without an account are listed but not added.",
+      "willInvite": "No account: will be invited",
+      "namePlaceholder": "Name (optional)",
+      "nameFor": "Name of {{email}}",
+      "import": {
+        "choose": "Import from CSV / Excel…",
+        "file": "People file (CSV or Excel)",
+        "hint": "Columns: E-mail, Name, Company (or party), Role, Task team. The first row is the header.",
+        "reading": "Reading the file…",
+        "tooBig": "The file is larger than 2 MB.",
+        "summary_one": "{{file}}: {{count}} row, {{usable}} can be added.",
+        "summary_other": "{{file}}: {{count}} rows, {{usable}} can be added.",
+        "line": "Row",
+        "outcome": "Result",
+        "outcomes": {
+          "error": "Not added",
+          "group_address": "Shared mailbox: not added",
+          "added": "Has an account: added",
+          "invite": "No account: invited",
+          "no_account": "No account: listed only"
+        },
+        "add_one": "Add {{count}} Person",
+        "add_other": "Add {{count}} People"
+      }
     },
     "folders": {
       "addHeading": "Add a Folder",
@@ -338,7 +370,11 @@
       "noCompany": "no company: no team",
       "check": "Check",
       "ready": "Everything checks out. The project can be created.",
-      "parts": "Template Parts"
+      "parts": "Template Parts",
+      "invitations": "Invitations",
+      "inviteOn": "People without an account are invited ({{language}})",
+      "inviteOff": "Off: people without an account are not added",
+      "peopleCheck": "People"
     },
     "report": {
       "created": "Project {{code}} · {{name}} was created.",
@@ -357,7 +393,9 @@
       "personStatus": {
         "added": "Added",
         "no_account": "No Account",
-        "group_address": "Shared Mailbox"
+        "group_address": "Shared Mailbox",
+        "invite": "Will Be Invited",
+        "invited": "Invited"
       },
       "open": "Open Project"
     },

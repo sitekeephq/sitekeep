@@ -9,7 +9,8 @@ import { codeHints } from "../../documents/components/cde/CodeChips";
 /**
  * Proje Ayarları → CDE → Codes (docs/features/CDE_STATES.md "Codes"): the code scheme (project
  * administrators choose it), the codes each state allows, and the older attribute values the
- * migration could not turn into codes.
+ * migration could not turn into codes; "Apply to existing files" maps them again under the saved
+ * scheme (e.g. after switching a project imported from Autodesk Forma / ACC to letter revisions).
  */
 export function CdeCodesSettings({ settings, onSaved }: { settings: CdeSettingsDto; onSaved(s: CdeSettingsDto): void }) {
   const { t } = useTranslation(["cde", "common"]);
@@ -18,8 +19,26 @@ export function CdeCodesSettings({ settings, onSaved }: { settings: CdeSettingsD
   const [scheme, setScheme] = useState<CdeCodeScheme>(settings.codeScheme);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
-  const { data: unmapped } = useLoad(() => (isAdmin ? cdeApi.unmappedCodes(project.id).catch(() => null) : Promise.resolve(null)), [project.id, isAdmin]);
+  const { data: unmapped, reload: reloadUnmapped } = useLoad(
+    () => (isAdmin ? cdeApi.unmappedCodes(project.id).catch(() => null) : Promise.resolve(null)),
+    [project.id, isAdmin],
+  );
   const profile = codeProfile({ codeScheme: scheme, suitabilityCodes: settings.suitabilityCodes });
+
+  /** Maps the older attribute values into empty codes under the saved scheme. */
+  async function apply() {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const r = await cdeApi.applyCodes(project.id);
+      setMessage({ ok: true, text: t("codes.settings.applied", { count: r.versionsMapped, unmapped: r.unmapped }) });
+      reloadUnmapped();
+    } catch (e) {
+      setMessage({ ok: false, text: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function save() {
     setBusy(true);
@@ -50,6 +69,17 @@ export function CdeCodesSettings({ settings, onSaved }: { settings: CdeSettingsD
           {isAdmin && (
             <button className="primary small" disabled={busy || scheme === settings.codeScheme} onClick={() => void save()}>
               {t("codes.settings.save")}
+            </button>
+          )}
+          {isAdmin && (
+            <button
+              className="small"
+              data-testid="cde-codes-apply"
+              disabled={busy || scheme !== settings.codeScheme}
+              title={t("codes.settings.applyHelp")}
+              onClick={() => void apply()}
+            >
+              {t("codes.settings.apply")}
             </button>
           )}
           {message && <span className={message.ok ? "muted small" : "error small"}>{message.text}</span>}

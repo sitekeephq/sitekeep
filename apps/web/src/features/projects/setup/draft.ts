@@ -9,6 +9,7 @@ import {
   PROJECT_SETUP_CODE_SCHEMES,
   type CdeState,
   type CdeWipPolicy,
+  type InvitationLanguage,
   type ProjectModule,
   type ProjectSetupOverrides,
   type ProjectSetupRequest,
@@ -26,6 +27,8 @@ export type SetupTemplateChoice = { kind: "builtin"; id: string } | { kind: "fil
 
 export interface SetupPerson {
   email: string;
+  /** Name of a person without an account (the invitation's name); unused for existing users. */
+  name?: string;
   slot: string;
   roles: string[];
   projectAdmin: boolean;
@@ -56,6 +59,10 @@ export interface SetupDraft {
   /** Undefined: the template's task teams (plus the added parties). */
   taskTeams?: TemplateTaskTeam[];
   people: SetupPerson[];
+  /** People without an account are invited (docs/features/INVITATIONS.md); off: they are only reported. */
+  invite: boolean;
+  /** Language of the invitation e-mails; "" = the installation's. */
+  inviteLanguage: "" | InvitationLanguage;
   /** Editable dimensions as text, one value per line. */
   dimensions: Record<string, string>;
   folderAdds: { parent: string; name: string }[];
@@ -91,6 +98,8 @@ export function emptyDraft(language: string): SetupDraft {
     slotCodes: {},
     parties: [],
     people: [],
+    invite: true,
+    inviteLanguage: "",
     dimensions: {},
     folderAdds: [],
     folderRemoves: [],
@@ -116,6 +125,8 @@ export function withTemplate(draft: SetupDraft, template: SetupTemplateChoice | 
     location: draft.location,
     client: draft.client,
     people: draft.people.map((p) => ({ ...p, slot: "", roles: [] })),
+    invite: draft.invite,
+    inviteLanguage: draft.inviteLanguage,
   };
 }
 
@@ -214,12 +225,14 @@ export function toRequest(draft: SetupDraft, template: ProjectTemplate): Project
             .filter((p) => p.email.trim())
             .map((p) => ({
               email: p.email.trim().toLowerCase(),
+              ...(draft.invite && p.name?.trim() ? { name: p.name.trim() } : {}),
               ...(p.slot ? { slot: p.slot } : {}),
               ...(p.roles.length ? { roles: p.roles } : {}),
               ...(p.projectAdmin ? { projectAdmin: true } : {}),
             })),
         }
       : {}),
+    ...(draft.invite && draft.people.length ? { invite: draft.inviteLanguage ? { language: draft.inviteLanguage } : {} } : {}),
   };
 }
 

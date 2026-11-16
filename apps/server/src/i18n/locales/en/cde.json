@@ -41,7 +41,8 @@
     "schemes": {
       "iso_uk_na": "ISO 19650 UK NA",
       "legacy_r": "legacy R00",
-      "custom": "custom"
+      "custom": "custom",
+      "letter_rev": "letter revisions"
     },
     "fields": {
       "suitability": "Suitability",

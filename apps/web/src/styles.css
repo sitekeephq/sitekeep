@@ -1022,6 +1022,14 @@ details > summary { cursor: pointer; font-weight: 600; }
 .login .card { width: min(380px, 100%); padding: 28px; }
 /* OAuth consent page (docs/features/OPENCDE.md). */
 .login .card.consent { width: min(460px, 100%); }
+/* Invitation accept page (/invite#token, docs/features/INVITATIONS.md). */
+.invite-page { min-height: 100dvh; display: grid; place-items: center; padding: 16px; background: var(--bg); }
+.invite-card { width: min(460px, 100%); padding: 28px; box-sizing: border-box; }
+.invite-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 500; }
+.invite-form input { width: 100%; box-sizing: border-box; }
+.invite-google { cursor: pointer; }
+.invite-link { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.invite-link input { flex: 1 1 220px; min-width: 0; font-family: var(--mono, monospace); font-size: 12px; }
 .consent-title { font-size: 18px; font-weight: 500; margin: 0 0 8px; line-height: 1.35; }
 .consent-scopes { list-style: none; padding: 0; margin: 8px 0 12px; border: 1px solid var(--border); border-radius: var(--radius); }
 .consent-scopes li { padding: 8px 12px; border-top: 1px solid var(--border); }
@@ -1477,6 +1485,11 @@ label.tpl-alt:focus-within { outline: 2px solid var(--primary); outline-offset: 
 .setup-file-button { justify-self: start; }
 .setup-phone-only { display: none; }
 .warn-text { color: var(--warn); }
+.error-text { color: var(--danger); }
+.setup-import { display: grid; gap: 8px; margin-top: 4px; }
+.setup-file-label { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-size: 13px; font-weight: 500; cursor: pointer; }
+.setup-file-label:focus-within { outline: 2px solid var(--primary); outline-offset: 1px; }
+.setup-invite { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
 .ok-text { color: var(--ok); }
 input.mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
 button.tree-toggle { min-height: 0; padding: 0; border: 0; background: none; font-size: 12px; line-height: 1; cursor: pointer; }

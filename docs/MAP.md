@@ -65,7 +65,7 @@ Module details: [Modules](modules/README.md) and one page per module ([cost](mod
 | A rule, type or DTO used by both server and web | `packages/shared/src/<area>/` | [structure](architecture/structure.md) |
 | An MCP tool | `packages/cde-tools/src/tools/` | [developer MCP](onboarding/DEVELOPER_MCP.md) |
 | A project template (folders, naming, workflows, roles, module settings) | `apps/server/templates/*.json` (generated ones from `apps/server/templates/src/`) | [project templates](features/PROJECT_TEMPLATES.md), [concept](product/CONCEPT.md) |
-| A choice of the project set-up wizard | `packages/shared/src/platform/project-setup.ts` (override + check), `apps/web/src/features/projects/setup/` (step) | [project set-up wizard](features/PROJECT_SETUP_WIZARD.md) |
+| A choice of the project set-up wizard | `packages/shared/src/platform/project-setup.ts` (override + check), `apps/web/src/features/projects/setup/` (step) | [project set-up wizard](features/PROJECT_SETUP_WIZARD.md), [invitations](features/INVITATIONS.md) |
 | A file viewer (PDF, DWG, Office) | `apps/web/src/viewers/`, server side in `apps/server/src/previews` | [viewers](features/VIEWERS.md) |
 | Something a module must be able to use | the SDK: `apps/server/src/sdk`, `apps/web/src/sdk`, then `packages/sdk` | [module contract](modules/README.md#module-contract) |
 

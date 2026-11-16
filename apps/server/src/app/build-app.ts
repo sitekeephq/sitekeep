@@ -17,6 +17,7 @@ import { clientInfo, withAuditClient } from "../core/platform/audit.js";
 import { devToolsEnabled } from "../dev/flag.js";
 import { devRoutes } from "../dev/routes.js";
 import { authRoutes } from "../auth/routes.js";
+import { invitationRoutes } from "../auth/invitation-routes.js";
 import { adminRoutes } from "../admin/routes.js";
 import { projectRoutes } from "../projects/routes.js";
 import { documentRoutes } from "../modules/documents/routes.js";
@@ -168,6 +169,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       }));
       await aboutRoutes(api);
       await authRoutes(api, deps);
+      await invitationRoutes(api, deps);
       await adminRoutes(api, deps);
       await projectRoutes(api, deps);
       await documentRoutes(api, deps);

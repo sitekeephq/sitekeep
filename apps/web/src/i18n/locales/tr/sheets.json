@@ -110,6 +110,81 @@
     "folders": "Ayrıca Bu Klasörler (Alt Klasörleriyle)",
     "addFolder": "Klasör Ekle…",
     "removeFolder": "Çıkar",
-    "saved": "Pafta ayarları kaydedildi. Önceden yüklenen çizimler için Paftalar sayfasında Yeniden Oku'yu kullanın."
+    "saved": "Pafta ayarları kaydedildi. Önceden yüklenen çizimler için Paftalar sayfasında Yeniden Oku'yu kullanın.",
+    "template": "Antet Şablonu",
+    "templateNone": "Şablon yok: numara, ad ve revizyon otomatik bulunur.",
+    "templateSet": "{{orientations}} paftalar için şablon çizildi; eşlemediği alanları otomatik okuma doldurur.",
+    "templateHow": "Çizmek ya da değiştirmek için Paftalar sayfasında bir paftayı açıp Antet Şablonu'nu seçin.",
+    "templateRemove": "Şablonu Kaldır",
+    "templateRemoved": "Antet şablonu kaldırıldı. Çizimleri şablonsuz okumak için Paftalar sayfasında Yeniden Oku'yu kullanın.",
+    "orientations": {
+      "landscape": "yatay",
+      "portrait": "dikey"
+    },
+    "ocr": "Taranmış Çizimleri OCR ile Oku",
+    "ocrHint": "Metni olmayan sayfalar bu sunucuda (İngilizce ve Türkçe), yalnız antet bölgesinde okunur. Hiçbir yere bir şey gönderilmez. OCR ile okunan değerler kontrol için işaretlenir.",
+    "ocrInstanceOff": "OCR kurulum genelinde kapalı (Yönetim → Gizlilik)."
+  },
+  "ocr": {
+    "badge": "OCR ile okundu – kontrol edin (%{{percent}})",
+    "badgeHint": "Numara, ad ve revizyon taranmış sayfadan metin tanıma ile okundu (güven %{{percent}}). Kontrol edip gerekirse düzeltin.",
+    "readBy": "Okunduğu Yer",
+    "readByValues": {
+      "text": "PDF'in metni",
+      "ocr": "taranmış sayfa (OCR)",
+      "none": "okunabilir bir şey yok (taranmış sayfa)"
+    },
+    "fromTemplate": "antet şablonuyla",
+    "admin": {
+      "title": "Taranmış Çizimler İçin Metin Tanıma (OCR)",
+      "description": "Taranmış paftaların anteti bu sunucuda OCR ile okunur ({{languages}}, {{dpi}} dpi). Dil verisi SiteKeep ile kurulur; hiçbir şey indirilmez ya da gönderilmez. Projeler pafta ayarlarından kapatabilir.",
+      "enabled": "Bu Kurulumda OCR Açık",
+      "disabledByEnv": "Sunucuda kapatıldı (SITEKEEP_SHEETS_OCR=off)."
+    }
+  },
+  "template": {
+    "open": "Antet Şablonu",
+    "title": "Antet Şablonu",
+    "appliesTo": {
+      "landscape": "Projenin bütün yatay paftalarına uygulanır (her kağıt boyutunda).",
+      "portrait": "Projenin bütün dikey paftalarına uygulanır (her kağıt boyutunda)."
+    },
+    "drawRegion": "Anteti Çiz",
+    "redrawRegion": "Anteti Yeniden Çiz",
+    "zoom": "Antete Yakınlaştır",
+    "wholeSheet": "Bütün Pafta",
+    "hintRegion": "Antetin çevresine bir dikdörtgen çizin.",
+    "hintField": "{{field}} değerinin çevresine bir dikdörtgen çizin ya da yanında yazan etiketi girin.",
+    "noRegion": "Önce anteti çizin, sonra alanlarını eşleyin.",
+    "field": "Alan",
+    "area": "Bölge",
+    "label": "Etiket",
+    "draw": "Çiz",
+    "redraw": "Yeniden Çiz",
+    "clearArea": "{{field}} bölgesini temizle",
+    "labelFor": "{{field}} etiketi",
+    "fields": {
+      "number": "Pafta No",
+      "title": "Pafta Adı",
+      "revision": "Revizyon",
+      "discipline": "Disiplin",
+      "date": "Tarih"
+    },
+    "labelExamples": {
+      "number": "örn. Pafta No",
+      "title": "örn. Pafta Adı",
+      "revision": "örn. Rev",
+      "discipline": "örn. Disiplin",
+      "date": "örn. Tarih"
+    },
+    "fallback": "Bölgesi ya da etiketi olmayan ve bulunamayan alanlar otomatik okunur.",
+    "test": "Bu Paftada Dene",
+    "previewTitle": "Bu şablonla okunan",
+    "saveAndRead": "Kaydet ve Yeniden Oku",
+    "remove": "Şablonu Kaldır",
+    "clear": "Baştan Başla",
+    "saved": "Antet şablonu kaydedildi. Yüklenmiş çizimlere uygulamak için Yeniden Oku'yu kullanın.",
+    "savedReading_one": "Antet şablonu kaydedildi; {{count}} çizim yeniden okunuyor.",
+    "savedReading_other": "Antet şablonu kaydedildi; {{count}} çizim yeniden okunuyor."
   }
 }

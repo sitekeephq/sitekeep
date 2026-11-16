@@ -189,6 +189,7 @@
         "override": "Kural istisnası (gerekçeli)",
         "teams_seeded": "Görev ekipleri oluşturuldu",
         "codes_migrated": "Kodlar özniteliklerden aktarıldı",
+        "codes_applied": "Kodlar mevcut dosyalara uygulandı",
         "migration_unmapped": "Koda dönüştürülemeyen öznitelik değerleri",
         "superseded": "Yayın arşive alındı (yenisi yayınlandı)",
         "returned": "Doküman ekibine geri döndü",
@@ -218,6 +219,13 @@
         "ai_summary": "Karşılaştırma özeti (yapay zekâ)",
         "report": "Karşılaştırma raporu",
         "review_note": "Karşılaştırma incelemeye eklendi"
+      },
+      "invitation": {
+        "created": "Kişi davet edildi",
+        "resent": "Davet yeniden gönderildi",
+        "accepted": "Davet kabul edildi",
+        "revoked": "Davet geri çekildi",
+        "settings": "Davet ayarı değişti"
       }
     },
     "columns": {
@@ -270,7 +278,49 @@
         "chooseUser": "Kullanıcı Seçin…"
       },
       "roleLabel": "Rol",
-      "hint": "Listede olmayan kişileri sistem yöneticisi Yönetim ekranından oluşturur."
+      "hint": "Hesabı olan kişiyi buradan seçin; hesabı olmayan kişileri aşağıdan e-postayla davet edin."
+    },
+    "pending": "Davetli",
+    "pendingHint": "Daveti henüz kabul etmedi; giriş yapamaz.",
+    "invite": {
+      "heading": "E-postayla Davet Et",
+      "email": "Davet edilecek e-posta adresi",
+      "emailPlaceholder": "ad@firma.com",
+      "name": "Davet edilen kişinin adı",
+      "namePlaceholder": "Ad (isteğe bağlı)",
+      "company": "Davet edilen kişinin firması",
+      "noCompany": "Firma yok",
+      "role": "Davet edilen kişinin proje rolü",
+      "noRole": "Rol yok",
+      "team": "Davet edilen kişinin görev ekibi",
+      "teamFromCompany": "Firmanın görev ekibi",
+      "language": "Davetin dili",
+      "languageDefault": "Kurulum dili",
+      "languages": {
+        "en": "İngilizce",
+        "tr": "Türkçe"
+      },
+      "submit": "Davet Et",
+      "mailOn": "Hesabı olan adres hemen eklenir; diğerlerine 14 gün geçerli bir davet e-postası gider.",
+      "mailOff": "E-posta sunucusu ayarlı değil: hesabı olan adres hemen eklenir; diğerleri için iletmeniz üzere bir davet bağlantısı (14 gün geçerli) alırsınız.",
+      "mailSwitchedOff": "E-posta Gizlilik Merkezi'nde kapalı: davet e-postası gönderilmez; iletmeniz üzere bir davet bağlantısı (14 gün geçerli) alırsınız.",
+      "notAllowed": "Hesabı olmayan kişileri yalnız sistem yöneticileri davet edebilir. Sistem yöneticisi Yönetim → Kullanıcılar'da proje yöneticilerine izin verebilir.",
+      "added": "{{email}} adresinin hesabı var; projeye eklendi.",
+      "invited": "{{email}} davet edildi.",
+      "resent": "{{email}} adresine davet yeniden gönderildi; önceki bağlantı artık çalışmaz.",
+      "status": "Durum",
+      "expires": "Geçerlilik",
+      "mailedOn": "{{date}} e-postalandı",
+      "statuses": {
+        "open": "Açık",
+        "expired": "Süresi Doldu",
+        "accepted": "Kabul Edildi",
+        "revoked": "Geri Çekildi"
+      },
+      "resend": "Yeniden Gönder",
+      "revoke": "Geri Çek",
+      "revokeTitle": "Daveti Geri Çek",
+      "revokeConfirm": "{{email}} adresine gönderilen davet geri çekilsin mi? Bağlantı çalışmaz ve kişi projeden çıkarılır."
     }
   },
   "naming": {
@@ -714,7 +764,8 @@
       "review": "Tüm İnceleme İşlemleri",
       "issue": "Tüm Sorun İşlemleri",
       "project": "Tüm Proje İşlemleri",
-      "audit": "Denetim Kaydı İşlemleri"
+      "audit": "Denetim Kaydı İşlemleri",
+      "invitation": "Tüm Davet İşlemleri"
     },
     "columns": {
       "client": "IP Adresi"

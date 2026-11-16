@@ -86,6 +86,9 @@ test("set-up wizard: the English construction template with teams, lead, people,
   await row.getByLabel(`${personEmail} tarafı`).selectOption("yuklenici");
   await row.locator("summary").click();
   await row.getByRole("checkbox", { name: "Information Manager" }).check();
+  // Invitations off (invitations.spec.ts covers them): the unknown address is only reported.
+  await expect(dialog.locator(`[data-email="nobody-${s}@example.com"]`)).toContainText("davet edilecek");
+  await dialog.getByRole("checkbox", { name: "Hesabı Olmayan Kişileri Davet Et" }).uncheck();
   await expect(dialog.locator(`[data-email="nobody-${s}@example.com"]`)).toContainText("SiteKeep hesabı yok");
   await next(page);
 

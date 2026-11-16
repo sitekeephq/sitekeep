@@ -15,6 +15,8 @@ import { Icon } from "../../shared/ui/Icon";
 import { LoadingIndicator } from "../../shared/ui/LoadingIndicator";
 import { sheetsApi, type SheetFilters } from "./api";
 import { SheetThumb, releaseThumbnails } from "./SheetThumb";
+import { OcrBadge } from "./OcrBadge";
+import { TitleBlockEditor } from "./TitleBlockEditor";
 import "./sheets.css";
 
 type View = "grid" | "list";
@@ -348,7 +350,7 @@ export function SheetsPage() {
                             <input type="checkbox" aria-label={s.number} checked={selected.has(s.id)} onChange={() => toggle(s.id)} />
                           </td>
                           <td>
-                            <Link to={`/projects/${project.id}/sheets/${s.id}${setId ? `?set=${setId}` : ""}`}>{s.number}</Link>
+                            <Link to={`/projects/${project.id}/sheets/${s.id}${setId ? `?set=${setId}` : ""}`}>{s.number}</Link> <OcrBadge sheet={s} />
                           </td>
                           <td>{s.title}</td>
                           <td>{s.discipline}</td>
@@ -371,7 +373,15 @@ export function SheetsPage() {
         </section>
       </div>
 
-      {sheetId && <SheetDrawer pid={project.id} sheetId={sheetId} onClose={() => navigate(`/projects/${project.id}/sheets${setId ? `?set=${setId}` : ""}`)} onChanged={reloadAll} />}
+      {sheetId && (
+        <SheetDrawer
+          pid={project.id}
+          sheetId={sheetId}
+          onClose={() => navigate(`/projects/${project.id}/sheets${setId ? `?set=${setId}` : ""}`)}
+          onChanged={reloadAll}
+          onMessage={(text) => setMsg({ ok: true, text })}
+        />
+      )}
       {publishing && current && (
         <PublishDialog
           pid={project.id}
@@ -416,6 +426,7 @@ function SheetChips({ sheet }: { sheet: DrawingSheetDto }) {
   const { t } = useTranslation(["sheets", "cde"]);
   return (
     <div className="sheet-chips">
+      <OcrBadge sheet={sheet} />
       {sheet.revision && <span className="badge info">{sheet.revision}</span>}
       {sheet.suitability && <span className="badge">{sheet.suitability}</span>}
       {sheet.state && <span className="badge">{t(`cde:states.${sheet.state}`)}</span>}
@@ -547,13 +558,40 @@ function PublishDialog({ pid, set, onClose, onDone }: { pid: string; set: SheetS
   );
 }
 
-function SheetDrawer({ pid, sheetId, onClose, onChanged }: { pid: string; sheetId: string; onClose(): void; onChanged(): void }) {
+function SheetDrawer({
+  pid,
+  sheetId,
+  onClose,
+  onChanged,
+  onMessage,
+}: {
+  pid: string;
+  sheetId: string;
+  onClose(): void;
+  onChanged(): void;
+  onMessage(text: string): void;
+}) {
   const { t } = useTranslation(["sheets", "common", "cde"]);
   const { data, error, reload } = useLoad(() => sheetsApi.detail(pid, sheetId), [pid, sheetId]);
   const [edit, setEdit] = useState<{ number: string; title: string; discipline: string } | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [templating, setTemplating] = useState(false);
   const sheet = data?.sheet;
   const history = useMemo(() => data?.history ?? [], [data]);
+
+  if (templating && sheet)
+    return (
+      <TitleBlockEditor
+        pid={pid}
+        sheet={sheet}
+        onClose={() => setTemplating(false)}
+        onSaved={(text) => {
+          setTemplating(false);
+          onMessage(text);
+          onClose();
+        }}
+      />
+    );
 
   async function save() {
     if (!edit || !sheet) return;
@@ -611,6 +649,15 @@ function SheetDrawer({ pid, sheetId, onClose, onChanged }: { pid: string; sheetI
                 <dd>
                   {sheet.number} <span className="muted">({t(`numberSource.${sheet.numberSource}`)})</span>
                 </dd>
+                {(sheet.readBy || sheet.fromTemplate) && (
+                  <>
+                    <dt>{t("ocr.readBy")}</dt>
+                    <dd data-testid="sheet-read-by">
+                      {t(`ocr.readByValues.${sheet.readBy ?? "none"}`)}
+                      {sheet.fromTemplate ? ` · ${t("ocr.fromTemplate")}` : ""} <OcrBadge sheet={sheet} />
+                    </dd>
+                  </>
+                )}
                 <dt>{t("columns.title")}</dt>
                 <dd>{sheet.title ?? "—"}</dd>
                 <dt>{t("columns.discipline")}</dt>
@@ -640,6 +687,11 @@ function SheetDrawer({ pid, sheetId, onClose, onChanged }: { pid: string; sheetI
             {data.canEdit && !edit && (
               <button type="button" onClick={() => setEdit({ number: sheet.number, title: sheet.title ?? "", discipline: sheet.discipline ?? "" })} data-testid="sheet-edit">
                 {t("detail.edit")}
+              </button>
+            )}
+            {data.canManage && sheet.format === "pdf" && !edit && (
+              <button type="button" onClick={() => setTemplating(true)} data-testid="sheet-template">
+                {t("template.open")}
               </button>
             )}
             <h3>{t("detail.history")}</h3>

@@ -8,6 +8,16 @@
  *   node tools/third-party-notices.mjs --ee-only   node_modules paths that only Enterprise modules need
  *                                                  (the Community image removes them, see Dockerfile)
  *
+ * For a closed Enterprise module (a sitekeep-<id> checkout with its package-lock.json and node_modules):
+ *
+ *   node tools/third-party-notices.mjs --module ../sitekeep-ai [--out FILE] [--check]
+ *
+ * lists the module's own runtime dependencies (dependencies and optionalDependencies, followed through the
+ * module's package-lock.json; peerDependencies are provided by the core) that SiteKeep Community does not
+ * already ship (compared by name@version with this checkout's package-lock.json). FILE defaults to the
+ * module's THIRD_PARTY_NOTICES.md; --check exits 1 when it is out of date or a licence is not allowed.
+ * Proprietary packages a module may use are listed in MODULE_ACCEPTED (docs/modules/README.md).
+ *
  * What ships: the packages the workspaces (server, web bundle, mcp, shared, cde-tools, sdk; the 3D viewer
  * where it is a workspace) depend on, followed through package-lock.json the way Node resolves them, without
  * devDependencies and without the Enterprise modules (closed, not listed). Licence texts come from the
@@ -55,6 +65,26 @@ export const LICENCE_EXCEPTIONS = {
 /** Never part of what ships (closed licence): a production dependency on them fails the check. */
 export const FORBIDDEN_PACKAGES = {
   "@cursor/sdk": "proprietary (Anysphere Inc.); only the closed AI module may depend on it, never SiteKeep Community",
+};
+
+/**
+ * Packages outside the allow-list that a closed Enterprise module may ship (--module), with the note shown in
+ * its notices. A key also covers its per-platform binaries (`<key>-<platform>`).
+ */
+export const MODULE_ACCEPTED = {
+  "@cursor/sdk":
+    "Proprietary, not open source. Its LICENSE.md reads: \"© Anysphere Inc. All rights reserved. Use is subject to Cursor's Terms of Service (https://cursor.com/terms-of-service).\" Only the SiteKeep AI module depends on it.",
+};
+
+/** Licences that do not require attribution: their packages are listed for completeness only. */
+export const NO_ATTRIBUTION = {
+  "MIT-0": "MIT No Attribution (MIT-0) does not require keeping the copyright notice or the licence text; the package is listed for completeness.",
+};
+
+/** The entry of `table` for `name` or for one of its per-platform packages (`<key>-<platform>`). */
+const entryFor = (table, name) => {
+  const key = Object.keys(table).find((k) => name === k || name.startsWith(k + "-"));
+  return key ? table[key] : undefined;
 };
 
 /** Our own packages: not third-party, not listed. */
@@ -189,6 +219,36 @@ const workspacePaths = (packages) => Object.keys(packages).filter((p) => p && !p
 export function shippedPackages(lock) {
   const packages = lock.packages ?? {};
   const { paths, missing } = reachable(packages, workspacePaths(packages), isEnterpriseModule);
+  return { list: packageList(packages, paths), missing };
+}
+
+/**
+ * What an Enterprise module adds: the packages its own dependencies and optional dependencies reach in its
+ * lockfile (`moduleLock`), apart from our own packages and from what the core (`coreLock`) already ships
+ * (the same name@version). The module's peer dependencies come from the core: they are not followed, also
+ * where a dependency of the module needs them as a peer (whatever version the module's lockfile holds).
+ */
+export function modulePackages(moduleLock, coreLock) {
+  const packages = moduleLock.packages ?? {};
+  const top = packages[""] ?? {};
+  const roots = [];
+  const missing = [];
+  for (const [deps, optional] of [[top.dependencies, false], [top.optionalDependencies, true]])
+    for (const name of Object.keys(deps ?? {})) {
+      if (isOwnPackage(name)) continue;
+      const at = resolveIn(packages, "", name);
+      if (at) roots.push(at);
+      else if (!optional) missing.push(`${name} (needed by the module)`);
+    }
+  const peers = new Set(Object.keys(top.peerDependencies ?? {}));
+  const walked = reachable(packages, roots, (name) => isOwnPackage(name) || peers.has(name));
+  const core = new Set(shippedPackages(coreLock).list.map((p) => `${p.name}@${p.version}`));
+  const list = packageList(packages, walked.paths).filter((p) => !core.has(`${p.name}@${p.version}`));
+  return { list, missing: [...missing, ...walked.missing] };
+}
+
+/** [{ name, version, path, entry }] of lockfile `paths`, sorted by name and version, one per name@version. */
+function packageList(packages, paths) {
   const byKey = new Map();
   for (const p of paths) {
     const entry = packages[p];
@@ -200,8 +260,7 @@ export function shippedPackages(lock) {
     // The same package at several places: keep the shortest path (deterministic, hoisted one first).
     if (!prev || p.length < prev.path.length || (p.length === prev.path.length && p < prev.path)) byKey.set(key, { name, version: entry.version, path: p, entry });
   }
-  const list = [...byKey.values()].sort((a, b) => cmp(a.name, b.name) || cmp(a.version, b.version));
-  return { list, missing };
+  return [...byKey.values()].sort((a, b) => cmp(a.name, b.name) || cmp(a.version, b.version));
 }
 
 /** Lockfile paths installed only because of the Enterprise modules (and the modules themselves). */
@@ -283,10 +342,27 @@ const readJson = (f) => {
 
 /** Everything the notices need about each shipped package (read from node_modules). */
 export function collect(root = ROOT) {
+  const { list, missing } = shippedPackages(readLock(root));
+  return { items: describe(root, list), missing };
+}
+
+/** The same for an Enterprise module checkout (`moduleDir`), against the core at `coreRoot`. */
+export function collectModule(moduleDir, coreRoot = ROOT) {
+  const pkg = readJson(path.join(moduleDir, "package.json"));
+  if (!pkg) throw new Error("package.json not found in " + moduleDir);
+  const { list, missing } = modulePackages(readLock(moduleDir), readLock(coreRoot));
+  return { name: pkg.name, items: describe(moduleDir, list, true), missing };
+}
+
+function readLock(root) {
   const lock = readJson(path.join(root, "package-lock.json"));
   if (!lock) throw new Error("package-lock.json not found in " + root);
-  const { list, missing } = shippedPackages(lock);
-  const items = list.map(({ name, version, path: p, entry }) => {
+  return lock;
+}
+
+/** Licence data of each package of `list`, read from `root`/node_modules. */
+function describe(root, list, inModule = false) {
+  return list.map(({ name, version, path: p, entry }) => {
     const dir = path.join(root, p);
     // A pre-built binary for one platform (os / cpu in the lockfile): only the matching one is installed, so
     // nothing is read from node_modules for it and every platform writes the same file.
@@ -301,7 +377,8 @@ export function collect(root = ROOT) {
       installed: platform || !!pkg,
       declared,
       licence: exception?.licence ?? declared,
-      note: exception?.reason ?? "",
+      note: exception?.reason ?? (inModule ? entryFor(MODULE_ACCEPTED, name) : undefined) ?? NO_ATTRIBUTION[declared] ?? "",
+      accepted: inModule && !!entryFor(MODULE_ACCEPTED, name),
       url: name === VIEWER ? `${PUBLIC_REPO}/tree/main/packages/bim-viewer` : platform ? `https://www.npmjs.com/package/${name}` : repositoryUrl(pkg),
       // The viewer is SiteKeep's own code under SiteKeep's licence (LICENSE): no copy of the AGPL text here.
       licenceFiles: name === VIEWER ? [] : filesMatching(dir, LICENCE_FILE),
@@ -309,7 +386,6 @@ export function collect(root = ROOT) {
       author: typeof pkg?.author === "string" ? pkg.author : pkg?.author?.name ?? "",
     };
   });
-  return { items, missing };
 }
 
 /** Problems of the licence check: [] when every shipped package is allowed. */
@@ -317,7 +393,9 @@ export function licenceProblems(items, missing = []) {
   const problems = missing.map((m) => `missing from package-lock.json: ${m}`);
   for (const it of items) {
     const id = `${it.name}@${it.version}`;
-    if (FORBIDDEN_PACKAGES[it.name]) problems.push(`${id}: must not ship (${FORBIDDEN_PACKAGES[it.name]})`);
+    if (it.accepted) continue;
+    const forbidden = entryFor(FORBIDDEN_PACKAGES, it.name);
+    if (forbidden) problems.push(`${id}: must not ship (${forbidden})`);
     else if (LICENCE_EXCEPTIONS[it.name]) continue;
     else if (!it.licence) problems.push(`${id}: no licence`);
     else if (!licenceAllowed(it.licence)) problems.push(`${id}: licence "${it.licence}" is not on the allow-list`);
@@ -341,8 +419,37 @@ export function otherComponents(root = ROOT) {
     /* no Dockerfile */
   }
   const fontDir = path.join(root, "apps/server/assets/fonts");
-  const liberation = fs.existsSync(path.join(fontDir, "LICENSE_LIBERATION")) ? normaliseText(fs.readFileSync(path.join(fontDir, "LICENSE_LIBERATION"), "utf8")) : "";
-  return { libredwg, liberation };
+  const ofl = path.join(fontDir, "OFL.txt");
+  const liberation = fs.existsSync(ofl) ? normaliseText(fs.readFileSync(ofl, "utf8")) : "";
+  const liberationVersion = liberation ? fontVersion(path.join(fontDir, "LiberationSans-Regular.ttf")) : "";
+  return { libredwg, liberation, liberationVersion };
+}
+
+/** The version of a TrueType font from its name table ("Version 2.1.5" gives "2.1.5"); "" when unreadable. */
+export function fontVersion(file) {
+  try {
+    const b = fs.readFileSync(file);
+    const tables = b.readUInt16BE(4);
+    for (let i = 0; i < tables; i++) {
+      const rec = 12 + i * 16;
+      if (b.toString("latin1", rec, rec + 4) !== "name") continue;
+      const at = b.readUInt32BE(rec + 8);
+      const count = b.readUInt16BE(at + 2);
+      const strings = at + b.readUInt16BE(at + 4);
+      for (let j = 0; j < count; j++) {
+        const r = at + 6 + j * 12;
+        const [platform, , , nameId, length, offset] = [0, 2, 4, 6, 8, 10].map((o) => b.readUInt16BE(r + o));
+        if (nameId !== 5) continue;
+        const raw = b.subarray(strings + offset, strings + offset + length);
+        const text = platform === 1 ? raw.toString("latin1") : Buffer.from(raw).swap16().toString("utf16le");
+        const m = /(\d+(?:\.\d+)+)/.exec(text);
+        if (m) return m[1];
+      }
+    }
+  } catch {
+    /* not a readable font */
+  }
+  return "";
 }
 
 /** The whole THIRD_PARTY_NOTICES.md text. */
@@ -355,7 +462,8 @@ export function render({ items }, other) {
   out.push(
     "SiteKeep Community is free software under the GNU Affero General Public License, version 3 only (AGPL-3.0-only, see `LICENSE`). " +
       `Source code: ${PUBLIC_REPO}. It includes the third-party software listed below, each under its own licence. ` +
-      "SiteKeep Enterprise modules are licensed commercially by 7Dimensions OÜ; they are not covered by this file.",
+      "SiteKeep Enterprise modules are licensed commercially by 7Dimensions OÜ; they are not covered by this file " +
+      "(each module carries its own THIRD_PARTY_NOTICES.md for the third-party packages it adds).",
   );
   out.push("");
   out.push("## Contents");
@@ -367,17 +475,7 @@ export function render({ items }, other) {
   out.push("");
   out.push(`## 1. npm packages (${items.length})`);
   out.push("");
-  out.push("| Package | Version | Licence | Source |");
-  out.push("|---|---|---|---|");
-  for (const it of items) out.push(`| ${cell(it.name)} | ${cell(it.version)} | ${cell(it.licence || "unknown")} | ${cell(it.url)} |`);
-  const notes = items.filter((it) => it.note);
-  if (notes.length) {
-    out.push("");
-    out.push("Notes:");
-    out.push("");
-    for (const it of notes) out.push(`- **${it.name}**: ${it.note}`);
-  }
-  out.push("");
+  packageTable(out, items);
   out.push("## 2. Other components in the SiteKeep image");
   out.push("");
   if (other.libredwg) {
@@ -392,14 +490,27 @@ export function render({ items }, other) {
     out.push("");
   }
   if (other.liberation) {
-    out.push("### Liberation Sans fonts (apps/server/assets/fonts)");
+    const v = other.liberationVersion;
+    out.push(`### Liberation Sans fonts${v ? ` ${v}` : ""} (apps/server/assets/fonts)`);
     out.push("");
     out.push(
-      "LiberationSans-Regular.ttf and LiberationSans-Bold.ttf (version 1.07.4), used to write generated PDF files. " +
-        "Copyright © 2007-2011 Red Hat, Inc. Licensed under the GNU General Public License, version 2, with the font exception below.",
+      `LiberationSans-Regular.ttf and LiberationSans-Bold.ttf${v ? ` (version ${v})` : ""}, unmodified from the official release ` +
+        "(https://github.com/liberationfonts/liberation-fonts), used to write generated PDF files. " +
+        "Licensed under the SIL Open Font License, version 1.1 (OFL-1.1); the licence text, also in `apps/server/assets/fonts/OFL.txt`, follows.",
     );
     out.push("");
     out.push(fence(other.liberation));
+    out.push("");
+  }
+  const tessdata = items.filter((it) => it.name.startsWith("@tesseract.js-data/"));
+  if (tessdata.length) {
+    out.push("### Tesseract OCR engine and language data");
+    out.push("");
+    out.push(
+      "OCR of scanned drawing sheets runs the Tesseract OCR engine (Apache-2.0, https://github.com/tesseract-ocr/tesseract), compiled to WebAssembly in `tesseract.js-core`. " +
+        `The language models (${tessdata.map((it) => `\`${it.name.split("/")[1]}.traineddata\``).join(", ")}, integer "best" models) come from the Tesseract project's tessdata_best repository ` +
+        "(https://github.com/tesseract-ocr/tessdata_best), licensed under the Apache License, Version 2.0 (text in section 3); the `@tesseract.js-data/*` npm packages that carry them are MIT.",
+    );
     out.push("");
   }
   out.push("### Debian packages and Node.js");
@@ -409,8 +520,53 @@ export function render({ items }, other) {
       "Each Debian package carries its copyright and licence in `/usr/share/doc/<package>/copyright`; Node.js's licence is in `/usr/local/include/node` and https://github.com/nodejs/node/blob/main/LICENSE.",
   );
   out.push("");
+  licenceTexts(out, items, 3);
+  noticeTexts(out, items, 4);
+  return out.join("\n").replace(/\n+$/, "") + "\n";
+}
 
-  // Licence texts grouped by body; every package keeps its own copyright lines.
+/** THIRD_PARTY_NOTICES.md of an Enterprise module (`name` is its package name). */
+export function renderModule({ name, items }) {
+  const out = [];
+  out.push("# Third-Party Notices");
+  out.push("");
+  out.push(
+    "<!-- Generated by tools/third-party-notices.mjs --module (SiteKeep core) from this package's package-lock.json and node_modules. Do not edit: see docs/modules/README.md in the core. -->",
+  );
+  out.push("");
+  out.push(
+    `${name} is a SiteKeep Enterprise module, licensed commercially by 7Dimensions OÜ (not open source). ` +
+      "It runs inside SiteKeep; the third-party software SiteKeep itself ships is listed in SiteKeep's THIRD_PARTY_NOTICES.md " +
+      `(${PUBLIC_REPO}/blob/main/THIRD_PARTY_NOTICES.md). This file lists the third-party packages the module adds: ` +
+      "its own runtime dependencies (and theirs) that SiteKeep does not already ship, each under its own licence.",
+  );
+  out.push("");
+  out.push(`## 1. npm packages (${items.length})`);
+  out.push("");
+  if (!items.length) out.push("The module adds no third-party packages.\n");
+  else packageTable(out, items);
+  licenceTexts(out, items, 2);
+  noticeTexts(out, items, 3);
+  return out.join("\n").replace(/\n+$/, "") + "\n";
+}
+
+function packageTable(out, items) {
+  out.push("| Package | Version | Licence | Source |");
+  out.push("|---|---|---|---|");
+  for (const it of items) out.push(`| ${cell(it.name)} | ${cell(it.version)} | ${cell(it.licence || "unknown")} | ${cell(it.url)} |`);
+  // One note per package; per-platform binaries of a package with the same note are covered by it.
+  const notes = items.filter((it) => it.note && !items.some((o) => o !== it && it.name.startsWith(o.name + "-") && o.note === it.note));
+  if (notes.length) {
+    out.push("");
+    out.push("Notes:");
+    out.push("");
+    for (const it of notes) out.push(`- **${it.name}**: ${it.note}`);
+  }
+  out.push("");
+}
+
+/** Licence texts grouped by body; every package keeps its own copyright lines. */
+function licenceTexts(out, items, section) {
   const groups = new Map();
   const noText = [];
   for (const it of items) {
@@ -426,14 +582,18 @@ export function render({ items }, other) {
     }
   }
   const ordered = [...groups.values()].sort((a, b) => b.members.length - a.members.length || cmp(memberId(a.members[0]), memberId(b.members[0])));
-  out.push("## 3. Licence texts of the npm packages");
+  out.push(`## ${section}. Licence texts of the npm packages`);
   out.push("");
   out.push("Packages with the same licence text share one copy of it; each package's copyright lines are listed with it.");
   out.push("");
   ordered.forEach((g, i) => {
-    const licences = [...new Set(g.members.map((m) => m.it.licence || "unknown"))].sort(cmp).join(", ");
-    out.push(`### 3.${i + 1} ${licences} (${g.members.length} package${g.members.length === 1 ? "" : "s"})`);
+    const ids = [...new Set(g.members.map((m) => m.it.licence || "unknown"))].sort(cmp);
+    out.push(`### ${section}.${i + 1} ${ids.join(", ")} (${g.members.length} package${g.members.length === 1 ? "" : "s"})`);
     out.push("");
+    if (ids.every((id) => NO_ATTRIBUTION[id])) {
+      out.push(ids.map((id) => NO_ATTRIBUTION[id]).join(" "));
+      out.push("");
+    }
     for (const m of g.members) {
       const lines = m.copyright.length ? `: ${m.copyright.map(cell).join("; ")}` : "";
       out.push(`- ${memberId(m)}${lines}`);
@@ -454,12 +614,17 @@ export function render({ items }, other) {
   if (platform.length) {
     out.push("### Pre-built binaries for one platform");
     out.push("");
-    out.push("Each of these packages holds the compiled form of another package for one operating system and processor; an installation carries only the one for its platform. Their licence is the one stated, with the text and copyright of the package they belong to above.");
+    out.push(
+      "Each of these packages holds the compiled form of another package for one operating system and processor; an installation carries only the one for its platform. Their licence is the one stated, with the text and copyright of the package they belong to above.",
+    );
     out.push("");
     for (const it of platform) out.push(`- ${it.name}@${it.version}: ${it.licence || "unknown"}`);
     out.push("");
   }
-  out.push("## 4. NOTICE files of the npm packages");
+}
+
+function noticeTexts(out, items, section) {
+  out.push(`## ${section}. NOTICE files of the npm packages`);
   out.push("");
   const withNotice = items.filter((it) => it.noticeFiles.length);
   if (!withNotice.length) out.push("None of the packages has a NOTICE file.\n");
@@ -470,7 +635,6 @@ export function render({ items }, other) {
       out.push(fence(f.text));
       out.push("");
     }
-  return out.join("\n").replace(/\n+$/, "") + "\n";
 }
 
 function memberId(m) {
@@ -480,46 +644,67 @@ function memberId(m) {
 
 // ---------------------------------------------------------------------------------------------------------
 
+const VALUE_FLAGS = ["--module", "--out"];
+const MODES = ["--write", "--check", "--licences", "--ee-only"];
+const USAGE =
+  "usage: tools/third-party-notices.mjs [--check | --licences | --ee-only] [root]\n" +
+  "       tools/third-party-notices.mjs --module DIR [--out FILE] [--check | --licences] [core root]";
+
 function main(argv) {
-  const mode = argv.find((a) => a.startsWith("--")) ?? "--write";
-  const root = argv.find((a) => !a.startsWith("--")) ?? ROOT;
+  const valueOf = (flag) => {
+    const i = argv.indexOf(flag);
+    return i >= 0 ? argv[i + 1] : undefined;
+  };
+  const modes = argv.filter((a) => a.startsWith("--") && !VALUE_FLAGS.includes(a));
+  const positional = argv.filter((a, i) => !a.startsWith("--") && !VALUE_FLAGS.includes(argv[i - 1]));
+  const mode = modes[0] ?? "--write";
+  const moduleDir = valueOf("--module");
+  const out = valueOf("--out");
+  const bad =
+    modes.length > 1 ||
+    positional.length > 1 ||
+    !MODES.includes(mode) ||
+    (argv.includes("--module") && (!moduleDir || moduleDir.startsWith("--") || mode === "--ee-only")) ||
+    (argv.includes("--out") && (!out || out.startsWith("--") || !moduleDir));
+  if (bad) {
+    console.error(USAGE);
+    return 2;
+  }
+  const root = positional[0] ? path.resolve(positional[0]) : ROOT;
   if (mode === "--ee-only") {
-    const lock = readJson(path.join(root, "package-lock.json"));
-    for (const p of enterpriseOnlyPaths(lock)) console.log(p);
+    for (const p of enterpriseOnlyPaths(readLock(root))) console.log(p);
     return 0;
   }
-  const data = collect(root);
+  const data = moduleDir ? collectModule(path.resolve(moduleDir), root) : collect(root);
+  const file = out ? path.resolve(out) : path.join(moduleDir ? path.resolve(moduleDir) : root, OUTPUT);
+  const shown = path.relative(process.cwd(), file) || OUTPUT;
   const notInstalled = data.items.filter((it) => !it.installed).map((it) => `${it.name}@${it.version}`);
   if (notInstalled.length) {
-    console.error(`third-party-notices: not installed (run npm ci first): ${notInstalled.join(", ")}`);
+    console.error(`third-party-notices: not installed (run npm ci first${moduleDir ? " in the module" : ""}): ${notInstalled.join(", ")}`);
     return 1;
   }
   const problems = licenceProblems(data.items, data.missing);
   if (problems.length) {
     console.error("third-party-notices: licence check failed:\n" + problems.map((p) => "  " + p).join("\n"));
-    console.error("Allowed: " + [...ALLOWED_LICENCES].join(", ") + " (tools/third-party-notices.mjs).");
+    console.error("Allowed: " + [...ALLOWED_LICENCES].join(", ") + (moduleDir ? "; in a module also MODULE_ACCEPTED" : "") + " (tools/third-party-notices.mjs).");
   }
   if (mode === "--licences") {
     if (!problems.length) console.log(`third-party-notices: ${data.items.length} production packages, licences allowed`);
     return problems.length ? 1 : 0;
   }
-  const text = render(data, otherComponents(root));
-  const file = path.join(root, OUTPUT);
+  const text = moduleDir ? renderModule(data) : render(data, otherComponents(root));
   if (mode === "--check") {
     const current = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
     if (current !== text) {
-      console.error(`third-party-notices: ${OUTPUT} is out of date; run \`npm run notices\` and commit it.`);
+      const how = moduleDir ? "regenerate it with tools/third-party-notices.mjs --module (docs/modules/README.md)" : "run `npm run notices`";
+      console.error(`third-party-notices: ${shown} is out of date; ${how} and commit it.`);
       return 1;
     }
-    if (!problems.length) console.log(`third-party-notices: ${OUTPUT} is up to date (${data.items.length} packages), licences allowed`);
+    if (!problems.length) console.log(`third-party-notices: ${shown} is up to date (${data.items.length} packages), licences allowed`);
     return problems.length ? 1 : 0;
   }
-  if (mode !== "--write") {
-    console.error("usage: tools/third-party-notices.mjs [--check | --licences | --ee-only] [root]");
-    return 2;
-  }
   fs.writeFileSync(file, text);
-  console.log(`third-party-notices: wrote ${OUTPUT} (${data.items.length} packages)`);
+  console.log(`third-party-notices: wrote ${shown} (${data.items.length} packages)`);
   return problems.length ? 1 : 0;
 }
 

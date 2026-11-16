@@ -29,7 +29,8 @@ The two construction templates are generated from one source: see [authoring](#a
 
 Suitability and revision codes follow ISO 19650 in the ISO templates (`codeScheme: "iso_uk_na"`: S0–S4,
 A, B, CR; P01 / C01). The R00 scheme used on many sites is chosen per project in Project Settings → CDE
-→ **Code Scheme** (`legacy_r`), or by a template with `"cde": { "codeScheme": "legacy_r" }`.
+→ **Code Scheme** (`legacy_r`), or by a template with `"cde": { "codeScheme": "legacy_r" }`. Letter
+revisions A, B, C … (projects imported from Autodesk Forma / ACC) are `letter_rev`.
 
 ## Format
 
@@ -88,7 +89,7 @@ template" writes it back when the settings differ from the defaults.
 
 | Key | Effect |
 |---|---|
-| `codeScheme` | `iso_uk_na` (default), `legacy_r` (R00, R01 …), `custom` |
+| `codeScheme` | `iso_uk_na` (default), `legacy_r` (R00, R01 …), `custom`, `letter_rev` (A, B, C …) |
 | `enforceTransitions` | The transition table is enforced from the start (D-8) |
 | `wipPolicy`, `adminSeesWip` | `team_only`: a task team's WIP is closed to the other teams |
 | `archiveFolder` | Folder path of the archive (D-10) |

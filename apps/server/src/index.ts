@@ -37,8 +37,9 @@ import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
  *   AI_MODEL           default qwen3:8b; the builder is on when AI_BASE_URL or AI_MODEL is set, or AI_ENABLED=1
  *   AI_API_KEY         optional bearer key; AI_TIMEOUT_MS optional; AI_ENABLED=0 turns the builder off
  *   REPORT_TZ          time zone of report date buckets (default Europe/Istanbul)
- *   CDE_SMTP_URL       optional SMTP server for official letters, e.g. smtp://user:pass@mail.local:587
+ *   CDE_SMTP_URL       optional SMTP server for official letters and invitations, e.g. smtp://user:pass@mail.local:587
  *   CDE_SMTP_FROM      sender address for those e-mails; without both, letters are e-mailed by hand (.eml)
+ *                      and invitation links are handed to the inviter
  *   CDE_SOFFICE_PATH   LibreOffice soffice, last-resort office → PDF converter (default: install paths, then PATH)
  *   CDE_DWG2DXF_PATH   LibreDWG dwg2dxf for DWG previews (default: install paths, then PATH)
  *   CDE_CONVERT_TIMEOUT_MS  max time of one conversion (default 180000)

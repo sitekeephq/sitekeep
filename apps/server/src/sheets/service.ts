@@ -5,15 +5,19 @@
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import {
   CDE_STATES,
+  DEFAULT_OCR_REGION,
   DEFAULT_SHEET_STATES,
   SHEET_MAX_PAGES,
   can,
   isSheetFile,
+  normalizeTitleBlockTemplate,
   parseName,
   sheetKey,
   splitExtension,
+  templateRegion,
   type CdeState,
   type DrawingSheetDto,
+  type TitleBlockTemplate,
 } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { drawingSheetSettings, drawingSheets, fileVersions, files } from "../db/schema.js";
@@ -25,6 +29,7 @@ import { extractPdfText } from "../docintel/extract.js";
 import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { folderDisplayPath } from "../modules/documents/path.js";
 import { sheetFromCad, sheetsFromPdf, type ExtractedSheet, type SheetFileContext } from "./extract.js";
+import { ocrEnabledForInstance, ocrPdfPages } from "./ocr.js";
 
 export const SHEETS_JOB = "sheets_extract";
 
@@ -35,11 +40,20 @@ export type SheetRow = typeof drawingSheets.$inferSelect;
 export interface SheetSettings {
   states: CdeState[];
   folderIds: string[];
+  titleBlock: TitleBlockTemplate | null;
+  ocr: boolean;
 }
 
 export async function loadSheetSettings(db: Db, projectId: string): Promise<SheetSettings> {
   const [row] = await db.select().from(drawingSheetSettings).where(eq(drawingSheetSettings.projectId, projectId));
-  return row ? { states: row.states.filter((s) => (CDE_STATES as readonly string[]).includes(s)), folderIds: row.folderIds } : { states: [...DEFAULT_SHEET_STATES], folderIds: [] };
+  return row
+    ? {
+        states: row.states.filter((s) => (CDE_STATES as readonly string[]).includes(s)),
+        folderIds: row.folderIds,
+        titleBlock: normalizeTitleBlockTemplate(row.titleBlock),
+        ocr: row.ocr,
+      }
+    : { states: [...DEFAULT_SHEET_STATES], folderIds: [], titleBlock: null, ocr: true };
 }
 
 /** True when files in the folder become sheets: its state is chosen, or it is (below) a chosen folder. */
@@ -60,7 +74,12 @@ export async function queueSheetsFor(jobs: JobQueue, versionId: string, fileName
  * Job: splits a drawing version into sheets. Out of scope (folder settings) or deleted: nothing
  * happens. Rows edited by a person keep their number, title and discipline.
  */
-export async function processSheets(db: Db, storage: Storage, versionId: string, opts: { force?: boolean } = {}): Promise<number> {
+export async function processSheets(
+  db: Db,
+  storage: Storage,
+  versionId: string,
+  opts: { force?: boolean; log?: (msg: string) => void } = {},
+): Promise<number> {
   const [row] = await db
     .select({ v: fileVersions, f: files })
     .from(fileVersions)
@@ -69,25 +88,56 @@ export async function processSheets(db: Db, storage: Storage, versionId: string,
   if (!row || row.f.deletedAt || !isSheetFile(row.f.name)) return 0;
   const { v, f } = row;
   const tree = await FolderTree.load(db, f.projectId);
-  if (!opts.force && !inSheetScope(tree, await loadSheetSettings(db, f.projectId), f.folderId)) return 0;
+  const settings = await loadSheetSettings(db, f.projectId);
+  if (!opts.force && !inSheetScope(tree, settings, f.folderId)) return 0;
+  const ctx = await sheetFileContext(db, tree, f);
+  const ext = splitExtension(f.name).extension.toLowerCase();
+  const extracted =
+    ext === "pdf" ? await readPdfSheets(db, storage.localPath(v.storageKey), ctx, settings, { log: opts.log }) : [sheetFromCad(ctx)];
+  await saveSheets(db, f, v, extracted);
+  return extracted.length;
+}
+
+/**
+ * Sheets of a PDF: the text layer of its pages, OCR of the title block of scanned pages (when the
+ * project and the installation allow it), then the template and the automatic reading. `page`
+ * reads that one page only (the template preview).
+ */
+export async function readPdfSheets(
+  db: Db,
+  filePath: string,
+  ctx: SheetFileContext,
+  settings: Pick<SheetSettings, "titleBlock" | "ocr">,
+  opts: { page?: number; log?: (msg: string) => void } = {},
+): Promise<ExtractedSheet[]> {
+  const out = await extractPdfText({ filePath }, { maxPages: opts.page ?? SHEET_MAX_PAGES, timeoutMs: 300_000 });
+  if (opts.page) out.pages = out.pages.filter((p) => p.n === opts.page);
+  // Scanned pages (no text layer): OCR of the title block.
+  const ocr = new Map<number, number>();
+  const scanned = out.pages.filter((p) => !p.items.length && p.width > 0 && p.height > 0);
+  if (scanned.length && settings.ocr && (await ocrEnabledForInstance(db))) {
+    const requests = scanned.map((p) => ({ n: p.n, box: templateRegion(settings.titleBlock, p.width, p.height)?.box ?? DEFAULT_OCR_REGION }));
+    const read = await ocrPdfPages(filePath, requests, opts.log);
+    for (const p of out.pages) {
+      const r = read.get(p.n);
+      if (!r) continue;
+      p.items = r.items;
+      ocr.set(p.n, r.confidence);
+    }
+  }
+  return sheetsFromPdf(out, ctx, { template: settings.titleBlock, ocr });
+}
+
+/** Context of a drawing file for numbering and fallbacks (code, name, naming standard, attributes). */
+export async function sheetFileContext(db: Db, tree: FolderTree, f: FileRow): Promise<SheetFileContext> {
   const standard = await standardForFolder(db, tree, f.folderId).catch(() => null);
-  const ctx: SheetFileContext = {
+  return {
     fileName: f.name,
     documentCode: f.documentCode,
     description: f.description,
     nameFields: standard ? parseName(standard, f.name) : null,
     attributes: f.attributes,
   };
-  const ext = splitExtension(f.name).extension.toLowerCase();
-  let extracted: ExtractedSheet[];
-  if (ext === "pdf") {
-    const out = await extractPdfText({ filePath: storage.localPath(v.storageKey) }, { maxPages: SHEET_MAX_PAGES, timeoutMs: 300_000 });
-    extracted = sheetsFromPdf(out, ctx);
-  } else {
-    extracted = [sheetFromCad(ctx)];
-  }
-  await saveSheets(db, f, v, extracted);
-  return extracted.length;
 }
 
 /** Writes the sheets of a version; edited rows keep their metadata. */
@@ -110,6 +160,9 @@ export async function saveSheets(db: Db, f: FileRow, v: VersionRow, extracted: E
       discipline: keep ? old!.discipline : s.discipline,
       revision: s.revision,
       sheetDate: s.date,
+      readBy: s.readBy,
+      ocrConfidence: s.ocrConfidence,
+      fromTemplate: s.fromTemplate,
       updatedAt: new Date(),
     };
     await db
@@ -190,6 +243,9 @@ export function toSheetDto(tree: FolderTree, r: SheetJoined): DrawingSheetDto {
     suitability: r.v.suitabilityCode,
     date: sheetDate(r),
     edited: r.s.edited,
+    readBy: r.s.readBy ?? null,
+    ocrConfidence: r.s.ocrConfidence ?? null,
+    fromTemplate: r.s.fromTemplate,
     fileName: r.f.name,
     folderId: r.f.folderId,
     folderPath: known ? folderDisplayPath(tree, r.f.folderId) : "",

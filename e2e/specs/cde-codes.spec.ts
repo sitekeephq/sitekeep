@@ -78,3 +78,40 @@ test("ISO19650-2 5.1.7(b) / UK NA suitability: a code that does not fit the stat
     await setEnforce(false);
   }
 });
+
+test("ISO19650-2 5.1.7(b) / letter revisions: switching a Forma project to letter revisions and applying them to existing files", async ({ page }) => {
+  // Its own project: the scheme switch does not touch the other specs.
+  const suffix = Date.now().toString(36).toUpperCase();
+  const created = await page.request.post("/api/v1/projects", { data: { code: `LTR-${suffix}`, name: `Letters ${suffix}`, template: "iso19650" } });
+  expect(created.ok()).toBe(true);
+  const project = (await created.json()) as { id: string; rootFolderId: string };
+  const contents = (await (await page.request.get(`/api/v1/projects/${project.id}/folders/${project.rootFolderId}/contents`)).json()) as {
+    folders: { id: string; state: string | null }[];
+  };
+  const wipId = contents.folders.find((f) => f.state === "wip")!.id;
+  // A file as Forma / ACC delivers it: REVİZYON and STATUS attributes, no codes under the ISO scheme.
+  const name = `forma-${suffix.toLowerCase()}.txt`;
+  const upload = await page.request.post(`/api/v1/projects/${project.id}/folders/${wipId}/files`, {
+    multipart: { attributes: JSON.stringify({ REVİZYON: "B", STATUS: "Approved" }), file: { name, mimeType: "text/plain", buffer: Buffer.from("Forma file") } },
+  });
+  expect(upload.ok()).toBe(true);
+
+  await page.goto(`/projects/${project.id}/settings?sekme=cde`);
+  const codes = page.getByTestId("cde-codes-settings");
+  await expect(codes.getByTestId("cde-codes-unmapped")).toContainText("Approved");
+  // Apply is offered for the saved scheme only.
+  await codes.getByLabel("Kod Düzeni").selectOption("letter_rev");
+  await expect(codes.getByTestId("cde-codes-apply")).toBeDisabled();
+  await expect(codes).toContainText("A, B … Z, ardından AA, AB");
+  await codes.getByRole("button", { name: "Düzeni Kaydet" }).click();
+  await expect(codes.getByText("Kaydedildi.")).toBeVisible();
+  await codes.getByTestId("cde-codes-apply").click();
+  await expect(codes.getByText("1 versiyona kod verildi; 1 değer dönüştürülemedi.")).toBeVisible();
+  // The revision letter was converted; the STATUS value that is not a suitability code stays listed.
+  const unmapped = codes.getByTestId("cde-codes-unmapped");
+  await expect(unmapped).toContainText("Approved");
+  await expect(unmapped.getByRole("cell", { name: "B", exact: true })).toHaveCount(0);
+
+  await page.goto(`/projects/${project.id}/files/${wipId}`);
+  await expect(page.getByRole("row").filter({ hasText: name }).getByTestId("code-revision")).toHaveText("B");
+});

@@ -26,7 +26,7 @@ mapping, the steps to switch the rules on and the conformance test pack (`npm ru
 | **State** (WIP / Shared / Published / Archived) | `folders.state`; a folder without one inherits its nearest ancestor's (`cdeStateOf`, `apps/server/src/cde/state.ts`) | Turkish labels: Çalışma / Paylaşılan / Yayınlanan / Arşivlenen ([terminology](../product/TERMINOLOGY.md)) |
 | **Information container** (the document) | `files.container_id` | A new file starts its own container (database trigger `files_container_default`: `container_id = id`). An approved review copy joins the container of its source, so the WIP original, its Shared copy and its Published copy are one document. A manual "Copy to" is a new document. Moves and renames keep the container |
 | **Document code** | `files.document_code`, register `document_codes (project_id, code_norm) → container_id` | Unique per project: one code belongs to one container. Only names that follow the project's naming standard get a code; the same code with another extension is a rendition of the same document |
-| **Suitability and revision codes** | `file_versions.suitability_code`, `revision_code`, `codes_set_by`, `codes_set_at` | Per version. Profiles: `iso_uk_na` (S0, S1–S4, A1…, B1…, CR; P01.01 → P01 → C01), `legacy_r` (R00), `custom` |
+| **Suitability and revision codes** | `file_versions.suitability_code`, `revision_code`, `codes_set_by`, `codes_set_at` | Per version. Profiles: `iso_uk_na` (S0, S1–S4, A1…, B1…, CR; P01.01 → P01 → C01), `legacy_r` (R00), `custom`, `letter_rev` (A, B, C …) |
 | **Status flag** | `files.cde_status`: `returned`, `superseded`, `withdrawn` | Beside the state: a rejected WIP original is *returned*, its Shared copy *withdrawn*; a publication replaced by a newer one is *superseded*. Nothing is moved physically |
 | **Task team** | `project_roles.kind = 'task_team'` (+ `company_id`, `code`, `is_lead`); `folders.owner_team_id` | A kind of project role, one per company; a person may belong to several teams. A WIP folder can be owned by one team ([task teams](TASK_TEAMS.md)) |
 | **Audit trail** | `audit_log` (+ `prev_hash`, `hash`, `ip`, `user_agent`; indexes by project/action, target, user) | Append-only and hash-chained (migration 0043); `file.viewed`, `file.moved`, `cde.transition`; IP and user agent ([privacy](PRIVACY.md#audit-log-ip-address-and-user-agent)). See [audit log](AUDIT_LOG.md) |
@@ -38,7 +38,7 @@ One row per project in `project_cde_settings` (a project without a row uses the 
 | Setting | Default | Meaning |
 |---|---|---|
 | `enforce_transitions` | `false` | Off: the transition table is stored, nothing is enforced. Existing projects stay off; new projects from the ISO 19650 template start on. On: [transitions](#transitions) |
-| `code_scheme` | `iso_uk_na` | Code profile (`iso_uk_na`, `legacy_r`, `custom`) |
+| `code_scheme` | `iso_uk_na` | Code profile (`iso_uk_na`, `legacy_r`, `custom`, `letter_rev`). Never changed automatically except the one-time `legacy_r` choice of the live-data migration |
 | `suitability_codes`, `revision_rules` | null | Custom profile only |
 | `archive_folder_id` | null | Root of the archive; superseded publications go to the same path below it |
 | `container_standard_id` | null | Naming standard that gives the document code to files in folders without a standard of their own (**Document Code Standard**, [document codes](DOCUMENT_CODES.md)) |
@@ -127,20 +127,30 @@ everywhere).
 
 `custom` uses the ISO revisions with the project's own suitability list. S5–S7 are not used.
 
+`letter_rev` is for projects imported from Autodesk Forma / ACC, whose files carry the attributes
+`REVİZYON` (A, B, C …) and `STATUS`. Revisions are A, B … Z, then AA, AB … ZZ (702 revisions; after ZZ
+no next revision is proposed), in every state. Suitability: the ISO list without states (any code in
+any state) unless the project has its own list (`suitability_codes`), whose states then apply. No
+project is switched to it automatically: an administrator chooses it, then runs **Apply to Existing
+Files** ([below](#re-running-the-migration-for-one-project)).
+
 Input is normalised: `s2` → `S2`, `S2 · For information` → `S2`, `A` / `B` (OpenCDE and older
-attribute values) → `A1` / `B1`, `p1.2` → `P01.02`, `Rev 3` / `r3` → `R03`.
+attribute values) → `A1` / `B1`, `p1.2` → `P01.02`, `Rev 3` / `r3` → `R03`, `Rev b` → `B` (in
+`letter_rev` also a bare `b` → `B`).
 
 Revision sequence (`nextRevision`): P01.01 → P01.02 in WIP; WIP → Shared P01.03 → P01, or the next
 free P0n when P01 was shared already; Shared → Shared P01 → P02; → Published C01, then C02 …; back
 to WIP from P0n or C0n starts the next preliminary revision (P02.01); Archived keeps the revision.
 Legacy: R00 for a new document, R00 → R01 for a new version, a state change keeps the revision.
+Letters: A for a new document, A → B for a new version (never reusing a letter of the document's
+history), a state change keeps the revision.
 
 ### Where the codes are checked
 
 | Path | Behaviour |
 |---|---|
 | `addVersion` (upload route, OpenCDE completion, modules) | `checkCodes` → `apps/server/src/cde/codes.ts`. Codes given (`AddVersionOptions.codes`, the upload fields `suitabilityCode` / `revisionCode`) are normalised and checked against the profile in the folder's state (`cdeStateOf`). A code that does not fit is refused with 400 and the allowed codes **only when the project enforces the rules** (`enforce_transitions`, D-8). Otherwise it is stored as given (normalised) and returned as a non-blocking `warnings` entry (`field`, `kind`, `value`, `state`, `allowed`, `message`) on the upload result, so existing projects and clients (AEC Pilot sending S2/C01 into WIP) keep working. A code equal to the previous version's is not checked again (existing data is grandfathered) |
-| Legacy attributes | Uploads, OpenCDE and modules that still write the free attributes `Uygunluk Kodu`, `Uygunluk` or a revision attribute (`Revizyon`, `Rev`, `Revision` …) get them as codes: any code of the profile when the project does not enforce the rules (with a warning when it does not fit the state), only codes that fit the state when it does. Other values stay attributes only and never refuse the upload. Attributes are never removed |
+| Legacy attributes | Uploads, OpenCDE and modules that still write the free attributes for suitability (`Uygunluk Kodu`, `Uygunluk`, `Suitability Code`, `Suitability`, `STATUS`, `Durum`, in that order) or revision (`Revizyon`, `REVİZYON`, `Rev`, `Revision` …) get them as codes; names are compared case- and Turkish-İ-insensitively. A `STATUS` value is kept only when it is a suitability code of the profile (S0–S4, A1…, B1…, CR or the project's own); any other value (`Approved`, `In review`) is never translated: any code of the profile when the project does not enforce the rules (with a warning when it does not fit the state), only codes that fit the state when it does. Other values stay attributes only and never refuse the upload. Attributes are never removed |
 | Enforcement on (`enforce_transitions`) | A version stored without codes in a folder with a state gets them: the previous suitability when it still fits, else the state's default (WIP: S0); the next revision of the sequence |
 | Approved review copy | Not enforced: carries the source version's codes unchanged. Enforced: the codes of the target state ([transitions](#transitions)) |
 | OpenCDE upload page | The revision and suitability fields are checked against the target folder's state before any byte is sent: refused when the project enforces the rules, else returned as `warnings` beside `redirectTo`; `document_version_metadata` returns the version's codes as `Revizyon` / `Uygunluk` |
@@ -151,7 +161,8 @@ Legacy: R00 for a new document, R00 → R01 for a new version, a state change ke
 |---|---|---|---|
 | GET | `/api/v1/projects/:pid/folders/:fid/cde/codes` | members who see the folder | `CdeFolderCodesDto`: scheme, own suitability list, enforcement, the folder's state |
 | PATCH | `/api/v1/projects/:pid/versions/:vid/codes` | WIP (or no state): folder editors and the uploader; Shared / Published / Archived: project administrators with a `reason` | `{ suitabilityCode?, revisionCode?, reason? }`, null clears. A code that does not fit: 400 when the project enforces the rules, else stored and returned with `warnings`. Audit `file.codes_changed`; outside WIP also `cde.override` |
-| GET | `/api/v1/projects/:pid/cde/codes/unmapped` | project administrators | Older attribute values that are not codes of the profile (first 500) |
+| GET | `/api/v1/projects/:pid/cde/codes/unmapped` | project administrators | Older attribute values that are not codes of the profile (first 500); `reason`: `unknown`, or `state` (a code that does not fit the folder's state while the project enforces the rules) |
+| POST | `/api/v1/projects/:pid/cde/codes/apply` | project administrators | **Apply to Existing Files**: maps the older attribute values into empty codes under the current scheme ([below](#re-running-the-migration-for-one-project)). Returns `CdeApplyCodesReportDto` (`versionsMapped`, `codesMapped`, `outOfState`, `unmapped`, `resolved`). Audit `cde.codes_applied` |
 
 The code scheme is changed with `PUT /cde/settings` (`codeScheme`, `suitabilityCodes`).
 
@@ -161,8 +172,9 @@ Suitability and revision chips beside the version in the documents list, under t
 drawer and per version in the version history; a **Codes** block in the file drawer with the editor
 (the rules are checked while typing: an error when the project enforces them, else a warning); code
 inputs in the upload dialog (WIP: S0 and the proposed revision filled in; the same error or warning,
-and the server's warnings on the result); **Project Settings → CDE → Revision and Suitability Codes**: scheme, the codes
-each state allows, the values the migration could not convert. The ISO 19650 template no longer
+and the server's warnings on the result); **Project Settings → CDE → Revision and Suitability Codes**: scheme,
+**Apply to Existing Files** (enabled for the saved scheme), the codes each state allows, the values the
+migration could not convert. The ISO 19650 template no longer
 defines the free attributes "Revizyon" and "Uygunluk Kodu"; projects created earlier keep them.
 
 ### Live-data migration
@@ -171,7 +183,8 @@ defines the free attributes "Revizyon" and "Uygunluk Kodu"; projects created ear
 database migrations) and from `apps/server/src/scripts/cde-backfill.ts`. Idempotent and batched:
 
 1. For the current version of each file without codes, the attribute values are read
-   (`Uygunluk Kodu`, else `Uygunluk`; the first revision attribute).
+   (the first suitability attribute in the order above, from `Uygunluk Kodu` to `STATUS` / `Durum`; the
+   first revision attribute).
 2. Code scheme per project, chosen once (audit `cde.codes_migrated` is the marker): a project with
    any R revision (`R01`, `Rev 2`) gets `legacy_r`, others keep `iso_uk_na`. A project whose scheme is
    not the default, or whose CDE settings were saved by a person (`cde.settings_updated`), keeps it.
@@ -181,6 +194,21 @@ database migrations) and from `apps/server/src/scripts/cde-backfill.ts`. Idempot
 4. Values that are not codes stay in the attributes and are reported: audit
    `cde.migration_unmapped` (written again only when the list changes) and the unmapped endpoint /
    settings list.
+
+### Re-running the migration for one project
+
+After an administrator switches a project's scheme (typically a Forma / ACC import to `letter_rev`),
+**Apply to Existing Files** (`POST /cde/codes/apply`, `applyLegacyCodes`) maps the older attribute
+values of the current versions of the project's live files again, under the scheme as saved:
+
+- Batched and idempotent; never changes the scheme. Only empty codes are filled (checked again in the
+  update), a code already set (by a person, an upload or the earlier run) is never overwritten.
+  `codes_set_at` is set, `codes_set_by` is filled with the administrator when empty.
+- Enforcement on: a code that does not fit the folder's state is not stored and stays in the unmapped
+  list (`reason: "state"`). Enforcement off: it is stored and counted in `outOfState`.
+- The unmapped list is written again to `cde.migration_unmapped` when it changed; since the audit log is
+  append-only, resolved values leave the list through this newer entry (`previousCount`, `resolved`).
+- Audit `cde.codes_applied` with the counts, the scheme and whether the rules were enforced.
 
 ## Transitions
 

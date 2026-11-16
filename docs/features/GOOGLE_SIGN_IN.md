@@ -40,6 +40,9 @@ refuse.
 | Not in the CDE, allowed domain off or no match | `account_not_allowed` — "This Google account has no access to SiteKeep." |
 | Not in the CDE, allowed domain on and matches | User is created (`isAdmin: false`); session |
 | In the CDE, disabled (`disabled`) | Same message |
+| Invited, from the accept page's **Accept with Google**, same address | The invitation is accepted, the account activated; session ([invitations](INVITATIONS.md)) |
+| Invited, Google account with another address | `invitation_email_mismatch`; the invitation stays open |
+| Invited, signing in from `/login` without the accept page | Same as disabled: the invitation must be accepted first |
 | Google has not verified the email | `email_not_verified` |
 | The three env variables are missing | No button; `/auth/google` 404 |
 

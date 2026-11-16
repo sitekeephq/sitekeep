@@ -24,6 +24,103 @@ export const SHEET_MAX_PAGES = 500;
 /** Where a sheet's number came from. */
 export type SheetNumberSource = "titleblock" | "code" | "filename" | "manual";
 
+/** How the title block of a page was read: its text layer, or OCR of a scanned page. */
+export type SheetReadBy = "text" | "ocr";
+
+/**
+ * A rectangle in page-relative coordinates: 0..1 of the page width and height, origin top-left
+ * of the page as it is displayed (rotation applied), so one box fits every paper size.
+ */
+export interface RelBox {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/** Fields a title-block template maps. */
+export const TITLE_BLOCK_FIELDS = ["number", "title", "revision", "discipline", "date"] as const;
+export type TitleBlockFieldKey = (typeof TITLE_BLOCK_FIELDS)[number];
+
+/**
+ * Where one field is in the title block: a sub-region (the text inside it, labels dropped) and/or
+ * a label keyword (the value next to or below that label inside the title block).
+ */
+export interface TitleBlockFieldRule {
+  key: TitleBlockFieldKey;
+  box?: RelBox | null;
+  label?: string | null;
+}
+
+/** The title block of one paper orientation: its rectangle and the field rules inside it. */
+export interface TitleBlockRegion {
+  box: RelBox;
+  fields: TitleBlockFieldRule[];
+}
+
+export type PageOrientation = "landscape" | "portrait";
+
+/** A project's title-block template (drawn on a sample sheet by a project administrator). */
+export interface TitleBlockTemplate {
+  landscape: TitleBlockRegion | null;
+  portrait: TitleBlockRegion | null;
+  /** The sheet the template was drawn on. */
+  sample?: { versionId: string; page: number } | null;
+}
+
+/** OCR reads this part of a scanned page when the project has no title-block region: bottom right. */
+export const DEFAULT_OCR_REGION: RelBox = { x0: 0.5, y0: 0.5, x1: 1, y1: 1 };
+
+/** OCR results below this confidence are flagged more strongly in the interface. */
+export const OCR_LOW_CONFIDENCE = 0.75;
+
+export function pageOrientation(width: number, height: number): PageOrientation {
+  return width >= height ? "landscape" : "portrait";
+}
+
+/** The region of a template for a page size (null when the template has none for its orientation). */
+export function templateRegion(template: TitleBlockTemplate | null | undefined, width: number, height: number): TitleBlockRegion | null {
+  if (!template) return null;
+  return template[pageOrientation(width, height)] ?? null;
+}
+
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+
+/** A box ordered and clamped to the page; null when it is not a usable rectangle. */
+export function normalizeRelBox(b: Partial<RelBox> | null | undefined): RelBox | null {
+  if (!b) return null;
+  const vals = [b.x0, b.y0, b.x1, b.y1].map((v) => (typeof v === "number" ? v : Number.NaN));
+  if (vals.some((v) => !Number.isFinite(v))) return null;
+  const [ax, ay, bx, by] = vals.map(clamp01) as [number, number, number, number];
+  const r = (v: number) => Math.round(v * 10000) / 10000;
+  const box = { x0: r(Math.min(ax, bx)), y0: r(Math.min(ay, by)), x1: r(Math.max(ax, bx)), y1: r(Math.max(ay, by)) };
+  return box.x1 - box.x0 < 0.005 || box.y1 - box.y0 < 0.005 ? null : box;
+}
+
+/** A template cleaned for saving: boxes normalised, empty rules dropped, one rule per field. */
+export function normalizeTitleBlockTemplate(t: TitleBlockTemplate | null | undefined): TitleBlockTemplate | null {
+  if (!t) return null;
+  const region = (r: TitleBlockRegion | null | undefined): TitleBlockRegion | null => {
+    const box = normalizeRelBox(r?.box);
+    if (!r || !box) return null;
+    const seen = new Set<string>();
+    const fields: TitleBlockFieldRule[] = [];
+    for (const f of r.fields ?? []) {
+      if (!(TITLE_BLOCK_FIELDS as readonly string[]).includes(f.key) || seen.has(f.key)) continue;
+      const fb = normalizeRelBox(f.box);
+      const label = f.label?.replace(/\s+/g, " ").trim().slice(0, 60) || null;
+      if (!fb && !label) continue;
+      seen.add(f.key);
+      fields.push({ key: f.key, box: fb, label });
+    }
+    return { box, fields };
+  };
+  const landscape = region(t.landscape);
+  const portrait = region(t.portrait);
+  if (!landscape && !portrait) return null;
+  return { landscape, portrait, sample: t.sample ?? null };
+}
+
 export interface DrawingSheetDto {
   id: string;
   fileId: string;
@@ -45,6 +142,12 @@ export interface DrawingSheetDto {
   date: string | null;
   /** Metadata edited by a person: extraction no longer overwrites it. */
   edited: boolean;
+  /** How the title block was read (null: nothing could be read, e.g. a scan with OCR off). */
+  readBy: SheetReadBy | null;
+  /** Mean OCR confidence 0..1 of the words read (OCR only): the interface asks to check the values. */
+  ocrConfidence: number | null;
+  /** Values came from the project's title-block template. */
+  fromTemplate: boolean;
   fileName: string;
   folderId: string;
   folderPath: string;
@@ -70,6 +173,8 @@ export interface DrawingSheetDetailDto {
   /** Sets that contain this sheet number. */
   sets: { id: string; name: string }[];
   canEdit: boolean;
+  /** Project administrator: may draw the project's title-block template on this sheet. */
+  canManage: boolean;
 }
 
 export interface DrawingSheetUpdate {
@@ -138,7 +243,44 @@ export interface SheetSettingsDto {
   states: CdeState[];
   /** Extra folders (with their subfolders) scanned whatever their state. */
   folderIds: string[];
+  /** Title-block template (a region per paper orientation); null = automatic reading only. */
+  titleBlock: TitleBlockTemplate | null;
+  /** OCR of scanned pages in this project (default on). */
+  ocr: boolean;
+  /** OCR is switched on for the installation (Administration → Privacy). */
+  ocrInstance: boolean;
   canEdit: boolean;
+}
+
+export interface SheetSettingsInput {
+  states?: CdeState[];
+  folderIds?: string[];
+  titleBlock?: TitleBlockTemplate | null;
+  ocr?: boolean;
+}
+
+/** What a title-block template reads on one sheet (the editor's "Test on This Sheet"). */
+export interface SheetTemplatePreviewDto {
+  number: string;
+  numberSource: SheetNumberSource;
+  title: string | null;
+  discipline: string | null;
+  revision: string | null;
+  date: string | null;
+  readBy: SheetReadBy | null;
+  ocrConfidence: number | null;
+  fromTemplate: boolean;
+}
+
+/** Installation-wide OCR switch (system administrators). */
+export interface SheetOcrAdminDto {
+  enabled: boolean;
+  /** SITEKEEP_SHEETS_OCR=off on the server: OCR stays off whatever the switch says. */
+  disabledByEnv: boolean;
+  /** Recognised languages (bundled with the server). */
+  languages: string[];
+  /** Resolution the title block is rendered at. */
+  dpi: number;
 }
 
 /** Normalised sheet number: the key that links a sheet across versions, files and sets. */

@@ -62,7 +62,7 @@ export async function applyReviewRejections(
   if (!rules.enforce) return out;
   const tree = await FolderTree.load(db, review.projectId);
   const profile = codeProfile(await loadCodeSettings(db, review.projectId));
-  const s0 = profile.scheme !== "legacy_r" && allowedSuitability(profile, "wip").includes("S0");
+  const s0 = profile.scheme !== "legacy_r" && profile.scheme !== "letter_rev" && allowedSuitability(profile, "wip").includes("S0");
   const toState = review.targetFolderId ? cdeStateOf(tree, review.targetFolderId) : null;
   const sourceIds = [...new Set(refused.map((rf) => rf.fileId))];
   const sources = await db.select().from(files).where(inArray(files.id, sourceIds));

@@ -1,11 +1,12 @@
 /** Wizard steps 4–5: parties → companies → task teams and lead; people into parties and project roles. */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { PARTIES, asciiUpper, companyCodeInput, isGroupAddress, type Party, type TemplateTaskTeam } from "@sitekeep/shared";
+import { INVITATION_LANGUAGES, PARTIES, asciiUpper, companyCodeInput, isGroupAddress, type InvitationLanguage, type Party, type TemplateTaskTeam } from "@sitekeep/shared";
 import { api, dataLocale } from "../../../shared/api/api";
 import { useLabel } from "../../../i18n";
 import { NEW_COMPANY, templateTaskTeams, type SetupPerson } from "./draft";
 import type { StepProps } from "./ProjectSetupWizard";
+import { PeopleImport } from "./PeopleImport";
 
 /** "Client technical unit" → "client-technical-unit" (unique among `taken`). */
 function partyKey(label: string, taken: ReadonlySet<string>): string {
@@ -219,11 +220,12 @@ export function PartiesStep({ draft, update, base, template, companies, setCompa
 
 const SPLIT = /[\s,;]+/;
 
-export function PeopleStep({ draft, update, template, users }: StepProps) {
+export function PeopleStep({ draft, update, template, users, companies }: StepProps) {
   const { t } = useTranslation(["projects", "common"]);
   const [bulk, setBulk] = useState("");
   if (!template) return null;
-  const known = new Map(users.map((u) => [u.email.toLowerCase(), u]));
+  // Invited earlier and not accepted yet: no account to add, invited again.
+  const known = new Map(users.filter((u) => !u.pending).map((u) => [u.email.toLowerCase(), u]));
   const setPerson = (index: number, patch: Partial<SetupPerson>) =>
     update((d) => ({ people: d.people.map((p, i) => (i === index ? { ...p, ...patch } : p)) }));
   const addEmails = () => {
@@ -254,6 +256,27 @@ export function PeopleStep({ draft, update, template, users }: StepProps) {
           </button>
         </div>
         <p className="field-hint">{t("setup.people.hint")}</p>
+        <PeopleImport draft={draft} update={update} template={template} companies={companies} users={users} />
+      </div>
+      <div className="setup-invite" data-testid="setup-invite">
+        <label className="check">
+          <input type="checkbox" checked={draft.invite} onChange={(e) => update({ invite: e.target.checked })} />
+          {t("setup.people.invite")}
+        </label>
+        {draft.invite && (
+          <label className="row" style={{ gap: 6 }}>
+            <span className="small">{t("setup.people.inviteLanguage")}</span>
+            <select value={draft.inviteLanguage} onChange={(e) => update({ inviteLanguage: e.target.value as "" | InvitationLanguage })}>
+              <option value="">{t("setup.people.inviteLanguageDefault")}</option>
+              {INVITATION_LANGUAGES.map((l) => (
+                <option key={l} value={l}>
+                  {t(`setup.people.languages.${l}`)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <span className="muted small">{draft.invite ? t("setup.people.inviteHint") : t("setup.people.noInviteHint")}</span>
       </div>
       <datalist id="setup-users">
         {users.map((u) => (
@@ -292,7 +315,21 @@ export function PeopleStep({ draft, update, template, users }: StepProps) {
                       onChange={(e) => setPerson(index, { email: e.target.value })}
                     />
                     {user && <div className="muted small">{user.name}</div>}
-                    {!user && person.email && !group && <div className="small warn-text">{t("setup.people.noAccount")}</div>}
+                    {!user && person.email && !group && draft.invite && (
+                      <>
+                        <input
+                          aria-label={t("setup.people.nameFor", { email: person.email })}
+                          placeholder={t("setup.people.namePlaceholder")}
+                          value={person.name ?? ""}
+                          maxLength={200}
+                          onChange={(e) => setPerson(index, { name: e.target.value })}
+                        />
+                        <div className="small">
+                          <span className="badge info">{t("setup.people.willInvite")}</span>
+                        </div>
+                      </>
+                    )}
+                    {!user && person.email && !group && !draft.invite && <div className="small warn-text">{t("setup.people.noAccount")}</div>}
                     {group && <div className="small warn-text">{t("setup.people.groupAddress")}</div>}
                   </td>
                   <td data-label={t("setup.people.party")}>

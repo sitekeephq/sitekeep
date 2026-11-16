@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, lt } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lt } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { DEFAULT_PROJECT_ROLES, PROJECT_MODULES, type FolderState, type ProjectModule } from "@sitekeep/shared";
@@ -8,7 +8,7 @@ import { joinCompanyTeam } from "../cde/teams.js";
 import { toAuditDtos } from "../audit/query.js";
 import { audit } from "../core/platform/audit.js";
 import { ensureCdeSettings } from "../cde/settings.js";
-import { auditLog, companies, folders, memberRoles, projectMembers, projectRoles, projects, users } from "../db/schema.js";
+import { auditLog, companies, folders, invitations, memberRoles, projectMembers, projectRoles, projects, users } from "../db/schema.js";
 import { badRequest, forbidden, notFound } from "../core/platform/http.js";
 import { msg } from "../i18n/index.js";
 import { projectModules } from "./modules.js";
@@ -174,6 +174,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
         companyId: projectMembers.companyId,
         companyName: companies.name,
         isProjectAdmin: projectMembers.isProjectAdmin,
+        pending: users.pending,
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
@@ -284,6 +285,11 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
       .where(and(eq(projectMembers.projectId, a.project.id), eq(projectMembers.userId, req.params.uid)))
       .returning();
     if (!rows.length) throw notFound(msg("projects:entities.member"));
+    // A removed invited member's open invitation to this project ends too (docs/features/INVITATIONS.md).
+    await db
+      .update(invitations)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(invitations.projectId, a.project.id), eq(invitations.userId, req.params.uid), isNull(invitations.acceptedAt), isNull(invitations.revokedAt)));
     await audit(db, {
       projectId: a.project.id,
       userId: a.user.id,

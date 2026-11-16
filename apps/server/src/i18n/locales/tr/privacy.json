@@ -20,7 +20,7 @@
     "reportModel": "Rapor Oluşturucu Modeli (AI_BASE_URL)",
     "fromEnvironment": "Ortam değişkeniyle tanımlı",
     "smtp": "E-posta Sunucusu (SMTP)",
-    "smtpSends": "Resmî yazıları gönderir",
+    "smtpSends": "Resmî yazıları ve davetleri gönderir",
     "smtpNotConfigured": "Tanımlı değil (CDE_SMTP_URL)",
     "officeEditor": "Ofis Editörü",
     "officeEditorWith": "Ofis Editörü ({{name}})",

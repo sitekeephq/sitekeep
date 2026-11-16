@@ -41,7 +41,8 @@
     "schemes": {
       "iso_uk_na": "ISO 19650 UK NA",
       "legacy_r": "eski R00 düzeni",
-      "custom": "özel"
+      "custom": "özel",
+      "letter_rev": "harf revizyonları"
     },
     "fields": {
       "suitability": "Uygunluk",

@@ -330,6 +330,20 @@
       "when": 1794792220242,
       "tag": "0046_reports_to_platform",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1794831773498,
+      "tag": "0047_invitations",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794834653712,
+      "tag": "0048_sheets_ocr",
+      "breakpoints": true
     }
   ]
 }

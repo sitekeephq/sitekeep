@@ -20,7 +20,7 @@
     "reportModel": "Report Builder Model (AI_BASE_URL)",
     "fromEnvironment": "Defined by an environment variable",
     "smtp": "E-mail Server (SMTP)",
-    "smtpSends": "Sends official letters",
+    "smtpSends": "Sends official letters and invitations",
     "smtpNotConfigured": "Not configured (CDE_SMTP_URL)",
     "officeEditor": "Office Editor",
     "officeEditorWith": "Office Editor ({{name}})",

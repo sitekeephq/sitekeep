@@ -38,11 +38,13 @@ import {
   type WorkflowKind,
   type WorkflowStep,
 } from "@sitekeep/shared";
-import { audit } from "../core/platform/audit.js";
+import { audit, type AuditEvent } from "../core/platform/audit.js";
 import { ensureDefaultProjectRoles, ensureProjectAdminsHoldAdminRole } from "../core/security/default-roles.js";
 import { badRequest, conflict } from "../core/platform/http.js";
 import { DEFAULT_LANGUAGE, msg, tFor } from "../i18n/index.js";
 import type { AuthUser } from "../core/security/access.js";
+import { deliverInvitation, ensurePendingUser, invitationLanguage, invitedName, issueInvitation } from "../auth/invitations.js";
+import type { LetterMailer } from "../works/letter.js";
 import type { Db } from "../db/index.js";
 import {
   attributeDefinitions,
@@ -325,29 +327,38 @@ export async function previewProjectTemplate(db: Db, body: unknown, lang: string
   };
 }
 
-/** People of the wizard by e-mail: existing users are added, others are reported (no invitations by e-mail yet). */
-async function resolvePeople(db: Db, people: PreviewRequest["people"], lang: string) {
-  const list = people ?? [];
+type SetupPersonInput = NonNullable<PreviewRequest["people"]>[number];
+
+/**
+ * People of the wizard by e-mail: existing users are added; with `invite` on the request, people
+ * without an account (or invited earlier and not yet accepted) are invited; otherwise they are reported.
+ */
+async function resolvePeople(db: Db, req: Pick<PreviewRequest, "people" | "invite">, lang: string) {
+  const list = req.people ?? [];
   const emails = [...new Set(list.map((p) => p.email))];
   const rows = emails.length ? await db.select().from(users).where(inArray(users.email, emails)) : [];
-  const byEmail = new Map(rows.filter((u) => !u.disabled).map((u) => [u.email, u]));
+  const byEmail = new Map(rows.map((u) => [u.email, u]));
   const report: ProjectSetupPersonReportDto[] = [];
   const warnings: string[] = [];
-  const add: { person: NonNullable<PreviewRequest["people"]>[number]; userId: string; companyId: string | null }[] = [];
+  const add: { person: SetupPersonInput; userId: string; companyId: string | null }[] = [];
+  const invite: SetupPersonInput[] = [];
   for (const person of list) {
     const user = byEmail.get(person.email);
     if (isGroupAddress(person.email)) {
       report.push({ email: person.email, status: "group_address" });
       warnings.push(sharedText(lang, "setup.groupAddress", { email: person.email }));
-    } else if (!user) {
-      report.push({ email: person.email, status: "no_account" });
-      warnings.push(sharedText(lang, "setup.noAccount", { email: person.email }));
-    } else {
+    } else if (user && !user.disabled) {
       report.push({ email: person.email, status: "added", userId: user.id, name: user.name });
       add.push({ person, userId: user.id, companyId: user.companyId });
+    } else if (req.invite && (!user || user.pending)) {
+      report.push({ email: person.email, status: "invite", ...(user ? { userId: user.id, name: user.name } : person.name ? { name: person.name } : {}) });
+      invite.push(person);
+    } else {
+      report.push({ email: person.email, status: "no_account" });
+      warnings.push(sharedText(lang, "setup.noAccount", { email: person.email }));
     }
   }
-  return { report, warnings, add };
+  return { report, warnings, add, invite };
 }
 
 /**
@@ -365,7 +376,7 @@ export async function dryRunProjectSetup(db: Db, body: unknown, lang: string = D
       .where(and(eq(projects.code, req.code), eq(projects.archived, false)));
     if (taken) errors.push(sharedText(lang, "setup.codeTaken", { code: req.code }));
   }
-  const people = await resolvePeople(db, req.people, lang);
+  const people = await resolvePeople(db, req, lang);
   return {
     ...preview,
     ok: errors.length === 0,
@@ -395,14 +406,25 @@ export async function assertProjectCodeFree(db: Db, code: string, selfId?: strin
  * the project language (`language` of the request, else `lang`) picks the template's per-language values.
  * The v2 parts are applied after the project exists; `parts` reports each one (applied, skipped …).
  */
-export async function createProjectFromTemplate(db: Db, user: AuthUser, body: unknown, lang: string = DEFAULT_LANGUAGE) {
+export async function createProjectFromTemplate(
+  db: Db,
+  user: AuthUser,
+  body: unknown,
+  lang: string = DEFAULT_LANGUAGE,
+  /** Invitations of the wizard: the SMTP sender and the web address of the links. */
+  opts: { mailer?: LetterMailer | null; baseUrl?: string } = {},
+) {
   const req: CreateRequest = createRequestSchema.parse(body);
   const language = req.language ?? lang;
   const { template, templateId, errors: setupErrors } = requestTemplate(req, language, lang);
   const prepared = await prepare(db, template, req, req.code, lang, setupErrors);
   if (prepared.errors.length) throw badRequest(prepared.errors.join(" "), prepared.errors);
   await assertProjectCodeFree(db, req.code);
-  const people = await resolvePeople(db, req.people, lang);
+  const people = await resolvePeople(db, req, lang);
+  const inviteLanguage = invitationLanguage(req.invite?.language);
+  const issuedInvitations: { id: string; token: string; expiresAt: Date; email: string; name: string }[] = [];
+  // Audit rows of the invitations, written after the transaction (the audit chain lock, AUDIT_LOG.md).
+  const invitationAudits: AuditEvent[] = [];
   const details = req.details && Object.fromEntries(Object.entries(req.details).filter(([, v]) => v));
 
   const projectId = randomUUID();
@@ -560,8 +582,18 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
       templateName: template.name,
       dimensions: Object.keys(req.dimensions).length ? prepared.dimensions : null,
     });
+    const txDb = tx as unknown as Db;
     // People of the set-up wizard: members in the company of their party, with their project roles.
-    const added = people.add.filter((p) => p.userId !== user.id || p.person.slot || p.person.roles?.length || p.person.projectAdmin);
+    // People without an account become pending members with an invitation (docs/features/INVITATIONS.md).
+    const pendingIds = new Set<string>();
+    const invitees: { person: SetupPersonInput; userId: string; companyId: string | null }[] = [];
+    for (const person of people.invite) {
+      const slotCompany = person.slot ? (prepared.slots.get(person.slot)?.companyId ?? null) : null;
+      const pending = await ensurePendingUser(txDb, { email: person.email, name: person.name, companyId: slotCompany, invitedBy: user.id }, invitationAudits);
+      pendingIds.add(pending.id);
+      invitees.push({ person, userId: pending.id, companyId: pending.companyId });
+    }
+    const added = [...people.add, ...invitees].filter((p) => p.userId !== user.id || p.person.slot || p.person.roles?.length || p.person.projectAdmin);
     for (const { person, userId, companyId } of added) {
       const slotCompany = person.slot ? prepared.slots.get(person.slot)?.companyId : null;
       const values = { companyId: slotCompany ?? companyId, isProjectAdmin: userId === user.id || !!person.projectAdmin };
@@ -571,8 +603,21 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
         .onConflictDoUpdate({ target: [projectMembers.projectId, projectMembers.userId], set: values });
       const roles = (person.roles ?? []).map((key) => prepared.roleIds.get(key)).filter((id): id is string => !!id);
       if (roles.length) await tx.insert(memberRoles).values(roles.map((roleId) => ({ projectId, userId, roleId }))).onConflictDoNothing();
+      if (pendingIds.has(userId)) {
+        const issued = await issueInvitation(txDb, {
+          userId,
+          email: person.email,
+          projectId,
+          companyId: values.companyId,
+          roleIds: roles,
+          isProjectAdmin: values.isProjectAdmin,
+          language: inviteLanguage,
+          invitedBy: user.id,
+          viaWizard: true,
+        }, invitationAudits);
+        issuedInvitations.push({ ...issued, email: person.email, name: invitedName(person.email, person.name) });
+      }
     }
-    const txDb = tx as unknown as Db;
     const roleIds = await ensureDefaultProjectRoles(txDb, projectId, rootId);
     const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
     if (adminRoleId) await ensureProjectAdminsHoldAdminRole(txDb, projectId, adminRoleId);
@@ -604,6 +649,19 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
     roleIds: prepared.roleIds,
     folderIds: realPaths,
   });
+  for (const e of invitationAudits) await audit(db, e);
+  // Invitations after the project exists: e-mailed when SMTP is configured and allowed, else the link.
+  for (const issued of issuedInvitations) {
+    const delivery = await deliverInvitation(db, opts.mailer, {
+      ...issued,
+      language: inviteLanguage,
+      inviterName: user.name,
+      projectName: req.name,
+      baseUrl: opts.baseUrl ?? "",
+    });
+    const entry = people.report.find((p) => p.email === issued.email && p.status === "invite");
+    if (entry) Object.assign(entry, { status: "invited", name: entry.name ?? issued.name, invitation: delivery });
+  }
   await audit(db, {
     projectId,
     userId: user.id,

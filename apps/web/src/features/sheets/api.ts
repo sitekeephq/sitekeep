@@ -8,7 +8,11 @@ import type {
   SheetSetDto,
   SheetSetPublicationDto,
   SheetSetSummaryDto,
+  SheetOcrAdminDto,
   SheetSettingsDto,
+  SheetSettingsInput,
+  SheetTemplatePreviewDto,
+  TitleBlockTemplate,
 } from "@sitekeep/shared";
 import { del, get, patch, post, put, qs } from "../../shared/api/client";
 
@@ -36,7 +40,11 @@ export const sheetsApi = {
     return `/api/v1/projects/${pid}/sheets/export${q ? `${q}&` : "?"}format=${format}`;
   },
   settings: (pid: string) => get<SheetSettingsDto>(`/projects/${pid}/sheet-settings`),
-  saveSettings: (pid: string, body: { states?: CdeState[]; folderIds?: string[] }) => put<SheetSettingsDto>(`/projects/${pid}/sheet-settings`, body),
+  saveSettings: (pid: string, body: SheetSettingsInput) => put<SheetSettingsDto>(`/projects/${pid}/sheet-settings`, body),
+  templatePreview: (pid: string, sid: string, titleBlock: TitleBlockTemplate) =>
+    post<SheetTemplatePreviewDto>(`/projects/${pid}/sheets/${sid}/template-preview`, { titleBlock }),
+  ocrAdmin: () => get<SheetOcrAdminDto>(`/admin/sheets-ocr`),
+  saveOcrAdmin: (enabled: boolean) => put<SheetOcrAdminDto>(`/admin/sheets-ocr`, { enabled }),
   sets: (pid: string) => get<{ sets: SheetSetSummaryDto[] }>(`/projects/${pid}/sheet-sets`),
   set: (pid: string, setId: string) => get<SheetSetDto>(`/projects/${pid}/sheet-sets/${setId}`),
   createSet: (pid: string, body: { name: string; description?: string | null; sheetIds?: string[] }) =>

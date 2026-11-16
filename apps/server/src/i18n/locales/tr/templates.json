@@ -3,6 +3,8 @@
     "template": "Şablon"
   },
   "errors": {
-    "adminRequired": "Proje oluşturmak için sistem yöneticisi olmalısınız."
+    "adminRequired": "Proje oluşturmak için sistem yöneticisi olmalısınız.",
+    "peopleFileUnreadable": "Dosya Excel çalışma kitabı (.xlsx) olarak okunamadı.",
+    "peopleFileType": "Kişileri .csv ya da .xlsx dosyasından içe aktarın."
   }
 }

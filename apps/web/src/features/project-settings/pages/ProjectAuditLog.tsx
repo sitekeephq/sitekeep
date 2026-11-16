@@ -14,7 +14,7 @@ import { useLoad, useProject } from "../../../app/context/project";
 const PAGE = 50;
 
 /** Action groups of the filter: a prefix ("file.*") or one action. */
-const ACTION_GROUPS = ["file.*", "file.viewed", "file.downloaded", "file.moved", "cde.*", "folder.*", "member.*", "role.*", "review.*", "issue.*", "project.*", "audit.*"] as const;
+const ACTION_GROUPS = ["file.*", "file.viewed", "file.downloaded", "file.moved", "cde.*", "folder.*", "member.*", "invitation.*", "role.*", "review.*", "issue.*", "project.*", "audit.*"] as const;
 
 export function AuditLog() {
   const { t } = useTranslation("projectSettings");

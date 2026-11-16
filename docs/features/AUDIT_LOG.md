@@ -35,6 +35,7 @@ Document events that matter for ISO 19650:
 | `cde.superseded`, `cde.returned`, `cde.withdrawn` | Transitions (ISO-1): a publication archived on a newer one; a WIP document sent back by a review (suitability S0, team notified); a Shared copy refused for publication |
 | `file.updated`, `file.deleted`, `file.restored`, `file.purged` | Rename, attributes, description; recycle bin |
 | `folder.permissions_set`, `role.*`, `member.*`, `role_package.applied` | Permission changes |
+| `invitation.*` (created, resent, accepted, revoked, settings) | [Invitations](INVITATIONS.md) of people without an account |
 | `folder.updated`, `folder.settings_updated`, `cde.settings_updated` | Folder and CDE settings |
 | `review.*` | Reviews and their decisions |
 | `audit.exported` | Someone downloaded the log as CSV (the filters are in `details.query`) |

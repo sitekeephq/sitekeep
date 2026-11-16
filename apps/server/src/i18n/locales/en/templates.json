@@ -3,6 +3,8 @@
     "template": "Template"
   },
   "errors": {
-    "adminRequired": "You must be a System Administrator to create a project."
+    "adminRequired": "You must be a System Administrator to create a project.",
+    "peopleFileUnreadable": "The file could not be read as an Excel workbook (.xlsx).",
+    "peopleFileType": "Import people from a .csv or .xlsx file."
   }
 }

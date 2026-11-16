@@ -23,6 +23,8 @@ export interface UserDto {
   mustChangePassword?: boolean;
   /** Interface language from the profile (users.prefs.language); null = not chosen yet. */
   language?: string | null;
+  /** Invited, has not accepted yet (no sign-in); listed for system administrators only. */
+  pending?: boolean;
 }
 
 /** Password we set when creating accounts for someone else; first login must replace it. */
@@ -64,6 +66,8 @@ export interface MemberDto {
   isProjectAdmin: boolean;
   /** Project roles (teams) the member holds. */
   roleIds?: string[];
+  /** Invited, has not accepted the invitation yet (cannot sign in). */
+  pending?: boolean;
 }
 
 export interface FolderDto {

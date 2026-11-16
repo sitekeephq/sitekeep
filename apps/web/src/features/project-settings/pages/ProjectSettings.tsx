@@ -22,6 +22,7 @@ import { AttributeSettings } from "./ProjectSettingsDocs";
 
 import { webCapability } from "../../../sdk/capabilities";
 import { RoleChip, RolesSettings } from "./ProjectSettingsRoles";
+import { MemberInvitations } from "./MemberInvitations";
 import { LocationsPage } from "./Locations";
 import { CdeSettings } from "./ProjectSettingsCde";
 import { AuditLog } from "./ProjectAuditLog";
@@ -207,7 +208,14 @@ function Members() {
         <tbody>
           {members?.map((m) => (
             <tr key={m.userId}>
-              <td className="pc-title">{m.name}</td>
+              <td className="pc-title">
+                {m.name}
+                {m.pending && (
+                  <span className="badge warn" style={{ marginLeft: 6 }} title={t("members.pendingHint")}>
+                    {t("members.pending")}
+                  </span>
+                )}
+              </td>
               <td className="muted">{m.email}</td>
               <td data-label={t("members.columns.company")}>
                 <select
@@ -304,6 +312,15 @@ function Members() {
       </div>
       <p className="muted small">{t("members.add.hint")}</p>
       {msg && <p className="error">{msg}</p>}
+      <MemberInvitations
+        projectId={project.id}
+        companies={companies ?? []}
+        roles={roles ?? []}
+        onChanged={() => {
+          reload();
+          reloadRoles();
+        }}
+      />
     </div>
   );
 }

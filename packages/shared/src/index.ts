@@ -14,6 +14,8 @@ export * from "./workflow/roles.js";
 export * from "./platform/template.js";
 export * from "./platform/template-v2.js";
 export * from "./platform/project-setup.js";
+export * from "./platform/people-import.js";
+export * from "./platform/invitations.js";
 export * from "./works/work-catalog.js";
 export * from "./works/company-code.js";
 export * from "./works/work-numbering.js";

@@ -57,6 +57,11 @@ export const users = pgTable("users", {
   isAdmin: boolean("is_admin").notNull().default(false),
   companyId: uuid("company_id").references(() => companies.id),
   disabled: boolean("disabled").notNull().default(false),
+  /**
+   * Invited and not yet accepted (docs/features/INVITATIONS.md): the account exists for the project
+   * memberships but stays disabled (no sign-in, no seat) until the invitation is accepted.
+   */
+  pending: boolean("pending").notNull().default(false),
   /** Per-user settings ("Gelişmiş Ayarları Göster" …), see UserPrefs. */
   prefs: jsonb("prefs").$type<UserPrefs>().notNull().default({}),
   createdAt: createdAt(),
@@ -416,3 +421,4 @@ export * from "./schema-cde.js";
 
 export * from "./schema-sheets.js";
 export * from "./schema-model-markup.js";
+export * from "./schema-invitations.js";

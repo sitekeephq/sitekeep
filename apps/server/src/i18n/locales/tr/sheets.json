@@ -12,6 +12,8 @@
     "emptySet": "Sette görebileceğiniz pafta yok.",
     "notDrawing": "Paftalar yalnız PDF, DWG ve DXF dosyalarından okunur.",
     "unknownFolder": "Seçilen klasörlerden biri bu projede değil.",
+    "notPdf": "Antet şablonu PDF paftalarda denenir.",
+    "badTemplate": "Şablonu kaydetmeden önce antet dikdörtgenini pafta üzerinde çizin.",
     "badFormat": "format csv ya da xlsx olmalı."
   },
   "export": {

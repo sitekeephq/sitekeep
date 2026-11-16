@@ -11,6 +11,7 @@ import type { CdeCodeScheme, CdeState, CdeWipPolicy, TemplateTaskTeam } from "..
 import { cdeTransitionKey } from "../documents/cde.js";
 import type { StepRule } from "../workflow/workflow.js";
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "./i18n.js";
+import type { InvitationDeliveryDto, InvitationLanguage } from "./invitations.js";
 import {
   FOLDER_NAME_FORBIDDEN,
   checkProjectTemplate,
@@ -43,9 +44,14 @@ export interface ProjectSetupDetails {
   client?: string;
 }
 
-/** A person added to the project: an existing user by e-mail, in a party (slot) and project roles. */
+/**
+ * A person added to the project by e-mail, in a party (slot) and project roles: an existing user, or
+ * (with `invite` on the request) someone without an account, who is invited.
+ */
 export interface ProjectSetupPerson {
   email: string;
+  /** Name of an invited person until they set their own (default: the part before @). */
+  name?: string;
   /** Slot key: the member's company in the project is the company mapped to it. */
   slot?: string | null;
   /** Project role keys of the template (`roles[].key`). */
@@ -102,10 +108,22 @@ export interface ProjectSetupOverrides {
 /** What happened to a person of the wizard when the project was created (or would be, in the dry run). */
 export interface ProjectSetupPersonReportDto {
   email: string;
-  /** added: member with the chosen party and roles; no_account: no user with this e-mail; group_address: info@, noreply@ … are not added. */
-  status: "added" | "no_account" | "group_address";
+  /**
+   * added: member with the chosen party and roles; invite (dry run) / invited: no account, invited
+   * (a pending member until the invitation is accepted); no_account: no account and no invitation;
+   * group_address: info@, noreply@ … are not added.
+   */
+  status: "added" | "invite" | "invited" | "no_account" | "group_address";
   userId?: string;
   name?: string;
+  /** invited: the invitation (the link when no e-mail was sent). */
+  invitation?: InvitationDeliveryDto;
+}
+
+/** Invitations of the wizard: people without an account are invited instead of only reported. */
+export interface ProjectSetupInvite {
+  /** Language of the e-mails; default the installation's language. */
+  language?: InvitationLanguage;
 }
 
 /** `POST /projects/from-template` and `POST /projects/setup/preview` with the wizard's choices. */
@@ -113,6 +131,7 @@ export interface ProjectSetupRequest extends CreateFromTemplateRequest {
   setup?: ProjectSetupOverrides;
   details?: ProjectSetupDetails;
   people?: ProjectSetupPerson[];
+  invite?: ProjectSetupInvite;
 }
 
 /** The dry run of the wizard (`POST /projects/setup/preview`): the template preview plus the people. */
@@ -327,6 +346,7 @@ export function checkSetupPeople(
     if (!EMAIL.test(email)) errors.push(sharedText(lang, "setup.emailInvalid", { email: person.email }));
     else if (seen.has(email)) errors.push(sharedText(lang, "setup.emailDuplicate", { email }));
     seen.add(email);
+    if ((person.name ?? "").length > 200) errors.push(sharedText(lang, "setup.tooLong", { field: email, max: 200 }));
     if (person.slot && !slots.has(person.slot)) errors.push(sharedText(lang, "setup.personSlotUnknown", { email, slot: person.slot }));
     for (const role of person.roles ?? []) if (!roles.has(role)) errors.push(sharedText(lang, "setup.personRoleUnknown", { email, role }));
   }

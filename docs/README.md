@@ -50,6 +50,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [BCF](features/BCF.md)
 - [Privacy](features/PRIVACY.md)
 - [Google sign-in](features/GOOGLE_SIGN_IN.md)
+- [Invitations](features/INVITATIONS.md)
 - [Parameter Change](features/PARAMETER_CHANGE.md)
 - [Office Integration](features/OFFICE_INTEGRATION.md)
 - [Viewers](features/VIEWERS.md)

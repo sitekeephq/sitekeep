@@ -14,6 +14,7 @@ import { AdminOAuthSection } from "./AdminOAuth";
 import { AdminPrivacySection } from "./AdminPrivacy";
 import { AdminStatusSection } from "./AdminStatus";
 import { AdminLicenseSection } from "./AdminLicense";
+import { invitationsApi } from "../../../shared/api/api-invitations";
 
 type AdminTab = "users" | "ai" | "office" | "oauth" | "privacy" | "status" | "license" | "forma";
 const ALL_ADMIN_TABS: AdminTab[] = ["users", "ai", "office", "oauth", "privacy", "status", "license", "forma"];
@@ -87,6 +88,7 @@ function UsersAndCompanies() {
     <div className="stack">
       {msg && <p className="error">{msg}</p>}
       <GoogleDomainCard onError={setMsg} />
+      <InvitationSettingsCard onError={setMsg} />
       <div className="card">
         <div className="row" style={{ marginBottom: 8 }}>
           <h2 style={{ margin: 0 }}>{t("users.title")}</h2>
@@ -108,7 +110,14 @@ function UsersAndCompanies() {
           <tbody>
             {users?.map((u) => (
               <tr key={u.id}>
-                <td className="pc-title">{u.name}</td>
+                <td className="pc-title">
+                  {u.name}
+                  {u.pending && (
+                    <span className="badge warn" style={{ marginLeft: 6 }}>
+                      {t("users.pending")}
+                    </span>
+                  )}
+                </td>
                 <td className="muted">{u.email}</td>
                 <td data-label={t("common:fields.company")}>
                   <select
@@ -225,6 +234,40 @@ function UsersAndCompanies() {
         </form>
       </div>
       {newUser && <NewUserDialog companies={companies ?? []} onClose={() => setNewUser(false)} onCreated={reload} />}
+    </div>
+  );
+}
+
+/** Who may invite people without an account (docs/features/INVITATIONS.md); project administrators: off by default. */
+function InvitationSettingsCard({ onError }: { onError(message: string | null): void }) {
+  const { t } = useTranslation(["admin", "common"]);
+  const { data, reload } = useLoad(() => invitationsApi.settings(), []);
+  const [busy, setBusy] = useState(false);
+  if (!data) return null;
+  return (
+    <div className="card" data-testid="invitation-settings">
+      <h2 style={{ margin: 0 }}>{t("invitations.title")}</h2>
+      <p className="muted small" style={{ margin: "6px 0 8px" }}>
+        {t("invitations.description")}
+      </p>
+      <label className="row" style={{ color: "var(--text)", fontSize: 13, margin: 0 }}>
+        <input
+          type="checkbox"
+          style={{ width: "auto" }}
+          checked={data.projectAdminsMayInvite}
+          disabled={busy}
+          onChange={(e) => {
+            const next = { projectAdminsMayInvite: e.target.checked };
+            setBusy(true);
+            onError(null);
+            invitationsApi
+              .updateSettings(next)
+              .then(reload, (err: Error) => onError(err.message))
+              .finally(() => setBusy(false));
+          }}
+        />{" "}
+        {t("invitations.projectAdmins")}
+      </label>
     </div>
   );
 }

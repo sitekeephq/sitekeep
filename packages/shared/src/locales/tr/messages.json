@@ -549,7 +549,19 @@
     "personSlotUnknown": "{{email}}: \"{{slot}}\" tarafı şablonda yok.",
     "personRoleUnknown": "{{email}}: \"{{role}}\" proje rolü şablonda yok.",
     "codeTaken": "{{code}} proje kodu başka bir projede kullanılıyor.",
-    "noAccount": "{{email}} için SiteKeep hesabı yok; kullanıcıyı Yönetim → Kullanıcılar'da açıp projeye sonra ekleyin.",
+    "noAccount": "{{email}} için SiteKeep hesabı yok ve davet edilmiyor; kişiler adımında davet edin ya da kullanıcıyı Yönetim → Kullanıcılar'da açın.",
     "groupAddress": "{{email}} ortak bir posta kutusu gibi görünüyor, eklenmedi; arkasındaki kişileri ekleyin."
+  },
+  "peopleImport": {
+    "empty": "Dosya boş.",
+    "noEmailColumn": "İlk satırda bir e-posta sütunu olmalı (E-posta, Ad Soyad, Firma, Rol, Görev Ekibi).",
+    "noRows": "Dosyada başlık var ama kişi yok.",
+    "tooManyRows": "En çok {{max}} kişi içe aktarılabilir; dosyanın kalanı alınmadı.",
+    "emailMissing": "E-posta adresi yok.",
+    "partyUnknown": "\"{{value}}\" firması ya da tarafı projenin bir tarafı değil.",
+    "teamUnknown": "\"{{value}}\" projenin bir görev ekibi değil.",
+    "teamOtherParty": "\"{{team}}\" görev ekibi \"{{party}}\" tarafına ait değil.",
+    "roleUnknown": "\"{{value}}\" proje rolü şablonda yok.",
+    "roleOtherParty": "\"{{role}}\" proje rolü başka bir tarafa ait."
   }
 }

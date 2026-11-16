@@ -21,10 +21,10 @@ export async function verifyPassword(password: string, stored: string): Promise<
 
 /**
  * Prefixed random secret: s = session, api = API token, oauth / refresh / code = OAuth access token,
- * refresh token and authorization code, secret = OAuth client secret. The "7dcde_" prefix lets the
+ * refresh token and authorization code, secret = OAuth client secret, invite = invitation link. The "7dcde_" prefix lets the
  * logs redact every kind (error-ring.ts).
  */
-export function newToken(prefix: "s" | "api" | "oauth" | "refresh" | "code" | "secret"): string {
+export function newToken(prefix: "s" | "api" | "oauth" | "refresh" | "code" | "secret" | "invite"): string {
   return `7dcde_${prefix}_${randomBytes(32).toString("base64url")}`;
 }
 

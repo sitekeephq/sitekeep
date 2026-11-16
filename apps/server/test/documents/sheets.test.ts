@@ -9,7 +9,18 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
 import { PDFDocument, StandardFonts } from "pdf-lib";
-import { compareSheetNumbers, disciplineFrom, isSheetFile, numberSheets, sheetKey } from "@sitekeep/shared";
+import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
+import {
+  compareSheetNumbers,
+  disciplineFrom,
+  isSheetFile,
+  normalizeTitleBlockTemplate,
+  numberSheets,
+  pageOrientation,
+  sheetKey,
+  templateRegion,
+  type TitleBlockTemplate,
+} from "@sitekeep/shared";
 import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
@@ -19,6 +30,9 @@ import { LocalStorage } from "../../src/core/platform/storage.js";
 import { extractPdfText } from "../../src/docintel/extract.js";
 import { readZip } from "../../src/core/formats/zip.js";
 import { sheetFromCad, sheetsFromPdf } from "../../src/sheets/extract.js";
+import { applyTitleBlock, cleanFieldValue } from "../../src/sheets/titleblock.js";
+import { fixOcrCode, ocrDisabledByEnv, wordsToItems } from "../../src/sheets/ocr.js";
+import type { WorkerPage } from "../../src/docintel/pdf-worker.js";
 
 // ---------------------------------------------------------------------------
 // Fixtures: A3 sheets with a title block bottom-right (pdf-lib Helvetica: WinAnsi letters only)
@@ -52,6 +66,80 @@ async function drawingSet(pages: PageSpec[]): Promise<Buffer> {
     put("15.03.2026", 1060, 48, 9);
   }
   return Buffer.from(await doc.save());
+}
+
+type Put = (text: string, x: number, y: number, size?: number) => void;
+
+/**
+ * A title block the automatic reader does not know ("DWG REF", "CONTENT", "ISSUE"), and a decoy
+ * sheet number at the top left that it would take instead.
+ */
+function customBlock(put: Put, p: { no: string; title: string; rev: string }): void {
+  put("PAFTA NO: WRONG-1", 80, 700, 9);
+  put("DWG REF", 870, 200, 6);
+  put(p.no, 870, 186, 10);
+  put("ISSUE", 1060, 200, 6);
+  put(p.rev, 1060, 186, 10);
+  put("CONTENT", 870, 150, 6);
+  put(p.title, 870, 136, 10);
+}
+
+async function customSheet(p: { no: string; title: string; rev: string }): Promise<Buffer> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([1190, 842]);
+  customBlock((text, x, y, size = 8) => page.drawText(text, { x, y, size, font }), p);
+  return Buffer.from(await doc.save());
+}
+
+/** The template for customBlock: the bottom-right block, the number and revision by label, the title by its cell. */
+const CUSTOM_TEMPLATE: TitleBlockTemplate = {
+  landscape: {
+    box: { x0: 0.7, y0: 0.66, x1: 1, y1: 1 },
+    fields: [
+      { key: "number", label: "DWG REF" },
+      { key: "title", box: { x0: 0.7227, y0: 0.8242, x1: 0.9916, y1: 0.85 } },
+      { key: "revision", label: "Issue" },
+    ],
+  },
+  portrait: null,
+};
+
+const FONT = path.resolve(__dirname, "../../assets/fonts/LiberationSans-Regular.ttf");
+
+/**
+ * A scanned sheet: the title block drawn into an image (150 dpi) and the image put on an A3 page,
+ * so the PDF has no text layer. Small: the page is mostly white.
+ */
+async function scannedSheet(draw: (put: Put) => void): Promise<Buffer> {
+  GlobalFonts.registerFromPath(FONT, "SheetScan");
+  const scale = 150 / 72;
+  const canvas = createCanvas(Math.round(1190 * scale), Math.round(842 * scale));
+  const g = canvas.getContext("2d");
+  g.fillStyle = "#ffffff";
+  g.fillRect(0, 0, canvas.width, canvas.height);
+  g.fillStyle = "#000000";
+  draw((text, x, y, size = 8) => {
+    g.font = `${size * scale}px SheetScan`;
+    g.fillText(text, x * scale, (842 - y) * scale);
+  });
+  const doc = await PDFDocument.create();
+  const image = await doc.embedPng(canvas.toBuffer("image/png"));
+  doc.addPage([1190, 842]).drawImage(image, { x: 0, y: 0, width: 1190, height: 842 });
+  return Buffer.from(await doc.save());
+}
+
+/** The title block of drawingSet() on a scan. */
+function scannedBlock(put: Put, p: { no: string; title: string; rev: string }): void {
+  put("DISIPLIN", 860, 230, 6);
+  put("MIMARI", 860, 218, 9);
+  put("PAFTA ADI", 860, 196, 6);
+  put(p.title, 860, 184, 10);
+  put(`PAFTA NO: ${p.no}`, 1040, 140, 7);
+  put("REV", 1000, 100, 6);
+  put(p.rev, 1000, 88, 10);
+  put("TARIH", 1060, 60, 6);
+  put("15.03.2026", 1060, 48, 9);
 }
 
 const SET_V1: PageSpec[] = [
@@ -114,9 +202,134 @@ describe("sheet extraction from a multi-page PDF (FP-2)", () => {
     const out = await extractPdfText({ data: new Uint8Array(await drawingSet([{ title: "SKETCH" }])) }, { maxPages: 50 });
     const ctx = { fileName: "Kroki.pdf", documentCode: "ZAVM-PAS-A-0007", description: "Site sketch", nameFields: { Rol: "A" }, attributes: {} };
     expect(sheetsFromPdf(out, ctx)).toEqual([
-      { page: 1, pageCount: 1, number: "ZAVM-PAS-A-0007", numberSource: "code", title: "Site sketch", discipline: "A", revision: null, date: null },
+      {
+        page: 1,
+        pageCount: 1,
+        number: "ZAVM-PAS-A-0007",
+        numberSource: "code",
+        title: "Site sketch",
+        discipline: "A",
+        revision: null,
+        date: null,
+        readBy: "text",
+        ocrConfidence: null,
+        fromTemplate: false,
+      },
     ]);
     expect(sheetFromCad({ ...ctx, fileName: "plan.dwg", documentCode: null })).toMatchObject({ number: "plan", numberSource: "filename", discipline: "A" });
+  });
+});
+
+describe("title-block template: region mapping", () => {
+  const ctx = { fileName: "Custom.pdf", documentCode: null, description: null, nameFields: null, attributes: {} };
+
+  it("normalises templates and picks the region of the page's orientation", () => {
+    const t = normalizeTitleBlockTemplate({
+      landscape: {
+        box: { x0: 1.2, y0: 0.9, x1: 0.6, y1: 0.5 },
+        fields: [
+          { key: "number", label: "  Sheet   No " },
+          { key: "number", label: "Drawing No" },
+          { key: "title", box: { x0: 0.7, y0: 0.7, x1: 0.7, y1: 0.8 } },
+          { key: "revision", box: { x0: 0.9, y0: 0.9, x1: 0.95, y1: 0.95 }, label: "" },
+          { key: "nope" as never, label: "X" },
+        ],
+      },
+      portrait: { box: { x0: 0.1, y0: 0.1, x1: 0.1, y1: 0.1 }, fields: [] },
+    });
+    expect(t).toEqual({
+      landscape: {
+        box: { x0: 0.6, y0: 0.5, x1: 1, y1: 0.9 },
+        fields: [
+          { key: "number", box: null, label: "Sheet No" },
+          { key: "revision", box: { x0: 0.9, y0: 0.9, x1: 0.95, y1: 0.95 }, label: null },
+        ],
+      },
+      portrait: null,
+      sample: null,
+    });
+    expect(normalizeTitleBlockTemplate({ landscape: null, portrait: null })).toBeNull();
+    expect(pageOrientation(1190, 842)).toBe("landscape");
+    expect(pageOrientation(595, 842)).toBe("portrait");
+    expect(templateRegion(t, 1190, 842)?.box.x0).toBe(0.6);
+    expect(templateRegion(t, 595, 842)).toBeNull();
+  });
+
+  it("reads fields from sub-regions and label keywords on positioned text", () => {
+    const item = (s: string, x: number, y: number, h = 8) => ({ s, x, y, w: s.length * h * 0.55, h, hz: true });
+    const page: WorkerPage = {
+      n: 1,
+      width: 1000,
+      height: 1000,
+      items: [
+        item("DRG", 720, 800, 6),
+        item("E-410", 720, 815, 10),
+        item("Sheet Title: Panel schedule", 720, 860),
+        item("REV C03", 900, 900),
+        item("OUTSIDE 9", 100, 100),
+      ],
+    };
+    const values = applyTitleBlock(page, {
+      box: { x0: 0.7, y0: 0.75, x1: 1, y1: 1 },
+      fields: [
+        { key: "number", label: "drg" },
+        { key: "title", label: "SHEET TITLE" },
+        { key: "revision", box: { x0: 0.89, y0: 0.88, x1: 1, y1: 0.91 } },
+        { key: "discipline", label: "Discipline" },
+        { key: "date", label: "OUTSIDE" },
+      ],
+    });
+    // The label outside the rectangle and the missing one give nothing: automatic reading takes over.
+    expect(values).toEqual({ number: "E-410", title: "Panel schedule", revision: "C03" });
+    expect(cleanFieldValue("revision", "p2 for approval")).toBe("P02");
+    expect(cleanFieldValue("date", "15/03/2026")).toBe("2026-03-15");
+    expect(cleanFieldValue("date", "soon")).toBeNull();
+  });
+
+  it("reads the template first and the automatic title-block reader as fallback", async () => {
+    const custom = await extractPdfText({ data: new Uint8Array(await customSheet({ no: "M-501", title: "BOILER ROOM", rev: "C02" })) });
+    // Without a template the automatic reader takes the decoy number and finds no title.
+    expect(sheetsFromPdf(custom, ctx)[0]).toMatchObject({ number: "WRONG-1", title: null, fromTemplate: false });
+    expect(sheetsFromPdf(custom, ctx, { template: CUSTOM_TEMPLATE })[0]).toMatchObject({
+      number: "M-501",
+      numberSource: "titleblock",
+      title: "BOILER ROOM",
+      revision: "C02",
+      readBy: "text",
+      fromTemplate: true,
+    });
+    // A template for the other orientation does not apply.
+    expect(sheetsFromPdf(custom, ctx, { template: { landscape: null, portrait: CUSTOM_TEMPLATE.landscape } })[0]!.number).toBe("WRONG-1");
+
+    // Only the number mapped: the rest comes from the automatic reader inside the rectangle.
+    const standard = await extractPdfText({ data: new Uint8Array(await drawingSet([{ no: "A-101", title: "ZEMIN KAT PLANI", rev: "P01" }])) });
+    const numberOnly: TitleBlockTemplate = { landscape: { box: { x0: 0.7, y0: 0.6, x1: 1, y1: 1 }, fields: [{ key: "number", label: "Pafta No" }] }, portrait: null };
+    expect(sheetsFromPdf(standard, ctx, { template: numberOnly })[0]).toMatchObject({
+      number: "A-101",
+      title: "ZEMIN KAT PLANI",
+      revision: "P01",
+      discipline: "MIMARI",
+      date: "2026-03-15",
+      fromTemplate: true,
+    });
+  });
+
+  it("turns OCR words into text items in page points", () => {
+    const r = wordsToItems({ scale: 300 / 72, x0: 595, y0: 421 }, [
+      {
+        baseline: { x0: 100, y0: 200, x1: 500, y1: 200 },
+        words: [
+          { text: "PAFTA", confidence: 90, bbox: { x0: 100, y0: 172, x1: 200, y1: 200 } },
+          { text: "NO:", confidence: 80, bbox: { x0: 210, y0: 172, x1: 260, y1: 200 } },
+          { text: " ", confidence: 10, bbox: { x0: 270, y0: 172, x1: 280, y1: 200 } },
+        ],
+      },
+    ]);
+    expect(r.items).toHaveLength(2);
+    expect(r.items[0]).toEqual({ s: "PAFTA", x: 619, y: 469, w: 24, h: 9.6, hz: true });
+    expect(r.confidence).toBe(0.86);
+    expect(["PO3", "A-1O1", "1OO", "ROOM", "CO", "l2"].map(fixOcrCode)).toEqual(["P03", "A-101", "100", "ROOM", "CO", "12"]);
+    expect(ocrDisabledByEnv("off") && ocrDisabledByEnv("0") && !ocrDisabledByEnv(undefined) && !ocrDisabledByEnv("on")).toBe(true);
   });
 });
 
@@ -400,4 +613,116 @@ describe("sheets API (FP-2)", () => {
     expect((await admin.del(`/projects/${pid}/sheet-sets/${own.body.id}`)).status).toBe(200);
     expect((await admin.get(`/projects/${pid}/sheet-sets`)).body.sets.map((s: any) => s.name)).toEqual(["Tender set"]);
   });
+});
+
+describe("title-block template and OCR of scanned sheets (API)", () => {
+  let admin: Api;
+  let member: Api;
+  let pid: string;
+  let folderId: string;
+  const sheetOf = async (q: string) => (await admin.get(`/projects/${pid}/sheets?q=${encodeURIComponent(q)}`)).body.sheets as any[];
+
+  it("reads the title block of a scanned page with OCR, offline", async () => {
+    admin = api(await login("admin@7d.test"));
+    member = api(await login("uye@7d.test"));
+    const p = await admin.post("/projects", { code: "OCR", name: "Scans", template: "empty" });
+    pid = p.body.id;
+    expect((await admin.post(`/projects/${pid}/members`, { email: "uye@7d.test" })).status).toBe(200);
+    folderId = (await admin.post(`/projects/${pid}/folders`, { parentId: p.body.rootFolderId, name: "Shared" })).body.id;
+    await admin.patch(`/projects/${pid}/folders/${folderId}`, { state: "shared" });
+
+    const scan = await scannedSheet((put) => scannedBlock(put, { no: "A-301", title: "KESIT A-A", rev: "P03" }));
+    expect(scan.length).toBeLessThan(150_000);
+    // No text layer.
+    expect((await extractPdfText({ data: new Uint8Array(scan) })).pages[0]!.items).toEqual([]);
+    expect((await admin.upload(`/projects/${pid}/folders/${folderId}/files`, "Tarama.pdf", scan)).status).toBe(200);
+    await jobs.drain();
+    const [sheet] = await sheetOf("Tarama");
+    expect(sheet).toMatchObject({
+      number: "A-301",
+      numberSource: "titleblock",
+      title: expect.stringMatching(/^KES[Iİ]T A-A$/),
+      revision: "P03",
+      discipline: "MIMARI",
+      date: "2026-03-15",
+      readBy: "ocr",
+      fromTemplate: false,
+    });
+    expect(sheet.ocrConfidence).toBeGreaterThan(0.6);
+    expect(sheet.ocrConfidence).toBeLessThanOrEqual(1);
+    const settings = (await member.get(`/projects/${pid}/sheet-settings`)).body;
+    expect(settings).toMatchObject({ ocr: true, ocrInstance: true, titleBlock: null, canEdit: false });
+  }, 60_000);
+
+  it("reads with the project's template first, falls back to automatic reading and keeps manual edits", async () => {
+    expect((await admin.upload(`/projects/${pid}/folders/${folderId}/files`, "Custom.pdf", await customSheet({ no: "M-501", title: "BOILER ROOM", rev: "C02" }))).status).toBe(200);
+    await jobs.drain();
+    const [before] = await sheetOf("Custom");
+    expect(before).toMatchObject({ number: "WRONG-1", readBy: "text", fromTemplate: false });
+
+    // Try the template on the sheet before saving it (project administrators).
+    expect((await member.post(`/projects/${pid}/sheets/${before.id}/template-preview`, { titleBlock: CUSTOM_TEMPLATE })).status).toBe(403);
+    const preview = await admin.post(`/projects/${pid}/sheets/${before.id}/template-preview`, { titleBlock: CUSTOM_TEMPLATE });
+    expect(preview.status, JSON.stringify(preview.body)).toBe(200);
+    expect(preview.body).toMatchObject({ number: "M-501", title: "BOILER ROOM", revision: "C02", fromTemplate: true });
+    expect((await admin.get(`/projects/${pid}/sheets/${before.id}`)).body).toMatchObject({ canManage: true, sheet: { number: "WRONG-1" } });
+
+    expect((await member.put(`/projects/${pid}/sheet-settings`, { titleBlock: CUSTOM_TEMPLATE })).status).toBe(403);
+    const bad = await admin.put(`/projects/${pid}/sheet-settings`, { titleBlock: { landscape: { box: { x0: 0.5, y0: 0.5, x1: 0.5, y1: 0.9 }, fields: [] }, portrait: null } });
+    expect(bad.status).toBe(400);
+    const saved = await admin.put(`/projects/${pid}/sheet-settings`, { titleBlock: { ...CUSTOM_TEMPLATE, sample: { versionId: before.versionId, page: 1 } } });
+    expect(saved.status, JSON.stringify(saved.body)).toBe(200);
+    expect(saved.body.titleBlock.landscape.fields.map((f: any) => f.key)).toEqual(["number", "title", "revision"]);
+    expect(saved.body.states).toEqual(["shared", "published"]);
+
+    // Read Again applies the template to the sheets already there.
+    expect((await admin.post(`/projects/${pid}/sheets/rescan`)).body.queued).toBe(2);
+    await jobs.drain();
+    const [after] = await sheetOf("Custom");
+    expect(after).toMatchObject({ id: before.id, number: "M-501", title: "BOILER ROOM", revision: "C02", fromTemplate: true });
+    // The scanned sheet (other layout) still gets its values from the automatic reader inside the rectangle.
+    const [scan] = await sheetOf("Tarama");
+    expect(scan).toMatchObject({ number: "A-301", readBy: "ocr" });
+
+    // A person's correction survives the next reading (number, title, discipline), the revision is read again.
+    expect((await admin.patch(`/projects/${pid}/sheets/${after.id}`, { title: "Kazan Dairesi" })).status).toBe(200);
+    await admin.post(`/projects/${pid}/sheets/rescan`);
+    await jobs.drain();
+    expect((await sheetOf("Custom"))[0]).toMatchObject({ number: "M-501", title: "Kazan Dairesi", revision: "C02", edited: true });
+  });
+
+  it("reads a scanned sheet inside the template's rectangle", async () => {
+    const scan = await scannedSheet((put) => customBlock(put, { no: "M-502", title: "PUMP ROOM", rev: "C01" }));
+    expect((await admin.upload(`/projects/${pid}/folders/${folderId}/files`, "Custom Scan.pdf", scan)).status).toBe(200);
+    await jobs.drain();
+    const [sheet] = await sheetOf("Custom Scan");
+    // The decoy at the top left is outside the rectangle: OCR never read it.
+    expect(sheet).toMatchObject({ number: "M-502", title: "PUMP ROOM", revision: "C01", readBy: "ocr", fromTemplate: true });
+  }, 60_000);
+
+  it("follows the project's and the installation's OCR switches", async () => {
+    const scan = () => scannedSheet((put) => scannedBlock(put, { no: "A-302", title: "KESIT B-B", rev: "P01" }));
+    expect((await admin.put(`/projects/${pid}/sheet-settings`, { ocr: false })).body).toMatchObject({ ocr: false, titleBlock: { landscape: expect.any(Object) } });
+    await admin.upload(`/projects/${pid}/folders/${folderId}/files`, "Kapali.pdf", await scan());
+    await jobs.drain();
+    expect((await sheetOf("Kapali"))[0]).toMatchObject({ number: "Kapali", numberSource: "filename", readBy: null, ocrConfidence: null });
+    await admin.put(`/projects/${pid}/sheet-settings`, { ocr: true });
+
+    // The installation switch: system administrators only.
+    expect((await member.get("/admin/sheets-ocr")).status).toBe(403);
+    expect((await member.put("/admin/sheets-ocr", { enabled: false })).status).toBe(403);
+    expect((await admin.get("/admin/sheets-ocr")).body).toEqual({ enabled: true, disabledByEnv: false, languages: ["eng", "tur"], dpi: 300 });
+    expect((await admin.put("/admin/sheets-ocr", { enabled: false })).body).toMatchObject({ enabled: false });
+    expect((await admin.get(`/projects/${pid}/sheet-settings`)).body).toMatchObject({ ocr: true, ocrInstance: false });
+    await admin.post(`/projects/${pid}/versions/${(await sheetOf("Kapali"))[0].versionId}/sheets/extract`);
+    await jobs.drain();
+    expect((await sheetOf("Kapali"))[0]).toMatchObject({ readBy: null });
+    const [row] = await handle.db.select().from(auditLog).where(eq(auditLog.action, "settings.sheets_ocr_updated"));
+    expect(row?.details).toEqual({ before: true, after: false });
+
+    expect((await admin.put("/admin/sheets-ocr", { enabled: true })).body.enabled).toBe(true);
+    await admin.post(`/projects/${pid}/versions/${(await sheetOf("Kapali"))[0].versionId}/sheets/extract`);
+    await jobs.drain();
+    expect((await sheetOf("Kapali"))[0]).toMatchObject({ number: "A-302", readBy: "ocr" });
+  }, 60_000);
 });

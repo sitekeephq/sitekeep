@@ -49,6 +49,10 @@ RUN npm run build -w @7dimensions-project/bim-viewer \
  && rm -f apps/server/dist/scripts/seed-* apps/server/dist/scripts/assign-ui-load.* \
  && node tools/harden-dist.mjs apps/server/dist apps/mcp/dist packages/shared/dist packages/cde-tools/dist \
  && npm prune --omit=dev \
+ && rm -rf node_modules/@tesseract.js-data/*/4.0.0 \
+ && find node_modules/tesseract.js-core -maxdepth 1 -type f -name '*.wasm.js' -delete \
+ && test -s node_modules/@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz \
+ && test -s node_modules/@tesseract.js-data/tur/4.0.0_best_int/tur.traineddata.gz \
  && if [ "$EDITION" = community ]; then \
       rm -rf node_modules/@7dimensions-project/sitekeep-ee-* \
       && node tools/third-party-notices.mjs --ee-only | xargs -r rm -rf \
@@ -56,6 +60,10 @@ RUN npm run build -w @7dimensions-project/bim-viewer \
     fi
 # (again after prune: npm restores missing optional packages from its cache; the packages only the Enterprise
 # modules need, such as @cursor/sdk, go too)
+# OCR of scanned sheets (docs/features/SHEETS.md): tesseract.js runs a WebAssembly build of Tesseract in Node
+# with the English and Turkish "best_int" models, all installed by npm ci (nothing is downloaded at run time).
+# The legacy models and the browser builds (WebAssembly inlined in JavaScript) are removed, about 45 MB; the
+# build stops if a model is missing.
 
 # LibreDWG (GPL-3.0) dwg2dxf for DWG previews, built from the GNU release (0.14+: 0.13 writes MTEXT
 # values broken over lines; the server repairs them, see docs/features/VIEWERS.md). The server runs it

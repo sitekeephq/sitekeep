@@ -189,6 +189,7 @@
         "override": "Rule exception (with reason)",
         "teams_seeded": "Task teams created",
         "codes_migrated": "Codes taken over from attributes",
+        "codes_applied": "Codes applied to existing files",
         "migration_unmapped": "Attribute values not converted to codes",
         "superseded": "Publication archived (superseded)",
         "returned": "Document returned to its team",
@@ -218,6 +219,13 @@
         "ai_summary": "Comparison summary (AI)",
         "report": "Comparison report",
         "review_note": "Comparison added to a review"
+      },
+      "invitation": {
+        "created": "Person invited",
+        "resent": "Invitation sent again",
+        "accepted": "Invitation accepted",
+        "revoked": "Invitation revoked",
+        "settings": "Invitation setting changed"
       }
     },
     "columns": {
@@ -270,7 +278,49 @@
         "chooseUser": "Choose a User…"
       },
       "roleLabel": "Role",
-      "hint": "People not in the list are created by the system administrator in Administration."
+      "hint": "Choose a person with an account here; invite people without an account by e-mail below."
+    },
+    "pending": "Invited",
+    "pendingHint": "Has not accepted the invitation yet; cannot sign in.",
+    "invite": {
+      "heading": "Invite by E-mail",
+      "email": "E-mail address to invite",
+      "emailPlaceholder": "name@company.com",
+      "name": "Name of the invited person",
+      "namePlaceholder": "Name (optional)",
+      "company": "Company of the invited person",
+      "noCompany": "No company",
+      "role": "Project role of the invited person",
+      "noRole": "No role",
+      "team": "Task team of the invited person",
+      "teamFromCompany": "Task team of the company",
+      "language": "Language of the invitation",
+      "languageDefault": "Installation language",
+      "languages": {
+        "en": "English",
+        "tr": "Turkish"
+      },
+      "submit": "Invite",
+      "mailOn": "An address with an account is added at once; anyone else gets an invitation e-mail valid for 14 days.",
+      "mailOff": "No e-mail server is configured: an address with an account is added at once; for anyone else you get an invitation link (valid for 14 days) to hand over.",
+      "mailSwitchedOff": "E-mail is switched off in the Privacy Centre: no invitation e-mail is sent; you get an invitation link (valid for 14 days) to hand over.",
+      "notAllowed": "Only system administrators can invite people without an account. A system administrator can allow project administrators in Administration → Users.",
+      "added": "{{email}} has an account and was added to the project.",
+      "invited": "{{email}} was invited.",
+      "resent": "The invitation to {{email}} was sent again; the earlier link no longer works.",
+      "status": "Status",
+      "expires": "Valid Until",
+      "mailedOn": "e-mailed {{date}}",
+      "statuses": {
+        "open": "Open",
+        "expired": "Expired",
+        "accepted": "Accepted",
+        "revoked": "Revoked"
+      },
+      "resend": "Send Again",
+      "revoke": "Revoke",
+      "revokeTitle": "Revoke Invitation",
+      "revokeConfirm": "Revoke the invitation to {{email}}? The link stops working and the person is removed from the project."
     }
   },
   "naming": {
@@ -714,7 +764,8 @@
       "review": "All Review Actions",
       "issue": "All Issue Actions",
       "project": "All Project Actions",
-      "audit": "Audit Log Actions"
+      "audit": "Audit Log Actions",
+      "invitation": "All Invitation Actions"
     },
     "columns": {
       "client": "IP Address"

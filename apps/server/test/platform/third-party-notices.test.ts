@@ -2,14 +2,16 @@ import { describe, expect, it } from "vitest";
 // @ts-expect-error -- plain ESM script without type declarations
 import * as notices from "../../../../tools/third-party-notices.mjs";
 
-type Item = { name: string; version: string; licence: string };
-const { licenceAllowed, licenceOf, licenceProblems, reachable, enterpriseOnlyPaths, shippedPackages, splitCopyright } = notices as {
+type Item = { name: string; version: string; licence: string; accepted?: boolean };
+const { licenceAllowed, licenceOf, licenceProblems, reachable, enterpriseOnlyPaths, shippedPackages, modulePackages, fontVersion, splitCopyright } = notices as {
   licenceAllowed: (expr: unknown) => boolean;
   licenceOf: (pkg: unknown) => string;
   licenceProblems: (items: Item[], missing?: string[]) => string[];
   reachable: (packages: Record<string, unknown>, roots: string[], skip?: (n: string) => boolean) => { paths: Set<string>; missing: string[] };
   enterpriseOnlyPaths: (lock: unknown) => string[];
   shippedPackages: (lock: unknown) => { list: { name: string; version: string }[]; missing: string[] };
+  modulePackages: (moduleLock: unknown, coreLock: unknown) => { list: { name: string; version: string }[]; missing: string[] };
+  fontVersion: (file: string) => string;
   splitCopyright: (text: string) => { copyright: string[]; body: string };
 };
 
@@ -44,6 +46,11 @@ describe("tools/third-party-notices.mjs: licence check", () => {
       "@cursor/sdk@1.0.38: must not ship (proprietary (Anysphere Inc.); only the closed AI module may depend on it, never SiteKeep Community)",
     ]);
   });
+
+  it("also forbids a closed package's per-platform binaries, and passes what a module may ship (MODULE_ACCEPTED)", () => {
+    expect(licenceProblems([{ name: "@cursor/sdk-linux-x64", version: "1.3.1", licence: "SEE LICENSE IN LICENSE.md" }])).toHaveLength(1);
+    expect(licenceProblems([{ name: "@cursor/sdk-linux-x64", version: "1.3.1", licence: "SEE LICENSE IN LICENSE.md", accepted: true }])).toEqual([]);
+  });
 });
 
 describe("tools/third-party-notices.mjs: what ships", () => {
@@ -73,6 +80,40 @@ describe("tools/third-party-notices.mjs: what ships", () => {
     expect(enterpriseOnlyPaths(lock)).toEqual(["node_modules/@7dimensions-project/sitekeep-ee-ai", "node_modules/@cursor/sdk"]);
   });
 
+  it("lists what an Enterprise module adds: its own dependencies, without its peers and what the core ships", () => {
+    const moduleLock = {
+      packages: {
+        "": {
+          name: "@7dimensions-project/sitekeep-ee-ai",
+          dependencies: { "@cursor/sdk": "^1", c: "1" },
+          peerDependencies: { "@7dimensions-project/sitekeep-sdk": "1", zod: "4" },
+          devDependencies: { vite: "1" },
+        },
+        "node_modules/@cursor/sdk": { version: "1.3.1", dependencies: { x: "1" }, optionalDependencies: { "@cursor/sdk-linux-x64": "1.3.1" }, peerDependencies: { zod: "4" } },
+        "node_modules/@cursor/sdk-linux-x64": { version: "1.3.1", optional: true, os: ["linux"], cpu: ["x64"] },
+        "node_modules/x": { version: "1.0.0", license: "MIT", dependencies: { c: "2" } },
+        "node_modules/x/node_modules/c": { version: "2.0.0", license: "MIT" },
+        "node_modules/c": { version: "1.0.0", license: "MIT" },
+        "node_modules/zod": { version: "4.0.0", license: "MIT", dev: true },
+        "node_modules/@7dimensions-project/sitekeep-sdk": { version: "1.0.0", dev: true },
+        "node_modules/vite": { version: "1.0.0", dev: true },
+      },
+    };
+    const ids = modulePackages(moduleLock, lock).list.map((p) => `${p.name}@${p.version}`);
+    // c@1.0.0 ships with the core (lock above); c@2.0.0 is the module's own copy.
+    expect(ids).toEqual(["@cursor/sdk@1.3.1", "@cursor/sdk-linux-x64@1.3.1", "c@2.0.0", "x@1.0.0"]);
+    expect(modulePackages({ packages: { "": { dependencies: { gone: "1" } } } }, lock).missing).toEqual(["gone (needed by the module)"]);
+  });
+
+  it("reads the bundled fonts' version (Liberation Sans 2.x, SIL OFL 1.1)", async () => {
+    const fs = await import("node:fs");
+    const { fileURLToPath } = await import("node:url");
+    const dir = new URL("../../../../apps/server/assets/fonts/", import.meta.url);
+    expect(fontVersion(fileURLToPath(new URL("LiberationSans-Regular.ttf", dir)))).toMatch(/^2\./);
+    expect(fontVersion(fileURLToPath(new URL("LiberationSans-Bold.ttf", dir)))).toMatch(/^2\./);
+    expect(fs.readFileSync(new URL("OFL.txt", dir), "utf8")).toContain("SIL OPEN FONT LICENSE Version 1.1");
+  });
+
   it("reports a required dependency that is not in the lockfile", () => {
     const { missing } = reachable({ "apps/x": { name: "x", dependencies: { gone: "1" } } }, ["apps/x"]);
     expect(missing).toEqual(["gone (needed by apps/x)"]);
@@ -89,5 +130,7 @@ describe("tools/third-party-notices.mjs: what ships", () => {
     const text = fs.readFileSync(new URL("../../../../THIRD_PARTY_NOTICES.md", import.meta.url), "utf8");
     expect(text).not.toMatch(/sitekeep-ee-|@cursor\/sdk|@sitekeep\//);
     expect(text).toContain("| jszip |");
+    expect(text).toContain("MIT No Attribution (MIT-0) does not require");
+    expect(text).toContain("SIL Open Font License, version 1.1 (OFL-1.1)");
   });
 });

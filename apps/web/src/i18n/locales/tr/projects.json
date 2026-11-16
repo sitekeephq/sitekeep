@@ -252,7 +252,7 @@
       "emails": "E-posta Adresleri",
       "emailsPlaceholder": "bir ya da daha çok adres, virgül ya da satır başıyla ayrılmış",
       "add": "Ekle",
-      "hint": "Hesabı olmayan kişiler listelenir ama eklenmez; ortak posta kutuları (info@, noreply@ …) eklenmez.",
+      "hint": "Hesabı olanlar eklenir; hesabı olmayanlar davet edilir (aşağıda); ortak posta kutuları (info@, noreply@ …) eklenmez.",
       "empty": "Henüz kimse eklenmedi. Kişileri sonra Proje Ayarları → Üyeler'den de ekleyebilirsiniz.",
       "email": "E-posta",
       "party": "Taraf",
@@ -265,8 +265,40 @@
       "admin": "Yönetici",
       "isAdmin": "Proje Yöneticisi",
       "ownCompany": "Kendi firması",
-      "noAccount": "Bu adresle SiteKeep hesabı yok: eklenmeyecek.",
-      "groupAddress": "Ortak posta kutusu: eklenmeyecek."
+      "noAccount": "Bu adresle SiteKeep hesabı yok: eklenmez (davetler kapalı).",
+      "groupAddress": "Ortak posta kutusu: eklenmeyecek.",
+      "invite": "Hesabı Olmayan Kişileri Davet Et",
+      "inviteLanguage": "Davet dili",
+      "inviteLanguageDefault": "Kurulum dili",
+      "languages": {
+        "en": "İngilizce",
+        "tr": "Türkçe"
+      },
+      "inviteHint": "Projeye davetli üye olarak katılırlar ve 14 gün geçerli bir e-posta alırlar (ya da iletmeniz için size bir bağlantı verilir).",
+      "noInviteHint": "Hesabı olmayan kişiler listelenir ama eklenmez.",
+      "willInvite": "Hesap yok: davet edilecek",
+      "namePlaceholder": "Ad (isteğe bağlı)",
+      "nameFor": "{{email}} adı",
+      "import": {
+        "choose": "CSV / Excel'den İçe Aktar…",
+        "file": "Kişi dosyası (CSV ya da Excel)",
+        "hint": "Sütunlar: E-posta, Ad Soyad, Firma (ya da taraf), Rol, Görev Ekibi. İlk satır başlıktır.",
+        "reading": "Dosya okunuyor…",
+        "tooBig": "Dosya 2 MB'tan büyük.",
+        "summary_one": "{{file}}: {{count}} satır, {{usable}} eklenebilir.",
+        "summary_other": "{{file}}: {{count}} satır, {{usable}} eklenebilir.",
+        "line": "Satır",
+        "outcome": "Sonuç",
+        "outcomes": {
+          "error": "Eklenmez",
+          "group_address": "Ortak posta kutusu: eklenmez",
+          "added": "Hesabı var: eklenir",
+          "invite": "Hesap yok: davet edilir",
+          "no_account": "Hesap yok: yalnız listelenir"
+        },
+        "add_one": "{{count}} Kişiyi Ekle",
+        "add_other": "{{count}} Kişiyi Ekle"
+      }
     },
     "folders": {
       "addHeading": "Klasör Ekle",
@@ -338,7 +370,11 @@
       "noCompany": "firma yok: ekip açılmaz",
       "check": "Denetim",
       "ready": "Her şey uygun. Proje oluşturulabilir.",
-      "parts": "Şablon Parçaları"
+      "parts": "Şablon Parçaları",
+      "invitations": "Davetler",
+      "inviteOn": "Hesabı olmayan kişiler davet edilir ({{language}})",
+      "inviteOff": "Kapalı: hesabı olmayan kişiler eklenmez",
+      "peopleCheck": "Kişiler"
     },
     "report": {
       "created": "{{code}} · {{name}} projesi oluşturuldu.",
@@ -357,7 +393,9 @@
       "personStatus": {
         "added": "Eklendi",
         "no_account": "Hesap Yok",
-        "group_address": "Ortak Posta Kutusu"
+        "group_address": "Ortak Posta Kutusu",
+        "invite": "Davet Edilecek",
+        "invited": "Davet Edildi"
       },
       "open": "Projeyi Aç"
     },

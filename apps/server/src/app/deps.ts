@@ -47,7 +47,7 @@ export interface AppDeps {
   personalAiModels?: (apiKey: string, workspaceId?: string | null) => Promise<{ id: string; label: string }[]>;
   /** Identity bridge for the "Sor" assistant's in-process tool calls (tests pass their own). */
   askBridge?: AskBridge;
-  /** SMTP sender for official letters (CDE_SMTP_URL / CDE_SMTP_FROM); without it letters are e-mailed by hand (.eml). */
+  /** SMTP sender for official letters and invitations (CDE_SMTP_URL / CDE_SMTP_FROM); without it letters are e-mailed by hand (.eml). */
   mailer?: LetterMailer | null;
   /** Local converter processes: DWG → DXF (LibreDWG) and the last-resort soffice; default: found from env/PATH. */
   converters?: Converters;

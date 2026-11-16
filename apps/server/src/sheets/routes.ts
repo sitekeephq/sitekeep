@@ -7,7 +7,10 @@
  *   PATCH /projects/:pid/sheets/:sid                     { number?, title?, discipline? } (edit right on the folder)
  *   GET   /projects/:pid/versions/:vid/sheets            sheets of one version
  *   POST  /projects/:pid/versions/:vid/sheets/extract    read the sheets again (edit right on the folder)
- *   GET   /projects/:pid/sheet-settings                  members; PUT: project administrators
+ *   POST  /projects/:pid/sheets/:sid/template-preview    project administrators: what a title-block template reads here
+ *   GET   /projects/:pid/sheet-settings                  members; PUT: project administrators (states, folders,
+ *                                                         title-block template, OCR switch)
+ *   GET   /admin/sheets-ocr                              system administrators: the installation's OCR switch; PUT { enabled }
  *   GET   /projects/:pid/sheet-sets                      sets
  *   POST  /projects/:pid/sheet-sets                      { name, description?, sheetIds? }
  *   GET   /projects/:pid/sheet-sets/:setId               set with its items and issues
@@ -27,11 +30,15 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 import {
   CDE_STATES,
+  TITLE_BLOCK_FIELDS,
   compareSheetNumbers,
   foldTr,
+  normalizeTitleBlockTemplate,
   sheetExportName,
   sheetKey,
   type DrawingSheetDetailDto,
+  type SheetOcrAdminDto,
+  type SheetTemplatePreviewDto,
   type DrawingSheetDto,
   type DrawingSheetListDto,
   type SheetSetDto,
@@ -58,10 +65,13 @@ import {
   loadSheets,
   newestFirst,
   processSheets,
+  readPdfSheets,
+  sheetFileContext,
   resolveLatest,
   toSheetDto,
   type SheetJoined,
 } from "./service.js";
+import { OCR_DPI, OCR_LANGUAGES, ocrDisabledByEnv, ocrEnabledForInstance, ocrInstanceSwitch, setOcrInstanceSwitch } from "./ocr.js";
 
 type SetRow = typeof sheetSets.$inferSelect;
 
@@ -94,8 +104,32 @@ const setSchema = z.object({
   sheetIds: z.array(z.string().uuid()).max(5000).optional(),
 });
 const setPatchSchema = z.object({ name: z.string().trim().min(1).max(120), description: z.string().trim().max(1000).nullable() }).partial().strict();
+const relBox = z.object({ x0: z.number(), y0: z.number(), x1: z.number(), y1: z.number() });
+const regionSchema = z.object({
+  box: relBox,
+  fields: z
+    .array(
+      z.object({
+        key: z.enum(TITLE_BLOCK_FIELDS),
+        box: relBox.nullable().optional(),
+        label: z.string().max(60).nullable().optional(),
+      }),
+    )
+    .max(TITLE_BLOCK_FIELDS.length * 2),
+});
 const settingsSchema = z
-  .object({ states: z.array(z.enum(CDE_STATES)).max(CDE_STATES.length), folderIds: z.array(z.string().uuid()).max(200) })
+  .object({
+    states: z.array(z.enum(CDE_STATES)).max(CDE_STATES.length),
+    folderIds: z.array(z.string().uuid()).max(200),
+    titleBlock: z
+      .object({
+        landscape: regionSchema.nullable(),
+        portrait: regionSchema.nullable(),
+        sample: z.object({ versionId: z.string().uuid(), page: z.number().int().min(1) }).nullable().optional(),
+      })
+      .nullable(),
+    ocr: z.boolean(),
+  })
   .partial()
   .strict();
 
@@ -104,7 +138,10 @@ const fold = (s: string) => foldTr(s);
 export async function sheetRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   const { db, storage, jobs } = deps;
   jobs.register(SHEETS_JOB, async (job) => {
-    await processSheets(db, storage, String(job.payload.versionId), { force: job.payload.force === true });
+    await processSheets(db, storage, String(job.payload.versionId), {
+      force: job.payload.force === true,
+      log: (m) => api.log.warn({ versionId: job.payload.versionId }, m),
+    });
   });
 
   /** Visible sheets of the project (current versions unless `all`). */
@@ -202,7 +239,7 @@ export async function sheetRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       .innerJoin(sheetSets, eq(sheetSets.id, sheetSetItems.setId))
       .where(and(eq(sheetSets.projectId, a.project.id), eq(sheetSetItems.numberKey, row.s.numberKey)))
       .orderBy(asc(sheetSets.name));
-    return { sheet: toSheetDto(tree, row), history, sets, canEdit: canEditSheet(tree, a, row.f) };
+    return { sheet: toSheetDto(tree, row), history, sets, canEdit: canEditSheet(tree, a, row.f), canManage: a.isProjectAdmin };
   });
 
   api.patch<{ Params: { pid: string; sid: string } }>("/projects/:pid/sheets/:sid", async (req) => {
@@ -231,6 +268,23 @@ export async function sheetRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     });
     const [updated] = await loadSheets(db, a.project.id, { ids: [row.s.id] });
     return toSheetDto(tree, updated!);
+  });
+
+  /** What a title-block template (not saved yet) reads on this sheet; scanned pages are read by OCR. */
+  api.post<{ Params: { pid: string; sid: string } }>("/projects/:pid/sheets/:sid/template-preview", async (req): Promise<SheetTemplatePreviewDto> => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireProjectAdmin(a);
+    const tree = await FolderTree.load(db, a.project.id);
+    const row = await loadSheet(tree, a, req.params.sid);
+    if (!/\.pdf$/i.test(row.f.name)) throw badRequest(msg("sheets:errors.notPdf"));
+    const body = z.object({ titleBlock: settingsSchema.shape.titleBlock.unwrap() }).strict().parse(req.body ?? {});
+    const settings = await loadSheetSettings(db, a.project.id);
+    const titleBlock = normalizeTitleBlockTemplate(body.titleBlock);
+    const ctx = await sheetFileContext(db, tree, row.f);
+    const [s] = await readPdfSheets(db, storage.localPath(row.v.storageKey), ctx, { titleBlock, ocr: settings.ocr }, { page: row.s.page });
+    if (!s) throw notFound(msg("sheets:entities.sheet"));
+    const { page: _p, pageCount: _c, ...values } = s;
+    return values;
   });
 
   async function loadVersionFile(a: ProjectAccess, tree: FolderTree, vid: string) {
@@ -272,7 +326,7 @@ export async function sheetRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   api.get<{ Params: { pid: string } }>("/projects/:pid/sheet-settings", async (req): Promise<SheetSettingsDto> => {
     const a = await projectAccess(db, req.params.pid, req.user!);
     const s = await loadSheetSettings(db, a.project.id);
-    return { ...s, canEdit: a.isProjectAdmin };
+    return { ...s, ocrInstance: await ocrEnabledForInstance(db), canEdit: a.isProjectAdmin };
   });
 
   api.put<{ Params: { pid: string } }>("/projects/:pid/sheet-settings", async (req): Promise<SheetSettingsDto> => {
@@ -282,13 +336,43 @@ export async function sheetRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     const before = await loadSheetSettings(db, a.project.id);
     const tree = await FolderTree.load(db, a.project.id);
     if (body.folderIds?.some((id) => !tree.byId.has(id))) throw badRequest(msg("sheets:errors.unknownFolder"));
-    const next = { states: [...new Set(body.states ?? before.states)], folderIds: [...new Set(body.folderIds ?? before.folderIds)] };
+    const titleBlock = body.titleBlock === undefined ? before.titleBlock : normalizeTitleBlockTemplate(body.titleBlock);
+    if (body.titleBlock && !titleBlock) throw badRequest(msg("sheets:errors.badTemplate"));
+    const next = {
+      states: [...new Set(body.states ?? before.states)],
+      folderIds: [...new Set(body.folderIds ?? before.folderIds)],
+      titleBlock,
+      ocr: body.ocr ?? before.ocr,
+    };
     await db
       .insert(drawingSheetSettings)
       .values({ projectId: a.project.id, ...next })
       .onConflictDoUpdate({ target: drawingSheetSettings.projectId, set: { ...next, updatedAt: new Date() } });
     await audit(db, { projectId: a.project.id, userId: a.user.id, action: "sheet.settings_updated", targetType: "project", targetId: a.project.id, details: { before, after: next } });
-    return { ...next, canEdit: true };
+    return { ...next, ocrInstance: await ocrEnabledForInstance(db), canEdit: true };
+  });
+
+  // ---- installation OCR switch (system administrators) ----------------------------------------
+
+  const ocrAdmin = async (): Promise<SheetOcrAdminDto> => ({
+    enabled: await ocrInstanceSwitch(db),
+    disabledByEnv: ocrDisabledByEnv(),
+    languages: [...OCR_LANGUAGES],
+    dpi: OCR_DPI,
+  });
+
+  api.get("/admin/sheets-ocr", async (req): Promise<SheetOcrAdminDto> => {
+    if (!req.user?.isAdmin) throw forbidden(msg("admin:errors.adminOnly"));
+    return ocrAdmin();
+  });
+
+  api.put("/admin/sheets-ocr", async (req): Promise<SheetOcrAdminDto> => {
+    if (!req.user?.isAdmin) throw forbidden(msg("admin:errors.adminOnly"));
+    const body = z.object({ enabled: z.boolean() }).strict().parse(req.body ?? {});
+    const before = await ocrInstanceSwitch(db);
+    await setOcrInstanceSwitch(db, body.enabled, req.user.id);
+    await audit(db, { userId: req.user.id, action: "settings.sheets_ocr_updated", details: { before, after: body.enabled } });
+    return ocrAdmin();
   });
 
   // ---- sets --------------------------------------------------------------------------------

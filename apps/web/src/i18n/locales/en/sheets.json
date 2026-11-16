@@ -110,6 +110,81 @@
     "folders": "Also These Folders (with Subfolders)",
     "addFolder": "Add Folder…",
     "removeFolder": "Remove",
-    "saved": "Sheet settings saved. Use Read Again on the Sheets page for drawings already uploaded."
+    "saved": "Sheet settings saved. Use Read Again on the Sheets page for drawings already uploaded.",
+    "template": "Title-Block Template",
+    "templateNone": "No template: number, title and revision are found automatically.",
+    "templateSet": "Template drawn for {{orientations}} sheets; automatic reading fills what it does not map.",
+    "templateHow": "To draw or change it, open a sheet on the Sheets page and choose Title-Block Template.",
+    "templateRemove": "Remove Template",
+    "templateRemoved": "Title-block template removed. Use Read Again on the Sheets page to read the drawings without it.",
+    "orientations": {
+      "landscape": "landscape",
+      "portrait": "portrait"
+    },
+    "ocr": "Read Scanned Drawings with OCR",
+    "ocrHint": "Pages without text are read on this server (English and Turkish), only in the title block. Nothing is sent anywhere. Values read by OCR are marked for checking.",
+    "ocrInstanceOff": "OCR is switched off for the installation (Administration → Privacy)."
+  },
+  "ocr": {
+    "badge": "Read by OCR – check ({{percent}} %)",
+    "badgeHint": "Number, title and revision were read from a scanned page by text recognition (confidence {{percent}} %). Check them and correct them if needed.",
+    "readBy": "Read From",
+    "readByValues": {
+      "text": "text of the PDF",
+      "ocr": "scanned page (OCR)",
+      "none": "nothing readable (scanned page)"
+    },
+    "fromTemplate": "with the title-block template",
+    "admin": {
+      "title": "Text Recognition (OCR) for Scanned Drawings",
+      "description": "Scanned sheets get their title block read by OCR on this server ({{languages}}, {{dpi}} dpi). The language data is installed with SiteKeep; nothing is downloaded or sent. Projects can switch it off in their sheet settings.",
+      "enabled": "OCR On for This Installation",
+      "disabledByEnv": "Switched off on the server (SITEKEEP_SHEETS_OCR=off)."
+    }
+  },
+  "template": {
+    "open": "Title-Block Template",
+    "title": "Title-Block Template",
+    "appliesTo": {
+      "landscape": "Applies to every landscape sheet of the project (all paper sizes).",
+      "portrait": "Applies to every portrait sheet of the project (all paper sizes)."
+    },
+    "drawRegion": "Draw Title Block",
+    "redrawRegion": "Draw Title Block Again",
+    "zoom": "Zoom to Title Block",
+    "wholeSheet": "Whole Sheet",
+    "hintRegion": "Drag a rectangle around the title block.",
+    "hintField": "Drag a rectangle around the {{field}} value, or type the label printed next to it.",
+    "noRegion": "Draw the title block first, then map its fields.",
+    "field": "Field",
+    "area": "Area",
+    "label": "Label Keyword",
+    "draw": "Draw",
+    "redraw": "Redraw",
+    "clearArea": "Clear the area of {{field}}",
+    "labelFor": "Label keyword of {{field}}",
+    "fields": {
+      "number": "Sheet Number",
+      "title": "Title",
+      "revision": "Revision",
+      "discipline": "Discipline",
+      "date": "Date"
+    },
+    "labelExamples": {
+      "number": "e.g. Sheet No",
+      "title": "e.g. Drawing Title",
+      "revision": "e.g. Rev",
+      "discipline": "e.g. Discipline",
+      "date": "e.g. Date"
+    },
+    "fallback": "Fields without an area or label, and fields not found, are read automatically.",
+    "test": "Test on This Sheet",
+    "previewTitle": "Read with this template",
+    "saveAndRead": "Save and Read Again",
+    "remove": "Remove Template",
+    "clear": "Start Over",
+    "saved": "Title-block template saved. Use Read Again to apply it to the drawings already uploaded.",
+    "savedReading_one": "Title-block template saved; {{count}} drawing is being read again.",
+    "savedReading_other": "Title-block template saved; {{count}} drawings are being read again."
   }
 }

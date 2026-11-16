@@ -8,6 +8,7 @@ import {
   PROJECT_SETUP_MAX_EXTRA_PARTIES,
   PROJECT_SETUP_MAX_FOLDER_EDITS,
   PROJECT_SETUP_MAX_PEOPLE,
+  INVITATION_LANGUAGES,
   PARTIES,
   PERMISSION_LEVELS,
   PROJECT_MODULES,
@@ -282,6 +283,7 @@ const detailsSchema = z.object({
 
 const personSchema = z.object({
   email: z.string().trim().toLowerCase().max(320),
+  name: z.string().trim().max(200).optional(),
   slot: key64.nullable().optional(),
   roles: z.array(key64).max(50).optional(),
   projectAdmin: z.boolean().optional(),
@@ -301,6 +303,8 @@ export const previewRequestSchema = z.object({
   /** Project details and people of the set-up wizard (checked by the dry run, applied by create). */
   details: detailsSchema.optional(),
   people: z.array(personSchema).max(PROJECT_SETUP_MAX_PEOPLE).optional(),
+  /** People without an account are invited (docs/features/INVITATIONS.md) instead of only reported. */
+  invite: z.object({ language: z.enum(INVITATION_LANGUAGES).optional() }).optional(),
 });
 
 export const createRequestSchema = previewRequestSchema.extend({

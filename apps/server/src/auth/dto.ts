@@ -10,6 +10,7 @@ export function toUserDto(u: typeof users.$inferSelect) {
     companyId: u.companyId,
     mustChangePassword: !!u.prefs?.mustChangePassword,
     language: u.prefs?.language ?? null,
+    ...(u.pending ? { pending: true } : {}),
   };
 }
 

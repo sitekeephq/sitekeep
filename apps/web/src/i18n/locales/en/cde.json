@@ -60,7 +60,8 @@
   "schemes": {
     "iso_uk_na": "ISO 19650 (UK National Annex)",
     "legacy_r": "Legacy (R00)",
-    "custom": "Custom"
+    "custom": "Custom",
+    "letter_rev": "Letter Revisions (A, B, C …)"
   },
   "wipPolicies": {
     "grants": "Folder Permissions",
@@ -183,9 +184,13 @@
       "schemeHelp": {
         "iso_uk_na": "WIP: S0 with P01.01, P01.02 …; Shared: S1–S4 with P01, P02 …; Published: A1…An, B1…Bn, CR with C01, C02 …",
         "legacy_r": "Revisions R00, R01 … in every state; suitability codes are not tied to a state.",
-        "custom": "ISO revisions with the project's own suitability codes."
+        "custom": "ISO revisions with the project's own suitability codes.",
+        "letter_rev": "Revisions A, B … Z, then AA, AB … in every state (projects imported from Autodesk Forma / ACC); suitability codes are not tied to a state."
       },
       "save": "Save Scheme",
+      "apply": "Apply to Existing Files",
+      "applyHelp": "Converts the older revision and suitability attributes (e.g. REVİZYON, STATUS) of the current versions into codes of the saved scheme. Only empty codes are filled; nothing is overwritten.",
+      "applied": "Codes applied to {{count}} versions; {{unmapped}} values left unconverted.",
       "saved": "Saved.",
       "allowedHeading": "Allowed Codes per State",
       "state": "State",

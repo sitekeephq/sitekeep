@@ -9,6 +9,13 @@
  *      Gizlilik Merkezi → Dış Bağlantılar;
  *   2. is written to outbound_log: time, purpose, host, method, bytes out/in, status, duration,
  *      user and project when known (request context), and non-content details. NEVER content.
+ *
+ * Connections and their callers (docs/features/PRIVACY.md → Data flows):
+ *   "ai:<providerId>", "ai:env"   AI providers, the report model (purpose yapay_zeka:*)
+ *   "smtp"                        official letters (works/letter.ts) and invitations of people without
+ *                                 an account (auth/invitations.ts, details.kind "invitation"); purpose eposta
+ *   "office:editor/converter"     office editor discovery and conversions (purpose ofis:*)
+ *   "google"                      sign-in with Google (purpose giris:google)
  */
 import { AsyncLocalStorage } from "node:async_hooks";
 import { eq, lt } from "drizzle-orm";

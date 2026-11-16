@@ -16,6 +16,7 @@ export function SheetSettingsSection() {
   const { data: root } = useLoad(() => documentsApi.contents(project.id, project.rootFolderId).catch(() => null), [project.id, project.rootFolderId]);
   const [states, setStates] = useState<CdeState[]>([]);
   const [folderIds, setFolderIds] = useState<string[]>([]);
+  const [ocr, setOcr] = useState(true);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -23,6 +24,7 @@ export function SheetSettingsSection() {
     if (!data) return;
     setStates(data.states);
     setFolderIds(data.folderIds);
+    setOcr(data.ocr);
   }, [data]);
 
   if (!data) return null;
@@ -32,13 +34,27 @@ export function SheetSettingsSection() {
     ...(root?.folders ?? []).map((f) => ({ id: f.id, name: `${root?.folder.name ?? ""} / ${f.name}` })),
   ];
   const nameOf = (id: string) => folders.find((f) => f.id === id)?.name ?? id.slice(0, 8);
-  const changed = states.join() !== data.states.join() || folderIds.join() !== data.folderIds.join();
+  const changed = states.join() !== data.states.join() || folderIds.join() !== data.folderIds.join() || ocr !== data.ocr;
+  const orientations = (["landscape", "portrait"] as const).filter((o) => data.titleBlock?.[o]);
+
+  async function removeTemplate() {
+    setBusy(true);
+    setMessage(null);
+    try {
+      setData(await sheetsApi.saveSettings(project.id, { titleBlock: null }));
+      setMessage({ ok: true, text: t("settings.templateRemoved") });
+    } catch (e) {
+      setMessage({ ok: false, text: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function save() {
     setBusy(true);
     setMessage(null);
     try {
-      const saved = await sheetsApi.saveSettings(project.id, { states, folderIds });
+      const saved = await sheetsApi.saveSettings(project.id, { states, folderIds, ocr });
       setData(saved);
       setMessage({ ok: true, text: t("settings.saved") });
     } catch (e) {
@@ -97,7 +113,31 @@ export function SheetSettingsSection() {
           </select>
         )}
       </div>
-      {message && <div className={message.ok ? "success" : "error"}>{message.text}</div>}
+      <div className="stack" style={{ gap: 4 }}>
+        <strong>{t("settings.template")}</strong>
+        <p className="muted" style={{ margin: 0 }} data-testid="sheet-settings-template">
+          {orientations.length
+            ? t("settings.templateSet", { orientations: orientations.map((o) => t(`settings.orientations.${o}`)).join(", ") })
+            : t("settings.templateNone")}{" "}
+          {t("settings.templateHow")}
+        </p>
+        {canEdit && orientations.length > 0 && (
+          <div>
+            <button type="button" className="ghost" onClick={removeTemplate} disabled={busy}>
+              {t("settings.templateRemove")}
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="stack" style={{ gap: 4 }}>
+        <label className="check">
+          <input type="checkbox" disabled={!canEdit} checked={ocr} onChange={(e) => setOcr(e.target.checked)} data-testid="sheet-settings-ocr" /> {t("settings.ocr")}
+        </label>
+        <p className="muted small" style={{ margin: 0 }}>
+          {data.ocrInstance ? t("settings.ocrHint") : t("settings.ocrInstanceOff")}
+        </p>
+      </div>
+      {message &&<div className={message.ok ? "success" : "error"}>{message.text}</div>}
       {canEdit && (
         <div className="row">
           <button type="button" className="primary" onClick={save} disabled={busy || !changed}>

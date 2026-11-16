@@ -8,6 +8,8 @@
  *   A1…An, B1…Bn, CR with C01. Archived keeps whatever the publication had. S5–S7 are not used.
  * - `legacy_r`: R00, R01 … in any state; suitability codes are not tied to a state.
  * - `custom`: the ISO revisions with the project's own suitability list.
+ * - `letter_rev`: letter revisions A, B … Z, then AA, AB … ZZ (projects imported from Autodesk
+ *   Forma / ACC) in any state; suitability codes are not tied to a state.
  *
  * A project may override the suitability list (`suitability_codes`) in any profile; an entry
  * without states is allowed everywhere. A folder without a state accepts any code of the profile.
@@ -26,7 +28,7 @@ interface SuitabilityRule {
 }
 
 /** Revision forms. */
-export type CdeRevisionForm = "wip" | "preliminary" | "contractual" | "legacy";
+export type CdeRevisionForm = "wip" | "preliminary" | "contractual" | "legacy" | "letter";
 
 export interface CdeCodeProfile {
   scheme: CdeCodeScheme;
@@ -72,9 +74,22 @@ export const LEGACY_R: CdeCodeProfile = {
   customSuitability: false,
 };
 
+/**
+ * Letter revisions (Autodesk Forma / ACC): A, B … Z, then AA, AB … ZZ, in any state; the
+ * suitability codes are those of the ISO list without a state (a project may override the list).
+ */
+export const LETTER_REV: CdeCodeProfile = {
+  scheme: "letter_rev",
+  suitability: LEGACY_R.suitability,
+  revisions: { wip: ["letter"], shared: ["letter"], published: ["letter"], archived: ["letter"], any: ["letter"] },
+  customSuitability: false,
+};
+
+const BASE_PROFILES: Partial<Record<CdeCodeScheme, CdeCodeProfile>> = { legacy_r: LEGACY_R, letter_rev: LETTER_REV };
+
 /** The profile of a project: its scheme plus its own suitability list, when it has one. */
 export function codeProfile(settings: { codeScheme: CdeCodeScheme; suitabilityCodes?: readonly CdeSuitabilityCode[] | null }): CdeCodeProfile {
-  const base = settings.codeScheme === "legacy_r" ? LEGACY_R : ISO_UK_NA;
+  const base = BASE_PROFILES[settings.codeScheme] ?? ISO_UK_NA;
   const own = settings.suitabilityCodes?.filter((c) => normaliseSuitability(c.code));
   if (own?.length)
     return {
@@ -110,10 +125,32 @@ export function normaliseSuitability(raw: string | null | undefined): string | n
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** A letter revision: A … Z, AA … ZZ. */
+const LETTER = /^[A-Z]{1,2}$/;
+
+/** A → 1, Z → 26, AA → 27 … ZZ → 702; 0 for anything else. */
+export function letterIndex(rev: string | null | undefined): number {
+  if (!rev || !LETTER.test(rev)) return 0;
+  return [...rev].reduce((n, ch) => n * 26 + (ch.charCodeAt(0) - 64), 0);
+}
+
+/** 1 → A, 26 → Z, 27 → AA … 702 → ZZ; null outside 1–702. */
+export function letterRevision(index: number): string | null {
+  if (!Number.isInteger(index) || index < 1 || index > 702) return null;
+  let n = index;
+  let out = "";
+  while (n > 0) {
+    out = String.fromCharCode(65 + ((n - 1) % 26)) + out;
+    n = Math.floor((n - 1) / 26);
+  }
+  return out;
+}
+
 /**
  * Revision text in its canonical form: "p1" → "P01", "P1.2" → "P01.02", "c 1" → "C01",
- * "Rev 3" / "r3" → "R03"; in the legacy profile a bare number is an R revision ("3" → "R03").
- * Anything else is returned trimmed and upper-cased (and then fails validation). Empty → null.
+ * "Rev 3" / "r3" → "R03"; in the legacy profile a bare number is an R revision ("3" → "R03");
+ * "Rev b" / "rev. B" → "B" (a letter revision, in any profile; in the letter profile also a bare
+ * "b"). Anything else is returned trimmed and upper-cased (and then fails validation). Empty → null.
  */
 export function normaliseRevision(raw: string | null | undefined, profile?: CdeCodeProfile): string | null {
   if (raw === null || raw === undefined) return null;
@@ -131,6 +168,7 @@ export function normaliseRevision(raw: string | null | undefined, profile?: CdeC
   m = /^R[-]?(\d{1,3})$/.exec(compact);
   if (m) return `R${pad(Number(m[1]))}`;
   if ((hadRev || profile?.scheme === "legacy_r") && /^\d{1,3}$/.test(compact)) return `R${pad(Number(compact))}`;
+  if ((hadRev || profile?.scheme === "letter_rev") && LETTER.test(compact)) return compact;
   return t;
 }
 
@@ -140,6 +178,7 @@ export function revisionForm(rev: string): CdeRevisionForm | null {
   if (/^P\d{2,3}$/.test(rev)) return "preliminary";
   if (/^C\d{2,3}$/.test(rev)) return "contractual";
   if (/^R\d{2,3}$/.test(rev)) return "legacy";
+  if (LETTER.test(rev)) return "letter";
   return null;
 }
 
@@ -215,6 +254,7 @@ export const REVISION_FORM_EXAMPLES: Record<CdeRevisionForm, string> = {
   preliminary: "P01",
   contractual: "C01",
   legacy: "R00",
+  letter: "A",
 };
 
 /**
@@ -274,7 +314,7 @@ function highest(history: readonly (string | null | undefined)[], prefix: "P" | 
  * Shared → Shared P01 → P02, → Published C01, then C02 …; back to WIP from P0n or C0n starts
  * the next preliminary revision (P02.01). Archived keeps the revision.
  * Legacy profile: R00 for a new document, R00 → R01 for a new version in the same state; a state
- * change keeps the revision.
+ * change keeps the revision. Letter profile: the same with A, A → B … Z → AA … ZZ (then none).
  */
 export function nextRevision(
   profile: CdeCodeProfile,
@@ -286,6 +326,13 @@ export function nextRevision(
   const cur = normaliseRevision(current, profile);
   const all = [...history.map((h) => normaliseRevision(h, profile)), cur];
   if (toState === "archived") return cur;
+
+  if (profile.scheme === "letter_rev") {
+    const top = Math.max(0, ...all.map(letterIndex));
+    if (!cur || !letterIndex(cur)) return letterRevision(top + 1);
+    if (fromState !== toState) return cur;
+    return letterRevision(Math.max(top, letterIndex(cur)) + 1);
+  }
 
   if (profile.scheme === "legacy_r") {
     const m = cur ? /^R(\d{2,3})$/.exec(cur) : null;
@@ -328,7 +375,7 @@ export function nextRevision(
   return null;
 }
 
-/** First revision of a new document in a state (P01.01, P01, C01; R00). */
+/** First revision of a new document in a state (P01.01, P01, C01; R00; A). */
 export function initialRevision(profile: CdeCodeProfile, state: CdeState | null | undefined): string | null {
   return nextRevision(profile, null, null, state ?? null);
 }
@@ -362,6 +409,31 @@ export interface CdeUnmappedCodeDto {
   field: "suitabilityCode" | "revisionCode";
   /** The attribute value as written. */
   value: string;
+  /**
+   * `unknown`: not a code of the profile; `state`: a code of the profile that does not fit the
+   * folder's state, while the project enforces the rules.
+   */
+  reason?: "unknown" | "state";
+}
+
+/**
+ * Result of POST /projects/:pid/cde/codes/apply: the legacy attribute values of the project's
+ * current versions mapped into empty codes under its current profile.
+ */
+export interface CdeApplyCodesReportDto {
+  scheme: CdeCodeScheme;
+  /** Versions that got at least one code. */
+  versionsMapped: number;
+  /** Codes stored (suitability and revision counted separately). */
+  codesMapped: number;
+  /** Of these, codes that do not fit the folder's state (stored: the project does not enforce the rules). */
+  outOfState: number;
+  /** Values still not converted. */
+  unmapped: number;
+  /** Values that left the unmapped list ("cde.migration_unmapped") in this run. */
+  resolved: number;
+  /** The unmapped list was cut at its limit. */
+  truncated: boolean;
 }
 
 /**

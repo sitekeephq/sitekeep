@@ -8,6 +8,7 @@ import {
   type TemplatePartReportDto,
 } from "@sitekeep/shared";
 import { moduleName } from "./StartSteps";
+import { InvitationLink } from "../../../shared/ui/InvitationLink";
 import type { StepProps } from "./ProjectSetupWizard";
 
 export type CreatedProject = ProjectDto & { warnings: string[]; parts: TemplatePartReportDto[]; people: ProjectSetupPersonReportDto[] };
@@ -31,6 +32,9 @@ export function SummaryStep({ draft, template, companies, preview, refreshPrevie
     [t("cde:settings.teams.adminSeesWip"), cde.adminSeesWip === false ? t("common:actions.no") : t("common:actions.yes")],
     [t("cde:documentCode.standard.label"), cde.containerStandard ?? t("common:status.none")],
     [t("setup.summary.people"), String(draft.people.filter((p) => p.email.trim()).length)],
+    ...(draft.people.length
+      ? [[t("setup.summary.invitations"), draft.invite ? t("setup.summary.inviteOn", { language: draft.inviteLanguage ? t(`setup.people.languages.${draft.inviteLanguage}`) : t("setup.people.inviteLanguageDefault") }) : t("setup.summary.inviteOff")] as [string, string]]
+      : []),
   ];
   return (
     <div className="stack" data-testid="setup-summary">
@@ -102,6 +106,19 @@ export function SummaryStep({ draft, template, companies, preview, refreshPrevie
               ))}
             </ul>
           )}
+          {preview.people.length > 0 && (
+            <div data-testid="setup-people-check">
+              <h4>{t("setup.summary.peopleCheck")}</h4>
+              <ul className="setup-teams">
+                {preview.people.map((p) => (
+                  <li key={p.email} data-email={p.email} data-status={p.status}>
+                    {p.name ? `${p.name} · ` : ""}
+                    {p.email}: <span className={`badge ${PERSON_BADGE[p.status]}`}>{t(`setup.report.personStatus.${p.status}`)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {preview.parts.length > 0 && (
             <table className="data-table phone-cards setup-parts" data-testid="setup-expected-parts">
               <caption className="setup-caption">{t("setup.summary.parts")}</caption>
@@ -140,6 +157,7 @@ export function SummaryStep({ draft, template, companies, preview, refreshPrevie
 }
 
 const STATUS_BADGE: Record<TemplatePartReportDto["status"], string> = { applied: "ok", partial: "info", skipped: "", failed: "danger" };
+const PERSON_BADGE: Record<ProjectSetupPersonReportDto["status"], string> = { added: "ok", invite: "info", invited: "info", no_account: "warn", group_address: "warn" };
 
 export function SetupReport({ project, onOpen }: { project: CreatedProject; onOpen(): void }) {
   const { t } = useTranslation(["projects", "common"]);
@@ -190,9 +208,10 @@ export function SetupReport({ project, onOpen }: { project: CreatedProject; onOp
           <h4>{t("setup.report.people")}</h4>
           <ul className="setup-teams">
             {project.people.map((p) => (
-              <li key={p.email}>
+              <li key={p.email} data-email={p.email} data-status={p.status}>
                 {p.name ? `${p.name} · ` : ""}
-                {p.email}: <span className={`badge ${p.status === "added" ? "ok" : "warn"}`}>{t(`setup.report.personStatus.${p.status}`)}</span>
+                {p.email}: <span className={`badge ${PERSON_BADGE[p.status]}`}>{t(`setup.report.personStatus.${p.status}`)}</span>
+                {p.invitation && <InvitationLink email={p.email} delivery={p.invitation} />}
               </li>
             ))}
           </ul>

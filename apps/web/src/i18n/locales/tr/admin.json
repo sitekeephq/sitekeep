@@ -34,7 +34,8 @@
     "columns": {
       "systemAdmin": "Sistem Yöneticisi"
     },
-    "passwordPrompt": "{{name}} için yeni şifre (en az 10 karakter)."
+    "passwordPrompt": "{{name}} için yeni şifre (en az 10 karakter).",
+    "pending": "Davetli"
   },
   "companies": {
     "title": "Firmalar",
@@ -827,5 +828,10 @@
       "build_after_support": "Bu SiteKeep sürümü destek süresi bittikten sonra çıktı."
     },
     "seatsOver": "Lisansın izin verdiğinden {{count}} fazla etkin kullanıcı var: hesaplar kapatılana ya da koltuk eklenene kadar Enterprise modülleri salt okunur."
+  },
+  "invitations": {
+    "title": "Davetler",
+    "description": "Hesabı olmayan kişiler bir projeye e-postayla davet edilebilir (Proje Ayarları → Üyeler ve kurulum sihirbazı). Sistem yöneticileri her zaman davet edebilir. Varsayılan kapalı: proje yöneticileri yalnız hesabı olan kişileri ekleyebilir.",
+    "projectAdmins": "Proje Yöneticileri Hesabı Olmayan Kişileri Davet Edebilir"
   }
 }

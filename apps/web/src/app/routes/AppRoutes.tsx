@@ -3,6 +3,7 @@ import type { UserDto } from "@sitekeep/shared";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "../../features/auth/pages/Login";
 import { AccountPage } from "../../features/auth/pages/Account";
+import { AcceptInvitationPage } from "../../features/auth/pages/AcceptInvitation";
 import { AboutPage, LicencesPage } from "../../features/about/AboutPage";
 import { IssuesPage } from "../../features/coordination/pages/Issues";
 import { CoordinationPage } from "../../features/coordination/pages/Coordination";
@@ -40,6 +41,7 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/invite" element={<AcceptInvitationPage />} />
         <Route path="/about" element={<AboutPage signedIn={false} />} />
         <Route path="/about/licences" element={<LicencesPage signedIn={false} />} />
         <Route path="/oauth/consent" element={<OAuthConsentPage />} />
@@ -53,6 +55,7 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
   return (
     <Routes>
       <Route path="/login" element={<AfterLoginPage />} />
+      <Route path="/invite" element={<AcceptInvitationPage />} />
       <Route path="/oauth/consent" element={<OAuthConsentPage />} />
       <Route path="/opencde/upload" element={<OpenCdeUploadPage />} />
       <Route path="/opencde/select" element={<OpenCdeSelectPage />} />

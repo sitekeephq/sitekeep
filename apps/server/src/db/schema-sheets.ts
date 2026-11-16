@@ -4,8 +4,8 @@
  * references to core tables are lazy so the circular import is safe.
  */
 import { sql } from "drizzle-orm";
-import { boolean, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
-import type { CdeState, SheetNumberSource, SheetSetPublicationItem } from "@sitekeep/shared";
+import { boolean, index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import type { CdeState, SheetNumberSource, SheetReadBy, SheetSetPublicationItem, TitleBlockTemplate } from "@sitekeep/shared";
 import { fileVersions, files, projects, users } from "./schema.js";
 
 /** One row per page of a drawing version (PDF page; DWG/DXF: page 1). */
@@ -34,6 +34,12 @@ export const drawingSheets = pgTable(
     revision: text("revision"),
     /** Issue date YYYY-MM-DD from the title block. */
     sheetDate: text("sheet_date"),
+    /** How the title block was read: "text" (text layer) or "ocr" (scanned page); null = nothing read. */
+    readBy: text("read_by").$type<SheetReadBy>(),
+    /** Mean OCR word confidence 0..1 (OCR only). */
+    ocrConfidence: real("ocr_confidence"),
+    /** Values came from the project's title-block template. */
+    fromTemplate: boolean("from_template").notNull().default(false),
     /** Edited by a person: re-extraction keeps number, title and discipline. */
     edited: boolean("edited").notNull().default(false),
     editedBy: uuid("edited_by").references(() => users.id, { onDelete: "set null" }),
@@ -55,6 +61,10 @@ export const drawingSheetSettings = pgTable("drawing_sheet_settings", {
     .references(() => projects.id, { onDelete: "cascade" }),
   states: jsonb("states").$type<CdeState[]>().notNull().default(["shared", "published"]),
   folderIds: jsonb("folder_ids").$type<string[]>().notNull().default([]),
+  /** Title-block template: a region per paper orientation with field rules (null = automatic reading). */
+  titleBlock: jsonb("title_block").$type<TitleBlockTemplate | null>(),
+  /** OCR of scanned pages (the installation switch must be on too). */
+  ocr: boolean("ocr").notNull().default(true),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

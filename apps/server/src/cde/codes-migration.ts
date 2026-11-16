@@ -16,6 +16,11 @@
  * Idempotent and batched: a version whose codes were set (codes_set_at) is never touched again;
  * the run can be repeated or stopped at any time. Runs at server start (after the migrations) and
  * from src/scripts/cde-backfill.ts.
+ *
+ * `applyLegacyCodes` runs the same mapping again for one project, on an administrator's request
+ * (POST /projects/:pid/cde/codes/apply), typically after its scheme was switched (a project imported
+ * from Autodesk Forma / ACC to `letter_rev`). It fills empty codes only, never overwrites one, and
+ * writes the remaining list to "cde.migration_unmapped" when it changed.
  */
 import { createHash } from "node:crypto";
 import { and, asc, desc, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
@@ -25,14 +30,19 @@ import {
   isKnownSuitability,
   normaliseRevision,
   normaliseSuitability,
+  validateCodes,
+  type CdeApplyCodesReportDto,
   type CdeCodeProfile,
   type CdeCodeScheme,
+  type CdeState,
   type CdeUnmappedCodeDto,
 } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { auditLog, fileVersions, files, projectCdeSettings } from "../db/schema.js";
 import { audit } from "../core/platform/audit.js";
+import { FolderTree } from "../core/security/access.js";
 import { legacyCodeInputs, loadCodeSettings } from "./codes.js";
+import { cdeStateOf } from "./state.js";
 
 export type UnmappedCode = CdeUnmappedCodeDto;
 
@@ -104,38 +114,99 @@ async function* candidates(db: Db, batchSize: number, filter: { projectId?: stri
   }
 }
 
+/**
+ * The folder states of a project, for checking codes against them. When the project enforces the
+ * ISO 19650 rules (D-8) a code that does not fit the folder's state is not stored but reported
+ * (reason "state"); otherwise it is stored and counted (`outOfState`). Without a check (null) any
+ * code of the profile is stored, as in the server-start migration.
+ */
+type StateCheck = { enforced: boolean; stateOf(folderId: string): CdeState | null } | null;
+
+async function stateCheck(db: Db, projectId: string, enforced: boolean): Promise<StateCheck> {
+  const tree = await FolderTree.load(db, projectId);
+  return { enforced, stateOf: (folderId) => (tree.byId.has(folderId) ? cdeStateOf(tree, folderId) : null) };
+}
+
 /** What the attributes of a version give under a profile: codes to store and values that do not fit. */
-function mapCandidate(profile: CdeCodeProfile, c: Candidate) {
+function mapCandidate(profile: CdeCodeProfile, c: Candidate, states: StateCheck = null) {
   const raw = legacyCodeInputs(c.attributes);
   const set: { suitabilityCode?: string; revisionCode?: string } = {};
   const unmapped: UnmappedCode[] = [];
+  let outOfState = 0;
   const base = { fileId: c.fileId, versionId: c.versionId, name: c.name, folderId: c.folderId };
-  if (!c.suitabilityCode && raw.suitabilityCode) {
-    if (isKnownSuitability(profile, raw.suitabilityCode)) set.suitabilityCode = normaliseSuitability(raw.suitabilityCode)!;
-    else unmapped.push({ ...base, field: "suitabilityCode", value: raw.suitabilityCode });
+  const fields = [
+    ["suitabilityCode", c.suitabilityCode, raw.suitabilityCode, isKnownSuitability(profile, raw.suitabilityCode), normaliseSuitability(raw.suitabilityCode)],
+    ["revisionCode", c.revisionCode, raw.revisionCode, isKnownRevision(profile, raw.revisionCode), normaliseRevision(raw.revisionCode, profile)],
+  ] as const;
+  for (const [field, current, value, known, code] of fields) {
+    if (current || !value) continue;
+    if (!known || !code) {
+      unmapped.push({ ...base, field, value, reason: "unknown" });
+      continue;
+    }
+    const fits = !states || validateCodes(profile, states.stateOf(c.folderId), { [field]: code }).ok;
+    if (!fits && states?.enforced) {
+      unmapped.push({ ...base, field, value, reason: "state" });
+      continue;
+    }
+    if (!fits) outOfState++;
+    set[field] = code;
   }
-  if (!c.revisionCode && raw.revisionCode) {
-    if (isKnownRevision(profile, raw.revisionCode)) set.revisionCode = normaliseRevision(raw.revisionCode, profile)!;
-    else unmapped.push({ ...base, field: "revisionCode", value: raw.revisionCode });
-  }
-  return { set, unmapped };
+  return { set, unmapped, outOfState };
 }
 
 const MAX_REPORTED = 500;
 
-/** Legacy attribute values of a project's current versions that are not codes of its profile. */
+/**
+ * Legacy attribute values of a project's current versions that are not codes of its profile (and,
+ * when the project enforces the rules, codes that do not fit the folder's state).
+ */
 export async function unmappedLegacyCodes(db: Db, projectId: string, batchSize = 1000): Promise<{ items: UnmappedCode[]; truncated: boolean }> {
-  const profile = codeProfile(await loadCodeSettings(db, projectId));
+  const settings = await loadCodeSettings(db, projectId);
+  const profile = codeProfile(settings);
+  // Not enforced: any code of the profile is stored, so only unknown values are listed.
+  const states = settings.enforceTransitions ? await stateCheck(db, projectId, true) : null;
   const items: UnmappedCode[] = [];
   let truncated = false;
   for await (const batch of candidates(db, batchSize, { projectId })) {
-    for (const c of batch) items.push(...mapCandidate(profile, c).unmapped);
+    for (const c of batch) items.push(...mapCandidate(profile, c, states).unmapped);
     if (items.length > MAX_REPORTED) {
       truncated = true;
       break;
     }
   }
   return { items: items.slice(0, MAX_REPORTED), truncated };
+}
+
+/**
+ * Writes the project's unmapped list to the audit log ("cde.migration_unmapped") when it differs from
+ * the last one written; the last entry is the current list (the log is append-only, so resolved
+ * values leave the list by a newer entry, with `resolved` counting them). An empty list is written
+ * only to replace a non-empty one.
+ */
+async function recordUnmapped(db: Db, projectId: string, items: UnmappedCode[], userId: string | null = null): Promise<{ written: boolean; resolved: number }> {
+  const digest = createHash("sha256")
+    .update(JSON.stringify(items.map((i) => [i.versionId, i.field, i.value])))
+    .digest("hex");
+  const [last] = await db
+    .select({ details: auditLog.details })
+    .from(auditLog)
+    .where(and(eq(auditLog.projectId, projectId), eq(auditLog.action, "cde.migration_unmapped")))
+    .orderBy(desc(auditLog.id))
+    .limit(1);
+  const previous = last?.details as { digest?: string; count?: number } | null | undefined;
+  if (previous?.digest === digest) return { written: false, resolved: 0 };
+  if (!items.length && !previous?.count) return { written: false, resolved: 0 };
+  const resolved = Math.max(0, (previous?.count ?? 0) - items.length);
+  await audit(db, {
+    projectId,
+    userId,
+    action: "cde.migration_unmapped",
+    targetType: "project",
+    targetId: projectId,
+    details: { count: items.length, digest, items: items.slice(0, 100), ...(previous ? { previousCount: previous.count ?? 0, resolved } : {}) },
+  });
+  return { written: true, resolved };
 }
 
 async function hasAudit(db: Db, projectId: string, actions: string[]): Promise<boolean> {
@@ -211,25 +282,61 @@ export async function migrateLegacyCodes(db: Db, opts: { batchSize?: number; log
         targetId: projectId,
         details: { scheme: scheme ?? profiles.get(projectId)?.scheme ?? null, schemeChosen: !!scheme, mapped: mapped.get(projectId) ?? 0, unmapped: items.length },
       });
-    if (!items.length) continue;
-    const digest = createHash("sha256")
-      .update(JSON.stringify(items.map((i) => [i.versionId, i.field, i.value])))
-      .digest("hex");
-    const [last] = await db
-      .select({ details: auditLog.details })
-      .from(auditLog)
-      .where(and(eq(auditLog.projectId, projectId), eq(auditLog.action, "cde.migration_unmapped")))
-      .orderBy(desc(auditLog.id))
-      .limit(1);
-    if ((last?.details as { digest?: string } | null)?.digest === digest) continue;
-    await audit(db, {
-      projectId,
-      action: "cde.migration_unmapped",
-      targetType: "project",
-      targetId: projectId,
-      details: { count: items.length, digest, items: items.slice(0, 100) },
-    });
+    await recordUnmapped(db, projectId, items);
   }
   log(`codes: ${report.versionsMapped} mapped, ${report.unmapped} unmapped, ${report.schemesChosen} schemes chosen`);
+  return report;
+}
+
+/**
+ * Maps the legacy attribute values of one project's current versions into empty codes under the
+ * project's current profile (POST /projects/:pid/cde/codes/apply). Never changes the scheme and never
+ * overwrites a code (an empty field only, checked again in the update). When the project enforces the
+ * ISO 19650 rules, a code that does not fit the folder's state is not stored but stays unmapped;
+ * otherwise it is stored and counted in `outOfState`. Batched and idempotent: a second run maps
+ * nothing. Audited as "cde.codes_applied"; the unmapped list is written again when it changed.
+ */
+export async function applyLegacyCodes(
+  db: Db,
+  projectId: string,
+  opts: { actorId?: string | null; batchSize?: number } = {},
+): Promise<CdeApplyCodesReportDto> {
+  const batchSize = Math.max(1, opts.batchSize ?? 500);
+  const settings = await loadCodeSettings(db, projectId);
+  const profile = codeProfile(settings);
+  const states = await stateCheck(db, projectId, settings.enforceTransitions);
+  const report: CdeApplyCodesReportDto = { scheme: settings.codeScheme, versionsMapped: 0, codesMapped: 0, outOfState: 0, unmapped: 0, resolved: 0, truncated: false };
+  const now = new Date();
+  for await (const batch of candidates(db, batchSize, { projectId })) {
+    for (const c of batch) {
+      const m = mapCandidate(profile, c, states);
+      const fields = Object.keys(m.set) as ("suitabilityCode" | "revisionCode")[];
+      if (!fields.length) continue;
+      const set: Record<string, unknown> = { codesSetAt: now };
+      if (opts.actorId) set.codesSetBy = sql`coalesce(${fileVersions.codesSetBy}, ${opts.actorId}::uuid)`;
+      for (const f of fields) set[f] = sql`coalesce(${fileVersions[f]}, ${m.set[f]!})`;
+      const updated = await db
+        .update(fileVersions)
+        .set(set)
+        .where(and(eq(fileVersions.id, c.versionId), or(...fields.map((f) => isNull(fileVersions[f])))))
+        .returning({ id: fileVersions.id });
+      if (!updated.length) continue;
+      report.versionsMapped++;
+      report.codesMapped += fields.length;
+      report.outOfState += m.outOfState;
+    }
+  }
+  const { items, truncated } = await unmappedLegacyCodes(db, projectId, batchSize);
+  report.unmapped = items.length;
+  report.truncated = truncated;
+  report.resolved = (await recordUnmapped(db, projectId, items, opts.actorId ?? null)).resolved;
+  await audit(db, {
+    projectId,
+    userId: opts.actorId ?? null,
+    action: "cde.codes_applied",
+    targetType: "project",
+    targetId: projectId,
+    details: { ...report, enforced: settings.enforceTransitions },
+  });
   return report;
 }

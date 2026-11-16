@@ -549,7 +549,19 @@
     "personSlotUnknown": "{{email}}: party \"{{slot}}\" is not in the template.",
     "personRoleUnknown": "{{email}}: project role \"{{role}}\" is not in the template.",
     "codeTaken": "Project code {{code}} is already used by another project.",
-    "noAccount": "{{email}} has no SiteKeep account; create the user in Administration → Users and add them to the project later.",
+    "noAccount": "{{email}} has no SiteKeep account and is not invited; invite them in the people step or create the user in Administration → Users.",
     "groupAddress": "{{email}} looks like a shared mailbox and is not added; add the people behind it."
+  },
+  "peopleImport": {
+    "empty": "The file is empty.",
+    "noEmailColumn": "The first row needs an e-mail column (E-mail, Name, Company, Role, Task team).",
+    "noRows": "The file has a header but no people.",
+    "tooManyRows": "At most {{max}} people can be imported; the rest of the file is left out.",
+    "emailMissing": "No e-mail address.",
+    "partyUnknown": "Company or party \"{{value}}\" is not a party of the project.",
+    "teamUnknown": "Task team \"{{value}}\" is not a task team of the project.",
+    "teamOtherParty": "Task team \"{{team}}\" does not belong to \"{{party}}\".",
+    "roleUnknown": "Project role \"{{value}}\" is not in the template.",
+    "roleOtherParty": "Project role \"{{role}}\" belongs to another party."
   }
 }

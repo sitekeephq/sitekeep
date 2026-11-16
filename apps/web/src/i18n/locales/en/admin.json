@@ -34,7 +34,8 @@
     "columns": {
       "systemAdmin": "System Administrator"
     },
-    "passwordPrompt": "New password for {{name}} (at least 10 characters)."
+    "passwordPrompt": "New password for {{name}} (at least 10 characters).",
+    "pending": "Invited"
   },
   "companies": {
     "title": "Companies",
@@ -827,5 +828,10 @@
       "build_after_support": "This SiteKeep version was released after the support period ended."
     },
     "seatsOver": "{{count}} more active users than the licence allows: Enterprise modules are read-only until accounts are disabled or seats are added."
+  },
+  "invitations": {
+    "title": "Invitations",
+    "description": "People without an account can be invited to a project by e-mail (Project Settings → Members and the set-up wizard). System administrators can always invite. Off by default: project administrators can only add people who already have an account.",
+    "projectAdmins": "Project Administrators May Invite People Without an Account"
   }
 }

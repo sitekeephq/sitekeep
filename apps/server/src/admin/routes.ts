@@ -196,6 +196,8 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
       companyId: body.companyId,
       isAdmin: body.isAdmin,
       disabled: body.disabled,
+      // Enabling an invited account by hand ends its invitation (the person signs in with the password set here).
+      ...(body.disabled === false ? { pending: false } : {}),
     };
     if (body.password !== undefined) {
       const problem = passwordProblem(body.password);

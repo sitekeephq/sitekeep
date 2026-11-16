@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { and, desc, eq, inArray } from "drizzle-orm";
-import type { FastifyInstance, FastifyReply } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { PROVISION_PASSWORD } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
@@ -15,9 +15,11 @@ import { projectMembers, projects, tokens, users } from "../db/schema.js";
 import { HttpError, badRequest, forbidden, notFound } from "../core/platform/http.js";
 import { outboundFetch } from "../privacy/outbound.js";
 import { resolveGoogleUser } from "./google-settings.js";
+import { createSession } from "./session.js";
+import { INVITATION_COOKIE } from "./invitation-routes.js";
+import { acceptInvitation, findOpenInvitation } from "./invitations.js";
 import { msg, render, requestLanguage, type Msg } from "../i18n/index.js";
 
-const SESSION_DAYS = 14;
 const GOOGLE_STATE_COOKIE = "cde_google_state";
 
 export async function authRoutes(api: FastifyInstance, { db, secureCookies, googleAuth }: AppDeps) {
@@ -54,6 +56,9 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
       .parse(req.query);
     const expectedState = req.cookies[GOOGLE_STATE_COOKIE];
     reply.clearCookie(GOOGLE_STATE_COOKIE, { path: "/api/v1/auth/google" });
+    // Set by POST /invitations/google: accept that invitation when Google confirms the same address.
+    const invitationToken = req.cookies[INVITATION_COOKIE];
+    if (invitationToken) reply.clearCookie(INVITATION_COOKIE, { path: "/api/v1/auth/google" });
     if (query.error) return reply.redirect("/login?authError=google_cancelled");
     if (!query.code || !query.state || !expectedState || query.state !== expectedState) {
       return reply.redirect("/login?authError=invalid_state");
@@ -83,6 +88,18 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
       if (!profile.email_verified) return reply.redirect("/login?authError=email_not_verified");
 
       const email = profile.email.trim().toLowerCase();
+      if (invitationToken) {
+        const found = await findOpenInvitation(db, invitationToken);
+        if (!found.ok) return reply.redirect(`/login?authError=${found.problem}`);
+        if (found.user.email !== email) {
+          await audit(db, { action: "auth.login_failed", details: { email, provider: "google", invitation: "email_mismatch" } });
+          return reply.redirect("/login?authError=invitation_email_mismatch");
+        }
+        const user = await acceptInvitation(db, invitationToken, { name: profile.name, provider: "google" });
+        await createSession(db, user.id, reply, !!secureCookies);
+        await audit(db, { userId: user.id, action: "auth.login", details: { provider: "google", invitation: true } });
+        return reply.redirect("/");
+      }
       const resolved = await resolveGoogleUser(db, email, profile.name ?? "");
       if (!resolved) {
         await audit(db, { action: "auth.login_failed", details: { email, provider: "google" } });
@@ -242,19 +259,6 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
     return { ok: true };
   });
 }
-async function createSession(db: Db, userId: string, reply: FastifyReply, secure: boolean) {
-  const token = newToken("s");
-  const expiresAt = new Date(Date.now() + SESSION_DAYS * 86400_000);
-  await db.insert(tokens).values({ userId, kind: "session", tokenHash: hashToken(token), expiresAt });
-  reply.setCookie(SESSION_COOKIE, token, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    expires: expiresAt,
-  });
-}
-
 /** Reason the user may not create API tokens, or null when allowed. */
 async function tokenCreationBlocked(db: Db, user: AuthUser, s: McpSettings): Promise<Msg | null> {
   if (user.isAdmin || s.tokenCreators === "everyone") return null;

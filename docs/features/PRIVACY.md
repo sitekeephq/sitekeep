@@ -18,11 +18,16 @@ In the default installation, the server makes no connections outside the network
 |---|---|---|---|
 | AI provider (Ollama, vLLM, DeepSeek, Claude…) | When an AI feature is used | Prompt: the question, summaries of related records. Personal data is masked in prompts that leave the network. | `yapay_zeka:<sağlayıcı>` |
 | Report model (`AI_BASE_URL`) | When the report builder is used | Dataset schema and the request | `yapay_zeka:rapor` |
-| Email server (SMTP) | When an official letter is sent with "Send" | Letter text and PDF attachment, recipients | `eposta` |
+| Email server (SMTP) | When an official letter is sent with "Send"; when a person without an account is [invited](INVITATIONS.md) (or the invitation is sent again) | Letter text and PDF attachment, recipients; for an invitation: the invited address, the inviter's and the project's name and the single-use link | `eposta` (invitations: detail `kind: invitation`) |
 | Office editor (ONLYOFFICE / Collabora) | Editor settings and opening a file | Server: only the discovery request. The editor fetches the file from the CDE itself over WOPI. | `ofis:onlyoffice`, `ofis:collabora` |
 | Office → PDF converter (ONLYOFFICE, Collabora, Gotenberg) | Office file preview | The file to convert | `ofis:<dönüştürücü>` |
 | Sign in with Google | When a user chooses Google sign-in | OAuth code; the verified email information is then received | `giris:google` — [Sign in with Google](GOOGLE_SIGN_IN.md) |
 | Autodesk APS / ACC | When a project administrator sets up the connection and when sync runs | OAuth code and read-only project API requests; ACC records are brought into the CDE | `entegrasyon:autodesk` |
+
+Switching **Email server (SMTP)** off in External Connections (or the kill switch, for a server outside
+the network) stops invitation e-mails too: the invitation is still created and the inviter gets the
+link to hand over; nothing is sent. Only the hash of an invitation token is stored, and the link
+carries the token in the URL fragment, so it does not appear in request logs.
 
 Inbound connections (the server does not connect out; the client connects to the CDE):
 

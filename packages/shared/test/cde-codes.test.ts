@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import {
   ISO_UK_NA,
   LEGACY_R,
+  LETTER_REV,
   allowedSuitability,
   codeProfile,
   defaultSuitability,
   initialRevision,
   isKnownRevision,
   isKnownSuitability,
+  letterIndex,
+  letterRevision,
   nextRevision,
   normaliseRevision,
   normaliseSuitability,
@@ -143,5 +146,71 @@ describe("ISO19650-2 5.1.7(b) / UK NA suitability: project overrides", () => {
     expect(validateCodes(p, "shared", { suitabilityCode: "S2" }).errors[0]!.kind).toBe("suitabilityUnknown");
     // The scheme's own list when the override is empty.
     expect(codeProfile({ codeScheme: "legacy_r", suitabilityCodes: [] }).customSuitability).toBe(false);
+  });
+});
+
+describe("ISO19650-2 5.1.7(b) / letter revisions: Forma / ACC profile", () => {
+  const LETTER = codeProfile({ codeScheme: "letter_rev" });
+
+  it("is the letter_rev scheme with the ISO suitability codes in any state", () => {
+    expect(LETTER).toMatchObject({ scheme: "letter_rev", customSuitability: false });
+    expect(LETTER.revisions).toEqual(LETTER_REV.revisions);
+    expect(allowedSuitability(LETTER, "wip")).toEqual(allowedSuitability(LETTER, "published"));
+    expect(allowedSuitability(LETTER, "wip")).toEqual(expect.arrayContaining(["S0", "S2", "A1", "CR"]));
+    expect(defaultSuitability(LETTER, "wip")).toBe("S0");
+  });
+
+  it("reads letter revisions the way people and Forma write them", () => {
+    expect(normaliseRevision("rev b", LETTER)).toBe("B");
+    expect(normaliseRevision("REVİZYON c", LETTER)).toBe("C");
+    expect(normaliseRevision(" a ", LETTER)).toBe("A");
+    expect(normaliseRevision("ab", LETTER)).toBe("AB");
+    expect(normaliseRevision("Rev. D")).toBe("D");
+    // Without the profile a bare letter stays as written (and is not an ISO revision).
+    expect(normaliseRevision("b")).toBe("B");
+    expect(isKnownRevision(ISO_UK_NA, "B")).toBe(false);
+    expect(isKnownRevision(LETTER, "b")).toBe(true);
+    expect(isKnownRevision(LETTER, "P01")).toBe(false);
+    expect(isKnownRevision(LETTER, "ABC")).toBe(false);
+    expect(isKnownRevision(LETTER, "1")).toBe(false);
+  });
+
+  it("allows any letter revision and any suitability code in any state", () => {
+    for (const state of ["wip", "shared", "published", "archived", null] as const) {
+      expect(validateCodes(LETTER, state, { suitabilityCode: "s2", revisionCode: "rev b" })).toEqual({
+        ok: true,
+        codes: { suitabilityCode: "S2", revisionCode: "B" },
+        errors: [],
+      });
+    }
+    expect(validateCodes(LETTER, "wip", { revisionCode: "P01.01" }).errors[0]).toMatchObject({ kind: "revisionFormat", allowed: "A" });
+    expect(validateCodes(LETTER, "wip", { suitabilityCode: "Approved" }).errors[0]!.kind).toBe("suitabilityUnknown");
+  });
+
+  it("counts A → B … Z → AA, keeps the revision on a state change", () => {
+    expect(initialRevision(LETTER, "wip")).toBe("A");
+    expect(initialRevision(LETTER, null)).toBe("A");
+    expect(nextRevision(LETTER, "A", "wip", "wip")).toBe("B");
+    expect(nextRevision(LETTER, "B", "shared", "shared")).toBe("C");
+    expect(nextRevision(LETTER, "Z", "wip", "wip")).toBe("AA");
+    expect(nextRevision(LETTER, "AZ", null, null)).toBe("BA");
+    expect(nextRevision(LETTER, "ZZ", "wip", "wip")).toBeNull();
+    expect(nextRevision(LETTER, "B", "wip", "shared")).toBe("B");
+    expect(nextRevision(LETTER, "C", "published", "archived")).toBe("C");
+    // Never reuses a letter of the history; a non-letter current revision starts after the highest letter.
+    expect(nextRevision(LETTER, "B", "wip", "wip", ["A", "D"])).toBe("E");
+    expect(nextRevision(LETTER, "R03", "wip", "wip", ["C"])).toBe("D");
+    expect(letterIndex("A")).toBe(1);
+    expect(letterIndex("AA")).toBe(27);
+    expect(letterRevision(702)).toBe("ZZ");
+    expect(letterRevision(703)).toBeNull();
+  });
+
+  it("keeps the project's own suitability list and its states", () => {
+    const own = codeProfile({ codeScheme: "letter_rev", suitabilityCodes: [{ code: "S2", states: ["shared"] }, { code: "X" }] });
+    expect(own).toMatchObject({ scheme: "letter_rev", customSuitability: true });
+    expect(validateCodes(own, "shared", { suitabilityCode: "S2", revisionCode: "C" }).ok).toBe(true);
+    expect(validateCodes(own, "wip", { suitabilityCode: "S2" }).errors[0]!.kind).toBe("suitabilityState");
+    expect(validateCodes(own, "wip", { suitabilityCode: "X", revisionCode: "A" }).ok).toBe(true);
   });
 });

@@ -60,7 +60,8 @@
   "schemes": {
     "iso_uk_na": "ISO 19650 (Birleşik Krallık Ulusal Eki)",
     "legacy_r": "Eski Düzen (R00)",
-    "custom": "Özel"
+    "custom": "Özel",
+    "letter_rev": "Harf Revizyonları (A, B, C …)"
   },
   "wipPolicies": {
     "grants": "Klasör Yetkileri",
@@ -183,9 +184,13 @@
       "schemeHelp": {
         "iso_uk_na": "Çalışma: S0 ile P01.01, P01.02 …; Paylaşılan: S1–S4 ile P01, P02 …; Yayınlanan: A1…An, B1…Bn, CR ile C01, C02 …",
         "legacy_r": "Her durumda R00, R01 … revizyonları; uygunluk kodları duruma bağlı değil.",
-        "custom": "ISO revizyonları ve projenin kendi uygunluk kodları."
+        "custom": "ISO revizyonları ve projenin kendi uygunluk kodları.",
+        "letter_rev": "Her durumda A, B … Z, ardından AA, AB … revizyonları (Autodesk Forma / ACC'den aktarılan projeler); uygunluk kodları duruma bağlı değil."
       },
       "save": "Düzeni Kaydet",
+      "apply": "Mevcut Dosyalara Uygula",
+      "applyHelp": "Güncel versiyonların eski revizyon ve uygunluk özniteliklerini (ör. REVİZYON, STATUS) kaydedilmiş düzenin kodlarına dönüştürür. Yalnız boş kodlar doldurulur; hiçbir şeyin üzerine yazılmaz.",
+      "applied": "{{count}} versiyona kod verildi; {{unmapped}} değer dönüştürülemedi.",
       "saved": "Kaydedildi.",
       "allowedHeading": "Durumlara Göre Kullanılabilen Kodlar",
       "state": "Durum",

@@ -26,7 +26,11 @@ export function LoginPage() {
           ? t("login.errors.accountNotAllowed")
           : code === "google_cancelled"
             ? t("login.errors.googleCancelled")
-            : t("login.errors.googleFailed"),
+            : code === "invitation_email_mismatch"
+              ? t("login.errors.invitationEmailMismatch")
+              : code.startsWith("invitation_")
+                ? t("login.errors.invitationClosed")
+                : t("login.errors.googleFailed"),
       );
       window.history.replaceState({}, "", "/login");
     }
@@ -172,7 +176,7 @@ function Feature({ icon, title, children }: { icon: ReactNode; title: string; ch
   );
 }
 
-function GoogleIcon() {
+export function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path fill="#4285f4" d="M21.6 12.2c0-.7-.1-1.5-.2-2.2H12v4.3h5.4a4.6 4.6 0 0 1-2 3v2.8h3.5c2-1.9 2.7-4.6 2.7-7.9Z" />

@@ -54,6 +54,7 @@ sunucusu", a tool server for AI clients).
 | Token (API) | Erişim anahtarı (en: Access Token) | "API erişim anahtarları" (API Access Tokens), "Yeni erişim anahtarı" (New Access Token) |
 | Google Sign-In | Google ile devam et (en: Continue with Google) | `/login` button. Not the OpenCDE OAuth application. [Google sign-in](../features/GOOGLE_SIGN_IN.md) |
 | Domain allowlist | İzinli Alan Adı (en: Allowed Domain) | Administration → Users. Switch for creating new users via Google |
+| Invitation | Davet (en: Invitation); Davetli (en: Invited) for a member who has not accepted | Project Settings → Members → E-postayla Davet Et (Invite by E-mail); the set-up wizard. [Invitations](../features/INVITATIONS.md) |
 | Forma / ACC file sync | Forma Eşitleme (en: Forma Sync) | Project → Administration. ACC project connection, registration and file fetching on one page. [Forma sync](../features/FORMA_SYNC.md) |
 | Upload / download | Yükle / indir (en: Upload / Download) | |
 | WIP / Shared / Published / Archived | Çalışma / Paylaşılan / Yayınlanan / Arşivlenen (en: Work in Progress / Shared / Published / Archived) | ISO 19650 status labels |

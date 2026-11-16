@@ -23,8 +23,12 @@ export type CdeState = (typeof CDE_STATES)[number];
 export const CDE_TRANSITION_MODES = ["direct", "review", "auto", "forbidden"] as const;
 export type CdeTransitionMode = (typeof CDE_TRANSITION_MODES)[number];
 
-/** Revision and suitability code profile of a project (D-1). */
-export const CDE_CODE_SCHEMES = ["iso_uk_na", "legacy_r", "custom"] as const;
+/**
+ * Revision and suitability code profile of a project (D-1): ISO 19650 UK NA, legacy "R00", the ISO
+ * revisions with the project's own suitability list, and letter revisions A, B, C … (projects
+ * imported from Autodesk Forma / ACC).
+ */
+export const CDE_CODE_SCHEMES = ["iso_uk_na", "legacy_r", "custom", "letter_rev"] as const;
 export type CdeCodeScheme = (typeof CDE_CODE_SCHEMES)[number];
 
 /** Who sees a task team's WIP folders: the folder grants as set, or the owning team only (D-3, D-4). */

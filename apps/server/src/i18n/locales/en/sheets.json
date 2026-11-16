@@ -12,6 +12,8 @@
     "emptySet": "The set has no sheets you can see.",
     "notDrawing": "Sheets are read from PDF, DWG and DXF files only.",
     "unknownFolder": "A chosen folder is not in this project.",
+    "notPdf": "Title-block templates are tried on PDF sheets.",
+    "badTemplate": "Draw the title-block rectangle on the sheet before saving the template.",
     "badFormat": "format must be csv or xlsx."
   },
   "export": {

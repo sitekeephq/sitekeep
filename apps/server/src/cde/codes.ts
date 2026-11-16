@@ -7,7 +7,8 @@
  * - `checkVersionCodes` is the `checkCodes` guard (guards.ts delegates here), called by addVersion
  *   and the approved review copy.
  * - `legacyCodeInputs` / `acceptedLegacyCodes` lift the free attributes older clients write
- *   ("Uygunluk", "Uygunluk Kodu", "Revizyon") into the structured fields.
+ *   ("Uygunluk", "Uygunluk Kodu", "Revizyon"; Forma / ACC imports: "REVİZYON", "STATUS") into the
+ *   structured fields.
  */
 import { eq } from "drizzle-orm";
 import {
@@ -30,11 +31,18 @@ import { projectCdeSettings } from "../db/schema.js";
 import { HttpError } from "../core/platform/http.js";
 import { msg, render, type Msg } from "../i18n/index.js";
 import { isRevisionAttribute } from "../docintel/revision.js";
+import { foldKey } from "../docintel/text.js";
 import type { CdeCodes, CodesCheck } from "./guards.js";
 import { cdeStateOf } from "./state.js";
 
-/** Attribute names that held the suitability code before codes were stored per version. */
-export const LEGACY_SUITABILITY_KEYS = ["Uygunluk Kodu", "Uygunluk"] as const; // i18n-ok: attribute names (data)
+/**
+ * Attribute names that held the suitability code before codes were stored per version, in order of
+ * preference, compared folded (case- and Turkish-İ-insensitive: "STATUS", "Durum", "UYGUNLUK"):
+ * the ISO template, OpenCDE, and projects imported from Autodesk Forma / ACC (`STATUS`).
+ */
+export const LEGACY_SUITABILITY_KEYS = ["Uygunluk Kodu", "Uygunluk", "Suitability Code", "Suitability", "Status", "Durum"] as const; // i18n-ok: attribute names (data)
+
+const SUITABILITY_KEYS_FOLDED = LEGACY_SUITABILITY_KEYS.map(foldKey);
 
 export type CodeSettings = Pick<CdeSettingsDto, "codeScheme" | "suitabilityCodes" | "enforceTransitions">;
 
@@ -139,18 +147,24 @@ export async function checkVersionCodes(db: Db, input: CodesCheck): Promise<Chec
   return { suitabilityCode, revisionCode, warnings };
 }
 
-/** Raw suitability / revision values in attributes, by the names older clients use. */
+/**
+ * Raw suitability / revision values in attributes, by the names older clients and imports use
+ * (`LEGACY_SUITABILITY_KEYS`; revisions: `Revizyon`, `REVİZYON`, `Rev`, `Revision` …, see
+ * isRevisionAttribute). Names are compared folded; the values are returned as written.
+ */
 export function legacyCodeInputs(attributes: Record<string, string> | null | undefined): Partial<CdeCodes> {
   const out: Partial<CdeCodes> = {};
   if (!attributes) return out;
-  for (const k of LEGACY_SUITABILITY_KEYS) {
-    const v = attributes[k]?.trim();
-    if (v) {
-      out.suitabilityCode = v;
+  const keys = Object.keys(attributes).filter((k) => typeof attributes[k] === "string" && attributes[k]!.trim());
+  const folded = keys.map(foldKey);
+  for (const want of SUITABILITY_KEYS_FOLDED) {
+    const i = folded.indexOf(want);
+    if (i >= 0) {
+      out.suitabilityCode = attributes[keys[i]!]!.trim();
       break;
     }
   }
-  const revKey = Object.keys(attributes).find((k) => isRevisionAttribute(k) && attributes[k]?.trim());
+  const revKey = keys.find((k) => isRevisionAttribute(k));
   if (revKey) out.revisionCode = attributes[revKey]!.trim();
   return out;
 }

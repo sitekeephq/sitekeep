@@ -19,6 +19,7 @@ import { useLoad } from "../../../app/context/project";
 import { i18n } from "../../../i18n";
 import { ConfirmDialog } from "../../../shared/ui/Dialog";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
+import { AdminSheetsOcrCard } from "../../sheets/AdminSheetsOcr";
 
 type Section = "summary" | "connections" | "log";
 
@@ -103,7 +104,10 @@ export function AdminPrivacySection() {
       </div>
 
       {section === "summary" ? (
-        <PrivacySummary data={data} onSaved={setData} />
+        <>
+          <PrivacySummary data={data} onSaved={setData} />
+          <AdminSheetsOcrCard />
+        </>
       ) : section === "connections" ? (
         <Connections killSwitch={kill.on} />
       ) : (
