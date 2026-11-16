@@ -1,0 +1,47 @@
+/* Model markups on the IFC viewer (features/coordination/model-markup). */
+.mm-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+.mm-layer .mm-ui { pointer-events: auto; }
+.mm-overlay { position: absolute; inset: 0; pointer-events: none; }
+.mm-layer.drawing .mm-overlay { pointer-events: all; cursor: crosshair; touch-action: none; }
+.mm-pin {
+  position: absolute; left: 0; top: 0; width: 22px; height: 22px; margin: -11px 0 0 -11px; padding: 0;
+  border: 2px solid #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45); cursor: pointer;
+}
+.mm-pin.active { width: 30px; height: 30px; margin: -15px 0 0 -15px; outline: 3px solid var(--primary); }
+.mm-pin.closed { opacity: 0.55; }
+.mm-pin.missing { border-style: dashed; }
+.mm-hint {
+  position: absolute; top: 56px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 32px);
+  padding: 6px 12px; border-radius: var(--radius-sm); background: var(--surface); box-shadow: var(--shadow); font-size: 13px;
+}
+.mm-toolbar {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 24px);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px;
+  padding: 6px 8px; border-radius: var(--radius-sm); background: var(--surface); box-shadow: var(--shadow);
+}
+.mm-panel h3 { margin: 0; }
+.mm-panel .mm-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.mm-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.mm-list li + li { margin-top: 4px; }
+.mm-item {
+  display: flex; align-items: flex-start; gap: 8px; width: 100%; padding: 6px 8px; border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--text); text-align: left; cursor: pointer; font-size: 13px;
+}
+.mm-item:hover { background: var(--surface-2); }
+.mm-item.closed { opacity: 0.65; }
+.mm-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.mm-item-body { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.mm-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.mm-snapshot { width: 100%; border-radius: 6px; border: 1px solid var(--border); margin: 8px 0; }
+.mm-comments { list-style: none; margin: 8px 0; padding: 0; }
+.mm-comments li { padding: 6px 0; border-top: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mm-comment-form textarea { width: 100%; min-height: 60px; }
+.mm-older { margin-top: 16px; }
+@media (max-width: 900px) {
+  .mm-toolbar .mm-tool-label { display: none; }
+  .mm-hint { top: auto; bottom: 72px; }
+}
+.mm-toolbar button.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.mm-toolbar .pdf-sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+.mm-toolbar .swatch { width: 20px; height: 20px; padding: 0; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--border); }
+.mm-toolbar .swatch.active { box-shadow: 0 0 0 2px var(--primary); }

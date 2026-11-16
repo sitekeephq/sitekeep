@@ -6,7 +6,8 @@
     "idsReport": "Bilgi gereksinimi raporu",
     "issue": "Sorun",
     "link": "Bağlantı",
-    "markup": "İşaretleme"
+    "markup": "İşaretleme",
+    "modelMarkup": "Model işaretlemesi"
   },
   "errors": {
     "versionNotFound": "Versiyon bulunamadı.",
@@ -28,6 +29,19 @@
     "markupFolderDenied": "Bu klasörde işaretleme yetkiniz yok.",
     "markupOwnOnly": "Yalnızca kendi işaretlemelerinizi değiştirebilirsiniz.",
     "issueLinksRole": "Sorun bağlantılarını yalnızca oluşturan, atanan kişi veya proje yöneticisi değiştirebilir."
+  },
+  "modelMarkup": {
+    "notIfc": "{{name}} bir IFC dosyası değil; model işaretlemeleri IFC modellerine aittir.",
+    "versionNotInView": "İşaretlemenin model versiyonu, görünümündeki modellerden biri olmalıdır.",
+    "markupDenied": "Bu modelin klasöründe işaretleme yetkiniz yok.",
+    "editOwnOnly": "İşaretlemeyi yalnız yazarı değiştirebilir.",
+    "statusRole": "İşaretlemeyi yalnız yazarı ya da proje yöneticisi açıp kapatabilir.",
+    "deleteRole": "İşaretlemeyi yalnız yazarı ya da proje yöneticisi silebilir.",
+    "pinNeedsAnchor": "Nokta işaretlemesi için bir nokta gerekir.",
+    "drawingNeedsShapes": "Çizim işaretlemesi en az bir şekil içermelidir.",
+    "carryNotNewer": "İşaretlemeler yalnız aynı dosyanın daha yeni bir versiyonuna taşınabilir.",
+    "issueExists": "Bu işaretlemeden zaten bir sorun (#{{number}}) oluşturuldu.",
+    "titleRequired": "Başlık gerekli."
   },
   "jobs": {
     "workerExit": "İşlem {{code}} koduyla bitti.",

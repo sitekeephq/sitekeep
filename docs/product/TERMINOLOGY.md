@@ -32,7 +32,7 @@ sunucusu", a tool server for AI clients).
 | Spec, spec section | Şartname, şartname bölümü (en: Specification, Spec Section) | "Şartnameden teknik onay listesi çıkar" (Build Submittal Register from Specification) |
 | Register ("şartname register'ı") | Liste (en: Register) | "Şartname listesini içe aktar" (Import Specification Register) |
 | Transmittal, Transmittaller | Gönderim formu, Gönderim formları (en: Transmittal, Transmittals) | Cover PDF title "GÖNDERİM FORMU" (TRANSMITTAL); default folder "Gönderim formları" (see below). In new projects the number abbreviation is **GF** (`{Proje}-GF-…`); in old projects the stored `{Proje}-TRM-…` remains |
-| Markup | İşaretleme (en: Markup) | "İşaretlemeler" (Markups), "İşaretleme olarak kaydet" (Save as Markup) |
+| Markup | İşaretleme (en: Markup) | "İşaretlemeler" (Markups), "İşaretleme olarak kaydet" (Save as Markup); on models "Nokta İşaretlemesi" (Pin Markup), "Görünüme Çiz" (Draw on View), "Eski Versiyonlardan" (From Older Versions), "Taşı" (Carry Over). [Model markup](../features/MODEL_MARKUP.md) |
 | Clash, clash testi | Çakışma, çakışma testi (en: Clash) | |
 | Model Coordination | Model koordinasyonu | "Koordinasyon" (Coordination) in the menu |
 | Model viewer (menu) | Model Görüntüleyici (en: Model Viewer) | User decision (10.10.2026); previously "Model" |

@@ -17,6 +17,7 @@ import forms from "./locales/en/forms.json";
 import integrations from "./locales/en/integrations.json";
 // Enum labels live in the shared package: the server renders them too (Excel, e-mails).
 import labels from "../../../../packages/shared/src/locales/en/labels.json";
+import modelMarkup from "./locales/en/modelMarkup.json";
 import onboarding from "./locales/en/onboarding.json";
 import projectSettings from "./locales/en/projectSettings.json";
 import projects from "./locales/en/projects.json";
@@ -41,6 +42,7 @@ export const en = {
   forms,
   integrations,
   labels,
+  modelMarkup,
   onboarding,
   projectSettings,
   projects,

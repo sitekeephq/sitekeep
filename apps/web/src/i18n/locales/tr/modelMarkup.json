@@ -1,0 +1,77 @@
+{
+  "title": "İşaretlemeler",
+  "toggle": "✎ İşaretlemeler",
+  "panel": "İşaretlemeler",
+  "actions": {
+    "pin": "📍 Nokta İşaretlemesi",
+    "draw": "✎ Görünüme Çiz",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "undo": "Geri Al",
+    "show": "Görünümü Göster",
+    "closeMarkup": "İşaretlemeyi Kapat",
+    "reopen": "Yeniden Aç",
+    "share": "Projeyle Paylaş",
+    "makePrivate": "Özel Yap",
+    "delete": "Sil",
+    "toIssue": "Sorun Oluştur",
+    "carryOver": "Taşı",
+    "send": "Gönder",
+    "back": "← Tüm İşaretlemeler",
+    "closePanel": "İşaretlemeleri Kapat"
+  },
+  "kind": {
+    "pin": "Nokta",
+    "drawing": "Çizim"
+  },
+  "status": {
+    "open": "Açık",
+    "closed": "Kapalı"
+  },
+  "visibility": {
+    "private": "Özel",
+    "project": "Proje"
+  },
+  "visibilityHint": {
+    "private": "Yalnız siz görürsünüz.",
+    "project": "Bu modelleri görebilen herkes görür."
+  },
+  "fields": {
+    "title": "Başlık",
+    "colour": "Renk",
+    "visibility": "Görünürlük",
+    "description": "Açıklama",
+    "priority": "Öncelik"
+  },
+  "colour": "Renk {{colour}}",
+  "untitled": "(başlıksız)",
+  "empty": "Bu modellerde henüz işaretleme yok.",
+  "noModels": "İşaretlemelerini görmek için bir model açın.",
+  "noPermission": "Bu modellerin klasörlerinde işaretleme yetkiniz yok.",
+  "older": "Eski Versiyonlardan",
+  "olderHint": "Bu modellerin önceki bir versiyonunda yapıldı. Burada çalışmaya devam etmek için taşıyın; nokta işaretlemesi elemanını GlobalId ile yeniden bulur.",
+  "olderBadge": "V{{version}}",
+  "olderDetail": "Bu işaretleme {{version}}. versiyona ait. Görünümü resim olarak gösteriliyor; güncel modelde açmak için taşıyın.",
+  "carried": "Eski bir versiyondan taşındı.",
+  "anchorMissing": "Bu noktanın elemanı bu versiyonda yok; nokta eski konumunda kalır.",
+  "pickPin": "İşaretleme için modelde bir noktaya tıklayın (Esc: vazgeç).",
+  "drawHint": "Görünümün üzerine çizin; çizim kamerayla birlikte kaydedilir.",
+  "hidden": "Çizim kayıtlı görünüme aittir; görünüm değişince gizlendi.",
+  "saveTitle": "İşaretleme Olarak Kaydet",
+  "saving": "Görünüm kaydediliyor…",
+  "meta": "{{author}} · {{date}}",
+  "versionMeta": "{{file}} · V{{version}}",
+  "issueBadge": "Sorun #{{number}}",
+  "issueTitle": "İşaretlemeden Sorun Oluştur",
+  "issueHint": "Sorun bu işaretlemenin görünümünü, resmini ve noktasını alır ve BCF dışa aktarımlarına taşır. Özel bir işaretleme projeyle paylaşılır.",
+  "issueCreated": "Sorun #{{number}} oluşturuldu.",
+  "openIssue": "Sorunu Aç",
+  "comments": "Yorumlar",
+  "commentCount_one": "{{count}} yorum",
+  "commentCount_other": "{{count}} yorum",
+  "noComments": "Henüz yorum yok.",
+  "commentPlaceholder": "Yorum yazın",
+  "confirmDelete": "Bu işaretleme silinsin mi? Yorumları da silinir.",
+  "textPlaceholder": "Metin (eklemek için Enter)",
+  "shapes": "{{count}} şekil"
+}

@@ -6,7 +6,8 @@
     "idsReport": "Information requirements report",
     "issue": "Issue",
     "link": "Link",
-    "markup": "Markup"
+    "markup": "Markup",
+    "modelMarkup": "Model markup"
   },
   "errors": {
     "versionNotFound": "Version not found.",
@@ -28,6 +29,19 @@
     "markupFolderDenied": "You do not have markup permission in this folder.",
     "markupOwnOnly": "You can only change your own markups.",
     "issueLinksRole": "Only the creator, the assignee or a project administrator can change the issue's links."
+  },
+  "modelMarkup": {
+    "notIfc": "{{name}} is not an IFC file; model markups belong to IFC models.",
+    "versionNotInView": "The markup's model version must be one of the models of its viewpoint.",
+    "markupDenied": "You do not have markup permission in the folder of this model.",
+    "editOwnOnly": "Only the author can change the markup.",
+    "statusRole": "Only the author or a project administrator can open or close the markup.",
+    "deleteRole": "Only the author or a project administrator can delete the markup.",
+    "pinNeedsAnchor": "A pin markup needs a point.",
+    "drawingNeedsShapes": "A drawing markup needs at least one shape.",
+    "carryNotNewer": "Markups can only be carried over to a newer version of the same file.",
+    "issueExists": "An issue (#{{number}}) has already been created from this markup.",
+    "titleRequired": "A title is required."
   },
   "jobs": {
     "workerExit": "The process ended with code {{code}}.",

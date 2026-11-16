@@ -19,6 +19,9 @@ import { webCapability, type ViewerClash } from "../../../sdk";
 import { MoreMenu } from "../../../shared/ui/MoreMenu";
 import { viewerMoreItems } from "../../../viewers/viewer-phone";
 import { labelEntries, useLabel } from "../../../i18n";
+import { MarkupLayer } from "../model-markup/MarkupLayer";
+import { MarkupPanel } from "../model-markup/MarkupPanel";
+import { useModelMarkups } from "../model-markup/useModelMarkups";
 
 const PIN_COLORS: Record<string, string> = {
   open: "#d92d20",
@@ -38,7 +41,7 @@ const ISSUE_TYPES: { value: string; key: "coordination" | "design" | "site" | "q
 ];
 
 export function ViewerPage() {
-  const { t } = useTranslation(["coordination", "common"]);
+  const { t } = useTranslation(["coordination", "common", "modelMarkup"]);
   const label = useLabel();
   const project = useProject();
   const [params, setParams] = useSearchParams();
@@ -90,6 +93,34 @@ export function ViewerPage() {
   const appliedView = useRef<string | null>(null);
   // Narrow screens (≤ 900px, CSS) hide the left panel; "Modeller" opens it as a bottom sheet.
   const [modelsOpen, setModelsOpen] = useState(false);
+  // Model markups (?markup=<id> opens one): list beside the viewer, pins and drawings on the canvas.
+  const markupParam = params.get("markup");
+  const [markupsOpen, setMarkupsOpen] = useState(!!markupParam);
+  const markups = useModelMarkups({
+    projectId: project.id,
+    engine,
+    loaded,
+    ready: requested.length > 0 && requested.every((id) => loaded.includes(id)),
+    enabled: markupsOpen,
+    selectedId: markupParam,
+    onSelect: (id) =>
+      setParams((p) => {
+        if (id) p.set("markup", id);
+        else p.delete("markup");
+        return p;
+      }),
+    requestVersions: (ids) =>
+      setParams((p) => {
+        p.set("v", [...requested, ...ids.filter((id) => !requested.includes(id))].join(","));
+        return p;
+      }),
+  });
+  function closeMarkups() {
+    setMarkupsOpen(false);
+    markups.setMode(null);
+    markups.setPending(null);
+    closeCoordination(["markup"]);
+  }
   // Navigation modes, sections, measurements, visibility, view cube (components/viewer-tools).
   const viewerTools = useViewerTools(engine, {
     loaded,
@@ -396,14 +427,14 @@ export function ViewerPage() {
           ? "all"
           : (loaded.find((id) => id !== cmpFrom) ?? loaded[0] ?? null);
   const showAsk = askOpen && !!askTarget;
-  const rightOpen = !!(selected || comparing || clash || showAsk);
+  const rightOpen = !!(selected || comparing || clash || showAsk || markupsOpen);
 
   const byFolder = groupBy(models ?? [], (m) => m.folderPath);
 
   const versionsByFile = groupBy(allVersions ?? [], (m) => m.fileId);
 
   return (
-    <div className={`viewer model-viewer${rightOpen ? "" : " no-right"}${showAsk || comparing ? " right-on-phone" : ""}`}>
+    <div className={`viewer model-viewer${rightOpen ? "" : " no-right"}${showAsk || comparing || markupsOpen ? " right-on-phone" : ""}`}>
       {modelsOpen && <div className="viewer-sheet-backdrop" onClick={() => setModelsOpen(false)} />}
       <aside className={`panel left${modelsOpen ? " sheet-open" : ""}`} aria-label={t("viewer.models")} data-tour="viewer-models">
         <div className="viewer-sheet-head">
@@ -476,6 +507,7 @@ export function ViewerPage() {
       </aside>
       <div className="canvas-wrap">
         <div ref={container} className="viewer-container" />
+        <MarkupLayer mm={markups} visible={markupsOpen} />
         <div className="viewer-hud" data-tour="viewer-hud">
           <button className="viewer-models-btn primary" data-tour="viewer-models" onClick={() => setModelsOpen(true)} aria-haspopup="dialog">
             {requested.length ? t("viewer.actions.modelsCount", { n: requested.length }) : t("viewer.actions.models")}
@@ -488,14 +520,22 @@ export function ViewerPage() {
               {t("viewer.actions.fourD")}
             </button>
           )}
+          <button className={`wide-tool${markupsOpen ? " primary" : ""}`} onClick={() => (markupsOpen ? closeMarkups() : setMarkupsOpen(true))} disabled={!loaded.length}>
+            {t("modelMarkup:toggle")}
+          </button>
           <button className={askOpen ? "primary" : ""} onClick={() => setAskOpen((v) => !v)} disabled={!loaded.length} title={t("viewer.askHint")}>
             {t("viewer.actions.ask")}
           </button>
           <div className="phone-tool">
             <MoreMenu
-              items={[...viewerMoreItems(loaded.length > 0, fourD).filter((i) => i.key !== "four_d" || planningFourD), ...(loaded.length ? toolMoreItems(viewerTools.state) : [])]}
+              items={[
+                ...(loaded.length ? [{ key: "markups" as const, label: t("modelMarkup:toggle"), checked: markupsOpen }] : []),
+                ...viewerMoreItems(loaded.length > 0, fourD).filter((i) => i.key !== "four_d" || planningFourD),
+                ...(loaded.length ? toolMoreItems(viewerTools.state) : []),
+              ]}
               onSelect={(key) => {
                 if (isToolMoreKey(key)) viewerTools.command(key);
+                else if (key === "markups") (markupsOpen ? closeMarkups() : setMarkupsOpen(true));
                 else if (key === "pin_issue") void newIssue(true);
                 else if (key === "view_issue") void newIssue(false);
                 else setFourD((v) => !v);
@@ -532,6 +572,7 @@ export function ViewerPage() {
       </div>
       {rightOpen && (
         <aside className="panel right">
+          {markupsOpen && <MarkupPanel mm={markups} onClose={closeMarkups} />}
           {showAsk && askTarget && (
             <ModelAskPanel
               projectId={project.id}

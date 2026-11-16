@@ -49,7 +49,7 @@ const shapeSchema = z.discriminatedUnion("type", [
     size: z.number().min(2).max(500),
   }),
 ]);
-const shapesSchema = z.array(shapeSchema).min(1).max(200);
+export const shapesSchema = z.array(shapeSchema).min(1).max(200);
 const pageSchema = z.number().int().min(1).max(100_000);
 
 export async function markupRoutes(api: FastifyInstance, deps: AppDeps) {

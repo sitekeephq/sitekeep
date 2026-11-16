@@ -82,6 +82,10 @@ On phones the joystick at the bottom left walks, and dragging the screen changes
 - **Visibility:** hide/isolate/show all work on the selection. X-Ray makes unselected elements 12% opaque.
   The properties panel shows the IFC class, storey, GlobalId and copyable property values.
 
+**Markups** (✎ Markups in the floating bar, ⋯ More on phones): pins on model elements and drawings (pen, arrow, revision cloud,
+rectangle, text) over the current view, saved with the viewpoint, listed beside the viewer, carried over to newer versions by
+GlobalId and turned into issues. See [Model markup](MODEL_MARKUP.md).
+
 Sections and measurements are saved to issue viewpoints and model set views. They are restored when the view opens; if the saved
 view has none, the current sections and measurements are cleared. Section planes are stored in scene coordinates, measurements as
 points/values (for volume, a GUID list/value); this is compatible with older records.

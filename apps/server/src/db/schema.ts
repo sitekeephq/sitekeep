@@ -415,3 +415,4 @@ export * from "./schema-integrations.js";
 export * from "./schema-cde.js";
 
 export * from "./schema-sheets.js";
+export * from "./schema-model-markup.js";

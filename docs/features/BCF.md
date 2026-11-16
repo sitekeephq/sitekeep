@@ -60,6 +60,10 @@ The file layout follows buildingSMART BCF-XML: `bcf.version`, `project.bcfp`, `e
 | `measurements`, issue point (pin) | `Lines` (point = a line with the same start and end) |
 | `snapshot` | `snapshot.png` / `.jpg` |
 
+An issue created from a [model markup](MODEL_MARKUP.md#issues-and-bcf) takes the markup's viewpoint as its primary
+viewpoint: the snapshot already has the drawing or pin burnt in, and a pin markup becomes the issue pin (a point in `Lines`).
+Markups themselves are not exported as topics.
+
 ## Coordinates
 
 - BCF: IFC world coordinates, metres, Z up.

@@ -1,0 +1,77 @@
+{
+  "title": "Markups",
+  "toggle": "✎ Markups",
+  "panel": "Markups",
+  "actions": {
+    "pin": "📍 Pin Markup",
+    "draw": "✎ Draw on View",
+    "save": "Save",
+    "cancel": "Cancel",
+    "undo": "Undo",
+    "show": "Show Viewpoint",
+    "closeMarkup": "Close Markup",
+    "reopen": "Reopen",
+    "share": "Share with Project",
+    "makePrivate": "Make Private",
+    "delete": "Delete",
+    "toIssue": "Create Issue",
+    "carryOver": "Carry Over",
+    "send": "Send",
+    "back": "← All Markups",
+    "closePanel": "Close Markups"
+  },
+  "kind": {
+    "pin": "Pin",
+    "drawing": "Drawing"
+  },
+  "status": {
+    "open": "Open",
+    "closed": "Closed"
+  },
+  "visibility": {
+    "private": "Private",
+    "project": "Project"
+  },
+  "visibilityHint": {
+    "private": "Only you see it.",
+    "project": "Everyone who can see these models sees it."
+  },
+  "fields": {
+    "title": "Title",
+    "colour": "Colour",
+    "visibility": "Visibility",
+    "description": "Description",
+    "priority": "Priority"
+  },
+  "colour": "Colour {{colour}}",
+  "untitled": "(untitled)",
+  "empty": "No markups on these models yet.",
+  "noModels": "Open a model to see its markups.",
+  "noPermission": "You do not have markup permission in the folders of these models.",
+  "older": "From Older Versions",
+  "olderHint": "Made on an earlier version of these models. Carry one over to keep working on it here; a pin finds its element again by GlobalId.",
+  "olderBadge": "V{{version}}",
+  "olderDetail": "This markup belongs to version {{version}}. Its viewpoint is shown as a picture; carry it over to open it on the current model.",
+  "carried": "Carried over from an older version.",
+  "anchorMissing": "The element of this pin is not in this version; the pin stays at its old position.",
+  "pickPin": "Click a point in the model for the markup (Esc: cancel).",
+  "drawHint": "Draw on the view; the drawing is saved with the camera.",
+  "hidden": "The drawing belongs to the saved viewpoint; it was hidden when the view moved.",
+  "saveTitle": "Save as Markup",
+  "saving": "Capturing the viewpoint…",
+  "meta": "{{author}} · {{date}}",
+  "versionMeta": "{{file}} · V{{version}}",
+  "issueBadge": "Issue #{{number}}",
+  "issueTitle": "Create Issue from Markup",
+  "issueHint": "The issue gets this markup's viewpoint, picture and pin, and takes them into BCF exports. A private markup is shared with the project.",
+  "issueCreated": "Issue #{{number}} created.",
+  "openIssue": "Open Issue",
+  "comments": "Comments",
+  "commentCount_one": "{{count}} comment",
+  "commentCount_other": "{{count}} comments",
+  "noComments": "No comments yet.",
+  "commentPlaceholder": "Write a comment",
+  "confirmDelete": "Delete this markup? Its comments are deleted too.",
+  "textPlaceholder": "Text (Enter to add)",
+  "shapes": "{{count}} shapes"
+}

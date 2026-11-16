@@ -65,6 +65,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [Form PDF](features/FORM_PDF.md)
 - [Document Comparison](features/DOCUMENT_COMPARISON.md)
 - [Drawing Sheets and Sheet Sets](features/SHEETS.md)
+- [Model Markup](features/MODEL_MARKUP.md)
 
 ## Compliance
 

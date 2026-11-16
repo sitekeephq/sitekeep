@@ -39,6 +39,8 @@ coverage for critical browser journeys:
 - quantity approval (Metraj Onayı): approving `openings.ifc` with a note, the Onaylar tab and its groups, binding
   groups to contract items on **Metraj Bağları**, filling a draft payment from the approval (quantity, source note,
   payment source) and revoking with a reason; on the iPhone approve, bind and fill by touch without sideways scroll;
+- model markups (FP-3): a pin and a drawing on the IFC fixture, restored with their viewpoint after a reload, hidden when
+  the view moves and shown again, a comment and an issue from the drawing; on the iPhone the panel from ⋯ Diğer and a pin by tap;
 - Forma Eşitleme: the "not configured" state, and the Autodesk'ten Getir dialog with Autodesk endpoints
   answered in the browser (browse, select, target folder, queued/rejected, recent list);
 - iPhone 13: hamburger navigation, ask panel, create dialogs, CSV Gantt bars, document

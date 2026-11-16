@@ -15,7 +15,7 @@ import { issueViewpointList } from "../../bcf/topics.js";
 import { DEFAULT_LANGUAGE, msg, render } from "../../i18n/index.js";
 
 const vec3 = z.tuple([z.number(), z.number(), z.number()]);
-const viewpointSchema = z.object({
+export const viewpointSchema = z.object({
   camera: viewpointCameraSchema,
   fileVersionIds: z.array(z.string().uuid()).max(100),
   selection: z.array(z.string().max(64)).max(5000).optional(),

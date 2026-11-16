@@ -27,6 +27,7 @@ import { workflowRoutes } from "../workflow/routes/workflow.js";
 import { reviewRoutes } from "../workflow/routes/reviews.js";
 import { notificationRoutes } from "../workflow/routes/notifications.js";
 import { markupRoutes } from "../coordination/routes/markups.js";
+import { modelMarkupRoutes } from "../coordination/routes/model-markups.js";
 import { compareRoutes } from "../doccompare/routes/compare.js";
 import { modelRoutes } from "../model/routes.js";
 import { locationRoutes } from "../locations/routes.js";
@@ -177,6 +178,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await reviewRoutes(api, deps);
       await notificationRoutes(api, deps);
       await markupRoutes(api, deps);
+      await modelMarkupRoutes(api, deps);
       await compareRoutes(api, deps);
       await modelRoutes(api, deps);
       await locationRoutes(api, deps);
