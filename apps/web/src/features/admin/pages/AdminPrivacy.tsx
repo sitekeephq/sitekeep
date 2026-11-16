@@ -21,10 +21,12 @@ import { i18n } from "../../../i18n";
 import { ConfirmDialog } from "../../../shared/ui/Dialog";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 import { AdminSheetsOcrCard } from "../../sheets/AdminSheetsOcr";
+import { RetentionSection } from "./AdminRetention";
+import { PrivacyNoticeSection } from "./AdminPrivacyNotice";
 
-type Section = "summary" | "connections" | "log";
+type Section = "summary" | "connections" | "log" | "retention" | "notice";
 
-const SECTIONS: Section[] = ["summary", "connections", "log"];
+const SECTIONS: Section[] = ["summary", "connections", "log", "retention", "notice"];
 
 const AI_MODE_KEY = {
   off: "privacy.aiModes.off",
@@ -32,7 +34,8 @@ const AI_MODE_KEY = {
   allow_external: "privacy.aiModes.allowExternal",
 } as const satisfies Record<PrivacyAiMode, string>;
 
-export function AdminPrivacySection() {
+/** `readOnly`: an auditor (docs/features/SECURITY_LOG.md#auditor) sees every section, every control disabled. */
+export function AdminPrivacySection({ readOnly = false }: { readOnly?: boolean }) {
   const { t } = useTranslation("admin");
   const { data, error, setData } = useLoad(() => privacyApi.summary(), []);
   const [section, setSection] = useState<Section>("summary");
@@ -83,7 +86,7 @@ export function AdminPrivacySection() {
                 : t("privacy.kill.off")}
             </p>
           </div>
-          {kill.on ? (
+          {readOnly ? null : kill.on ? (
             <button className="primary" disabled={busy} onClick={() => requestToggle(false)}>
               {t("privacy.kill.actions.reopenAll")}
             </button>
@@ -104,15 +107,24 @@ export function AdminPrivacySection() {
         ))}
       </div>
 
-      {section === "summary" ? (
-        <>
-          <PrivacySummary data={data} onSaved={setData} />
-          <AdminSheetsOcrCard />
-        </>
-      ) : section === "connections" ? (
-        <Connections killSwitch={kill.on} />
-      ) : (
+      {section === "log" ? (
         <OutboundLog />
+      ) : (
+        // An auditor reads the same screens; a disabled fieldset turns every control off (links stay).
+        <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }} data-testid="privacy-sections">
+          {section === "summary" ? (
+            <>
+              <PrivacySummary data={data} onSaved={setData} />
+              {!readOnly && <AdminSheetsOcrCard />}
+            </>
+          ) : section === "connections" ? (
+            <Connections killSwitch={kill.on} />
+          ) : section === "notice" ? (
+            <PrivacyNoticeSection />
+          ) : (
+            <RetentionSection data={data} onSaved={setData} />
+          )}
+        </fieldset>
       )}
 
       {ask && (

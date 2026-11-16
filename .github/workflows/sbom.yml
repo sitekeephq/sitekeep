@@ -1,0 +1,67 @@
+name: SBOM
+
+# Software bill of materials of every release (SECURITY.md, deploy/onprem/release-notes.md): the CycloneDX
+# SBOM of SiteKeep Community's production dependencies, built from the tagged lockfile and attached to the
+# GitHub release as sitekeep-<version>-sbom.cdx.json.
+#   - a published release (gh release create v1.2.3 …): attached to it;
+#   - a pushed v* tag without a release yet: a draft release is created with it (publish it later);
+#   - a manual run for an existing tag (Actions → SBOM → Run workflow): attached again (--clobber).
+# Only GITHUB_TOKEN is used.
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [published]
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag, e.g. v1.2.3"
+        required: true
+
+concurrency:
+  group: sbom-${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  sbom:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+    steps:
+      - name: Version
+        id: v
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "::error::not a release tag: $TAG"; exit 1; }
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      # The tree as the lockfile pins it; no install scripts are needed to list it.
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: SBOM (CycloneDX)
+        env:
+          FILE: sitekeep-${{ steps.v.outputs.version }}-sbom.cdx.json
+        run: |
+          npm sbom --sbom-format cyclonedx --omit dev > "$FILE"
+          node -e 'const b = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); if (b.bomFormat !== "CycloneDX" || !b.components?.length) process.exit(1); console.log(`${b.components.length} components, CycloneDX ${b.specVersion}`)' "$FILE"
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$FILE" --clobber
+          else
+            gh release create "$TAG" "$FILE" --draft --verify-tag --title "SiteKeep Community ${TAG#v}" \
+              --notes "Dependency list (SBOM, CycloneDX): $FILE"
+          fi
+          echo "### $FILE attached to $TAG" >> "$GITHUB_STEP_SUMMARY"

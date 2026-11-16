@@ -50,6 +50,7 @@ revisions A, B, C … (projects imported from Autodesk Forma / ACC) are `letter_
   "workflows": [/* steps with { slot } / { role } / { projectRole } assignees, review chains */],
   "modules": { "rfi": true, "forms": false },  // project module switches; missing = on
   "cde": { /* ISO 19650 settings, below */ },
+  "deliveryPlan": { "milestones": [{ "code": "M1", "name": "Concept Design", "offsetDays": 90 }] },
   "notes": ["…"],
   // v2 parts
   "roles": [], "issues": {}, "transmittal": {}, "rfi": {}, "submittals": {}, "meetings": [], "forms": []
@@ -98,6 +99,18 @@ template" writes it back when the settings differ from the defaults.
 | `taskTeams` | `[{ "slot": "yuklenici", "lead": true }, …]`: the slots whose companies get a task team, and the lead appointed party's team. Absent: one team per mapped slot ([task teams](TASK_TEAMS.md)) |
 
 The ISO templates set every key; their naming standard is the document code standard.
+
+### `deliveryPlan` block
+
+Optional. The milestones of the project's master information delivery plan (MIDP), created with the
+project ([delivery plan](DELIVERY_PLAN.md)):
+
+| Key | Effect |
+|---|---|
+| `milestones` | `[{ code?, name, offsetDays? }]`, in order. `offsetDays`: the date, in days after the project start (the set-up wizard's start date, else the creation day); without it the milestone has no date. Names are unique (`checkProjectTemplate`) and may be per language |
+
+"Export as template" writes the project's milestones back, `offsetDays` counted from the project's
+creation. The ISO 19650 templates seed stage milestones (M1 Concept Design … handover).
 
 ### v2 parts
 
@@ -212,6 +225,7 @@ passes `checkProjectTemplate` and previews without errors.
 | Built-in templates parse, check and preview; projects from them; export round trip | `apps/server/test/projects/templates.test.ts` |
 | Construction templates: generator up to date, both languages, `cde` block, teams, roles, issue types, transmittal, folders for ISO-8 / ISO-14, on-demand folders, part report without modules; per-language values; project-role steps and export; module hook with fake handlers; anonymised demo | `apps/server/test/projects/template-v2.test.ts` |
 | Template `cde` block applied and exported | `apps/server/test/cde/settings.test.ts` |
+| Template `deliveryPlan` block applied and exported; duplicate milestones refused | `apps/server/test/cde/delivery-plan.test.ts`, `packages/shared/test/delivery-plan.test.ts` |
 | `patchWorkType` (SDK) | `apps/server/test/projects/template-v2.test.ts` |
 | Module parts against the real modules (run when the installed version has the handler) | `apps/server/test/modules/manage/template-apply.test.ts`, `apps/server/test/modules/field/template-apply.test.ts` |
 | A project from the English construction template in the browser (with and without modules) | `e2e/specs/project-templates.spec.ts` |

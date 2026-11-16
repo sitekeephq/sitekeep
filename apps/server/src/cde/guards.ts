@@ -8,6 +8,9 @@
  *   checkCodes         addVersion and the approved review copy: suitability / revision codes
  *   checkDocumentCode  addVersion, manual copy, rename / move, review copy: unique document code
  *
+ * checkUpload and checkMove also refuse every write into a closed project (close-out archive,
+ * closeout/closed.ts), whatever the source.
+ *
  * Transitions (ISO-1: checkUpload, checkMove, rules in transitions.ts) refuse only when the
  * project enforces them (`enforce_transitions`, D-8); codes (ISO-2: checkCodes), unique codes
  * (ISO-3: checkDocumentCode), task teams (ISO-5). A guard refuses by throwing an HttpError
@@ -22,6 +25,7 @@ import type { Db } from "../db/index.js";
 import { badRequest, forbidden } from "../core/platform/http.js";
 import { msg } from "../i18n/index.js";
 import { checkVersionCodes } from "./codes.js";
+import { assertProjectOpen } from "../closeout/closed.js";
 import { cdeStateOf } from "./state.js";
 import { directWriteRefusal, findTransition, loadTransitionRules, moveRefusal } from "./transitions.js";
 
@@ -60,6 +64,8 @@ export interface UploadCheck extends GuardBase {
 
 /** May a document be written into `folderId` (a new file, or a new version of `existingFileId`)? */
 export async function checkUpload(db: Db, input: UploadCheck): Promise<void> {
+  // A closed project (close-out archive) takes no new information on any path.
+  await assertProjectOpen(db, input.projectId);
   // The approved review copy is the transition itself (checked when the review started).
   if (input.source === "review_copy") return;
   const rules = await loadTransitionRules(db, input.projectId);
@@ -80,6 +86,7 @@ export interface MoveCheck extends GuardBase {
 
 /** May a file be moved from one folder to another? (A state change is a transition.) */
 export async function checkMove(db: Db, input: MoveCheck): Promise<void> {
+  await assertProjectOpen(db, input.projectId);
   const rules = await loadTransitionRules(db, input.projectId);
   if (!rules.enforce) return;
   const tree = input.tree ?? (await FolderTree.load(db, input.projectId));

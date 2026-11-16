@@ -70,5 +70,62 @@
       "rejected": "Rejected. The document is back in Work in Progress with suitability S0.",
       "revise": "Revise and resubmit. The document is back in Work in Progress with suitability S0."
     }
+  },
+  "deliveryPlan": {
+    "entities": {
+      "milestone": "Milestone",
+      "deliverable": "Planned deliverable",
+      "team": "Task team"
+    },
+    "errors": {
+      "notAllowed": "Only project administrators and the lead of task team \"{{team}}\" can change its delivery plan.",
+      "noTeam": "Choose the task team responsible for the deliverable.",
+      "codeRequired": "Give the planned document code.",
+      "titleRequired": "Give the title of the deliverable.",
+      "codeTaken": "The document code {{code}} is already planned in this project.",
+      "codeNaming": "The document code {{code}} does not follow the naming standard \"{{standard}}\": {{errors}}",
+      "dueOrder": "The due date for Published ({{published}}) is before the due date for Shared ({{shared}}).",
+      "milestoneUnknown": "The milestone is not one of this project's.",
+      "milestoneTaken": "A milestone named \"{{name}}\" already exists.",
+      "suitabilityUnknown": "Suitability code {{value}} is not one of this project's codes.",
+      "revisionUnknown": "Revision {{value}} does not follow the project's revision scheme.",
+      "leadNotMember": "The lead must be a member of the task team.",
+      "fileType": "Choose an Excel (.xlsx) or CSV file.",
+      "fileUnreadable": "The file could not be read as a spreadsheet.",
+      "noCodeColumn": "The first row must have a column for the document code (\"Document Code\").",
+      "empty": "The file has no rows below the header.",
+      "tooManyRows": "The file has more than {{max}} rows.",
+      "rowTeamUnknown": "Task team \"{{team}}\" is not one of this project's.",
+      "rowDate": "{{column}}: \"{{value}}\" is not a date (use YYYY-MM-DD or DD.MM.YYYY).",
+      "rowTarget": "{{milestone}}: {{error}}",
+      "rowDuplicate": "The document code {{code}} is listed more than once in the file."
+    },
+    "columns": {
+      "code": "Document Code",
+      "title": "Title",
+      "team": "Task Team",
+      "discipline": "Discipline",
+      "docType": "Type",
+      "dueShared": "Due Shared",
+      "duePublished": "Due Published",
+      "notes": "Notes",
+      "status": "Status",
+      "late": "Late",
+      "document": "Document"
+    },
+    "statuses": {
+      "not_started": "Not started",
+      "wip": "Work in Progress",
+      "shared": "Shared",
+      "published": "Published"
+    },
+    "late": {
+      "shared": "Not shared by the due date",
+      "published": "Not published by the due date"
+    },
+    "sheetName": "Delivery Plan",
+    "fileName": "delivery-plan",
+    "milestonesSheet": "Milestones",
+    "noTeam": "(no team)"
   }
 }

@@ -7,6 +7,8 @@ import type { Storage } from "../core/platform/storage.js";
 import type { Db } from "../db/index.js";
 import type { OAuthOptions, ResolvedOAuthOptions } from "../oauth/config.js";
 import type { FailureLimiter } from "../oauth/rate-limit.js";
+import type { SignInSecurity } from "../auth/sign-in-security.js";
+import type { CloseoutLimits } from "../closeout/config.js";
 
 export interface AppDeps {
   db: Db;
@@ -71,10 +73,17 @@ export interface AppDeps {
    * CDE_PUBLIC_URL, CDE_OAUTH_AUTH_URL, CDE_OAUTH_TOKEN_URL, CDE_OPENCDE_APIS.
    */
   oauth?: OAuthOptions;
+  /**
+   * Close-out archive limits (docs/features/CLOSEOUT_ARCHIVE.md#limits); unset fields come from
+   * CDE_CLOSEOUT_MAX_GB, CDE_CLOSEOUT_RETENTION_DAYS and CDE_CLOSEOUT_MIN_FREE_GB.
+   */
+  closeout?: Partial<CloseoutLimits>;
   /** OpenCDE Documents API upload part size in bytes (tests use small parts); default 16 MiB. */
   documentsPartBytes?: number;
   /** Destination of the request log when `logger` is on (tests capture it); default stdout. */
   logStream?: NodeJS.WritableStream;
+  /** Sign-in limits and session lifetimes; tests pass one with their own clock. Default: settings from the database. */
+  signInSecurity?: SignInSecurity;
   /** Optional Google OpenID Connect login. Only existing, enabled users may sign in. */
   googleAuth?: {
     clientId: string;
@@ -95,6 +104,8 @@ export type ResolvedDeps = Omit<AppDeps, "oauth"> & {
   oauth: ResolvedOAuthOptions;
   /** Failed /oauth2/token and /oauth2/revoke requests per client IP. */
   oauthLimiter: FailureLimiter;
+  /** Failed sign-in limits, session lifetimes and the two-factor rule (docs/features/SIGN_IN_SECURITY.md). */
+  signInSecurity: SignInSecurity;
   secretKey: Buffer;
   askBridge: AskBridge;
   converters: Converters;

@@ -3,8 +3,10 @@
  *   GET /projects/:pid/audit           project administrators; filters, cursor pages
  *   GET /projects/:pid/audit.csv       the same filters, every row, streamed
  *   GET /projects/:pid/files/:id/history  people who may view the file; its rows and its versions'
- *   GET /admin/audit, /admin/audit.csv system administrators; all projects and system rows
- *   GET /admin/audit/verify            system administrators; walks the hash chain
+ *   GET /admin/audit, /admin/audit.csv system administrators and auditors; all projects and system rows
+ *   GET /admin/audit/projects          system administrators and auditors; every project (the filter)
+ *   GET /admin/audit/verify            system administrators and auditors; walks the hash chain
+ * The security log and its alerts: security-log-routes.ts.
  * IP address and user agent (D-9) are shown to administrators only, from audit_personal while it is
  * kept (P1-5); afterwards the row says they were deleted.
  */
@@ -15,18 +17,15 @@ import type { AuditPageDto, Principal } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import type { Db } from "../db/index.js";
 import { FolderTree, projectAccess, requireProjectAdmin } from "../core/security/access.js";
-import { forbidden } from "../core/platform/http.js";
+import { requireSecurityReader } from "../core/security/system-roles.js";
 import { audit } from "../core/platform/audit.js";
-import { msg, supportedLanguage, tFor, tReq } from "../i18n/index.js";
-import { CSV_BOM, csvLine } from "../docintel/export.js";
+import { asc } from "drizzle-orm";
+import { projects } from "../db/schema.js";
+import { securityLogRoutes } from "./security-log-routes.js";
+import { supportedLanguage, tFor, tReq } from "../i18n/index.js";
 import { loadFile, requireView } from "../modules/documents/files.js";
-import { auditPage, auditQuery, auditRows, auditWhere, fileHistoryWhere, toAuditDtos, verifyAuditChain } from "./query.js";
-
-function requireSystemAdmin(req: FastifyRequest) {
-  if (!req.user?.isAdmin) throw forbidden(msg("admin:errors.adminOnly"));
-}
-
-const CSV_COLUMNS = ["id", "time", "project", "user", "action", "targetType", "targetId", "target", "ip", "userAgent", "details", "hash"] as const;
+import { auditCsvLines } from "./csv.js";
+import { auditPage, auditQuery, auditWhere, fileHistoryWhere, toAuditDtos, verifyAuditChain } from "./query.js";
 
 /** Streams every row of a query as CSV, newest first. */
 async function sendCsv(
@@ -41,26 +40,7 @@ async function sendCsv(
   // A link cannot send the interface language as a header: `lang` in the query wins (column names).
   const asked = supportedLanguage((req.query as { lang?: string }).lang);
   const t = asked ? tFor(asked) : tReq(req);
-  async function* lines() {
-    yield CSV_BOM + csvLine(CSV_COLUMNS.map((c) => t(`audit:csv.columns.${c}`)));
-    for await (const rows of auditRows(db, where)) {
-      for (const e of await toAuditDtos(db, rows, { client: true, projectCodes: true, viewer }))
-        yield csvLine([
-          e.id,
-          e.at,
-          e.projectCode ?? "",
-          e.userName ?? e.userId ?? "",
-          e.action,
-          e.targetType ?? "",
-          e.targetId ?? "",
-          e.targetName ?? "",
-          e.ip ?? (e.personalRemoved ? t(`audit:csv.personalRemoved.${e.personalRemoved}`) : ""),
-          e.userAgent ?? (e.personalRemoved ? t(`audit:csv.personalRemoved.${e.personalRemoved}`) : ""),
-          e.details ? JSON.stringify(e.details) : "",
-          e.hash ?? "",
-        ]);
-    }
-  }
+  const lines = () => auditCsvLines(db, where, t, { client: true, viewer });
   // Taking the log out is itself on the record.
   await audit(db, { projectId, userId: req.user!.id, action: "audit.exported", details: { query: req.query as Record<string, unknown> } });
   reply.header("Content-Type", "text/csv; charset=utf-8");
@@ -100,20 +80,27 @@ export async function auditRoutes(api: FastifyInstance, deps: AppDeps) {
   });
 
   api.get("/admin/audit", async (req): Promise<AuditPageDto> => {
-    requireSystemAdmin(req);
+    requireSecurityReader(req);
     const q = auditQuery.parse(req.query);
     const page = await auditPage(db, auditWhere(q), q.limit, q.cursor);
     return { entries: await toAuditDtos(db, page.rows, { client: true, projectCodes: true }), nextCursor: page.nextCursor };
   });
 
   api.get("/admin/audit.csv", async (req, reply) => {
-    requireSystemAdmin(req);
+    requireSecurityReader(req);
     const q = auditQuery.parse(req.query);
     return sendCsv(db, req, reply, auditWhere(q), `audit-${stamp()}.csv`, null);
   });
 
+  api.get("/admin/audit/projects", async (req) => {
+    requireSecurityReader(req);
+    return db.select({ id: projects.id, code: projects.code, name: projects.name }).from(projects).orderBy(asc(projects.code));
+  });
+
   api.get("/admin/audit/verify", async (req) => {
-    requireSystemAdmin(req);
+    requireSecurityReader(req);
     return verifyAuditChain(db);
   });
+
+  await securityLogRoutes(api, deps);
 }

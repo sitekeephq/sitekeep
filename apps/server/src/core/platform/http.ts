@@ -12,6 +12,8 @@ export class HttpError extends Error {
   readonly msg: Msg | null;
   /** Text from @sitekeep/shared, built in the reader's language (`(lang) => moduleOffMessage(m, lang)`). */
   readonly text: ((lang: string) => string) | null;
+  /** Response headers sent with the error (Retry-After of a 429). */
+  headers?: Record<string, string>;
   constructor(
     readonly status: number,
     readonly code: string,
@@ -39,6 +41,7 @@ export const conflict = (message: Msg | string, details?: unknown) => new HttpEr
 export function errorHandler(err: unknown, req: FastifyRequest, reply: FastifyReply) {
   const lang = requestLanguage(req);
   if (err instanceof HttpError) {
+    if (err.headers) reply.headers(err.headers);
     return reply.status(err.status).send({ error: err.code, message: err.messageIn(lang), details: err.details });
   }
   if (err instanceof ZodError) {

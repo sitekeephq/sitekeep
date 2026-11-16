@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { webCapability } from "../../sdk/capabilities";
 
 import { isModelAskVisible, MODEL_ASK_VISIBILITY_EVENT } from "../../shared/ai/panel-coordination";
-import { api } from "../../shared/api/api";
+import { api, formatDate } from "../../shared/api/api";
 import { Icon } from "../../shared/ui/Icon";
 import { LoadingIndicator } from "../../shared/ui/LoadingIndicator";
 import { ProjectContext } from "../context/project";
@@ -229,6 +229,11 @@ export function ProjectShell() {
               </>
             )}
           </div>
+          {project.closedAt && (
+            <div className="notice small" role="status" data-testid="project-closed-banner" style={{ margin: "0 0 8px" }}>
+              {t("projectShell.closed", { date: formatDate(project.closedAt) })}
+            </div>
+          )}
           <div className="project-outlet">
             <Outlet />
           </div>

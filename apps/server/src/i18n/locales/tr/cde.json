@@ -70,5 +70,62 @@
       "rejected": "Reddedildi. Doküman Çalışma durumuna döndü, uygunluk kodu S0.",
       "revise": "Revize edip tekrar gönderin. Doküman Çalışma durumuna döndü, uygunluk kodu S0."
     }
+  },
+  "deliveryPlan": {
+    "entities": {
+      "milestone": "Kilometre taşı",
+      "deliverable": "Planlanan teslim",
+      "team": "Görev ekibi"
+    },
+    "errors": {
+      "notAllowed": "\"{{team}}\" görev ekibinin teslim planını yalnız proje yöneticileri ve ekibin sorumlusu değiştirebilir.",
+      "noTeam": "Teslimden sorumlu görev ekibini seçin.",
+      "codeRequired": "Planlanan doküman kodunu yazın.",
+      "titleRequired": "Teslimin başlığını yazın.",
+      "codeTaken": "{{code}} doküman kodu bu projede zaten planlanmış.",
+      "codeNaming": "{{code}} doküman kodu \"{{standard}}\" isimlendirme standardına uymuyor: {{errors}}",
+      "dueOrder": "Yayın teslim tarihi ({{published}}) paylaşım teslim tarihinden ({{shared}}) önce.",
+      "milestoneUnknown": "Kilometre taşı bu projenin değil.",
+      "milestoneTaken": "\"{{name}}\" adında bir kilometre taşı zaten var.",
+      "suitabilityUnknown": "{{value}} uygunluk kodu bu projenin kodlarından biri değil.",
+      "revisionUnknown": "{{value}} revizyonu projenin revizyon düzenine uymuyor.",
+      "leadNotMember": "Sorumlu, görev ekibinin üyesi olmalı.",
+      "fileType": "Bir Excel (.xlsx) ya da CSV dosyası seçin.",
+      "fileUnreadable": "Dosya tablo olarak okunamadı.",
+      "noCodeColumn": "İlk satırda doküman kodu için bir sütun olmalı (\"Doküman Kodu\").",
+      "empty": "Dosyada başlığın altında satır yok.",
+      "tooManyRows": "Dosyada {{max}} satırdan fazla var.",
+      "rowTeamUnknown": "\"{{team}}\" görev ekibi bu projenin değil.",
+      "rowDate": "{{column}}: \"{{value}}\" bir tarih değil (YYYY-AA-GG ya da GG.AA.YYYY yazın).",
+      "rowTarget": "{{milestone}}: {{error}}",
+      "rowDuplicate": "{{code}} doküman kodu dosyada birden fazla kez geçiyor."
+    },
+    "columns": {
+      "code": "Doküman Kodu",
+      "title": "Başlık",
+      "team": "Görev Ekibi",
+      "discipline": "Disiplin",
+      "docType": "Tip",
+      "dueShared": "Paylaşım Teslim Tarihi",
+      "duePublished": "Yayın Teslim Tarihi",
+      "notes": "Notlar",
+      "status": "Durum",
+      "late": "Gecikme",
+      "document": "Doküman"
+    },
+    "statuses": {
+      "not_started": "Başlamadı",
+      "wip": "Çalışma",
+      "shared": "Paylaşılan",
+      "published": "Yayınlanan"
+    },
+    "late": {
+      "shared": "Teslim tarihinde paylaşılmadı",
+      "published": "Teslim tarihinde yayınlanmadı"
+    },
+    "sheetName": "Teslim Planı",
+    "fileName": "teslim-plani",
+    "milestonesSheet": "Kilometre Taşları",
+    "noTeam": "(ekipsiz)"
   }
 }

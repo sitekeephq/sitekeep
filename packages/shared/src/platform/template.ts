@@ -26,6 +26,7 @@ import type { PermissionLevel } from "../kernel/permissions.js";
 import type { FolderState } from "../core/types.js";
 import type { ProjectModule } from "../core/modules.js";
 import { cdeTransitionKey, type TemplateCdeSettings } from "../documents/cde.js";
+import type { TemplateDeliveryPlan } from "../documents/delivery-plan.js";
 import type { OutcomeOption, ReviewParty, ReviewStage } from "../workflow/review-chains.js";
 import type { FinalOutcomeMap, OutcomeCode, StepRule, WorkflowKind, WorkflowRole } from "../workflow/workflow.js";
 import { TEMPLATE_PARTS, templatePartsOf, type TemplatePart, type TemplatePartAvailabilityDto, type TemplatePartModule, type TemplateParts } from "./template-v2.js";
@@ -193,6 +194,8 @@ export interface ProjectTemplate extends TemplateParts {
   modules?: Partial<Record<ProjectModule, boolean>>;
   /** ISO 19650 CDE settings of new projects: code scheme, transitions, WIP policy (documents/cde.ts). */
   cde?: TemplateCdeSettings;
+  /** ISO 19650 delivery plan of new projects: the MIDP milestones (documents/delivery-plan.ts, ISO-7). */
+  deliveryPlan?: TemplateDeliveryPlan;
   notes?: string[];
 }
 
@@ -537,6 +540,12 @@ export function checkProjectTemplate(
     if (!slotKeys.has(team.slot)) errors.push(sharedText(lang, "template.partSlotUnknown", { where: "cde.taskTeams", slot: team.slot }));
     if (teamSlots.has(team.slot)) errors.push(sharedText(lang, "template.duplicateTaskTeam", { slot: team.slot }));
     teamSlots.add(team.slot);
+  }
+  const milestones = new Set<string>();
+  for (const m of template.deliveryPlan?.milestones ?? []) {
+    const key = m.name.trim().toLocaleLowerCase("tr");
+    if (milestones.has(key)) errors.push(sharedText(lang, "template.duplicateMilestone", { name: m.name }));
+    milestones.add(key);
   }
   errors.push(...checkTemplateParts(template, slotKeys, workflowNames, lang));
   return [...new Set(errors)];

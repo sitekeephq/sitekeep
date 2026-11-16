@@ -8,7 +8,7 @@ import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, like, lt, min, 
 import { z } from "zod";
 import type { AuditEntryDto, AuditVerifyDto, Principal } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
-import { auditLog, auditPersonal, auditResealHashes, fileVersions, files, folders, projects } from "../db/schema.js";
+import { auditLog, auditPersonal, auditResealHashes, auditTruncations, fileVersions, files, folders, projects } from "../db/schema.js";
 import { auditPersonalHash, auditPersonalKey } from "../core/platform/audit.js";
 import { auditPersonalCutoff } from "../privacy/settings.js";
 import { hiddenByWipRule, userNames, type FolderTree } from "../core/security/access.js";
@@ -92,6 +92,8 @@ export async function toAuditDtos(
   opts: {
     client: boolean;
     projectCodes?: boolean;
+    /** Name rows about a user (security log) with the user's name. */
+    userTargets?: boolean;
     /**
      * ISO-5: the reader of a project's log. A row about a file or folder in a task team's WIP
      * closed to them (team-only policy with admin_sees_wip off) keeps its place in the log but
@@ -100,11 +102,12 @@ export async function toAuditDtos(
     viewer?: { tree: FolderTree; principal: Principal };
   },
 ): Promise<AuditEntryDto[]> {
-  const names = await userNames(db, rows.map((r) => r.userId));
   const ids = (type: string) => [...new Set(rows.filter((r) => r.targetType === type && r.targetId && isUuidLike(r.targetId)).map((r) => r.targetId!))];
+  const names = await userNames(db, [...rows.map((r) => r.userId), ...(opts.userTargets ? ids("user") : [])]);
   const fileIds = ids("file");
   const folderIds = ids("folder");
   const targetNames = new Map<string, string>();
+  if (opts.userTargets) for (const id of ids("user")) if (names.has(id)) targetNames.set(`user:${id}`, names.get(id)!);
   /** Folder of each file / folder / version target, for the WIP rule. */
   const targetFolder = new Map<string, string>();
   if (fileIds.length)
@@ -234,6 +237,11 @@ export async function fileHistoryWhere(db: Db, projectId: string, fileId: string
  * the installation's key is at hand, hash to it; a deleted personal record is fine (retention,
  * erasure). The archive of every re-seal (audit.resealed rows) must still give the digest the row
  * recorded.
+ *
+ * Retention (audit/truncate.ts): after a truncation the first chained row points to the last deleted
+ * row's hash. That is accepted only when the latest audit_truncation checkpoint names this row and
+ * that hash, and the chained `audit.truncated` row of the checkpoint (with the same values) follows;
+ * `truncation_mismatch` otherwise.
  */
 export async function verifyAuditChain(db: Db, batchSize = 2000, opts: { personalKey?: Buffer | null } = {}): Promise<AuditVerifyDto> {
   const key = opts.personalKey === undefined ? auditPersonalKey() : opts.personalKey;
@@ -247,7 +255,13 @@ export async function verifyAuditChain(db: Db, batchSize = 2000, opts: { persona
   let personalChecked: number | null = key ? 0 : null;
   if (first === null) return { ok: true, checked: 0, legacyRows, head: null, personalChecked, broken: null };
 
-  let expectedPrev: string | null = null;
+  const [trunc] = await db.select().from(auditTruncations).orderBy(desc(auditTruncations.id)).limit(1);
+  const truncation = trunc && Number(trunc.newFirstId) === Number(first) ? trunc : null;
+  const truncated: AuditVerifyDto["truncated"] = truncation
+    ? { id: truncation.id, before: truncation.before.toISOString(), removedHeadHash: truncation.removedHeadHash, newFirstId: truncation.newFirstId }
+    : null;
+  let truncationConfirmed = !truncation;
+  let expectedPrev: string | null = truncation?.removedHeadHash ?? null;
   let checked = 0;
   let head: AuditVerifyDto["head"] = null;
   let after = first - 1;
@@ -259,6 +273,7 @@ export async function verifyAuditChain(db: Db, batchSize = 2000, opts: { persona
     head,
     personalChecked,
     broken: { id, reason },
+    truncated,
   });
   for (;;) {
     const rows = await db
@@ -294,6 +309,11 @@ export async function verifyAuditChain(db: Db, batchSize = 2000, opts: { persona
         }
       }
       if (r.action === "audit.resealed") reseals.push({ id: r.id, details: r.details });
+      if (truncation && r.action === "audit.truncated" && Number(r.details?.truncationId) === truncation.id) {
+        if ((r.details?.removedHeadHash ?? null) !== truncation.removedHeadHash || Number(r.details?.newFirstId) !== Number(truncation.newFirstId))
+          return broken(r.id, "truncation_mismatch");
+        truncationConfirmed = true;
+      }
       expectedPrev = r.hash;
       checked++;
       head = { id: r.id, hash: r.hash, at: r.at.toISOString() };
@@ -301,11 +321,12 @@ export async function verifyAuditChain(db: Db, batchSize = 2000, opts: { persona
     }
     if (rows.length < batchSize) break;
   }
+  if (!truncationConfirmed) return broken(Number(first), "truncation_mismatch");
   for (const s of reseals) {
     const resealId = Number(s.details?.resealId);
     if (!Number.isSafeInteger(resealId) || (await resealArchiveDigest(db, resealId)) !== s.details?.archiveDigest) return broken(s.id, "reseal_archive_mismatch");
   }
-  return { ok: true, checked, legacyRows, head, personalChecked, broken: null };
+  return { ok: true, checked, legacyRows, head, personalChecked, broken: null, truncated };
 }
 
 /** One line per archived row, in id order: "id:old_prev_hash:old_hash\n". */

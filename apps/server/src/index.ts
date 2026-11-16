@@ -16,8 +16,10 @@ import { seedTaskTeams } from "./cde/teams.js";
 import { startDueReminders } from "./workflow/reminders.js";
 import { LocalStorage } from "./core/platform/storage.js";
 import { mailerFromEnv } from "./works/letter.js";
-import { startOutboundCleanup } from "./privacy/outbound.js";
-import { startAuditPersonalRetention } from "./audit/personal.js";
+import { startRetention } from "./privacy/retention.js";
+import { startSecurityAlerts } from "./audit/security-alerts.js";
+import { SignInSecurity } from "./auth/sign-in-security.js";
+import { startCloseoutCleanup } from "./closeout/build.js";
 import { FALLBACK_LANGUAGE, render } from "./i18n/index.js";
 import { editionName } from "./app/module-ids.js";
 import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
@@ -62,6 +64,9 @@ import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
  *                      optional Google Workspace login; all three are required
  *   AUTODESK_CLIENT_ID / AUTODESK_CALLBACK_URL
  *                      optional Autodesk APS 3-legged PKCE integration
+ *   CDE_CLOSEOUT_MAX_GB / CDE_CLOSEOUT_RETENTION_DAYS / CDE_CLOSEOUT_MIN_FREE_GB
+ *                      close-out archive: largest archive (unset = no limit), days a ZIP stays
+ *                      downloadable (default 14), free disk space to keep (default 2)
  *   CDE_IFC_CIRCLE_SEGMENTS
  *                      straight pieces per circle in viewer models (12–128, default 48)
  */
@@ -95,8 +100,11 @@ try {
 }
 
 const converters = new Converters();
+const signInSecurity = new SignInSecurity(db);
+const mailer = mailerFromEnv();
 const app = await buildApp({
   db,
+  signInSecurity,
   converters,
   storage,
   jobs,
@@ -105,7 +113,7 @@ const app = await buildApp({
   trustProxy: trustProxyFromEnv(process.env.CDE_TRUST_PROXY),
   secretKey: loadSecretKey(dataDir),
   logger: true,
-  mailer: mailerFromEnv(),
+  mailer,
   dbKind: kind,
   dataLocation: { database: databaseLocation(), storage: `Yerel disk: ${path.join(dataDir, "storage")}` },
   googleAuth: googleAuthFromEnv(),
@@ -122,10 +130,15 @@ await app.listen({ port, host: process.env.HOST ?? "0.0.0.0" });
 app.log.info(`${editionName()} ready on :${port} (database: ${kind}, data: ${dataDir})`);
 // Review step due-date reminders ("termin yaklaşıyor" / "termin geçti"), every 15 minutes.
 const stopReminders = startDueReminders(db, { log: (m, e) => console.error(m, e) });
-// Gizlilik Merkezi: outbound log rows older than the retention setting (default 90 days), daily.
-const stopOutboundCleanup = startOutboundCleanup(db, { log: (m, e) => console.error(m, e) });
-// Audit log: the personal part (IP, user agent, e-mail) of rows older than its retention (default 12 months), daily.
-const stopAuditRetention = startAuditPersonalRetention(db, { log: (m, e) => console.error(m, e) });
+// Privacy Centre → Retention, daily: outbound log (default 90 days), personal part of the audit log
+// (default 12 months), audit log (default unlimited), recycle bin (default off), expired sessions,
+// keys and invitations, old personal data exports; writes the disposal record (privacy/retention.ts).
+const stopRetention = startRetention(db, storage, { log: (m, e) => console.error(m, e) });
+// Security alerts (docs/features/SECURITY_LOG.md#alerts): the audit log is scanned every minute
+// against the alert rules, the hash chain is checked daily; new alerts optionally go out by e-mail.
+const stopSecurityAlerts = startSecurityAlerts({ db, mailer, log: (m, e) => console.error(m, e) });
+// Close-out archives past their download period (CDE_CLOSEOUT_RETENTION_DAYS): the ZIP is deleted, hourly.
+const stopCloseoutCleanup = startCloseoutCleanup(db, storage, { log: (m, e) => console.error(m, e) });
 // Modules' background work (Connect: Autodesk sync scheduler and interrupted file imports).
 const stopModules: (() => void)[] = [];
 for (const m of activeModules()) if (m.start) stopModules.push(await m.start({ db, jobs, log: (msg, e) => console.error(msg, e) }));
@@ -133,8 +146,9 @@ for (const m of activeModules()) if (m.start) stopModules.push(await m.start({ d
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, async () => {
     stopReminders();
-    stopOutboundCleanup();
-    stopAuditRetention();
+    stopRetention();
+    stopSecurityAlerts();
+    stopCloseoutCleanup();
     for (const stop of stopModules) stop();
     jobs.stop();
     await app.close();
@@ -152,7 +166,7 @@ async function bootstrapAdmin() {
     console.error("No users yet. Set ADMIN_EMAIL and ADMIN_PASSWORD to create the first administrator.");
     process.exit(1);
   }
-  const problem = passwordProblem(password);
+  const problem = passwordProblem(password, { email });
   if (problem) {
     console.error(`ADMIN_PASSWORD: ${render(FALLBACK_LANGUAGE, problem)}`);
     process.exit(1);

@@ -3,7 +3,15 @@
     "adminOnly": "This action requires system administrator permission.",
     "invalidDate": "The date must be in YYYY-MM-DD format.",
     "oauthManagedElsewhere": "OAuth applications are enabled and disabled on the Administration → OAuth Applications page.",
-    "unknownConnection": "Unknown connection."
+    "unknownConnection": "Unknown connection.",
+    "exportRunning": "An export of this person's data is already being prepared.",
+    "exportNotReady": "The export is not ready yet.",
+    "anonymised": "This account has been anonymised.",
+    "anonymiseConfirm": "Type the account's e-mail address exactly to confirm.",
+    "anonymiseSelf": "You cannot anonymise your own account.",
+    "emailInUse": "Another account already uses this e-mail address.",
+    "noticeRequired": "Read the privacy notice and tick “I Have Read the Privacy Notice” to continue.",
+    "noticeEmpty": "Write the privacy notice in at least one language before showing it."
   },
   "outbound": {
     "killSwitch": "All external connections are off (Administration → Privacy Centre): no connection was made to {{host}}.",
@@ -49,7 +57,10 @@
     "oauthApps_one": "{{count}} application, {{enabled}} enabled",
     "oauthApps_other": "{{count}} applications, {{enabled}} enabled",
     "oauthManaged": "Managed under Administration → OAuth Applications",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "oidc": "Sign-in with {{name}} (OpenID Connect)",
+    "oidcSends": "Reads the provider's settings and keys, exchanges the sign-in code and checks the ID token (e-mail address, name, groups); the browser itself goes to the provider",
+    "oidcProviderOff": "Provider turned off under Sign-in Security"
   },
   "csv": {
     "fileName": "outbound-connection-log.csv",
@@ -74,5 +85,49 @@
     "external": "External",
     "yes": "Yes",
     "no": "No"
+  },
+  "entities": {
+    "export": "Personal data export"
+  },
+  "anonymise": {
+    "name": "Deleted user #{{id}}"
+  },
+  "export": {
+    "readme": "SiteKeep personal data export\nCreated: {{date}}\n\nEvery section is included twice: json/<section>.json (machine-readable) and csv/<section>.csv (semicolon separated, UTF-8).\n\nSections (rows):\n{{sections}}\n\n{{files}}\n\nNot included: password hash, the values of access keys, other people's personal data.\nThis file is deleted from the server {{days}} days after it was created.\n",
+    "filesIncluded": "Contents of {{count}} of {{total}} uploaded file versions are in files/ (see files.csv for the full list).",
+    "filesListed": "Uploaded files are listed in files.csv; their contents are not included."
+  },
+  "disposal": {
+    "fileName": "disposal-record.csv",
+    "columns": {
+      "time": "Time (UTC)",
+      "run": "Run",
+      "category": "Category",
+      "description": "Description",
+      "count": "Records deleted",
+      "oldest": "Oldest record",
+      "newest": "Newest record",
+      "basis": "Rule",
+      "method": "Method",
+      "details": "Details"
+    },
+    "methods": {
+      "delete": "Deleted from the database",
+      "deleteStorage": "Deleted from the database and from file storage"
+    },
+    "categories": {
+      "trash_files": "Recycle bin: files deleted for good (with their versions and stored contents)",
+      "trash_folders": "Recycle bin: folders deleted for good",
+      "audit_log": "Audit log rows older than the retention period",
+      "audit_personal": "Audit log personal data (IP address, user agent, e-mail)",
+      "outbound_log": "Outbound connection log rows",
+      "sessions": "Expired sign-in sessions",
+      "api_tokens": "Expired API access keys",
+      "oauth_tokens": "Expired OAuth access tokens",
+      "oauth_codes": "Expired OAuth authorization codes",
+      "oauth_refresh_tokens": "Expired OAuth refresh tokens",
+      "invitations": "Invitations not accepted (expired or revoked)",
+      "personal_exports": "Personal data exports (ZIP)"
+    }
   }
 }

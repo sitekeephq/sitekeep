@@ -177,6 +177,32 @@ allowed outbound calls in the last 24 hours, whether the Autodesk scheduler has 
 Alert: a card on the screen + administrator email (optional). Who receives it
 is set up in consulting.
 
+### 3.9 Security alerts
+
+Separate from the operational alerts above, and already in the product (Community):
+[security alerts](../features/SECURITY_LOG.md#alerts-g-8) read the audit log every minute and check
+its hash chain daily. Cards at the top of Administration, acknowledged or dismissed by a system
+administrator (both audited); optional e-mail to the addresses set in Administration → Sign-in
+Security → Security Alerts, only when SMTP is configured and allowed in the Privacy Centre, and
+without personal data.
+
+| Rule | Default |
+|---|---|
+| Failed sign-ins for one account | 10 in 15 minutes |
+| Failed sign-ins installation-wide | 50 in 15 minutes |
+| Files downloaded by one person (ZIPs count their files) | 200 in 60 minutes |
+| New system administrator | every time |
+| "Turn Off All External Connections" switched off | every time |
+| Two-factor requirement set to nobody | every time |
+| Audit chain check failed (daily) | every time |
+
+Thresholds and rules are configurable. They give the organisation the moment it became aware of a
+possible personal data breach: GDPR Art. 33 asks for notification of the supervisory authority
+within 72 hours, KVKK Art. 12(5) for notification of the Board as soon as possible (72 hours by the
+Board's decision 2019/10). The security log (Administration → Security Log, CSV) and the chain
+check are the evidence. An external monitoring system can poll `GET /api/v1/admin/security-alerts`
+with an administrator's or auditor's read-only access key.
+
 ---
 
 ## 4. Technical (how it is done)

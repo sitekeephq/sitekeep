@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/api";
@@ -6,33 +6,76 @@ import { useAuth } from "../../../app/context/auth";
 import { edition } from "../../../app/brand";
 import { BrandMark, BrandName } from "../../../shared/ui/BrandMark";
 import { LanguageSwitcher } from "../../../app/layout/LanguageSwitcher";
+import { securityApi } from "../../../shared/api/api-security";
+import { TwoFactorSignInStep } from "../components/TwoFactor";
+import { PrivacyNoticePanel, noticeBlocks, noticeVersion, usePrivacyNotice } from "../components/PrivacyNotice";
+import type { OidcButtonDto } from "@sitekeep/shared";
+
+/** Sign-in page messages for the `authError` codes of the Google and OpenID Connect callbacks. */
+const AUTH_ERRORS: Record<string, string> = {
+  account_not_allowed: "login.errors.accountNotAllowed",
+  google_cancelled: "login.errors.googleCancelled",
+  google_disabled: "login.errors.googleDisabled",
+  invitation_email_mismatch: "login.errors.invitationEmailMismatch",
+  oidc_disabled: "login.errors.oidcDisabled",
+  oidc_cancelled: "login.errors.oidcCancelled",
+  oidc_failed: "login.errors.oidcFailed",
+  oidc_invalid_state: "login.errors.oidcFailed",
+  oidc_no_email: "login.errors.oidcNoEmail",
+  oidc_email_not_verified: "login.errors.oidcEmailNotVerified",
+  oidc_domain_not_allowed: "login.errors.oidcDomainNotAllowed",
+  oidc_account_not_allowed: "login.errors.oidcAccountNotAllowed",
+  privacy_notice_required: "privacyNotice.required",
+};
 
 export function LoginPage() {
   const { t } = useTranslation(["auth", "common"]);
-  const { login } = useAuth();
+  const { login, completeSignIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [googleEnabled, setGoogleEnabled] = useState(false);
+  const [oidcProviders, setOidcProviders] = useState<OidcButtonDto[]>([]);
+  /** Second step (two-factor) after the password, Google or an invitation. */
+  const [step, setStep] = useState<"password" | "verify" | "enrol">("password");
+  const notice = usePrivacyNotice();
+  const [noticeRead, setNoticeRead] = useState(false);
+  const blocked = noticeBlocks(notice, noticeRead);
+  const ticked = noticeVersion(notice, noticeRead);
+  const noticeQuery = ticked ? `?notice=${ticked}` : "";
+  /** Google and OpenID Connect links wait for the privacy notice checkbox too. */
+  const guardNotice = (e: MouseEvent) => {
+    if (!blocked) return;
+    e.preventDefault();
+    setError(t("privacyNotice.required"));
+  };
 
   useEffect(() => {
-    api.authMethods().then((methods) => setGoogleEnabled(methods.google), () => undefined);
+    api.authMethods().then(
+      (methods) => {
+        setGoogleEnabled(methods.google);
+        setOidcProviders(methods.oidc ?? []);
+      },
+      () => undefined,
+    );
+    // Back from Google or an invitation with a second step waiting (the server keeps it in a cookie).
+    if (new URLSearchParams(window.location.search).get("twoFactor")) {
+      window.history.replaceState({}, "", "/login");
+      securityApi.challenge().then(
+        (c) => setStep(c.twoFactor),
+        (err: Error) => setError(err.message),
+      );
+    }
     const code = new URLSearchParams(window.location.search).get("authError");
     if (code) {
       setError(
-        code === "account_not_allowed"
-          ? t("login.errors.accountNotAllowed")
-          : code === "google_cancelled"
-            ? t("login.errors.googleCancelled")
-            : code === "google_disabled"
-              ? t("login.errors.googleDisabled")
-              : code === "invitation_email_mismatch"
-                ? t("login.errors.invitationEmailMismatch")
-                : code.startsWith("invitation_")
-                  ? t("login.errors.invitationClosed")
-                  : t("login.errors.googleFailed"),
+        AUTH_ERRORS[code]
+          ? t(AUTH_ERRORS[code] as "login.errors.googleFailed")
+          : code.startsWith("invitation_")
+            ? t("login.errors.invitationClosed")
+            : t("login.errors.googleFailed"),
       );
       window.history.replaceState({}, "", "/login");
     }
@@ -43,7 +86,8 @@ export function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      await login(email, password);
+      const result = await login(email, password, noticeVersion(notice, noticeRead));
+      if (result !== "done") setStep(result);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -92,18 +136,49 @@ export function LoginPage() {
           <div className="login-mobile-logo">
             <BrandMark size={32} /> <BrandName edition={edition()} />
           </div>
-          <div className="login-heading">
-            <span className="login-kicker">{t("login.kicker")}</span>
-            <h2>{t("login.title")}</h2>
-            <p>{t("login.description")}</p>
-          </div>
+          {step === "password" && (
+            <div className="login-heading">
+              <span className="login-kicker">{t("login.kicker")}</span>
+              <h2>{t("login.title")}</h2>
+              <p>{t("login.description")}</p>
+            </div>
+          )}
 
-          {googleEnabled && (
+          {step !== "password" ? (
+            <TwoFactorSignInStep
+              mode={step}
+              onSignedIn={(u) => completeSignIn(u, password)}
+              onCancel={() => {
+                setStep("password");
+                setPassword("");
+                setError(null);
+              }}
+            />
+          ) : (
+          <>
+          <PrivacyNoticePanel notice={notice} accepted={noticeRead} onAccepted={setNoticeRead} disabled={busy} />
+          {(googleEnabled || oidcProviders.length > 0) && (
             <>
-              <a className="login-google" href="/api/v1/auth/google">
-                <GoogleIcon />
-                {t("login.actions.google")}
-              </a>
+              <div className="login-providers">
+                {googleEnabled && (
+                  <a className="login-google" href={`/api/v1/auth/google${noticeQuery}`} aria-disabled={blocked || undefined} onClick={guardNotice}>
+                    <GoogleIcon />
+                    {t("login.actions.google")}
+                  </a>
+                )}
+                {oidcProviders.map((p) => (
+                  <a
+                    key={p.id}
+                    className="login-google login-oidc"
+                    href={`/api/v1/auth/oidc/${encodeURIComponent(p.id)}/start${noticeQuery}`}
+                    aria-disabled={blocked || undefined}
+                    onClick={guardNotice}
+                  >
+                    <OidcIcon color={p.color} />
+                    {p.label}
+                  </a>
+                ))}
+              </div>
               <div className="login-divider">
                 <span>{t("login.orEmail")}</span>
               </div>
@@ -149,10 +224,12 @@ export function LoginPage() {
                 {error}
               </div>
             )}
-            <button className="primary login-submit" disabled={busy}>
+            <button className="primary login-submit" disabled={busy || blocked}>
               {busy ? <><span className="login-spinner" /> {t("login.signingIn")}</> : t("login.actions.signIn")}
             </button>
           </form>
+          </>
+          )}
 
           <p className="login-help">
             {t("login.helpQuestion")} <span>{t("login.helpContact")}</span>
@@ -185,6 +262,16 @@ export function GoogleIcon() {
       <path fill="#34a853" d="M12 22c2.7 0 5-.9 6.9-2.4l-3.5-2.8c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.2H2.8v2.9A10.4 10.4 0 0 0 12 22Z" />
       <path fill="#fbbc05" d="M6.4 13.6A6.2 6.2 0 0 1 6.1 12c0-.6.1-1.1.3-1.6v-3H2.8A10 10 0 0 0 1.7 12c0 1.7.4 3.2 1.1 4.6l3.6-3Z" />
       <path fill="#ea4335" d="M12 6.2c1.5 0 2.8.5 3.8 1.5l3-3A10 10 0 0 0 2.8 7.4l3.6 3C7.2 8 9.4 6.2 12 6.2Z" />
+    </svg>
+  );
+}
+
+/** A key in the provider's colour (OpenID Connect buttons). */
+function OidcIcon({ color }: { color: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8" cy="12" r="4.5" fill="none" stroke={color} strokeWidth="2.2" />
+      <path d="M12.5 12H21M18 12v3.5M15.5 12v2.5" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
     </svg>
   );
 }

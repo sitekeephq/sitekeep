@@ -21,7 +21,9 @@
     "privacy": "Gizlilik Merkezi",
     "status": "Sistem Durumu",
     "forma": "Forma Eşitleme",
-    "license": "Lisans"
+    "license": "Lisans",
+    "security": "Giriş Güvenliği",
+    "securityLog": "Güvenlik Kaydı"
   },
   "users": {
     "title": "Kullanıcılar",
@@ -29,13 +31,56 @@
       "add": "+ Kullanıcı",
       "setPassword": "Şifre Belirle",
       "revokeAdmin": "Yöneticiliği Al",
-      "makeAdmin": "Yönetici Yap"
+      "makeAdmin": "Yönetici Yap",
+      "endSessions": "Her Yerde Oturumu Kapat",
+      "resetTwoFactor": "İki Adımlı Doğrulamayı Sıfırla",
+      "makeAuditor": "Denetçi Yap",
+      "revokeAuditor": "Denetçi Yetkisini Kaldır"
     },
     "columns": {
       "systemAdmin": "Sistem Yöneticisi"
     },
     "passwordPrompt": "{{name}} için yeni şifre (en az 10 karakter).",
-    "pending": "Davetli"
+    "pending": "Davetli",
+    "anonymised": "Anonimleştirildi",
+    "personal": {
+      "open": "Kişisel Veriler",
+      "title": "Kişisel veriler: {{name}}",
+      "emailTitle": "E-posta adresi",
+      "changeEmail": "E-postayı Değiştir",
+      "changeEmailPrompt": "{{name}} için yeni e-posta adresi. Başka bir hesapta kullanılmıyor olmalı.",
+      "emailChanged": "E-posta adresi değişti. Kişinin oturumları kapatıldı.",
+      "emailHelp": "Adres düzeltilince kişinin oturumları kapanır; yeni adresle yeniden giriş yapar. Google ile giriş yapan hesap adresle eşleşir; bundan sonra yeni adresin Google hesabıyla girer.",
+      "exportTitle": "Kişisel verileri dışa aktar",
+      "exportHelp": "Kişinin profili, şirketi, proje üyelikleri ve rolleri, sorunları ve yorumları, işleri ve yazışmaları, inceleme adımları, denetim kaydı satırları, dış bağlantı günlüğü satırları, erişim anahtarları (değerleri olmadan) ve yüklediği dosyalar; her biri JSON ve CSV olarak bir ZIP içinde. Arka planda hazırlanır, 7 gün saklanır.",
+      "includeFiles": "Yüklenen Dosyaların İçeriğini de Ekle",
+      "export": "Dışa Aktarmayı Hazırla",
+      "download": "İndir",
+      "columns": {
+        "requested": "İstenme",
+        "status": "Durum",
+        "size": "Boyut"
+      },
+      "status": {
+        "queued": "Sırada",
+        "running": "Hazırlanıyor",
+        "done": "Hazır",
+        "failed": "Başarısız"
+      },
+      "anonymise": "Kullanıcıyı Anonimleştir",
+      "anonymiseHelp": "Geri alınamaz. Ad \"Silinmiş kullanıcı #…\", e-posta geçersiz bir adres olur; şifre, oturumlar, erişim anahtarları, tercihler, açık davetler ile denetim ve dış bağlantı kayıtlarının kişisel kısmı silinir. Kişinin oluşturduğu kayıtlar takma adla kalır; dosyalar değişmez. Serbest metinlerdeki (yorum, yazışma) ve dosya içeriklerindeki kişisel veriler otomatik silinmez.",
+      "anonymiseWarning": "{{name}} anonimleştirilecek. Bu işlem geri alınamaz ve hesap artık giriş yapamaz.",
+      "anonymiseContinue": "Devam Et",
+      "anonymiseType": "Onaylamak için hesabın e-posta adresini yazın: {{email}}",
+      "anonymiseConfirm": "Anonimleştir",
+      "anonymised": "Hesap artık \"{{name}}\"."
+    },
+    "twoFactorBadge": "2FA",
+    "twoFactorOn": "İki adımlı doğrulama açık",
+    "endSessionsConfirm": "{{name}} kullanıcısının bütün tarayıcı oturumları kapanır. API erişim anahtarları çalışmaya devam eder.",
+    "resetTwoFactorConfirm": "{{name}} kullanıcısının iki adımlı doğrulaması kaldırılır ve oturumları kapanır. Zorunluysa bir sonraki girişte yeniden kurar. Bu işlem denetim kaydına yazılır.",
+    "auditorBadge": "Denetçi",
+    "auditorHelp": "Salt okunur denetçi: güvenlik kaydı, Gizlilik Merkezi ve her projenin denetim kaydı; değişiklik yok, dosya yok."
   },
   "companies": {
     "title": "Firmalar",
@@ -76,7 +121,8 @@
     "fields": {
       "fullName": "Ad Soyad",
       "initialPassword": "İlk Şifre (en az 10 karakter — kullanıcı Hesabım ekranından değiştirir)",
-      "systemAdmin": "Sistem Yöneticisi"
+      "systemAdmin": "Sistem Yöneticisi",
+      "auditor": "Denetçi (salt okunur: güvenlik kaydı, Gizlilik Merkezi, denetim kayıtları)"
     }
   },
   "capacity": {
@@ -376,7 +422,9 @@
     "tabs": {
       "summary": "Özet",
       "connections": "Dış Bağlantılar",
-      "log": "Giden Bağlantı Kaydı"
+      "log": "Giden Bağlantı Kaydı",
+      "retention": "Saklama",
+      "notice": "Aydınlatma Metni"
     },
     "kill": {
       "title": "Tüm Dış Bağlantıları Kapat",
@@ -491,6 +539,53 @@
       },
       "empty": "Kayıt yok. Sunucu bu süzgece uyan hiçbir dış bağlantı kurmadı.",
       "count": "{{shown}} / {{total}} kayıt"
+    },
+    "retention": {
+      "title": "Saklama süreleri",
+      "intro": "Günlük bir iş bu sürelerden eski olanları siler ve silinen sayıları denetim kaydına ve imha kaydına yazar.",
+      "fields": {
+        "trash": "Çöp kutusu: kalıcı olarak sil",
+        "auditLog": "Denetim kaydı: sakla"
+      },
+      "off": "Hiçbir zaman (kapalı)",
+      "unlimited": "Süresiz",
+      "days_one": "{{count}} gün sonra",
+      "days_other": "{{count}} gün sonra",
+      "years_one": "{{count}} yıl",
+      "years_other": "{{count}} yıl",
+      "trashHelp": "Bu süreden önce silinen dosya ve klasörler, sürümleri ve depolanan içerikleriyle birlikte kalıcı olarak silinir. Başka bir yerde kullanılan öğeler (ör. bir incelemede) kalır.",
+      "auditLogHelp": "En az {{min}} yıl (ISO 19650 ve sözleşmeler genellikle projenin tamamını ister). Eski satırlar bir kontrol noktasıyla silinir; zincir denetimi yine geçer.",
+      "alwaysTitle": "Her zaman temizlenenler",
+      "always": {
+        "outbound": "Dış bağlantı günlüğü satırları {{days}} gün sonra (Özet → Ayarlar)",
+        "auditPersonal": "Denetim kaydındaki IP adresi, tarayıcı bilgisi ve e-posta {{months}} ay sonra (Özet → Ayarlar)",
+        "credentials": "Süresi dolmuş oturumlar, API anahtarları, OAuth anahtarları ve kodları",
+        "invitations": "Kabul edilmemiş davetler, süresi dolduktan ya da geri alındıktan 30 gün sonra",
+        "exports": "Kişisel veri dışa aktarımları, hazırlandıktan 7 gün sonra"
+      },
+      "disposalTitle": "İmha kaydı",
+      "disposalHelp": "Günlük işin sildikleri: kategori, sayı ve silinen kayıtların zaman aralığı (kayıtların kendisi değil). KVKK periyodik imha tutanağına dayanak olur.",
+      "disposalCsv": "CSV İndir"
+    },
+    "notice": {
+      "title": "Aydınlatma Metni",
+      "intro": "Giriş sayfasında ve davet sayfasında gösterilen metin; örneğin kurumunuzun veri sorumlusu olarak verdiği aydınlatma metni (KVKK m.10, GDPR m.13). İngilizce ve Türkçe yazın; sayfa kişinin seçtiği dili, o boşsa diğerini gösterir.",
+      "fields": {
+        "enabled": "Giriş ve Davet Sayfalarında Göster",
+        "requireAck": "Girişten Önce “Aydınlatma Metnini Okudum” Onayı İste",
+        "reask": "Metin Değişince Yeniden Sor",
+        "text_en": "Metin (İngilizce)",
+        "text_tr": "Metin (Türkçe)"
+      },
+      "actions": {
+        "preview": "Önizle",
+        "hidePreview": "Önizlemeyi Gizle"
+      },
+      "markupHelp": "Basit biçim: paragraflar arasında boş satır, # başlık, - liste maddesi, **kalın**, *italik*, [bağlantı](https://…). HTML metin olarak gösterilir.",
+      "version": "Sürüm {{version}}, {{date}} tarihinde {{name}} kaydetti. {{count}} kişi onayladı.",
+      "noVersion": "Henüz metin kaydedilmedi.",
+      "newVersion": "Değişen metni kaydetmek yeni bir sürüm oluşturur. Metin denetim kaydına yazılır.",
+      "newVersionReask": "Değişen metni kaydetmek yeni bir sürüm oluşturur; herkes bir sonraki girişte yeniden onaylar. Metin denetim kaydına yazılır."
     }
   },
   "ai": {
@@ -835,5 +930,225 @@
     "title": "Davetler",
     "description": "Hesabı olmayan kişiler bir projeye e-postayla davet edilebilir (Proje Ayarları → Üyeler ve kurulum sihirbazı). Sistem yöneticileri her zaman davet edebilir. Varsayılan kapalı: proje yöneticileri yalnız hesabı olan kişileri ekleyebilir.",
     "projectAdmins": "Proje Yöneticileri Hesabı Olmayan Kişileri Davet Edebilir"
+  },
+  "security": {
+    "title": "Giriş Güvenliği",
+    "description": "Hatalı giriş sınırları, oturum süreleri ve iki adımlı doğrulama. Değişiklikler denetim kaydına yazılır.",
+    "saved": "Kaydedildi.",
+    "twoFactor": {
+      "heading": "İki adımlı doğrulama",
+      "require": "İki adımlı doğrulama zorunlu olsun",
+      "options": {
+        "off": "Kimse için değil (her kişi kendisi seçer)",
+        "admins": "Tüm sistem yöneticileri için",
+        "all": "Tüm kullanıcılar için"
+      },
+      "help": "Kapsamdaki kişilerden henüz kurmamış olanlar bir sonraki girişte, oturumları başlamadan önce kurar. Açık oturumlar devam eder. API erişim anahtarları ve OAuth uygulamaları bundan etkilenmez."
+    },
+    "limits": {
+      "heading": "Hatalı girişler ve oturumlar"
+    },
+    "fields": {
+      "failureLimit": "Hesap başına hatalı deneme",
+      "ipFailureLimit": "IP adresi başına hatalı deneme",
+      "failureWindowMinutes": "Zaman penceresi (dakika)",
+      "sessionAbsoluteDays": "Oturum süresi (gün)",
+      "sessionIdleHours": "Hareketsizlik süresi (saat)"
+    },
+    "help": {
+      "failureLimit": "Sonra hesap, en eski hatalı deneme pencereden çıkana kadar kilitlenir (varsayılan 10).",
+      "ipFailureLimit": "Tüm hesaplar toplamı; bütün bir ofis tek adresi paylaşabilir (varsayılan 50).",
+      "failureWindowMinutes": "Bundan eski hatalı denemeler sayılmaz (varsayılan 15).",
+      "sessionAbsoluteDays": "Oturum, ne kadar kullanılırsa kullanılsın, girişten bu süre sonra kapanır (varsayılan 14).",
+      "sessionIdleHours": "Bu süre kullanılmayan oturum kapanır; 0 kapatır (varsayılan 12)."
+    },
+    "unlock": {
+      "heading": "Kilitli girişler",
+      "description": "Şu andaki bütün kilitleri kaldırır; örneğin biri şifresini çok kez yanlış yazdıysa.",
+      "action": "Bütün Kilitleri Kaldır",
+      "done": "Bütün kilitler kaldırıldı."
+    }
+  },
+  "auditor": {
+    "notice": "Denetçi olarak oturum açtınız: güvenlik kaydını, her projenin denetim kaydını ve Gizlilik Merkezi'ni okuyabilir, CSV olarak indirebilirsiniz. Hiçbir şeyi değiştiremezsiniz."
+  },
+  "securityLog": {
+    "title": "Güvenlik Kaydı",
+    "description": "Girişler ve başarısız girişler, kilitlenmeler, iki adımlı doğrulama değişiklikleri, kullanıcılar ve yetkileri, izin ve ayar değişiklikleri, dış bağlantılar, erişim anahtarları ve OAuth izinleri, kayıtların dışa aktarılması ve güvenlik uyarıları; tüm projelerde ve proje dışında, en yenisi üstte. IP adresi ve tarayıcı bilgisi saklandığı sürece gösterilir (Gizlilik Merkezi → Saklama).",
+    "allDescription": "Tüm projelerin ve sistemin denetim kaydı, en yenisi üstte.",
+    "scopes": {
+      "security": "Güvenlik Olayları",
+      "all": "Tüm Olaylar"
+    },
+    "onlyEntry": "Yalnız {{id}} numaralı kayıt.",
+    "filters": {
+      "type": "Tür",
+      "ip": "IP Adresi",
+      "project": "Proje"
+    },
+    "types": {
+      "sign_in": "Giriş",
+      "two_factor": "İki Adımlı Doğrulama",
+      "users": "Kullanıcılar",
+      "permissions": "İzinler ve Roller",
+      "settings": "Ayarlar",
+      "connections": "Dış Bağlantılar",
+      "api_access": "Erişim Anahtarları ve OAuth",
+      "audit": "Kayıtlar ve Saklama",
+      "alerts": "Güvenlik Uyarıları"
+    },
+    "columns": {
+      "project": "Proje"
+    }
+  },
+  "securityAlerts": {
+    "badge": "Güvenlik Uyarısı",
+    "person": "Kişi: {{name}}",
+    "occurrences_one": "{{count}} kez görüldü, son {{date}}",
+    "occurrences_other": "{{count}} kez görüldü, son {{date}}",
+    "mailed": "E-posta gönderildi",
+    "notification": "Bir uyarı kişisel veri ihlali olabilirse GDPR (m.33) denetim makamına ihlalin öğrenilmesinden sonra 72 saat içinde, KVKK (m.12) Kurul'a en kısa sürede bildirim yapılmasını ister. Bir uyarının görüldü olarak işaretlenmesi ya da kapatılması denetim kaydına yazılır.",
+    "actions": {
+      "acknowledge": "Görüldü",
+      "dismiss": "Kapat",
+      "showEvent": "Olayı Göster"
+    },
+    "history": "Son Güvenlik Uyarıları",
+    "columns": {
+      "time": "Zaman",
+      "alert": "Uyarı",
+      "person": "Kişi",
+      "status": "Durum"
+    },
+    "status": {
+      "open": "Açık",
+      "acknowledged": "Görüldü",
+      "dismissed": "Kapatıldı"
+    },
+    "handledBy": "{{name}} tarafından",
+    "rules": {
+      "failed_sign_ins_account": {
+        "title": "Bir Hesapta Çok Sayıda Başarısız Giriş",
+        "body": "Bir hesapta {{minutes}} dakika içinde {{count}} başarısız giriş (eşik {{threshold}})."
+      },
+      "failed_sign_ins_global": {
+        "title": "Çok Sayıda Başarısız Giriş",
+        "body": "Kurulumda {{minutes}} dakika içinde {{count}} başarısız giriş (eşik {{threshold}})."
+      },
+      "bulk_download": {
+        "title": "Toplu İndirme",
+        "body": "Bir kişi {{minutes}} dakika içinde {{count}} dosya indirdi (eşik {{threshold}})."
+      },
+      "new_admin": {
+        "title": "Yeni Sistem Yöneticisi",
+        "body": "Bir kullanıcıya sistem yöneticisi yetkisi verildi."
+      },
+      "kill_switch_off": {
+        "title": "Dış Bağlantılar Yeniden Açıldı",
+        "body": "\"Tüm Dış Bağlantıları Kapat\" kapatıldı: dış bağlantılara yeniden izin veriliyor."
+      },
+      "two_factor_off": {
+        "title": "İki Adımlı Doğrulama Zorunluluğu Kaldırıldı",
+        "body": "Girişte iki adımlı doğrulama artık zorunlu değil."
+      },
+      "audit_chain_broken": {
+        "title": "Denetim Zinciri Denetimi Başarısız",
+        "body": "Denetim kaydının hash zincirinin günlük denetimi {{id}} numaralı kayıtta başarısız oldu ({{reason}})."
+      }
+    },
+    "settings": {
+      "title": "Güvenlik Uyarıları",
+      "description": "Uyarılar, bir sistem yöneticisi görüldü olarak işaretleyene ya da kapatana kadar Yönetim sayfasının üstünde kart olarak görünür. Denetim kaydı dakikada bir, hash zinciri günde bir denetlenir. Değişiklikler denetim kaydına yazılır.",
+      "rules": "Kurallar",
+      "thresholds": "Eşikler",
+      "fields": {
+        "failedSignInsAccount": "Hesap Başına Başarısız Giriş",
+        "failedSignInsGlobal": "Toplam Başarısız Giriş",
+        "failedSignInsWindowMinutes": "Giriş Süresi (Dakika)",
+        "bulkDownloadFiles": "Bir Kişinin İndirdiği Dosya",
+        "bulkDownloadWindowMinutes": "İndirme Süresi (Dakika)"
+      },
+      "email": "E-posta",
+      "emailTo": "Uyarıların Gönderileceği Adresler",
+      "emailHelp": "Her satıra bir adres, en çok 10. E-postada yalnız uyarının adı ve zamanı vardır, kişisel veri yoktur.",
+      "mail": {
+        "ok": "E-posta gönderilebilir.",
+        "smtp_not_configured": "E-posta gönderilmez: SMTP ayarlı değil (CDE_SMTP_URL, CDE_SMTP_FROM).",
+        "smtp_disabled": "E-posta gönderilmez: SMTP, Gizlilik Merkezi'nde kapalı."
+      }
+    }
+  },
+  "oidc": {
+    "title": "OpenID Connect ile Giriş",
+    "description": "Kurumunuzun kimlik sağlayıcısı ile giriş (Entra ID, Keycloak, Okta, Google Workspace, Authentik …). Her sağlayıcı giriş sayfasında bir düğme ve Gizlilik Merkezi'nde kendi anahtarını alır. Değişiklikler denetim kaydına yazılır.",
+    "empty": "Henüz sağlayıcı yok.",
+    "off": "kapalı",
+    "saved": "Kaydedildi.",
+    "testOk": "Keşif çalışıyor: {{issuer}} (imzalar: {{algorithms}}).",
+    "deleteTitle": "Sağlayıcıyı Sil",
+    "deleteConfirm": "{{name}} silinsin mi? Giriş düğmesi kalkar; hesaplar kalır.",
+    "secretStored": "Kayıtlı — değiştirmemek için boş bırakın",
+    "secretNone": "Yok (PKCE ile açık istemci)",
+    "noCompany": "Firma yok",
+    "actions": {
+      "add": "Sağlayıcı Ekle",
+      "test": "Dene"
+    },
+    "columns": {
+      "provider": "Sağlayıcı",
+      "issuer": "Yayıncı",
+      "accounts": "Hesaplar"
+    },
+    "accounts": {
+      "create": "İlk girişte oluşturulur",
+      "existing": "Yalnız mevcut ve davetli kişiler"
+    },
+    "dialog": {
+      "newTitle": "Yeni OpenID Connect Sağlayıcısı",
+      "editTitle": "{{name}} Düzenle"
+    },
+    "sections": {
+      "button": "Giriş Düğmesi",
+      "accounts": "Kimler Girebilir",
+      "claims": "Talepler",
+      "trust": "Güven"
+    },
+    "fields": {
+      "id": "Kısa Kimlik",
+      "name": "Görünen Ad",
+      "issuer": "Yayıncı Adresi (Issuer)",
+      "clientId": "İstemci Kimliği",
+      "clientSecret": "İstemci Sırrı",
+      "scopes": "Kapsamlar",
+      "redirectUri": "Yönlendirme Adresi (sağlayıcıya kaydedin)",
+      "buttonLabel": "Düğme Metni",
+      "buttonColor": "Simge Rengi",
+      "allowedDomains": "İzinli E-posta Alan Adları",
+      "defaultCompany": "Yeni Hesapların Firması",
+      "emailClaim": "E-posta Talebi",
+      "nameClaim": "Ad Talebi",
+      "groupsClaim": "Grup Talebi",
+      "adminGroup": "Sistem Yöneticisi Grubu"
+    },
+    "placeholder": {
+      "buttonLabel": "Contoso ile giriş yap",
+      "adminGroup": "Kapalı (boş)"
+    },
+    "options": {
+      "enabled": "Sağlayıcı Açık",
+      "createAccounts": "İlk Girişte Hesap Oluştur",
+      "trustUnverifiedEmail": "Doğrulanmamış E-posta Adreslerine Güven",
+      "trustProviderMfa": "Sağlayıcının Çok Adımlı Girişine Güven"
+    },
+    "help": {
+      "id": "Küçük harf, rakam ve tire; yönlendirme adresinde kullanılır ve sonra değiştirilemez.",
+      "issuer": "SiteKeep, yayıncı adresinin sonuna /.well-known/openid-configuration ekleyerek okur. https:// gerekir (http:// yalnız localhost için).",
+      "redirectUri": "Kaydettikten sonra sağlayıcıya kaydedilecek yönlendirme adresi burada görünür.",
+      "allowedDomains": "Virgülle ayırın; alt alan adları da uyar. Boş: her alan adı.",
+      "createAccounts": "Kapalı (önerilen): yalnız mevcut kullanıcılar ve açık daveti olan kişiler girer. Açık: yeni kişi normal kullanıcı olarak açılır.",
+      "adminGroup": "Doluysa bu grubun üyeleri (grup talebinde) girişte sistem yöneticisi olur. Bu yetki kendiliğinden geri alınmaz.",
+      "trustUnverifiedEmail": "Kapalı: adres sağlayıcı tarafından doğrulanmış olmalı (email_verified). Yalnız adresleri kurumun kendisinin verdiği bir sağlayıcı için açın.",
+      "trustProviderMfa": "Açık: sağlayıcı çok adımlı giriş bildirirse (amr) SiteKeep kendi iki adımlı doğrulama kodunu sormaz. Kapalı: iki adımlı doğrulama, şifreyle girişteki gibi uygulanır."
+    }
   }
 }

@@ -20,7 +20,8 @@ import { fromAcceptLanguage, msg } from "../i18n/index.js";
 import { toUserDto } from "./dto.js";
 import { googleSignInRefusal } from "./google-connection.js";
 import { OutboundBlockedError } from "../privacy/outbound.js";
-import { createSession } from "./session.js";
+import { afterFirstFactor } from "./session.js";
+import { checkPrivacyNotice, noticeRequired, recordPrivacyNotice, setNoticeCookie } from "../privacy/notice.js";
 import {
   accountFor,
   acceptInvitation,
@@ -50,6 +51,8 @@ const INVITES_PER_HOUR = 60;
 const TOKEN_FAILURES = 20;
 
 const tokenBody = z.object({ token: z.string().trim().min(1).max(300) });
+/** Version of the privacy notice the person ticked "I have read it" for (privacy/notice.ts). */
+const noticeVersion = z.number().int().min(1).optional();
 
 export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   const { db } = deps;
@@ -238,23 +241,37 @@ export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps)
     }),
   );
 
-  api.post("/invitations/accept", { config: { public: true } }, async (req, reply) =>
-    withToken(req, async () => {
-      const body = tokenBody.extend({ name: z.string().trim().min(1).max(200), password: z.string().max(200) }).parse(req.body);
+  api.post("/invitations/accept", { config: { public: true } }, async (req, reply) => {
+    // G-1: the sign-in limits apply here too; a bad token counts as a failed attempt of the client IP.
+    await deps.signInSecurity.guard(req);
+    return withToken(req, async () => {
+      const body = tokenBody
+        .extend({ name: z.string().trim().min(1).max(200), password: z.string().max(200), privacyNoticeVersion: noticeVersion })
+        .parse(req.body);
+      const found = await findOpenInvitation(db, body.token);
+      if (!found.ok) {
+        await deps.signInSecurity.fail(req, { kind: "invitation" });
+        throw invitationError(found.problem);
+      }
       if (body.password === PROVISION_PASSWORD) throw badRequest(msg("auth:errors.provisionPassword"));
-      const problem = passwordProblem(body.password);
+      const problem = passwordProblem(body.password, { email: found.user.email, name: body.name });
       if (problem) throw badRequest(problem);
+      const notice = await checkPrivacyNotice(db, found.user.id, body.privacyNoticeVersion);
+      if (!notice.ok) throw noticeRequired();
       const user = await acceptInvitation(db, body.token, {
         name: body.name,
         password: body.password,
         provider: "password",
         language: fromAcceptLanguage(req.headers["accept-language"]),
       });
-      await createSession(db, user.id, reply, !!deps.secureCookies);
+      await recordPrivacyNotice(db, user.id, notice.accept, "invitation");
+      // Two-factor required for everyone: the person sets it up on the sign-in page before the session starts.
+      const challenge = await afterFirstFactor(deps, user, reply, { provider: "password", invitation: true });
+      if (challenge) return challenge;
       await audit(db, { userId: user.id, action: "auth.login", details: { invitation: true } });
       return toUserDto(user);
-    }),
-  );
+    });
+  });
 
   /** Google sign-in for an invitation: the token rides in a short cookie to the callback, which accepts it for the same address. */
   api.post("/invitations/google", { config: { public: true } }, async (req, reply) =>
@@ -262,9 +279,12 @@ export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps)
       if (!deps.googleAuth) throw notFound(msg("auth:entities.googleSignIn"));
       const refused = await googleSignInRefusal(db);
       if (refused) throw new OutboundBlockedError(refused);
-      const { token } = tokenBody.parse(req.body);
+      const { token, privacyNoticeVersion } = tokenBody.extend({ privacyNoticeVersion: noticeVersion }).parse(req.body);
       const found = await findOpenInvitation(db, token);
       if (!found.ok) throw invitationError(found.problem);
+      // Checked again in the callback; refusing here spares the round trip to Google.
+      if (!(await checkPrivacyNotice(db, found.user.id, privacyNoticeVersion)).ok) throw noticeRequired();
+      setNoticeCookie(reply, privacyNoticeVersion, !!deps.secureCookies);
       reply.setCookie(INVITATION_COOKIE, token, {
         path: "/api/v1/auth/google",
         httpOnly: true,

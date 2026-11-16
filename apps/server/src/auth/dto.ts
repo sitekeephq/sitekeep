@@ -7,6 +7,7 @@ export function toUserDto(u: typeof users.$inferSelect) {
     email: u.email,
     name: u.name,
     isAdmin: u.isAdmin,
+    isAuditor: u.isAuditor,
     companyId: u.companyId,
     mustChangePassword: !!u.prefs?.mustChangePassword,
     language: u.prefs?.language ?? null,

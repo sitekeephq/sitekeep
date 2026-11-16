@@ -26,6 +26,7 @@ import { MemberInvitations } from "./MemberInvitations";
 import { LocationsPage } from "./Locations";
 import { CdeSettings } from "./ProjectSettingsCde";
 import { AuditLog } from "./ProjectAuditLog";
+import { CloseoutArchive } from "./CloseoutArchive";
 import { hubApi } from "../../../shared/api/api-hub";
 import { SETTINGS_ADVANCED_LABEL, SETTINGS_TABS, type SettingsTabKey } from "../../../app/navigation/nav";
 import { AdminStatusSection } from "../../admin/pages/AdminStatus";
@@ -107,6 +108,7 @@ export function ProjectSettingsPage() {
       {tab === "oznitelikler" && <AttributeSettings />}
       {tab === "cde" && <CdeSettings />}
       {tab === "aktivite" && <AuditLog />}
+      {tab === "kapanis" && <CloseoutArchive />}
       {tab === "sistem-durumu" && user?.isAdmin && <AdminStatusSection />}
     </div>
   );

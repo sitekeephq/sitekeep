@@ -422,7 +422,9 @@ export function otherComponents(root = ROOT) {
   const ofl = path.join(fontDir, "OFL.txt");
   const liberation = fs.existsSync(ofl) ? normaliseText(fs.readFileSync(ofl, "utf8")) : "";
   const liberationVersion = liberation ? fontVersion(path.join(fontDir, "LiberationSans-Regular.ttf")) : "";
-  return { libredwg, liberation, liberationVersion };
+  const passwordLicence = path.join(root, "apps/server/assets/passwords/LICENSE-SecLists.txt");
+  const seclists = fs.existsSync(passwordLicence) ? normaliseText(fs.readFileSync(passwordLicence, "utf8")) : "";
+  return { libredwg, liberation, liberationVersion, seclists };
 }
 
 /** The version of a TrueType font from its name table ("Version 2.1.5" gives "2.1.5"); "" when unreadable. */
@@ -500,6 +502,19 @@ export function render({ items }, other) {
     );
     out.push("");
     out.push(fence(other.liberation));
+    out.push("");
+  }
+  if (other.seclists) {
+    out.push("### Common password list (apps/server/assets/passwords)");
+    out.push("");
+    out.push(
+      "`common-passwords.txt` is a data file derived from `Passwords/Common-Credentials/xato-net-10-million-passwords-1000000.txt` of SecLists " +
+        "(https://github.com/danielmiessler/SecLists, commit c205c36a445bff37f8e58a9ec829105cd4975c58), which compiles Mark Burnett's list of ten million passwords (xato.net, 2015). " +
+        "SiteKeep keeps the 50,000 most frequent entries of at least 10 characters, in lower case, and refuses them as new passwords (docs/features/SIGN_IN_SECURITY.md). " +
+        "SecLists is licensed under the MIT licence; the licence text, also in `apps/server/assets/passwords/LICENSE-SecLists.txt`, follows.",
+    );
+    out.push("");
+    out.push(fence(other.seclists));
     out.push("");
   }
   const tessdata = items.filter((it) => it.name.startsWith("@tesseract.js-data/"));

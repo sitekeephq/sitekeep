@@ -404,6 +404,23 @@ function cde() {
   };
 }
 
+/**
+ * MIDP milestones (ISO-7, docs/features/DELIVERY_PLAN.md): project stages dated in days after the
+ * project is created; the administrator moves them to the real dates.
+ */
+function deliveryPlan() {
+  const m = (code, name, offsetDays) => ({ code, name: t(name), offsetDays });
+  return {
+    milestones: [
+      m("M1", { tr: "Konsept Tasarım", en: "Concept Design" }, 60),
+      m("M2", { tr: "Kesin Proje", en: "Developed Design" }, 120),
+      m("M3", { tr: "Uygulama Projesi", en: "Technical Design" }, 210),
+      m("M4", { tr: "Yapım Başlangıcı", en: "Construction Start" }, 270),
+      m("M5", { tr: "Teslim (Yapıldığı Gibi)", en: "Handover (As-Built)" }, 720),
+    ],
+  };
+}
+
 function roles() {
   const role = (key, slot, name) => ({ key, slot, name: t(name) });
   return [
@@ -437,6 +454,7 @@ function template() {
     family: "iso19650-yapim",
     modules: { correspondence: true, rfi: true, submittals: true, meetings: true, transmittals: true, issues: true, reviews: true, forms: true, coordination: true, schedule: true, spec: true, reports: true },
     cde: cde(),
+    deliveryPlan: deliveryPlan(),
     slots: SLOTS.map((s) => ({ key: s.key, label: both(s.label), party: s.party, code: t(s.code), description: both(s.description) })),
     dimensions: {
       [t(N.disc)]: disc.map(([c]) => c),

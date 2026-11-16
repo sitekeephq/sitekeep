@@ -1,5 +1,16 @@
 /** API client for Yönetim → Gizlilik Merkezi (docs/features/PRIVACY.md). */
-import type { OutboundLogPageDto, PrivacyConnectionDto, PrivacySettingsDto, PrivacySummaryDto } from "@sitekeep/shared";
+import type {
+  AnonymiseResultDto,
+  OutboundLogPageDto,
+  PersonalDataExportDto,
+  PrivacyConnectionDto,
+  PrivacyNoticeAdminDto,
+  PrivacyNoticePublicDto,
+  PrivacyNoticeSettings,
+  PrivacySettingsDto,
+  PrivacySummaryDto,
+  UserDto,
+} from "@sitekeep/shared";
 import { request } from "./client";
 
 export interface OutboundFilter {
@@ -35,4 +46,22 @@ export const privacyApi = {
   outbound: (f: OutboundFilter, limit: number, offset: number) =>
     request<OutboundLogPageDto>("GET", `/admin/privacy/outbound?${outboundQuery(f, { limit, offset })}`),
   csvUrl: (f: OutboundFilter) => `/api/v1/admin/privacy/outbound.csv?${outboundQuery(f)}`,
+  notice: () => request<PrivacyNoticeAdminDto>("GET", "/admin/privacy/notice"),
+  saveNotice: (s: Partial<PrivacyNoticeSettings>) => request<PrivacyNoticeAdminDto>("PUT", "/admin/privacy/notice", s),
+  /** Signed out: the notice of the sign-in and invitation pages (docs/features/PRIVACY_NOTICE.md). */
+  publicNotice: () => request<PrivacyNoticePublicDto>("GET", "/auth/privacy-notice"),
+};
+
+/** Data subject rights (docs/features/DATA_SUBJECT_RIGHTS.md): export, anonymise, e-mail correction. */
+export const subjectApi = {
+  exports: (userId: string) => request<PersonalDataExportDto[]>("GET", `/admin/users/${userId}/data-exports`),
+  requestExport: (userId: string, includeFiles: boolean) =>
+    request<PersonalDataExportDto>("POST", `/admin/users/${userId}/data-exports`, { includeFiles }),
+  downloadUrl: (exportId: string) => `/api/v1/admin/data-exports/${exportId}/download`,
+  anonymise: (userId: string, confirmEmail: string) => request<AnonymiseResultDto>("POST", `/admin/users/${userId}/anonymise`, { confirmEmail }),
+  changeEmail: (userId: string, email: string) => request<UserDto>("PUT", `/admin/users/${userId}/email`, { email }),
+  myExports: () => request<PersonalDataExportDto[]>("GET", "/me/data-exports"),
+  requestMyExport: (includeFiles: boolean) => request<PersonalDataExportDto>("POST", "/me/data-exports", { includeFiles }),
+  myDownloadUrl: (exportId: string) => `/api/v1/me/data-exports/${exportId}/download`,
+  disposalsCsvUrl: (lang: string) => `/api/v1/admin/privacy/disposals.csv?lang=${encodeURIComponent(lang)}`,
 };

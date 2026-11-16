@@ -253,5 +253,99 @@
     "noAccess": "You cannot open this file.",
     "summaryBy": "superseded by {{target}}",
     "summarySupersedes": "supersedes {{target}}"
+  },
+  "deliveryPlan": {
+    "title": "Delivery Plan",
+    "description": "What each task team will deliver, by when, at which suitability and revision (ISO 19650 TIDP and MIDP). The status comes from the documents in the CDE.",
+    "tabs": {
+      "label": "Plans",
+      "midp": "Master Plan (MIDP)",
+      "tidp": "{{team}} (TIDP)"
+    },
+    "export": {
+      "xlsx": "Export Excel",
+      "csv": "Export CSV"
+    },
+    "filters": {
+      "search": "Search code or title",
+      "team": "Task Team",
+      "allTeams": "All Teams",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "late": "Late Only"
+    },
+    "columns": {
+      "code": "Document Code",
+      "title": "Title",
+      "team": "Task Team",
+      "discipline": "Discipline",
+      "docType": "Type",
+      "dueShared": "Due Shared",
+      "duePublished": "Due Published",
+      "status": "Status",
+      "document": "Document",
+      "actions": "Actions"
+    },
+    "statuses": {
+      "not_started": "Not Started",
+      "wip": "Work in Progress",
+      "shared": "Shared",
+      "published": "Published"
+    },
+    "late": {
+      "shared": "Late: not shared",
+      "published": "Late: not published"
+    },
+    "summary": "{{count}} deliverables · {{late}} late",
+    "empty": "No deliverables planned yet.",
+    "emptyFiltered": "No deliverables match the filters.",
+    "noTeams": "This project has no task teams yet. Project administrators create them in Project Settings → CDE → Task Teams.",
+    "notMember": "You are not in a task team of this project, so there is no delivery plan to show you. Project administrators see the whole plan.",
+    "noTeam": "(no team)",
+    "notVisible": "Not visible to you",
+    "notRegistered": "No document with this code yet",
+    "milestones": {
+      "heading": "Milestones",
+      "none": "No milestones yet.",
+      "add": "Add Milestone",
+      "edit": "Edit Milestone",
+      "code": "Code",
+      "name": "Name",
+      "dueDate": "Date",
+      "noDate": "no date",
+      "deleteConfirm": "Delete milestone \"{{name}}\"? The targets planned for it are removed from every deliverable."
+    },
+    "lead": {
+      "label": "Lead",
+      "none": "No lead",
+      "hint": "The lead edits this team's plan, besides the project administrators."
+    },
+    "deliverable": {
+      "add": "Add Deliverable",
+      "edit": "Edit Deliverable",
+      "delete": "Delete",
+      "deleteConfirm": "Delete the planned deliverable {{code}}?",
+      "codeHint": "Follows the project's naming standard, e.g. the code the document will be uploaded with.",
+      "targets": "Planned Suitability and Revision per Milestone",
+      "suitability": "Suitability",
+      "revision": "Revision",
+      "notes": "Notes",
+      "save": "Save",
+      "saved": "Deliverable saved."
+    },
+    "import": {
+      "button": "Import",
+      "title": "Import a Delivery Plan",
+      "hint": "An Excel (.xlsx) or CSV file with a header row: Document Code, Title, Task Team, Discipline, Type, a column per milestone (\"S2 / P01\"), Due Shared, Due Published, Notes. Rows are matched by document code: new codes are added, existing ones updated. The exported file can be imported again.",
+      "file": "File",
+      "into": "Rows without a task team go to",
+      "check": "Check",
+      "apply": "Import",
+      "report": "{{created}} new, {{updated}} updated, {{unchanged}} unchanged.",
+      "errors": "Fix these rows first; nothing was imported:",
+      "row": "Row {{row}}",
+      "done": "Imported: {{created}} new, {{updated}} updated."
+    },
+    "cancel": "Cancel"
   }
 }

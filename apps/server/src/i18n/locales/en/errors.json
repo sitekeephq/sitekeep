@@ -23,5 +23,7 @@
     "readOnly": "This access token has read-only permission."
   },
   "moduleOff": "This module is not enabled on this installation.",
-  "licenseReadOnly": "The licence for this module has expired: it is read-only until the licence is renewed."
+  "licenseReadOnly": "The licence for this module has expired: it is read-only until the licence is renewed.",
+  "passwordCommon": "This password is too common or has appeared in data breaches. Choose a less predictable one.",
+  "passwordPersonal": "The password must not contain your name or e-mail address."
 }

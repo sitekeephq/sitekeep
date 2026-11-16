@@ -253,5 +253,99 @@
     "noAccess": "Bu dosyayı açma yetkiniz yok.",
     "summaryBy": "yerini alan: {{target}}",
     "summarySupersedes": "yerini aldığı: {{target}}"
+  },
+  "deliveryPlan": {
+    "title": "Teslim Planı",
+    "description": "Her görev ekibinin neyi, ne zaman, hangi uygunluk ve revizyonla teslim edeceği (ISO 19650 TIDP ve MIDP). Durum, CDE'deki dokümanlardan gelir.",
+    "tabs": {
+      "label": "Planlar",
+      "midp": "Ana Teslim Planı (MIDP)",
+      "tidp": "{{team}} (TIDP)"
+    },
+    "export": {
+      "xlsx": "Excel'e Aktar",
+      "csv": "CSV'ye Aktar"
+    },
+    "filters": {
+      "search": "Kod ya da başlık ara",
+      "team": "Görev Ekibi",
+      "allTeams": "Tüm Ekipler",
+      "status": "Durum",
+      "allStatuses": "Tüm Durumlar",
+      "late": "Yalnız Gecikenler"
+    },
+    "columns": {
+      "code": "Doküman Kodu",
+      "title": "Başlık",
+      "team": "Görev Ekibi",
+      "discipline": "Disiplin",
+      "docType": "Tip",
+      "dueShared": "Paylaşım Tarihi",
+      "duePublished": "Yayın Tarihi",
+      "status": "Durum",
+      "document": "Doküman",
+      "actions": "İşlemler"
+    },
+    "statuses": {
+      "not_started": "Başlamadı",
+      "wip": "Çalışma",
+      "shared": "Paylaşılan",
+      "published": "Yayınlanan"
+    },
+    "late": {
+      "shared": "Gecikti: Paylaşılmadı",
+      "published": "Gecikti: Yayınlanmadı"
+    },
+    "summary": "{{count}} teslim · {{late}} geciken",
+    "empty": "Henüz planlanmış teslim yok.",
+    "emptyFiltered": "Filtrelere uyan teslim yok.",
+    "noTeams": "Bu projede henüz görev ekibi yok. Proje yöneticileri Proje Ayarları → CDE → Görev Ekipleri'nden oluşturur.",
+    "notMember": "Bu projede bir görev ekibinde değilsiniz; size gösterilecek teslim planı yok. Proje yöneticileri planın tamamını görür.",
+    "noTeam": "(ekipsiz)",
+    "notVisible": "Size görünmüyor",
+    "notRegistered": "Bu kodla henüz doküman yok",
+    "milestones": {
+      "heading": "Kilometre Taşları",
+      "none": "Henüz kilometre taşı yok.",
+      "add": "Kilometre Taşı Ekle",
+      "edit": "Kilometre Taşını Düzenle",
+      "code": "Kod",
+      "name": "Ad",
+      "dueDate": "Tarih",
+      "noDate": "tarihsiz",
+      "deleteConfirm": "\"{{name}}\" kilometre taşı silinsin mi? Ona göre planlanan hedefler bütün teslimlerden kaldırılır."
+    },
+    "lead": {
+      "label": "Sorumlu",
+      "none": "Sorumlu Yok",
+      "hint": "Sorumlu, proje yöneticilerinin yanında bu ekibin planını düzenler."
+    },
+    "deliverable": {
+      "add": "Teslim Ekle",
+      "edit": "Teslimi Düzenle",
+      "delete": "Sil",
+      "deleteConfirm": "{{code}} planlanan teslimi silinsin mi?",
+      "codeHint": "Projenin isimlendirme standardına uyar; dokümanın yükleneceği kod.",
+      "targets": "Kilometre Taşına Göre Planlanan Uygunluk ve Revizyon",
+      "suitability": "Uygunluk",
+      "revision": "Revizyon",
+      "notes": "Notlar",
+      "save": "Kaydet",
+      "saved": "Teslim kaydedildi."
+    },
+    "import": {
+      "button": "İçe Aktar",
+      "title": "Teslim Planını İçe Aktar",
+      "hint": "Başlık satırı olan bir Excel (.xlsx) ya da CSV dosyası: Doküman Kodu, Başlık, Görev Ekibi, Disiplin, Tip, her kilometre taşı için bir sütun (\"S2 / P01\"), Paylaşım Teslim Tarihi, Yayın Teslim Tarihi, Notlar. Satırlar doküman koduyla eşlenir: yeni kodlar eklenir, var olanlar güncellenir. Dışa aktarılan dosya yeniden içe aktarılabilir.",
+      "file": "Dosya",
+      "into": "Ekibi yazılmayan satırların ekibi",
+      "check": "Kontrol Et",
+      "apply": "İçe Aktar",
+      "report": "{{created}} yeni, {{updated}} güncellenen, {{unchanged}} değişmeyen.",
+      "errors": "Önce bu satırları düzeltin; hiçbir şey aktarılmadı:",
+      "row": "Satır {{row}}",
+      "done": "Aktarıldı: {{created}} yeni, {{updated}} güncellenen."
+    },
+    "cancel": "Vazgeç"
   }
 }

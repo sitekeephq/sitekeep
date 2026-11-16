@@ -18,6 +18,8 @@ import { devToolsEnabled } from "../dev/flag.js";
 import { devRoutes } from "../dev/routes.js";
 import { authRoutes } from "../auth/routes.js";
 import { invitationRoutes } from "../auth/invitation-routes.js";
+import { signInSecurityRoutes } from "../auth/security-routes.js";
+import { oidcRoutes } from "../auth/oidc-routes.js";
 import { adminRoutes } from "../admin/routes.js";
 import { projectRoutes } from "../projects/routes.js";
 import { documentRoutes } from "../modules/documents/routes.js";
@@ -39,6 +41,8 @@ import { AskBridge } from "../core/platform/ask-bridge.js";
 import { coordinationRoutes } from "../coordination/routes/coordination.js";
 import { idsRoutes } from "../coordination/routes/ids.js";
 import { enforceTokenScope } from "../core/security/token-scope.js";
+import { enforceProjectOpen } from "../closeout/closed.js";
+import { closeoutRoutes } from "../closeout/routes.js";
 import { reportRoutes } from "../reports/routes.js";
 import { docIntelRoutes } from "../docintel/routes.js";
 import { sheetRoutes } from "../sheets/routes.js";
@@ -50,6 +54,7 @@ import { officeRoutes, officeSourceRoutes } from "../office/routes.js";
 import { hubRoutes } from "../workflow/routes/hub.js";
 import { resolveOAuthOptions } from "../oauth/config.js";
 import { FailureLimiter } from "../oauth/rate-limit.js";
+import { SignInSecurity } from "../auth/sign-in-security.js";
 import { foundationRoutes } from "../oauth/foundation.js";
 import { oauthServerRoutes } from "../oauth/routes.js";
 import { oauthApiRoutes } from "../oauth/api-routes.js";
@@ -58,10 +63,14 @@ import { opencdePageRoutes } from "../opencde/pages.js";
 import { newCspNonce, registerSecurityHeaders, withNonce } from "../privacy/headers.js";
 import { configureOutbound, withOutboundContext } from "../privacy/outbound.js";
 import { privacyRoutes } from "../privacy/routes.js";
+import { privacyNoticeRoutes } from "../privacy/notice.js";
+import { securityTxtRoutes } from "../privacy/security-txt.js";
+import { dataSubjectRoutes } from "../privacy/subject/routes.js";
 import { cdeRoutes } from "../cde/routes.js";
 import { auditRoutes } from "../audit/routes.js";
 import { taskTeamRoutes } from "../cde/team-routes.js";
 import { cdeCodesRoutes } from "../cde/codes-routes.js";
+import { deliveryPlanRoutes } from "../cde/delivery-plan-routes.js";
 import { loadPrivacyState } from "../privacy/settings.js";
 import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
@@ -99,6 +108,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
     ...input,
     oauth,
     oauthLimiter: new FailureLimiter(oauth.tokenFailureLimit, oauth.tokenFailureWindowMs),
+    signInSecurity: input.signInSecurity ?? new SignInSecurity(input.db),
     secretKey,
     askBridge: input.askBridge ?? new AskBridge(),
     converters,
@@ -135,7 +145,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
   app.addHook("onRequest", async (req) => {
     // In-process calls of the "Sor" assistant carry a short-lived bridge key instead of a token.
     const bridged = deps.askBridge.lookup(req);
-    req.user = bridged !== undefined ? bridged : await authenticate(deps.db, req);
+    req.user = bridged !== undefined ? bridged : await authenticate(deps.db, deps.signInSecurity, req);
   });
 
   // Privacy (docs/features/PRIVACY.md): settings in memory, every outbound call logged with the request's
@@ -157,6 +167,8 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
         const open = req.routeOptions.config && (req.routeOptions.config as { public?: boolean }).public;
         if (!open && !req.user) throw new HttpError(401, "unauthorized", msg("errors:unauthorized"));
         enforceTokenScope(req);
+        // A closed project (close-out archive, ISO 19650-2 §5.8.1) refuses uploads and edits.
+        await enforceProjectOpen(deps.db, req);
       });
       api.get("/health", { config: { public: true } }, async () => ({ ok: true }));
       // Installed SiteKeep modules (signed-in only): the stdio MCP server offers only their tools
@@ -171,6 +183,8 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       }));
       await aboutRoutes(api);
       await authRoutes(api, deps);
+      await signInSecurityRoutes(api, deps);
+      await oidcRoutes(api, deps);
       await invitationRoutes(api, deps);
       await adminRoutes(api, deps);
       await projectRoutes(api, deps);
@@ -207,10 +221,14 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await oauthApiRoutes(api, deps);
       await opencdePageRoutes(api, deps);
       await privacyRoutes(api, deps);
+      await privacyNoticeRoutes(api, deps);
+      await dataSubjectRoutes(api, deps);
       await cdeRoutes(api, deps);
       await auditRoutes(api, deps);
       await taskTeamRoutes(api, deps);
       await cdeCodesRoutes(api, deps);
+      await deliveryPlanRoutes(api, deps);
+      await closeoutRoutes(api, deps);
       // Developer tools: registered only on a development server (CDE_DEV_TOOLS=1, not production).
       if (deps.devTools) await devRoutes(api, deps);
     },
@@ -219,6 +237,8 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
 
 
   // OpenCDE Foundation API 1.1 and the built-in OAuth2 server (docs/features/OPENCDE.md), outside /api/v1.
+  // RFC 9116 security.txt (SECURITY.md), outside /api/v1.
+  await securityTxtRoutes(app, deps);
   await foundationRoutes(app, deps);
   await oauthServerRoutes(app, deps);
   // OpenCDE Documents API 1.0 (upload / select documents), outside /api/v1.
@@ -275,7 +295,7 @@ export function redactUrl(url: string): string {
     .replace(/(\/opencde\/sessions\/)[^/?#]+/i, "$1***");
 }
 
-async function authenticate(db: Db, req: FastifyRequest): Promise<AuthUser | null> {
+async function authenticate(db: Db, security: SignInSecurity, req: FastifyRequest): Promise<AuthUser | null> {
   const header = req.headers.authorization;
   const token = header?.startsWith("Bearer ") ? header.slice(7).trim() : req.cookies?.[SESSION_COOKIE];
   if (!token) return null;
@@ -290,10 +310,12 @@ async function authenticate(db: Db, req: FastifyRequest): Promise<AuthUser | nul
       email: users.email,
       name: users.name,
       isAdmin: users.isAdmin,
+      isAuditor: users.isAuditor,
       companyId: users.companyId,
       prefs: users.prefs,
       disabled: users.disabled,
       lastUsedAt: tokens.lastUsedAt,
+      createdAt: tokens.createdAt,
       oauthClientId: tokens.oauthClientId,
       oauthScopes: tokens.oauthScopes,
       oauthClientEnabled: oauthClients.enabled,
@@ -303,6 +325,11 @@ async function authenticate(db: Db, req: FastifyRequest): Promise<AuthUser | nul
     .leftJoin(oauthClients, eq(oauthClients.id, tokens.oauthClientId))
     .where(and(eq(tokens.tokenHash, hashToken(token)), or(isNull(tokens.expiresAt), gt(tokens.expiresAt, now))));
   if (!row || row.disabled) return null;
+  // Browser sessions end after the administrator's absolute and idle limits (G-4); the ended row goes now.
+  if (row.kind === "session" && !(await security.sessionAlive(row.createdAt, row.lastUsedAt))) {
+    await db.delete(tokens).where(eq(tokens.id, row.tokenId));
+    return null;
+  }
   // OAuth access tokens stop working while their client is disabled.
   if (row.kind === "oauth" && !row.oauthClientEnabled) return null;
   // Touch at most once a minute.
@@ -314,6 +341,7 @@ async function authenticate(db: Db, req: FastifyRequest): Promise<AuthUser | nul
     email: row.email,
     name: row.name,
     isAdmin: row.isAdmin,
+    isAuditor: row.isAuditor,
     companyId: row.companyId,
     mustChangePassword: !!row.prefs?.mustChangePassword,
     language: row.prefs?.language ?? null,

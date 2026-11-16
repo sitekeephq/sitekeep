@@ -9,10 +9,38 @@ export type PrivacyAiMode = "off" | "local_only" | "allow_external";
 /** Months the personal part of the audit log (IP, user agent, e-mail) is kept (Privacy Centre). */
 export const AUDIT_PERSONAL_RETENTION = { default: 12, min: 1, max: 120 } as const;
 
+/** Recycle bin auto-purge choices in days (null = off, the default). */
+export const TRASH_PURGE_DAYS = [30, 90, 180, 365] as const;
+
+/** Audit log retention in years (null = unlimited, the default; at least 1 year: ISO 19650, contracts). */
+export const AUDIT_LOG_RETENTION = { min: 1, max: 50 } as const;
+
+/** Finished personal data exports (ZIP) are deleted this many days after they were built. */
+export const PERSONAL_EXPORT_KEEP_DAYS = 7;
+
+/** What the daily retention job can delete (disposal record, docs/features/DATA_SUBJECT_RIGHTS.md). */
+export type DisposalCategory =
+  | "trash_files"
+  | "trash_folders"
+  | "audit_log"
+  | "audit_personal"
+  | "outbound_log"
+  | "sessions"
+  | "api_tokens"
+  | "oauth_tokens"
+  | "oauth_codes"
+  | "oauth_refresh_tokens"
+  | "invitations"
+  | "personal_exports";
+
 export interface PrivacySettingsDto {
   logRetentionDays: number;
   /** Personal part of the audit log (IP address, user agent, e-mail) is deleted after this many months. */
   auditPersonalRetentionMonths: number;
+  /** Recycle bin items deleted for good this many days after they were deleted (null = never). */
+  trashPurgeDays: number | null;
+  /** Audit log rows deleted after this many years (null = kept for the life of the installation). */
+  auditLogRetentionYears: number | null;
   /** "İç ağ" list: exact host, "*.firma.com.tr" or an IPv4 range "10.20.0.0/16". */
   lanHosts: string[];
   /** "Yerel Modelde de Maskele". */
@@ -91,4 +119,26 @@ export interface OutboundLogPageDto {
 /** The promise at the top of Gizlilik Merkezi. */
 export function privacyStatement(lang: string = SHARED_DEFAULT_LANGUAGE): string {
   return sharedText(lang, "privacy.statement");
+}
+
+/** A personal data export of one user (P1-1, docs/features/DATA_SUBJECT_RIGHTS.md). */
+export interface PersonalDataExportDto {
+  id: string;
+  userId: string;
+  status: "queued" | "running" | "done" | "failed";
+  requestedAt: string;
+  finishedAt: string | null;
+  /** ZIP size in bytes when done. */
+  size: number | null;
+  includeFiles: boolean;
+  /** Deleted (with its ZIP) after this time. */
+  expiresAt: string | null;
+  error: string | null;
+}
+
+/** Result of "anonymise user" (P1-2). */
+export interface AnonymiseResultDto {
+  id: string;
+  name: string;
+  removed: { tokens: number; invitations: number; auditPersonal: number; outboundRows: number; importedAuthor: number };
 }

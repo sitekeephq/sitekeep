@@ -7,7 +7,7 @@ commit `{{COMMIT}}`
 | **SiteKeep Community** (AGPL-3.0, no licence required) | `sitekeep-community-{{VERSION}}-linux-{{ARCH}}.tar.gz` | `ghcr.io/sitekeephq/sitekeep:{{VERSION}}` |
 | **SiteKeep Enterprise** (modules unlocked by licence) | `sitekeep-enterprise-{{VERSION}}-linux-{{ARCH}}.tar.gz` | `ghcr.io/sitekeephq/sitekeep-enterprise:{{VERSION}}` |
 
-Each package comes with a `.sha256`; dependency list (SBOM, CycloneDX): `sitekeep-{{VERSION}}-sbom.cdx.json`.
+Each package comes with a `.sha256`; dependency list (SBOM, CycloneDX): `sitekeep-{{VERSION}}-sbom.cdx.json`, attached to this release (public repository: by its SBOM workflow, SECURITY.md).
 This page is for internal distribution (private repository). The Enterprise package is delivered to customers through the Odoo customer portal
 (docs/onprem/installation-bundle.md, release plan C-3); the Community package and image are public once the repository is opened.
 

@@ -69,6 +69,7 @@ import { templateFromRequest } from "./template-built-ins.js";
 import { parseProjectTemplate } from "./template-schemas.js";
 import { applyTemplateCde } from "../cde/settings.js";
 import { assignWipOwnerTeams, ensureCompanyTeams, type TeamSeedCompany } from "../cde/teams.js";
+import { applyTemplateDeliveryPlan } from "../cde/delivery-plan.js";
 import { applyTemplateParts, insertTemplateRoles, templatePartAvailabilityOf } from "./template-parts.js";
 import {
   createRequestSchema,
@@ -633,6 +634,9 @@ export async function createProjectFromTemplate(
       : [...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code }));
     const { teams } = await ensureCompanyTeams(txDb, projectId, [...slotTeams, ...(user.companyId ? [{ companyId: user.companyId }] : [])]);
     await assignWipOwnerTeams(txDb, projectId, teams);
+    // ISO 19650 delivery plan (ISO-7): the template's milestones, dated from the project start.
+    const start = details?.startDate && /^\d{4}-\d{2}-\d{2}$/.test(details.startDate) ? new Date(`${details.startDate}T00:00:00Z`) : new Date();
+    await applyTemplateDeliveryPlan(txDb, projectId, template.deliveryPlan, start);
     return { row: row!, workflowIds };
   });
   // Template format v2 parts: transmittal (core), RFI, submittals, meetings (Manage), forms (Field).

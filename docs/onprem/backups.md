@@ -163,6 +163,24 @@ No `docker compose down -v` in production.
 
 ---
 
+## Encryption of disks and backups (operator's responsibility)
+
+SiteKeep does not encrypt the database, the stored files or the backups today; only secrets are
+encrypted (`CDE_SECRET_KEY`). In-app encryption is planned. Until then the operator encrypts:
+
+- **the server disk:** LUKS on Linux, BitLocker on a Windows / Hyper-V host, the cloud provider's disk
+  encryption;
+- **every backup copy that leaves the server:** `gpg --symmetric --cipher-algo AES256`, `age -p`, or a
+  backup tool that encrypts by itself (restic, Borg); the passphrase is kept apart from the backups;
+- **the key file** (`.env` / `config/app.env` with `CDE_SECRET_KEY`): separately and encrypted, in a
+  second place.
+
+A deletion (retention, anonymisation) reaches only backups taken afterwards: set the backup retention
+(`CDE_BACKUP_KEEP`) to fit the organisation's retention policy. How-to:
+[encryption at rest](docker-compose.md#encryption-at-rest).
+
+---
+
 ## 5. A backup that will not open
 
 | Symptom | Common cause |

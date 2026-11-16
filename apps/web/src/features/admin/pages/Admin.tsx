@@ -14,13 +14,21 @@ import { AdminOAuthSection } from "./AdminOAuth";
 import { AdminPrivacySection } from "./AdminPrivacy";
 import { AdminStatusSection } from "./AdminStatus";
 import { AdminLicenseSection } from "./AdminLicense";
+import { AdminSecuritySection } from "./AdminSecurity";
+import { AdminSecurityLogSection, SecurityAlertCards } from "./AdminSecurityLog";
+import { securityApi } from "../../../shared/api/api-security";
 import { invitationsApi } from "../../../shared/api/api-invitations";
+import { PersonalDataDialog, isAnonymisedUser } from "./AdminDataSubject";
 
-type AdminTab = "users" | "ai" | "office" | "oauth" | "privacy" | "status" | "license" | "forma";
-const ALL_ADMIN_TABS: AdminTab[] = ["users", "ai", "office", "oauth", "privacy", "status", "license", "forma"];
+type AdminTab = "users" | "security" | "securityLog" | "ai" | "office" | "oauth" | "privacy" | "status" | "license" | "forma";
+const ALL_ADMIN_TABS: AdminTab[] = ["users", "security", "securityLog", "ai", "office", "oauth", "privacy", "status", "license", "forma"];
+/** What a read-only auditor sees (docs/features/SECURITY_LOG.md#auditor). */
+const AUDITOR_TABS: AdminTab[] = ["securityLog", "privacy"];
 
 export function AdminPage() {
   const { t } = useTranslation("admin");
+  const { user } = useAuth();
+  const isAdmin = !!user?.isAdmin;
   // ?tab=privacy opens a tab directly (the "dış bağlantılar kapalı" banner links there).
   const [params] = useSearchParams();
   const wanted = params.get("tab") as AdminTab | null;
@@ -28,8 +36,12 @@ export function AdminPage() {
   const AdminAiSection = webCapability("ai.ui")?.AdminAiSection;
   // "Forma Eşitleme" is the Connect module's.
   const AdminFormaSyncSection = webCapability("connect.ui")?.AdminFormaSyncSection;
-  const ADMIN_TABS = ALL_ADMIN_TABS.filter((k) => (k !== "ai" || !!AdminAiSection) && (k !== "forma" || !!AdminFormaSyncSection));
-  const [tab, setTab] = useState<AdminTab>(wanted && ADMIN_TABS.includes(wanted) ? wanted : "users");
+  const ADMIN_TABS = isAdmin
+    ? ALL_ADMIN_TABS.filter((k) => (k !== "ai" || !!AdminAiSection) && (k !== "forma" || !!AdminFormaSyncSection))
+    : AUDITOR_TABS;
+  const [tab, setTab] = useState<AdminTab>(wanted && ADMIN_TABS.includes(wanted) ? wanted : ADMIN_TABS[0]!);
+  /** An alert's "Show Event": the security log filtered to the row that raised it. */
+  const [focus, setFocus] = useState<number | null>(null);
   return (
     <div className="page stack">
       <div className="row wrap">
@@ -41,8 +53,19 @@ export function AdminPage() {
           </button>
         ))}
       </div>
+      {!isAdmin && <p className="notice" style={{ margin: 0 }}>{t("auditor.notice")}</p>}
+      <SecurityAlertCards
+        onShowEvent={(id) => {
+          setFocus(id);
+          setTab("securityLog");
+        }}
+      />
       {tab === "users" ? (
         <UsersAndCompanies />
+      ) : tab === "security" ? (
+        <AdminSecuritySection />
+      ) : tab === "securityLog" ? (
+        <AdminSecurityLogSection focus={focus} onFocusCleared={() => setFocus(null)} />
       ) : tab === "ai" && AdminAiSection ? (
         <AdminAiSection />
       ) : tab === "office" ? (
@@ -50,7 +73,7 @@ export function AdminPage() {
       ) : tab === "oauth" ? (
         <AdminOAuthSection />
       ) : tab === "privacy" ? (
-        <AdminPrivacySection />
+        <AdminPrivacySection readOnly={!isAdmin} />
       ) : tab === "status" ? (
         <AdminStatusSection />
       ) : tab === "license" ? (
@@ -64,11 +87,12 @@ export function AdminPage() {
 
 function UsersAndCompanies() {
   const { t } = useTranslation(["admin", "common"]);
-  const { prompt } = useAsk();
+  const { prompt, confirm } = useAsk();
   const { user: me } = useAuth();
   const { data: users, reload } = useLoad(() => api.users(), []);
   const { data: companies, reload: reloadCompanies } = useLoad(() => api.companies(), []);
   const [newUser, setNewUser] = useState(false);
+  const [personal, setPersonal] = useState<string | null>(null);
   const [company, setCompany] = useState("");
   const [companyCode, setCompanyCode] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -117,6 +141,11 @@ function UsersAndCompanies() {
                       {t("users.pending")}
                     </span>
                   )}
+                  {isAnonymisedUser(u) && (
+                    <span className="badge" style={{ marginLeft: 6 }}>
+                      {t("users.anonymised")}
+                    </span>
+                  )}
                 </td>
                 <td className="muted">{u.email}</td>
                 <td data-label={t("common:fields.company")}>
@@ -133,9 +162,24 @@ function UsersAndCompanies() {
                   </select>
                 </td>
                 <td className="pc-inline" data-label={t("users.columns.systemAdmin")}>
-                  {u.isAdmin ? <span className="badge info">{t("common:actions.yes")}</span> : <span className="muted">{t("common:dash")}</span>}
+                  {u.isAdmin ? <span className="badge info">{t("common:actions.yes")}</span> : !u.isAuditor && <span className="muted">{t("common:dash")}</span>}
+                  {u.isAuditor && (
+                    <span className="badge" style={{ marginLeft: u.isAdmin ? 6 : 0 }} title={t("users.auditorHelp")}>
+                      {t("users.auditorBadge")}
+                    </span>
+                  )}
+                  {u.twoFactor && (
+                    <span className="badge ok" style={{ marginLeft: 6 }} title={t("users.twoFactorOn")}>
+                      {t("users.twoFactorBadge")}
+                    </span>
+                  )}
                 </td>
                 <td className="row pc-actions">
+                  {!isAnonymisedUser(u) && (
+                    <button className="small" onClick={() => setPersonal(u.id)}>
+                      {t("users.personal.open")}
+                    </button>
+                  )}
                   <button
                     className="small"
                     onClick={() =>
@@ -156,12 +200,59 @@ function UsersAndCompanies() {
                       {u.isAdmin ? t("users.actions.revokeAdmin") : t("users.actions.makeAdmin")}
                     </button>
                   )}
+                  {!u.pending && !isAnonymisedUser(u) && (
+                    <button className="small" onClick={() => void act(() => api.updateUser(u.id, { isAuditor: !u.isAuditor }))}>
+                      {u.isAuditor ? t("users.actions.revokeAuditor") : t("users.actions.makeAuditor")}
+                    </button>
+                  )}
+                  {!u.pending && (
+                    <button
+                      className="small"
+                      onClick={() =>
+                        void confirm({
+                          title: t("users.actions.endSessions"),
+                          message: t("users.endSessionsConfirm", { name: u.name }),
+                          confirmLabel: t("users.actions.endSessions"),
+                          danger: true,
+                        }).then((ok) => {
+                          if (ok) void act(() => securityApi.endUserSessions(u.id));
+                        })
+                      }
+                    >
+                      {t("users.actions.endSessions")}
+                    </button>
+                  )}
+                  {u.twoFactor && (
+                    <button
+                      className="small danger"
+                      onClick={() =>
+                        void confirm({
+                          title: t("users.actions.resetTwoFactor"),
+                          message: t("users.resetTwoFactorConfirm", { name: u.name }),
+                          confirmLabel: t("users.actions.resetTwoFactor"),
+                          danger: true,
+                        }).then((ok) => {
+                          if (ok) void act(() => securityApi.resetTwoFactor(u.id));
+                        })
+                      }
+                    >
+                      {t("users.actions.resetTwoFactor")}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {personal && users?.find((u) => u.id === personal) && (
+        <PersonalDataDialog
+          user={users.find((u) => u.id === personal)!}
+          isSelf={personal === me?.id}
+          onClose={() => setPersonal(null)}
+          onChanged={() => reload()}
+        />
+      )}
       <div className="card">
         <h2>{t("companies.title")}</h2>
         <p className="muted small" style={{ marginTop: 0 }}>
@@ -450,6 +541,7 @@ function NewUserDialog({ companies, onClose, onCreated }: { companies: CompanyDt
   const [password, setPassword] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuditor, setIsAuditor] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Kapasite (docs/onprem/capacity.md §5): warn before the account pushes the server past its tier; never blocks.
   const { data: capacity } = useLoad(() => api.adminCapacity(), []);
@@ -465,7 +557,7 @@ function NewUserDialog({ companies, onClose, onCreated }: { companies: CompanyDt
         onSubmit={async (e) => {
           e.preventDefault();
           try {
-            await api.createUser({ email, name, password, companyId: companyId || null, isAdmin });
+            await api.createUser({ email, name, password, companyId: companyId || null, isAdmin, isAuditor });
             onCreated();
             onClose();
           } catch (err) {
@@ -491,6 +583,10 @@ function NewUserDialog({ companies, onClose, onCreated }: { companies: CompanyDt
         <label className="row" style={{ color: "var(--text)", fontSize: 13 }}>
           <input type="checkbox" style={{ width: "auto" }} checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />{" "}
           {t("newUser.fields.systemAdmin")}
+        </label>
+        <label className="row" style={{ color: "var(--text)", fontSize: 13 }}>
+          <input type="checkbox" style={{ width: "auto" }} checked={isAuditor} onChange={(e) => setIsAuditor(e.target.checked)} />{" "}
+          {t("newUser.fields.auditor")}
         </label>
         {error && <p className="error">{error}</p>}
         <div className="dialog-actions">

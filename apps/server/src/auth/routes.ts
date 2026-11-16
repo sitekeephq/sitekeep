@@ -3,11 +3,11 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { PROVISION_PASSWORD } from "@sitekeep/shared";
-import type { AppDeps } from "../app/deps.js";
+import type { ResolvedDeps } from "../app/deps.js";
 import { SESSION_COOKIE } from "../app/deps.js";
 import { prefsForPassword, toUserDto } from "./dto.js";
 import { audit } from "../core/platform/audit.js";
-import { hashPassword, hashToken, newToken, passwordProblem, verifyPassword } from "../core/security/auth.js";
+import { hashPassword, hashToken, newToken, passwordProblem, verifyNoPassword, verifyPassword } from "../core/security/auth.js";
 import type { AuthUser } from "../core/security/access.js";
 import { getMcpSettings, type McpSettings } from "../ai/settings.js";
 import type { Db } from "../db/index.js";
@@ -16,9 +16,12 @@ import { HttpError, badRequest, forbidden, notFound } from "../core/platform/htt
 import { outboundFetch } from "../privacy/outbound.js";
 import { resolveGoogleUser } from "./google-settings.js";
 import { GOOGLE_CONNECTION, GOOGLE_PURPOSE, GOOGLE_TOKEN_URL, GOOGLE_USERINFO_URL, googleSignInRefusal } from "./google-connection.js";
-import { createSession } from "./session.js";
+import { afterFirstFactor } from "./session.js";
+import { oidcButtons } from "./oidc-routes.js";
+import { endSessions } from "./sign-in-security.js";
 import { INVITATION_COOKIE } from "./invitation-routes.js";
 import { acceptInvitation, findOpenInvitation } from "./invitations.js";
+import { checkPrivacyNotice, noticeRequired, recordPrivacyNotice, setNoticeCookie, takeNoticeCookie } from "../privacy/notice.js";
 import { msg, render, requestLanguage, type Msg } from "../i18n/index.js";
 
 const GOOGLE_STATE_COOKIE = "cde_google_state";
@@ -29,17 +32,23 @@ async function knownUserId(db: Db, email: string): Promise<string | null> {
   return u?.id ?? null;
 }
 
-export async function authRoutes(api: FastifyInstance, { db, secureCookies, googleAuth }: AppDeps) {
+export async function authRoutes(api: FastifyInstance, deps: ResolvedDeps) {
+  const { db, secureCookies, googleAuth, signInSecurity: security } = deps;
   const apiGoogleAuth = googleAuth;
-  // Google is offered while it is configured and its connection is on (Privacy Centre, google-connection.ts).
+  // Google is offered while it is configured and its connection is on (Privacy Centre, google-connection.ts);
+  // each OpenID Connect provider while it is enabled and its own connection is on (oidc-routes.ts).
   api.get("/auth/methods", { config: { public: true } }, async () => ({
     password: true,
     google: !!apiGoogleAuth && !(await googleSignInRefusal(db)),
+    oidc: await oidcButtons(db),
   }));
 
-  api.get("/auth/google", { config: { public: true } }, async (_req, reply) => {
+  api.get("/auth/google", { config: { public: true } }, async (req, reply) => {
     if (!apiGoogleAuth) throw notFound(msg("auth:entities.googleSignIn"));
     if (await googleSignInRefusal(db)) return reply.redirect("/login?authError=google_disabled");
+    // The privacy notice version the person ticked on the sign-in page (privacy/notice.ts).
+    const notice = z.object({ notice: z.coerce.number().int().min(1).optional() }).safeParse(req.query);
+    setNoticeCookie(reply, notice.success ? notice.data.notice : null, !!secureCookies);
     const state = randomBytes(32).toString("base64url");
     reply.setCookie(GOOGLE_STATE_COOKIE, state, {
       path: "/api/v1/auth/google",
@@ -68,6 +77,7 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
     // Set by POST /invitations/google: accept that invitation when Google confirms the same address.
     const invitationToken = req.cookies[INVITATION_COOKIE];
     if (invitationToken) reply.clearCookie(INVITATION_COOKIE, { path: "/api/v1/auth/google" });
+    const noticeAck = takeNoticeCookie(req, reply);
     if (query.error) return reply.redirect("/login?authError=google_cancelled");
     if (await googleSignInRefusal(db)) return reply.redirect("/login?authError=google_disabled");
     if (!query.code || !query.state || !expectedState || query.state !== expectedState) {
@@ -105,8 +115,12 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
           await audit(db, { userId: await knownUserId(db, email), action: "auth.login_failed", details: { email, provider: "google", invitation: "email_mismatch" } });
           return reply.redirect("/login?authError=invitation_email_mismatch");
         }
+        const notice = await checkPrivacyNotice(db, found.user.id, noticeAck);
+        if (!notice.ok) return reply.redirect("/login?authError=privacy_notice_required");
         const user = await acceptInvitation(db, invitationToken, { name: profile.name, provider: "google" });
-        await createSession(db, user.id, reply, !!secureCookies);
+        await recordPrivacyNotice(db, user.id, notice.accept, "invitation_google");
+        // Two-factor on or required: the second step on the sign-in page (the session starts after it).
+        if (await afterFirstFactor(deps, user, reply, { provider: "google", invitation: true })) return reply.redirect("/login?twoFactor=1");
         await audit(db, { userId: user.id, action: "auth.login", details: { provider: "google", invitation: true } });
         return reply.redirect("/");
       }
@@ -115,7 +129,10 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
         await audit(db, { userId: await knownUserId(db, email), action: "auth.login_failed", details: { email, provider: "google" } });
         return reply.redirect("/login?authError=account_not_allowed");
       }
-      await createSession(db, resolved.user.id, reply, !!secureCookies);
+      const notice = await checkPrivacyNotice(db, resolved.user.id, noticeAck);
+      if (!notice.ok) return reply.redirect("/login?authError=privacy_notice_required");
+      await recordPrivacyNotice(db, resolved.user.id, notice.accept, "google");
+      if (await afterFirstFactor(deps, resolved.user, reply, { provider: "google" })) return reply.redirect("/login?twoFactor=1");
       await audit(db, {
         userId: resolved.user.id,
         action: "auth.login",
@@ -129,20 +146,40 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
   });
 
   api.post("/auth/login", { config: { public: true } }, async (req, reply) => {
-    const body = z.object({ email: z.string().trim().email().toLowerCase(), password: z.string() }).parse(req.body);
+    const body = z
+      .object({
+        email: z.string().trim().email().toLowerCase(),
+        password: z.string().max(1000),
+        /** Version of the privacy notice the person ticked "I have read it" for (privacy/notice.ts). */
+        privacyNoticeVersion: z.number().int().min(1).optional(),
+      })
+      .parse(req.body);
+    // G-1: locked IP or account → 429 with Retry-After, also for unknown addresses (no enumeration).
+    await security.guard(req, body.email);
     const [user] = await db.select().from(users).where(eq(users.email, body.email));
-    if (!user || user.disabled || !(await verifyPassword(body.password, user.passwordHash))) {
+    // An unknown address takes as long as a wrong password.
+    const passwordOk = user ? await verifyPassword(body.password, user.passwordHash) : await verifyNoPassword(body.password);
+    if (!user || user.disabled || !passwordOk) {
       // The address goes to the personal part of the log (details keep its hash); a known account by id.
       await audit(db, { userId: user?.id ?? null, action: "auth.login_failed", details: { email: body.email } });
+      await security.fail(req, { email: body.email, userId: user?.id ?? null, kind: "password" });
       throw new HttpError(401, "invalid_credentials", msg("auth:errors.invalidCredentials"));
     }
+    // Only after the password: the answer says nothing about an account to someone without it.
+    const notice = await checkPrivacyNotice(db, user.id, body.privacyNoticeVersion);
+    if (!notice.ok) throw noticeRequired();
+    await recordPrivacyNotice(db, user.id, notice.accept, "password");
     let signedIn = user;
     if (body.password === PROVISION_PASSWORD && !user.prefs?.mustChangePassword) {
       const prefs = prefsForPassword(user.prefs, body.password);
       const [updated] = await db.update(users).set({ prefs }).where(eq(users.id, user.id)).returning();
       if (updated) signedIn = updated;
     }
-    await createSession(db, signedIn.id, reply, !!secureCookies);
+    // Two-factor (G-2): the answer is { twoFactor: "verify" | "enrol" } and the session starts after the code.
+    // The account's failures are cleared only then, so guessing codes cannot hide behind the right password.
+    const challenge = await afterFirstFactor(deps, signedIn, reply, { provider: "password" });
+    if (challenge) return challenge;
+    security.succeed(body.email);
     await audit(db, { userId: signedIn.id, action: "auth.login" });
     return toUserDto(signedIn);
   });
@@ -160,13 +197,18 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
   });
 
   api.post("/auth/password", async (req) => {
-    const body = z.object({ currentPassword: z.string(), newPassword: z.string() }).parse(req.body);
+    const body = z.object({ currentPassword: z.string().max(1000), newPassword: z.string().max(1000) }).parse(req.body);
     const [user] = await db.select().from(users).where(eq(users.id, req.user!.id));
-    if (!user || !(await verifyPassword(body.currentPassword, user.passwordHash)))
+    if (!user) throw notFound(msg("auth:entities.user"));
+    // G-1: wrong current passwords count like failed sign-ins of the account.
+    await security.guard(req, user.email);
+    if (!(await verifyPassword(body.currentPassword, user.passwordHash))) {
+      await security.fail(req, { email: user.email, userId: user.id, kind: "password_change" });
       throw badRequest(msg("auth:errors.currentPasswordWrong"));
+    }
     if (body.newPassword === body.currentPassword) throw badRequest(msg("auth:errors.newPasswordSame"));
     if (body.newPassword === PROVISION_PASSWORD) throw badRequest(msg("auth:errors.provisionPassword"));
-    const problem = passwordProblem(body.newPassword);
+    const problem = passwordProblem(body.newPassword, { email: user.email, name: user.name });
     if (problem) throw badRequest(problem);
     await db
       .update(users)
@@ -175,8 +217,10 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
         prefs: prefsForPassword(user.prefs, body.newPassword),
       })
       .where(eq(users.id, user.id));
-    await audit(db, { userId: user.id, action: "auth.password_changed" });
-    return { ok: true };
+    // G-4: a new password ends the user's other sessions (this one stays).
+    const otherSessionsEnded = await endSessions(db, user.id, req.user!.token?.id ?? null);
+    await audit(db, { userId: user.id, action: "auth.password_changed", details: { otherSessionsEnded } });
+    return { ok: true, otherSessionsEnded };
   });
 
   // API tokens for the MCP server, AECPilot deliveries and scripts.

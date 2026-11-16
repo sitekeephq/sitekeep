@@ -5,7 +5,12 @@
         "created": "Proje oluşturuldu",
         "updated": "Proje güncellendi",
         "ai_updated": "Yapay zekâ ayarı değişti",
-        "created_from_template": "Proje şablondan oluşturuldu"
+        "created_from_template": "Proje şablondan oluşturuldu",
+        "closeout_archive_created": "Kapanış arşivi oluşturuldu",
+        "closeout_archive_downloaded": "Kapanış arşivi indirildi",
+        "closeout_archive_deleted": "Kapanış arşivi silindi",
+        "closed": "Proje kapatıldı (salt okunur)",
+        "reopened": "Proje yeniden açıldı"
       },
       "member": {
         "added": "Üye eklendi",
@@ -197,7 +202,12 @@
       },
       "audit": {
         "exported": "Denetim kaydı dışa aktarıldı",
-        "chain_started": "Denetim zinciri başladı"
+        "chain_started": "Denetim zinciri başladı",
+        "personal_split": "Kişisel veri zincirden ayrıldı",
+        "personal_expired": "Saklama süresi dolan kişisel veri silindi",
+        "personal_erased": "Bir kişinin kişisel verisi silindi",
+        "resealed": "Denetim zinciri yeniden mühürlendi",
+        "truncated": "Eski denetim kayıtları silindi (saklama)"
       },
       "sheet": {
         "updated": "Pafta bilgileri düzenlendi",
@@ -226,6 +236,86 @@
         "accepted": "Davet kabul edildi",
         "revoked": "Davet geri çekildi",
         "settings": "Davet ayarı değişti"
+      },
+      "delivery_plan": {
+        "milestone_created": "Teslim kilometre taşı eklendi",
+        "milestone_updated": "Teslim kilometre taşı değişti",
+        "milestone_deleted": "Teslim kilometre taşı silindi",
+        "lead_set": "Teslim planı sorumlusu atandı",
+        "deliverable_created": "Planlanan teslim eklendi",
+        "deliverable_updated": "Planlanan teslim değişti",
+        "deliverable_deleted": "Planlanan teslim silindi",
+        "imported": "Teslim planı içe aktarıldı",
+        "exported": "Teslim planı dışa aktarıldı"
+      },
+      "auth": {
+        "login": "Giriş yaptı",
+        "login_failed": "Başarısız giriş",
+        "locked": "Giriş kilitlendi",
+        "locks_cleared": "Giriş kilitleri kaldırıldı",
+        "password_changed": "Şifre değişti",
+        "security_settings": "Giriş güvenliği ayarları değişti",
+        "google_settings": "Google ile giriş ayarları değişti",
+        "oidc_login": "OpenID Connect ile giriş yapıldı",
+        "oidc_provider_created": "OpenID Connect sağlayıcısı eklendi",
+        "oidc_provider_updated": "OpenID Connect sağlayıcısı değişti",
+        "oidc_provider_deleted": "OpenID Connect sağlayıcısı silindi",
+        "sessions_ended": "Oturumlar sonlandırıldı",
+        "token_created": "Erişim anahtarı oluşturuldu",
+        "two_factor_enabled": "İki adımlı doğrulama açıldı",
+        "two_factor_disabled": "İki adımlı doğrulama kapatıldı",
+        "two_factor_recovery_codes": "Yeni kurtarma kodları",
+        "two_factor_reset": "İki adımlı doğrulama yönetici tarafından sıfırlandı"
+      },
+      "user": {
+        "created": "Kullanıcı oluşturuldu",
+        "updated": "Kullanıcı değişti",
+        "anonymised": "Kullanıcı anonimleştirildi",
+        "email_changed": "E-posta adresi düzeltildi",
+        "data_exported": "Kişisel veri dışa aktarımı hazırlandı",
+        "data_export_downloaded": "Kişisel veri dışa aktarımı indirildi"
+      },
+      "privacy": {
+        "kill_switch_on": "Tüm dış bağlantılar kapatıldı",
+        "kill_switch_off": "Dış bağlantılar yeniden açıldı",
+        "connection_updated": "Dış bağlantı değişti",
+        "disposals_exported": "İmha kaydı dışa aktarıldı"
+      },
+      "security": {
+        "alert_raised": "Güvenlik uyarısı verildi",
+        "alert_acknowledged": "Güvenlik uyarısı görüldü",
+        "alert_dismissed": "Güvenlik uyarısı kapatıldı",
+        "alert_settings": "Güvenlik uyarısı ayarları değişti"
+      },
+      "settings": {
+        "privacy_updated": "Gizlilik ayarları değişti",
+        "mcp_updated": "MCP ayarları değişti",
+        "office_updated": "Ofis ayarları değişti",
+        "office_tested": "Ofis bağlantısı denendi",
+        "sheets_ocr_updated": "Pafta metin tanıma ayarları değişti"
+      },
+      "oauth": {
+        "authorize": "OAuth yetkilendirmesi istendi",
+        "consent_granted": "OAuth erişimi verildi",
+        "consent_denied": "OAuth erişimi reddedildi",
+        "revoked": "OAuth erişimi geri alındı",
+        "client_created": "OAuth uygulaması eklendi",
+        "client_deleted": "OAuth uygulaması kaldırıldı",
+        "client_secret_rotated": "OAuth uygulama sırrı yenilendi",
+        "code_reused": "OAuth kodu yeniden kullanıldı",
+        "refresh_reused": "OAuth yenileme anahtarı yeniden kullanıldı",
+        "token_issued": "OAuth anahtarı verildi",
+        "token_refreshed": "OAuth anahtarı yenilendi"
+      },
+      "license": {
+        "installed": "Lisans yüklendi",
+        "removed": "Lisans kaldırıldı"
+      },
+      "retention": {
+        "completed": "Saklama işi veri sildi"
+      },
+      "trash": {
+        "auto_purged": "Çöp kutusu otomatik boşaltıldı"
       }
     },
     "columns": {
@@ -786,12 +876,66 @@
         "prev_mismatch": "bir kayıt eksik ya da sırası bozuk",
         "hash_mismatch": "kayıt değiştirilmiş",
         "personal_mismatch": "kaydın IP adresi, tarayıcı bilgisi ya da e-postası değiştirilmiş",
-        "reseal_archive_mismatch": "bir yeniden mühürlemenin arşivi değiştirilmiş"
-      }
+        "reseal_archive_mismatch": "bir yeniden mühürlemenin arşivi değiştirilmiş",
+        "truncation_mismatch": "zincirin başlangıcı bir saklama kontrol noktasıyla açıklanmıyor"
+      },
+      "truncated": "{{date}} tarihli saklama kesiminden sonra başlıyor"
     },
     "personalRemoved": {
       "retention": "silindi (saklama süresi)",
       "erased": "silindi (kişi talebi)"
+    }
+  },
+  "closeout": {
+    "heading": "Kapanış Arşivi",
+    "description": "Proje kapanışında (ISO 19650-2 §5.8.1) proje bilgilerini tek bir ZIP olarak arşivleyin: klasör yapısıyla Yayınlanan ve Arşivlenen dosyalar, her versiyonun manifesti (doküman kodu, bilgi kabı, revizyon, uygunluk, durum, SHA-256, onaylar, yerine geçme bağlantıları, isimlendirme kontrolü), zincir kontrolüyle denetim kaydı ve SHA256SUMS. Arşiv arka planda hazırlanır; {{days}} gün indirilebilir, sonra dosyası silinir.",
+    "options": {
+      "includeShared": "Paylaşılan Bilgileri de Ekle",
+      "versions": "Versiyonlar",
+      "latest": "Her Dosyanın Güncel Versiyonu",
+      "all": "Tüm Versiyonlar",
+      "closeProject": "Arşiv Eksiksiz Tamamlanınca Projeyi Kapat (Salt Okunur)"
+    },
+    "estimate": "{{files}} dosya, {{versions}} versiyon, {{size}}.",
+    "limit": "Sınır: {{size}}.",
+    "create": "Kapanış Arşivi Oluştur",
+    "scope": "Yayınlanan ve Arşivlenen",
+    "scopeWithShared": "Paylaşılan, Yayınlanan ve Arşivlenen",
+    "counts": "{{files}} versiyon, {{size}}",
+    "auditHead": "Denetim kaydı {{id}}, özet {{hash}}…",
+    "download": "İndir",
+    "expires": "{{date}} tarihine kadar indirilebilir",
+    "closedSince": "Proje {{date}} tarihinden beri kapalı (salt okunur), kapatan: {{name}}. Dosyalar görüntülenip indirilebilir; yükleme ve değişiklikler reddedilir.",
+    "columns": {
+      "created": "Oluşturulma",
+      "contents": "İçerik",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    "status": {
+      "queued": "Sırada",
+      "running": "Hazırlanıyor: {{done}} / {{total}} dosya",
+      "progress": "İlerleme",
+      "done": "Hazır",
+      "problems_one": "Hazır, {{count}} dosya eksik ya da değişmiş",
+      "problems_other": "Hazır, {{count}} dosya eksik ya da değişmiş",
+      "failed": "Başarısız",
+      "expired": "Süresi doldu (dosya silindi)"
+    },
+    "close": {
+      "action": "Projeyi Kapat",
+      "title": "Proje kapatılsın mı?",
+      "confirm": "Proje salt okunur olur: dosyalar görüntülenip indirilebilir, ancak kimse yükleme ya da değişiklik yapamaz. Projeyi yalnız bir sistem yöneticisi yeniden açabilir."
+    },
+    "reopen": {
+      "action": "Projeyi Yeniden Aç",
+      "title": "Proje yeniden açılsın mı?",
+      "reason": "Gerekçe (denetim kaydına yazılır, isteğe bağlı)"
+    },
+    "remove": {
+      "action": "Dosyayı Sil",
+      "title": "Arşiv dosyası silinsin mi?",
+      "confirm": "ZIP, indirme süresinin sonunu beklemeden şimdi silinir. Arşivin kaydı listede ve denetim kaydında kalır."
     }
   }
 }

@@ -15,6 +15,8 @@ import type {
   CapacityRunDto,
   CapacityRunMode,
   GoogleAuthSettings,
+  OidcButtonDto,
+  TwoFactorChallengeDto,
   CompanyDto,
   ReportCatalogDto,
   ReportDataResult,
@@ -408,8 +410,11 @@ export const api = {
   askSettings: () => get<AskSettings>("/admin/settings/ask"),
   updateAskSettings: (s: Partial<AskSettings>) => put<AskSettings>("/admin/settings/ask", s),
 
-  login: (email: string, password: string) => post<UserDto>("/auth/login", { email, password }),
-  authMethods: () => get<{ password: boolean; google: boolean }>("/auth/methods"),
+  /** The user, or { twoFactor } when a second step follows (api-security.ts). */
+  /** `privacyNoticeVersion`: the privacy notice version the person ticked "I have read it" for. */
+  login: (email: string, password: string, privacyNoticeVersion?: number) =>
+    post<UserDto | TwoFactorChallengeDto>("/auth/login", { email, password, ...(privacyNoticeVersion && { privacyNoticeVersion }) }),
+  authMethods: () => get<{ password: boolean; google: boolean; oidc?: OidcButtonDto[] }>("/auth/methods"),
   logout: () => post("/auth/logout"),
   me: () => get<UserDto | null>("/auth/me"),
   changePassword: (currentPassword: string, newPassword: string) =>
@@ -425,9 +430,9 @@ export const api = {
   updateCompany: (id: string, c: { name?: string; code?: string | null; address?: string | null; email?: string | null }) =>
     patch<CompanyDto>(`/companies/${id}`, c),
   users: () => get<UserDto[]>("/users"),
-  createUser: (u: { email: string; name: string; password: string; companyId: string | null; isAdmin: boolean }) =>
+  createUser: (u: { email: string; name: string; password: string; companyId: string | null; isAdmin: boolean; isAuditor?: boolean }) =>
     post<UserDto>("/users", u),
-  updateUser: (id: string, u: Partial<{ name: string; companyId: string | null; isAdmin: boolean; disabled: boolean; password: string }>) =>
+  updateUser: (id: string, u: Partial<{ name: string; companyId: string | null; isAdmin: boolean; isAuditor: boolean; disabled: boolean; password: string }>) =>
     patch<UserDto>(`/users/${id}`, u),
 
   adminStatus: () => get<AdminStatusDto>("/admin/status"),

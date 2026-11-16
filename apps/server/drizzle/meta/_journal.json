@@ -358,6 +358,48 @@
       "when": 1794848348494,
       "tag": "0050_cde_supersessions",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1794852256542,
+      "tag": "0052_closeout_archive",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1794853407913,
+      "tag": "0053_delivery_plan",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1794853598546,
+      "tag": "0054_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1794853845760,
+      "tag": "0055_two_factor",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1794854423646,
+      "tag": "0056_security_log",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1794856435611,
+      "tag": "0057_privacy_notice",
+      "breakpoints": true
     }
   ]
 }

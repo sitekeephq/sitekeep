@@ -4,7 +4,7 @@
  * are lazy so the circular import between the two files is safe.
  */
 import { sql } from "drizzle-orm";
-import { boolean, index, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type {
   CdeCodeScheme,
   CdeRevisionRules,
@@ -12,8 +12,10 @@ import type {
   CdeSuitabilityCode,
   CdeTransitionMode,
   CdeWipPolicy,
+  DeliverableTargetDto,
 } from "@sitekeep/shared";
-import { fileVersions, files, folders, namingStandards, projects } from "./schema.js";
+import { fileVersions, files, folders, namingStandards, projects, users } from "./schema.js";
+import { projectRoles } from "./schema-roles.js";
 import { reviews, workflowTemplates } from "./schema-workflow.js";
 
 /** One row per project; a project without a row uses DEFAULT_CDE_SETTINGS. */
@@ -95,3 +97,69 @@ export const cdeSupersessions = pgTable(
   },
   (t) => [primaryKey({ columns: [t.versionId, t.supersededVersionId] }), index("cde_supersessions_superseded").on(t.supersededVersionId)],
 );
+
+/**
+ * ISO-7: milestones of the master information delivery plan (MIDP, ISO 19650-2 §5.4.5),
+ * project-level dates the deliverables' targets refer to (docs/features/DELIVERY_PLAN.md).
+ */
+export const deliveryMilestones = pgTable(
+  "delivery_milestones",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    code: text("code"),
+    name: text("name").notNull(),
+    dueDate: date("due_date", { mode: "string" }),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("delivery_milestones_project").on(t.projectId)],
+);
+
+/**
+ * ISO-7: planned deliverables (information containers) of the task information delivery plans
+ * (TIDP, ISO 19650-2 §5.4.4); one TIDP per task team, the MIDP is all of them. A planned document
+ * code is unique per project (`code_norm`, upper-cased like document_codes).
+ */
+export const deliveryDeliverables = pgTable(
+  "delivery_deliverables",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    /** The responsible task team; a deleted team leaves the row in the MIDP without a team. */
+    teamId: uuid("team_id").references(() => projectRoles.id, { onDelete: "set null" }),
+    code: text("code").notNull(),
+    codeNorm: text("code_norm").notNull(),
+    title: text("title").notNull(),
+    discipline: text("discipline"),
+    docType: text("doc_type"),
+    /** Planned suitability and revision per milestone. */
+    targets: jsonb("targets").$type<DeliverableTargetDto[]>().notNull().default([]),
+    dueShared: date("due_shared", { mode: "string" }),
+    duePublished: date("due_published", { mode: "string" }),
+    notes: text("notes"),
+    position: integer("position").notNull().default(0),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("delivery_deliverables_code").on(t.projectId, t.codeNorm), index("delivery_deliverables_team").on(t.projectId, t.teamId)],
+);
+
+/** ISO-7: the lead of a task team's TIDP, who edits its rows besides the project administrators. */
+export const deliveryTeamLeads = pgTable("delivery_team_leads", {
+  teamId: uuid("team_id")
+    .primaryKey()
+    .references(() => projectRoles.id, { onDelete: "cascade" }),
+  projectId: uuid("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+});

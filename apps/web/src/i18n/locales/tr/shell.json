@@ -68,7 +68,8 @@
       "oznitelikler": "Öznitelikler",
       "cde": "CDE",
       "aktivite": "Denetim Kaydı",
-      "sistemDurumu": "Sistem Durumu"
+      "sistemDurumu": "Sistem Durumu",
+      "kapanis": "Kapanış"
     },
     "hub": {
       "views": "Görünümler",
@@ -95,6 +96,7 @@
       "works": "İşler",
       "files": "Dokümanlar",
       "sheets": "Paftalar",
+      "deliveryPlan": "Teslim Planı",
       "reviews": "İncelemeler",
       "forms": "Formlar",
       "viewer": "Model Görüntüleyici",
@@ -145,7 +147,8 @@
     "collapse": "Menüyü daralt",
     "expandShort": "Genişlet",
     "breadcrumbs": "Konum",
-    "projects": "Projeler"
+    "projects": "Projeler",
+    "closed": "Bu proje {{date}} tarihinden beri kapalı (salt okunur): dosyalar görüntülenip indirilebilir, yüklenemez ve değiştirilemez."
   },
   "app": {
     "loading": "SiteKeep yükleniyor…"

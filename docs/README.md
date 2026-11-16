@@ -44,11 +44,14 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 
 - [Project templates](features/PROJECT_TEMPLATES.md)
 - [CDE states (ISO 19650)](features/CDE_STATES.md)
+- [Delivery plan (TIDP / MIDP)](features/DELIVERY_PLAN.md)
 - [Audit log](features/AUDIT_LOG.md)
+- [Close-out archive (ISO 19650-2 §5.8.1)](features/CLOSEOUT_ARCHIVE.md)
 - [OpenCDE](features/OPENCDE.md)
 - [Forma sync (Autodesk)](features/FORMA_SYNC.md)
 - [BCF](features/BCF.md)
 - [Privacy](features/PRIVACY.md)
+- [Privacy notice on the sign-in page](features/PRIVACY_NOTICE.md)
 - [Google sign-in](features/GOOGLE_SIGN_IN.md)
 - [Invitations](features/INVITATIONS.md)
 - [Parameter Change](features/PARAMETER_CHANGE.md)
@@ -70,7 +73,15 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 
 ## Compliance
 
+- [Overview](compliance/README.md)
+- [Personal data inventory](compliance/PERSONAL_DATA_INVENTORY.md)
+- [Records of processing and VERBİS helper](compliance/RECORDS_OF_PROCESSING.md)
+- [DPIA helper](compliance/DPIA_HELPER.md)
+- [Subprocessors and transfers](compliance/SUBPROCESSORS.md)
+- [Data protection laws and SiteKeep features](compliance/LAW_MAPPING.md)
+- [Masking in AI prompts](compliance/MASKING.md)
 - [ISO 19650 conformance](compliance/ISO19650.md)
+- [Security policy (supported versions, vulnerability reporting, SBOM)](../SECURITY.md)
 
 ## Review notes
 

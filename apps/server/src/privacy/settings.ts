@@ -13,7 +13,7 @@ import { eq } from "drizzle-orm";
 import type { Db } from "../db/index.js";
 import { systemSettings } from "../db/schema.js";
 import { normalizeLanList, setLanAllowlist } from "../ai/hosts.js";
-import { AUDIT_PERSONAL_RETENTION } from "@sitekeep/shared";
+import { AUDIT_LOG_RETENTION, AUDIT_PERSONAL_RETENTION, TRASH_PURGE_DAYS } from "@sitekeep/shared";
 import { connectionDefaultEnabled } from "./connections.js";
 
 export interface PrivacySettings {
@@ -24,6 +24,13 @@ export interface PrivacySettings {
    * many months, then deleted by the daily job (audit/personal.ts). The chained rows stay.
    */
   auditPersonalRetentionMonths: number;
+  /** Recycle bin auto-purge after this many days (TRASH_PURGE_DAYS; null = off, the default). */
+  trashPurgeDays: number | null;
+  /**
+   * Audit log rows older than this many years are deleted by the daily job with a verifiable
+   * checkpoint (audit/truncate.ts). null = unlimited (the default); at least AUDIT_LOG_RETENTION.min.
+   */
+  auditLogRetentionYears: number | null;
   /** "İç ağ" list: hosts treated as inside the network (see ai/hosts.ts). */
   lanHosts: string[];
   /** Redact personal data also before prompts go to a local (LAN) model ("Yerel modelde de maskele"). */
@@ -47,6 +54,8 @@ export interface KillSwitchState {
 export const PRIVACY_DEFAULTS: PrivacySettings = {
   logRetentionDays: 90,
   auditPersonalRetentionMonths: AUDIT_PERSONAL_RETENTION.default,
+  trashPurgeDays: null,
+  auditLogRetentionYears: null,
   lanHosts: [],
   redactLocal: false,
   redactNames: true,
@@ -92,6 +101,13 @@ async function write(db: Db, key: string, value: unknown, userId: string | null)
     .onConflictDoUpdate({ target: systemSettings.key, set: { value, updatedBy: userId, updatedAt: now } });
 }
 
+function auditYears(v: unknown): number | null {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Math.round(Number(v));
+  if (!Number.isFinite(n)) return null;
+  return Math.min(Math.max(n, AUDIT_LOG_RETENTION.min), AUDIT_LOG_RETENTION.max);
+}
+
 function clean(s: Partial<PrivacySettings> | undefined): PrivacySettings {
   const v = { ...PRIVACY_DEFAULTS, ...(s ?? {}) };
   const days = Math.round(Number(v.logRetentionDays));
@@ -101,6 +117,8 @@ function clean(s: Partial<PrivacySettings> | undefined): PrivacySettings {
     auditPersonalRetentionMonths: Number.isFinite(months)
       ? Math.min(Math.max(months, AUDIT_PERSONAL_RETENTION.min), AUDIT_PERSONAL_RETENTION.max)
       : PRIVACY_DEFAULTS.auditPersonalRetentionMonths,
+    trashPurgeDays: (TRASH_PURGE_DAYS as readonly number[]).includes(Number(v.trashPurgeDays)) ? Number(v.trashPurgeDays) : null,
+    auditLogRetentionYears: auditYears(v.auditLogRetentionYears),
     lanHosts: normalizeLanList(Array.isArray(v.lanHosts) ? v.lanHosts.map(String) : []),
     redactLocal: !!v.redactLocal,
     redactNames: v.redactNames !== false,

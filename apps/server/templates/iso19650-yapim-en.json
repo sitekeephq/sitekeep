@@ -75,6 +75,35 @@
       }
     ]
   },
+  "deliveryPlan": {
+    "milestones": [
+      {
+        "code": "M1",
+        "name": "Concept Design",
+        "offsetDays": 60
+      },
+      {
+        "code": "M2",
+        "name": "Developed Design",
+        "offsetDays": 120
+      },
+      {
+        "code": "M3",
+        "name": "Technical Design",
+        "offsetDays": 210
+      },
+      {
+        "code": "M4",
+        "name": "Construction Start",
+        "offsetDays": 270
+      },
+      {
+        "code": "M5",
+        "name": "Handover (As-Built)",
+        "offsetDays": 720
+      }
+    ]
+  },
   "slots": [
     {
       "key": "idare",

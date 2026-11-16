@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "archive": "Kapanış arşivi"
+  },
+  "errors": {
+    "projectClosed": "Bu proje kapanış arşivinden sonra kapatıldı (salt okunur): dosyalar görüntülenip indirilebilir, ancak yüklenemez ve değiştirilemez. Bir sistem yöneticisi projeyi yeniden açabilir.",
+    "busy": "Bu projenin kapanış arşivi hazırlanıyor. Bitmesini bekleyin.",
+    "nothingToArchive": "Arşivlenecek bir şey yok: Yayınlanan ya da Arşivlenen bir klasörde (dahil edildiyse Paylaşılan) dosya bulunmuyor.",
+    "tooLarge": "Arşiv {{size}} GB tutacak; bu, {{max}} GB sınırını aşıyor (CDE_CLOSEOUT_MAX_GB).",
+    "noDiskSpace": "Arşiv için yeterli disk alanı yok: yaklaşık {{size}} GB ve {{reserve}} GB yedek alan gerekiyor, boş alan {{free}} GB.",
+    "notReady": "Arşiv indirilmeye hazır değil.",
+    "expired": "Bu arşivin indirme süresi doldu ve dosyası silindi. Yeni bir arşiv oluşturun.",
+    "archiveFirst": "Projeyi kapatmadan önce eksiksiz bir kapanış arşivi (eksik ya da değişmiş dosya olmadan) oluşturun.",
+    "alreadyClosed": "Proje zaten kapalı.",
+    "notClosed": "Proje kapalı değil.",
+    "reopenAdminOnly": "Kapalı bir projeyi yalnız sistem yöneticisi yeniden açabilir."
+  },
+  "manifestCsv": {
+    "yes": "evet",
+    "no": "hayır",
+    "columns": {
+      "path": "Yol",
+      "documentCode": "Doküman Kodu",
+      "containerId": "Bilgi Kabı Kimliği",
+      "fileId": "Dosya Kimliği",
+      "versionId": "Versiyon Kimliği",
+      "version": "Versiyon",
+      "latest": "Güncel",
+      "revision": "Revizyon",
+      "suitability": "Uygunluk",
+      "cdeState": "CDE Durumu",
+      "cdeStatus": "CDE İşareti",
+      "size": "Boyut (bayt)",
+      "sha256": "SHA-256",
+      "integrity": "Bütünlük",
+      "uploadedBy": "Yükleyen",
+      "uploadedAt": "Yükleme Zamanı (UTC)",
+      "approvals": "Onaylar",
+      "supersededBy": "Yerine Geçen",
+      "supersedes": "Yerine Geçtiği",
+      "namingStandard": "İsimlendirme Standardı",
+      "namingResult": "İsimlendirme Kontrolü"
+    }
+  },
+  "readme": {
+    "title": "SiteKeep kapanış arşivi",
+    "project": "Proje: {{code}} {{name}}",
+    "created": "Oluşturulma: {{at}} (UTC), {{user}}",
+    "scope": "Yayınlanan ve Arşivlenen bilgiler",
+    "scopeWithShared": "Paylaşılan, Yayınlanan ve Arşivlenen bilgiler",
+    "versionsAll": "her dosyanın tüm versiyonları",
+    "versionsLatest": "her dosyanın güncel versiyonu",
+    "scopeLine": "İçerik: {{scope}}, {{versions}}",
+    "counts": "{{files}} dosya, {{versions}} versiyon, {{bytes}} bayt",
+    "purpose": "Bu paket, proje kapanışında proje bilgi modelini arşivler (ISO 19650-2:2018, 5.8.1). Dosyaları projenin klasör yapısında, öznitelikleri, onayları ve yerine geçme bağlantılarıyla, ayrıca projenin denetim kaydıyla birlikte saklar.",
+    "contents": "Paketin içeriği:",
+    "files": "dosyalar, projenin klasör yapısında; eski versiyonlar \"ad (V2).uzantı\" olarak",
+    "manifestJson": "her versiyon için bir kayıt: doküman kodu, bilgi kabı, revizyon, uygunluk, CDE durumu, boyut, SHA-256, yükleyen, onaylar, yerine geçme bağlantıları, isimlendirme kontrolü (şema {{schema}})",
+    "manifestCsv": "aynı bilgiler tablo olarak, her versiyon bir satır (\";\" ile ayrılmış, UTF-8)",
+    "auditCsv": "projenin {{id}} numaralı kayda kadar denetim kaydı, IP adresi ve tarayıcı bilgisi olmadan",
+    "auditVerify": "arşiv oluşturulurken yapılan denetim zinciri kontrolü",
+    "sums": "paketteki her dosyanın SHA-256 değeri",
+    "chain": "Denetim zinciri kontrolü: {{result}}",
+    "chainOk": "sağlam, {{count}} kayıt kontrol edildi",
+    "chainBroken": "{{id}} numaralı kayıtta BOZUK ({{reason}})",
+    "head": "Son denetim kaydı: {{id}}, {{at}}, özet {{hash}}",
+    "noHead": "Denetim kaydında henüz zincirli kayıt yok.",
+    "recordHead": "Bu özet değerini SiteKeep dışında saklayın: bu kayda kadar herhangi bir denetim kaydının sonradan değiştirilmesi, silinmesi ya da araya eklenmesi zincir kontrolünü bozar.",
+    "check": "Paketi kontrol etmek için: sha256sum -c SHA256SUMS (Linux; macOS: shasum -a 256 -c SHA256SUMS). Manifestteki bütünlük sütunu, her dosyanın yüklendiğinde saklanan SHA-256 değeriyle eşleşip eşleşmediğini gösterir.",
+    "problems_one": "{{count}} dosya saklandığı haliyle arşivlenemedi:",
+    "problems_other": "{{count}} dosya saklandığı haliyle arşivlenemedi:",
+    "integrity": {
+      "missing": "depolamada yok",
+      "mismatch": "içerik saklanan SHA-256 ile eşleşmiyor"
+    }
+  }
+}

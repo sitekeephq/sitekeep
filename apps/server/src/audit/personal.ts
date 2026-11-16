@@ -75,13 +75,18 @@ export function startAuditPersonalRetention(db: Db, opts: { log?: (m: string, e?
  * a pseudonym once the account is anonymised (P1-2). Records `audit.personal_erased` with the count.
  * Rows chained before 0049 and not yet re-sealed keep their in-row values: run a re-seal first.
  */
-export async function eraseAuditPersonal(db: Db, subject: { userId: string; email?: string | null }, by: { userId?: string | null } = {}): Promise<number> {
+export async function eraseAuditPersonal(
+  db: Db,
+  subject: { userId: string; email?: string | null; /** Earlier addresses of the account (an e-mail correction). */ previousEmails?: string[] },
+  by: { userId?: string | null } = {},
+): Promise<number> {
   let email = subject.email ?? null;
   if (email === null) {
     const [u] = await db.select({ email: users.email }).from(users).where(eq(users.id, subject.userId));
     email = u?.email ?? null;
   }
-  const deleted = await deletePersonal(db, or(eq(auditPersonal.userId, subject.userId), email ? eq(auditPersonal.email, auditEmail(email)) : undefined)!);
+  const emails = [...new Set([email, ...(subject.previousEmails ?? [])].filter((e): e is string => !!e).map(auditEmail))];
+  const deleted = await deletePersonal(db, or(eq(auditPersonal.userId, subject.userId), emails.length ? inArray(auditPersonal.email, emails) : undefined)!);
   await audit(db, {
     userId: by.userId ?? null,
     action: "audit.personal_erased",

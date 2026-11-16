@@ -44,8 +44,8 @@ async function setUp(request: APIRequestContext) {
     "project from the ISO template",
   );
   const users: Record<"a" | "b", { email: string; password: string }> = {
-    a: { email: `e2e-team-a-${s}@7d-cde.localhost`, password: `Team-A!${s}#2026` },
-    b: { email: `e2e-team-b-${s}@7d-cde.localhost`, password: `Team-B!${s}#2026` },
+    a: { email: `e2e-team-a-${s}@7d-cde.localhost`, password: "Ekip-Bir!Gizli#2026" },
+    b: { email: `e2e-team-b-${s}@7d-cde.localhost`, password: "Ekip-Iki!Gizli#2026" },
   };
   for (const [key, company] of [["a", companyA.id], ["b", companyB.id]] as const) {
     const u = users[key];

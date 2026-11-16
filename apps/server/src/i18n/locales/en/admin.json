@@ -8,12 +8,14 @@
     "selfLockout": "You cannot remove your own administrator rights or disable your own account.",
     "loadTestOff": "The full load test is turned off on this installation (CAPACITY_LOAD_TEST=0).",
     "reportWhileRunning": "The report is available once the test has finished.",
-    "runActive": "A capacity test is already running."
+    "runActive": "A capacity test is already running.",
+    "adminOrAuditorOnly": "This page requires System Administrator or Auditor rights."
   },
   "entities": {
     "user": "User",
     "capacityRun": "Capacity test",
-    "company": "Company"
+    "company": "Company",
+    "securityAlert": "Security alert"
   },
   "capacity": {
     "stage": {
@@ -126,6 +128,42 @@
       "payload": "The licence content cannot be read.",
       "other_installation": "This licence belongs to another installation. Send this installation's id when you ask for a licence.",
       "build_after_support": "This SiteKeep version was released after your support period ended. Go back to an earlier version or renew support."
+    }
+  },
+  "securityAlerts": {
+    "rules": {
+      "failed_sign_ins_account": {
+        "title": "Many Failed Sign-Ins for One Account",
+        "body": "{{count}} failed sign-ins for one account within {{minutes}} minutes (threshold {{threshold}})."
+      },
+      "failed_sign_ins_global": {
+        "title": "Many Failed Sign-Ins",
+        "body": "{{count}} failed sign-ins on the installation within {{minutes}} minutes (threshold {{threshold}})."
+      },
+      "bulk_download": {
+        "title": "Bulk Download",
+        "body": "One person downloaded {{count}} files within {{minutes}} minutes (threshold {{threshold}})."
+      },
+      "new_admin": {
+        "title": "New System Administrator",
+        "body": "A user was given System Administrator rights."
+      },
+      "kill_switch_off": {
+        "title": "External Connections Turned On Again",
+        "body": "\"Turn Off All External Connections\" was switched off: external connections are allowed again."
+      },
+      "two_factor_off": {
+        "title": "Two-Factor Requirement Turned Off",
+        "body": "Two-factor authentication is no longer required at sign-in."
+      },
+      "audit_chain_broken": {
+        "title": "Audit Chain Check Failed",
+        "body": "The daily check of the audit log's hash chain failed at row {{id}} ({{reason}})."
+      }
+    },
+    "mail": {
+      "subject": "[SiteKeep] Security alert: {{title}}",
+      "body": "SiteKeep raised a security alert.\n\n{{title}}\n{{body}}\nTime (UTC): {{time}}\n\nThe details, the person concerned and the client IP address are in Administration → Security Log. This message contains no personal data.\n\nIf this may be a personal data breach: under the GDPR (Art. 33) the supervisory authority must be notified within 72 hours of becoming aware of it, and the KVKK (Art. 12) also requires prompt notification of the Board.\n"
     }
   }
 }

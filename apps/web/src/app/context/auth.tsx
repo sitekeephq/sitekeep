@@ -5,6 +5,7 @@ import { queryClient } from "../providers/QueryProvider";
 import { TOUR_STORAGE_KEY } from "../../features/onboarding/tour";
 import { currentLanguage, setLanguage, supportedLanguage } from "../../i18n";
 import { hubApi } from "../../shared/api/api-hub";
+import { isChallenge } from "../../shared/api/api-security";
 
 /**
  * The profile's language wins once the user is known (another device chose it); a profile without
@@ -22,7 +23,10 @@ interface AuthState {
   loading: boolean;
   /** Password just used at login, for the forced-change form. */
   pendingCurrentPassword: string;
-  login(email: string, password: string): Promise<void>;
+  /** "verify" / "enrol": a two-factor step follows (Login page), then completeSignIn. */
+  login(email: string, password: string, privacyNoticeVersion?: number): Promise<"done" | "verify" | "enrol">;
+  /** The user after the second step; the password is the one typed at the first (forced-change form). */
+  completeSignIn(user: UserDto, password?: string): void;
   logout(): Promise<void>;
   reloadUser(): Promise<void>;
 }
@@ -51,8 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("cde:unauthorized", onUnauthorized);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const next = await api.login(email, password);
+  const completeSignIn = useCallback((next: UserDto, password = "") => {
     setUser(next);
     syncLanguage(next);
     setPendingCurrentPassword(next.mustChangePassword ? password : "");
@@ -64,6 +67,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
   }, []);
+
+  const login = useCallback(
+    async (email: string, password: string, privacyNoticeVersion?: number) => {
+      const next = await api.login(email, password, privacyNoticeVersion);
+      if (isChallenge(next)) return next.twoFactor;
+      completeSignIn(next, password);
+      return "done" as const;
+    },
+    [completeSignIn],
+  );
 
   const logout = useCallback(async () => {
     await api.logout().catch(() => undefined);
@@ -79,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, pendingCurrentPassword, login, logout, reloadUser }}>
+    <AuthContext.Provider value={{ user, loading, pendingCurrentPassword, login, completeSignIn, logout, reloadUser }}>
       {children}
     </AuthContext.Provider>
   );

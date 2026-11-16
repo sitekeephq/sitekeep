@@ -245,7 +245,7 @@ class Access {
   }
 }
 
-function versionedName(name: string, version: number): string {
+export function versionedName(name: string, version: number): string {
   const { base, extension } = splitExtension(name);
   return `${base} (V${version})${extension ? `.${extension}` : ""}`;
 }

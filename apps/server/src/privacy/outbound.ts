@@ -16,6 +16,7 @@
  *                                 an account (auth/invitations.ts, details.kind "invitation"); purpose eposta
  *   "office:editor/converter"     office editor discovery and conversions (purpose ofis:*)
  *   "google"                      sign-in with Google (purpose giris:google)
+ *   "oidc:<providerId>"           sign-in with an OpenID Connect provider (purpose giris:oidc, auth/oidc.ts)
  */
 import { AsyncLocalStorage } from "node:async_hooks";
 import { eq, lt } from "drizzle-orm";

@@ -5,7 +5,7 @@ import { forbidden, notFound } from "../platform/http.js";
 import { msg } from "../../i18n/index.js";
 
 /** POST routes that only read data; read-only API tokens may call them. */
-const READ_ONLY_POSTS = new Set([
+export const READ_ONLY_POSTS: ReadonlySet<string> = new Set([
   "/api/v1/projects/:pid/naming/validate",
   "/api/v1/templates/preview",
   "/api/v1/projects/setup/preview",
@@ -39,7 +39,14 @@ const READ_ONLY_POSTS = new Set([
  * Routes API tokens may never call (whatever the scope): token and password management, revoking
  * connected OAuth applications.
  */
-const SESSION_ONLY = [/^\/api\/v1\/auth\/tokens/, /^\/api\/v1\/auth\/password$/, /^\/api\/v1\/auth\/oauth-apps/];
+const SESSION_ONLY = [
+  /^\/api\/v1\/auth\/tokens/,
+  /^\/api\/v1\/auth\/password$/,
+  /^\/api\/v1\/auth\/oauth-apps/,
+  // Two-factor set-up and browser sessions (docs/features/SIGN_IN_SECURITY.md).
+  /^\/api\/v1\/auth\/two-factor/,
+  /^\/api\/v1\/auth\/sessions/,
+];
 /** OAuth consent: a token must never approve access for another application, not even read it. */
 const CONSENT = /^\/api\/v1\/oauth\//;
 

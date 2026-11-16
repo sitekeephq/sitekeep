@@ -43,6 +43,7 @@ import {
 } from "../db/schema.js";
 import { withRuleAssignees } from "../workflow/chain-template.js";
 import { loadCdeSettings } from "../cde/settings.js";
+import { loadMilestones } from "../cde/delivery-plan.js";
 
 function slugify(text: string): string {
   const map: Record<string, string> = { ç: "c", ğ: "g", ı: "i", İ: "i", ö: "o", ş: "s", ü: "u" };
@@ -344,6 +345,18 @@ export async function exportProjectTemplate(db: Db, projectId: string, lang: str
     standardName,
   );
   if (cde) template.cde = cde;
+  // ISO-7: the delivery plan's milestones, dated in days from the project's creation.
+  const milestones = await loadMilestones(db, projectId);
+  if (milestones.length) {
+    const created = Date.UTC(project.createdAt.getUTCFullYear(), project.createdAt.getUTCMonth(), project.createdAt.getUTCDate());
+    template.deliveryPlan = {
+      milestones: milestones.map((m) => ({
+        ...(m.code ? { code: m.code } : {}),
+        name: m.name,
+        ...(m.dueDate ? { offsetDays: Math.round((Date.parse(`${m.dueDate}T00:00:00Z`) - created) / 86_400_000) } : {}),
+      })),
+    };
+  }
   if (notes.length) template.notes = notes;
   return template;
 }

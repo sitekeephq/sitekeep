@@ -206,6 +206,13 @@ export const projectTemplateSchema = z.object({
   notes: z.array(z.string().max(1000)).max(50).optional(),
   modules: z.partialRecord(z.enum(PROJECT_MODULES), z.boolean()).optional(),
   cde: templateCdeSchema.optional(),
+  deliveryPlan: z
+    .object({
+      milestones: z
+        .array(z.object({ code: z.string().trim().max(20).optional(), name: z.string().trim().min(1).max(200), offsetDays: z.number().int().min(-3650).max(36500).optional() }))
+        .max(100),
+    })
+    .optional(),
   roles: z.array(roleSchema).max(200).optional(),
   issues: issueSettingsSchema.optional(),
   transmittal: transmittalSchema.optional(),

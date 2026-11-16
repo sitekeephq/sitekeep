@@ -3,13 +3,13 @@
 SiteKeep Planning: Schedule (iş programı; Primavera P6 XER, MS Project XML, Excel / CSV import, versions,
 comparison, Gantt, S-curve) and 4D (link rules, activity links, 4D status, the viewer's
 4D panel). Product description: SiteKeep editions and modules §2.
-Feature document: [4D / 5D](../features/4D_5D.md).
+Feature documents: [4D / 5D](../features/4D_5D.md), [time–distance and programme authoring](../features/TIME_DISTANCE.md).
 
 | | |
 |---|---|
 | Repository | [7Dimensions-Project/sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private); local clone `~/Desktop/7dimensions/sitekeep-planning` |
 | Package | `@7dimensions-project/sitekeep-ee-planning` (GitHub Packages) |
-| Version in this repository | `0.3.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| Version in this repository | `0.4.0` (`apps/server/package.json`, `apps/web/package.json`) |
 | SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
 | ID | `planning` (`SITEKEEP_MODULES`) |
 

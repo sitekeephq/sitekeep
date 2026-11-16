@@ -138,8 +138,8 @@ function connectionRefs(code: string, consts: Map<string, string> = new Map()): 
   return { ids, prefixes, unresolved };
 }
 
-/** A template-built id ("ai:${provider.id}") is fine when its family is listed per item: AI providers. */
-const LISTED_FAMILIES = ["ai:"];
+/** A template-built id ("ai:${provider.id}") is fine when its family is listed per item: AI providers, OpenID Connect providers. */
+const LISTED_FAMILIES = ["ai:", "oidc:"];
 
 describe("every outbound connection has an entry in the Privacy Centre", () => {
   it("the core: each outboundFetch/outboundCall in src/ names a listed connection", async () => {
@@ -286,7 +286,7 @@ describe("Google sign-in in the Privacy Centre", () => {
   });
 
   it("switched off: the sign-in page gets no Google button, every step is refused, and the switch is audited", async () => {
-    expect((await call("GET", "/auth/methods", undefined, false)).body).toEqual({ password: true, google: true });
+    expect((await call("GET", "/auth/methods", undefined, false)).body).toEqual({ password: true, google: true, oidc: [] });
 
     const off = await call("PUT", "/admin/privacy/connections/google", { enabled: false });
     expect(off.status, off.raw).toBe(200);
@@ -299,7 +299,7 @@ describe("Google sign-in in the Privacy Centre", () => {
       .limit(1);
     expect(row?.details).toEqual({ id: "google", enabled: false });
 
-    expect((await call("GET", "/auth/methods", undefined, false)).body).toEqual({ password: true, google: false });
+    expect((await call("GET", "/auth/methods", undefined, false)).body).toEqual({ password: true, google: false, oidc: [] });
     const start = await app.inject({ method: "GET", url: "/api/v1/auth/google" });
     expect(start.statusCode).toBe(302);
     expect(start.headers.location).toBe("/login?authError=google_disabled");
@@ -338,7 +338,7 @@ it("a Google install without credentials still lists the connection as not confi
     const res = await plain.inject({ method: "GET", url: "/api/v1/admin/privacy/connections", headers: { cookie: ck, "accept-language": "en" } });
     const google = res.json().find((x: any) => x.id === "google");
     expect(google).toMatchObject({ name: "Sign-in with Google", toggleable: true, notes: ["Not configured (GOOGLE_CLIENT_ID)"] });
-    expect((await plain.inject({ method: "GET", url: "/api/v1/auth/methods" })).json()).toEqual({ password: true, google: false });
+    expect((await plain.inject({ method: "GET", url: "/api/v1/auth/methods" })).json()).toEqual({ password: true, google: false, oidc: [] });
   } finally {
     await plain.close();
     await h.close();

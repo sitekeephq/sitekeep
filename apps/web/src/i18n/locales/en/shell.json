@@ -68,7 +68,8 @@
       "oznitelikler": "Attributes",
       "cde": "CDE",
       "aktivite": "Audit Log",
-      "sistemDurumu": "System Status"
+      "sistemDurumu": "System Status",
+      "kapanis": "Close-out"
     },
     "hub": {
       "views": "Views",
@@ -95,6 +96,7 @@
       "works": "Work",
       "files": "Documents",
       "sheets": "Sheets",
+      "deliveryPlan": "Delivery Plan",
       "reviews": "Reviews",
       "forms": "Forms",
       "viewer": "Model Viewer",
@@ -145,7 +147,8 @@
     "collapse": "Collapse menu",
     "expandShort": "Expand",
     "breadcrumbs": "Location",
-    "projects": "Projects"
+    "projects": "Projects",
+    "closed": "This project is closed (read-only) since {{date}}: files can be viewed and downloaded, not uploaded or changed."
   },
   "app": {
     "loading": "Loading SiteKeep…"

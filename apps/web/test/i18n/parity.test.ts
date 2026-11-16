@@ -39,12 +39,14 @@ const read = (lang: string, ns: string): Tree | null => {
  * the installed modules' tables; those are checked in the modules and in module-locales.test.ts).
  */
 const coreTurkishLabels = (): Tree => {
-  const ownTables = new Set(
-    Object.keys(shared)
-      .filter((n) => /_LABELS?_TR$/.test(n))
-      .map((n) => n.replace(/_LABELS?_TR$/, "").toLowerCase().replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())),
+  // The shared package's own objects: a module may replace a core table of the same name in
+  // turkishLabels() (Planning adds "manual" to scheduleSource), which must not count as the core's.
+  const own = new Map(
+    Object.entries(shared as Record<string, unknown>)
+      .filter(([n]) => /_LABELS?_TR$/.test(n))
+      .map(([n, v]) => [n.replace(/_LABELS?_TR$/, "").toLowerCase().replace(/_([a-z])/g, (_, c: string) => c.toUpperCase()), v]),
   );
-  return Object.fromEntries(Object.entries(turkishLabels()).filter(([table]) => ownTables.has(table))) as Tree;
+  return Object.fromEntries(Object.keys(turkishLabels()).filter((table) => own.has(table)).map((table) => [table, own.get(table)])) as Tree;
 };
 
 /** A language's namespace: the file, or for Turkish labels the shared tables. */

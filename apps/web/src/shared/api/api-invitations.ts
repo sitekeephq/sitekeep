@@ -7,6 +7,7 @@ import type {
   InvitationSettings,
   InviteRequest,
   InviteResultDto,
+  TwoFactorChallengeDto,
   UserDto,
 } from "@sitekeep/shared";
 import { request } from "./client";
@@ -21,9 +22,12 @@ export const invitationsApi = {
   updateSettings: (s: InvitationSettings) => request<InvitationSettings>("PUT", "/admin/invitations", s),
   /** Accept page (signed out): the token comes from the link's fragment. */
   lookup: (token: string) => request<InvitationInfoDto>("POST", "/invitations/lookup", { token }),
-  accept: (token: string, name: string, password: string) => request<UserDto>("POST", "/invitations/accept", { token, name, password }),
+  /** The user, or { twoFactor: "enrol" } when the administrator requires two-factor for everyone. */
+  accept: (token: string, name: string, password: string, privacyNoticeVersion?: number) =>
+    request<UserDto | TwoFactorChallengeDto>("POST", "/invitations/accept", { token, name, password, ...(privacyNoticeVersion && { privacyNoticeVersion }) }),
   /** Remembers the invitation for the Google callback; then the browser goes to `url`. */
-  google: (token: string) => request<{ url: string }>("POST", "/invitations/google", { token }),
+  google: (token: string, privacyNoticeVersion?: number) =>
+    request<{ url: string }>("POST", "/invitations/google", { token, ...(privacyNoticeVersion && { privacyNoticeVersion }) }),
   /** Set-up wizard: a CSV or Excel file of people as a table (first row: the header). */
   peopleFile: (fileName: string, content: string) => request<{ table: string[][] }>("POST", "/projects/setup/people-file", { fileName, content }),
 };

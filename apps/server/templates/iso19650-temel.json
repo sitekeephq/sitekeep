@@ -23,6 +23,14 @@
       { "from": "published", "to": "archived", "mode": "auto" }
     ]
   },
+  "deliveryPlan": {
+    "milestones": [
+      { "code": "M1", "name": { "tr": "Konsept Tasarım", "en": "Concept Design" }, "offsetDays": 90 },
+      { "code": "M2", "name": { "tr": "Uygulama Projesi", "en": "Technical Design" }, "offsetDays": 180 },
+      { "code": "M3", "name": { "tr": "Yapım", "en": "Construction" }, "offsetDays": 365 },
+      { "code": "M4", "name": { "tr": "Teslim (Yapıldığı Gibi)", "en": "Handover (As-Built)" }, "offsetDays": 540 }
+    ]
+  },
   "slots": [
     {
       "key": "idare",

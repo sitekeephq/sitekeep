@@ -1,8 +1,11 @@
 /**
- * Gizlilik Merkezi (Yönetim → Gizlilik Merkezi), system administrators only:
+ * Gizlilik Merkezi (Yönetim → Gizlilik Merkezi): system administrators; the GET routes also auditors
+ * (read-only, docs/features/SECURITY_LOG.md#auditor):
  *   GET  /admin/privacy                     summary (statement, AI mode, data location, settings)
  *   GET  /admin/privacy/status              { killSwitch } for the admin banner
- *   PUT  /admin/privacy/settings            retention (outbound log, audit personal data), "iç ağ" list, redaction switches
+ *   PUT  /admin/privacy/settings            retention (outbound log, audit personal data, recycle bin, audit log),
+ *                                           "iç ağ" list, redaction switches
+ *   GET  /admin/privacy/disposals.csv       disposal record of the retention job (privacy/retention.ts)
  *   PUT  /admin/privacy/kill-switch         { on } "Tüm Dış Bağlantıları Kapat"
  *   GET  /admin/privacy/connections         every external connection: the core's (AI providers, SMTP, office,
  *                                           Google sign-in) and the ones modules declared (privacy/connections.ts)
@@ -13,7 +16,7 @@
 import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, isNull, like, lte, max, or, sql, type SQL } from "drizzle-orm";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { AUDIT_PERSONAL_RETENTION, privacyStatement, type OutboundLogRowDto, type PrivacyConnectionDto, type PrivacySummaryDto } from "@sitekeep/shared";
+import { AUDIT_LOG_RETENTION, AUDIT_PERSONAL_RETENTION, TRASH_PURGE_DAYS, privacyStatement, type DisposalCategory, type OutboundLogRowDto, type PrivacyConnectionDto, type PrivacySummaryDto } from "@sitekeep/shared";
 import type { ResolvedDeps } from "../app/deps.js";
 import { audit } from "../core/platform/audit.js";
 import { isExternalUrl, lanEntryProblem } from "../ai/hosts.js";
@@ -29,10 +32,13 @@ import {
 import { oauthClients, outboundLog, projectAiSettings, projects, tokens, users } from "../db/schema.js";
 import { toCsv } from "../docintel/export.js";
 import { badRequest, forbidden } from "../core/platform/http.js";
+import { requireSecurityReader } from "../core/security/system-roles.js";
 import { officeConverterLabel, officeEditorLabel } from "@sitekeep/shared";
 import { LocalStorage } from "../core/platform/storage.js";
 import { hostOf } from "./outbound.js";
-import { AI_PROVIDER_CONNECTION, knownConnectionId, privacyConnections } from "./connections.js";
+import { disposalRows } from "./retention.js";
+import { AI_PROVIDER_CONNECTION, OIDC_PROVIDER_CONNECTION, knownConnectionId, privacyConnections } from "./connections.js";
+import { getOidcProviders } from "../auth/oidc-settings.js";
 import { GOOGLE_HOSTS } from "../auth/google-connection.js";
 import { DEFAULT_LANGUAGE, msg, render, requestLanguage, tFor, tReq } from "../i18n/index.js";
 import { connectionDisabled, killSwitchOn, privacyState, savePrivacySettings, setConnectionEnabled, setKillSwitch } from "./settings.js";
@@ -83,6 +89,8 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       settings: {
         logRetentionDays: state.settings.logRetentionDays,
         auditPersonalRetentionMonths: state.settings.auditPersonalRetentionMonths,
+        trashPurgeDays: state.settings.trashPurgeDays,
+        auditLogRetentionYears: state.settings.auditLogRetentionYears,
         lanHosts: state.settings.lanHosts,
         redactLocal: state.settings.redactLocal,
         redactNames: state.settings.redactNames,
@@ -91,12 +99,12 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   }
 
   api.get("/admin/privacy", async (req) => {
-    requireAdmin(req);
+    requireSecurityReader(req);
     return summary(requestLanguage(req));
   });
 
   api.get("/admin/privacy/status", async (req) => {
-    requireAdmin(req);
+    requireSecurityReader(req);
     return { killSwitch: killSwitchOn() };
   });
 
@@ -106,6 +114,13 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       .object({
         logRetentionDays: z.number().int().min(1).max(3650).optional(),
         auditPersonalRetentionMonths: z.number().int().min(AUDIT_PERSONAL_RETENTION.min).max(AUDIT_PERSONAL_RETENTION.max).optional(),
+        trashPurgeDays: z
+          .number()
+          .int()
+          .refine((d) => (TRASH_PURGE_DAYS as readonly number[]).includes(d))
+          .nullable()
+          .optional(),
+        auditLogRetentionYears: z.number().int().min(AUDIT_LOG_RETENTION.min).max(AUDIT_LOG_RETENTION.max).nullable().optional(),
         lanHosts: z.array(z.string().trim().max(255)).max(200).optional(),
         redactLocal: z.boolean().optional(),
         redactNames: z.boolean().optional(),
@@ -233,6 +248,22 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       notes: deps.googleAuth ? [t("privacy:connections.googleSends")] : [t("privacy:connections.googleNotConfigured")],
     });
 
+    // One connection per OpenID Connect provider (Administration → Sign-in Security, auth/oidc.ts).
+    for (const p of await getOidcProviders(db)) {
+      const id = `oidc:${p.id}`;
+      out.push({
+        id,
+        kind: "auth",
+        name: t("privacy:connections.oidc", { name: p.name }),
+        host: hostOf(p.issuer),
+        location: loc(p.issuer),
+        enabled: !connectionDisabled(id),
+        toggleable: true,
+        lastUsedAt: last.get(id) ?? null,
+        notes: [t("privacy:connections.oidcSends"), ...(p.enabled ? [] : [t("privacy:connections.oidcProviderOff")])],
+      });
+    }
+
     // Connections the installed modules declared (SDK registerPrivacyConnection), e.g. Autodesk.
     for (const c of declared) {
       const seen = hostRows.filter((r) => r.connection === c.id).map((r) => r.host.toLowerCase());
@@ -301,7 +332,7 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   }
 
   api.get("/admin/privacy/connections", async (req) => {
-    requireAdmin(req);
+    requireSecurityReader(req);
     return connections(requestLanguage(req));
   });
 
@@ -320,7 +351,12 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       // A core connection, a configured AI provider or one a module declared (privacy/connections.ts);
       // an id switched off earlier can always be turned back on.
       const known =
-        id === "ai:env" || (AI_PROVIDER_CONNECTION.test(id) ? (await getProviders(db)).some((p) => `ai:${p.id}` === id) : knownConnectionId(id));
+        id === "ai:env" ||
+        (AI_PROVIDER_CONNECTION.test(id)
+          ? (await getProviders(db)).some((p) => `ai:${p.id}` === id)
+          : OIDC_PROVIDER_CONNECTION.test(id)
+            ? (await getOidcProviders(db)).some((p) => `oidc:${p.id}` === id)
+            : knownConnectionId(id));
       if (!known && !connectionDisabled(id)) throw badRequest(msg("privacy:errors.unknownConnection"));
       await setConnectionEnabled(db, id, enabled, uid);
       if (id.startsWith("office:")) deps.office.resetDiscovery();
@@ -372,7 +408,7 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   }
 
   api.get("/admin/privacy/outbound", async (req) => {
-    requireAdmin(req);
+    requireSecurityReader(req);
     const q = logQuery.parse(req.query);
     const [list, [total], purposes, hosts] = await Promise.all([
       rows(q, q.limit, q.offset),
@@ -384,7 +420,7 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
   });
 
   api.get("/admin/privacy/outbound.csv", async (req, reply) => {
-    requireAdmin(req);
+    requireSecurityReader(req);
     const q = logQuery.parse(req.query);
     const list = await rows(q, 10_000, 0);
     const t = tReq(req);
@@ -412,6 +448,38 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     );
     reply.header("Content-Type", "text/csv; charset=utf-8");
     reply.header("Content-Disposition", `attachment; filename="${t("privacy:csv.fileName")}"`);
+    return reply.send(csv);
+  });
+
+  // ---- Disposal record (retention job, privacy/retention.ts) ----------------------------------
+
+  api.get("/admin/privacy/disposals.csv", async (req, reply) => {
+    requireSecurityReader(req);
+    const q = z.object({ from: ymd.optional(), to: ymd.optional(), lang: z.string().max(10).optional() }).parse(req.query);
+    const t = q.lang ? tFor(q.lang) : tReq(req);
+    const list = await disposalRows(db, {
+      from: q.from ? new Date(`${q.from}T00:00:00Z`) : undefined,
+      to: q.to ? new Date(new Date(`${q.to}T00:00:00Z`).getTime() + 86_400_000) : undefined,
+    });
+    const columns = ["time", "run", "category", "description", "count", "oldest", "newest", "basis", "method", "details"] as const;
+    const csv = toCsv(
+      columns.map((c) => t(`privacy:disposal.columns.${c}`)),
+      list.map((r) => [
+        r.at.toISOString(),
+        r.runId,
+        r.category,
+        t(`privacy:disposal.categories.${r.category as DisposalCategory}`),
+        r.count,
+        r.oldest?.toISOString() ?? "",
+        r.newest?.toISOString() ?? "",
+        r.basis,
+        t(`privacy:disposal.methods.${r.method === "delete+storage" ? "deleteStorage" : "delete"}`),
+        r.details ? JSON.stringify(r.details) : "",
+      ]),
+    );
+    await audit(db, { userId: req.user!.id, action: "privacy.disposals_exported", details: { from: q.from, to: q.to, rows: list.length } });
+    reply.header("Content-Type", "text/csv; charset=utf-8");
+    reply.header("Content-Disposition", `attachment; filename="${t("privacy:disposal.fileName")}"`);
     return reply.send(csv);
   });
 }

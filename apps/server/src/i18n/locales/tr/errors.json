@@ -23,5 +23,7 @@
     "readOnly": "Bu erişim anahtarı salt okuma yetkisine sahip."
   },
   "moduleOff": "Bu modül bu kurulumda açık değil.",
-  "licenseReadOnly": "Bu modülün lisans süresi doldu: lisans yenilenene kadar salt okunur."
+  "licenseReadOnly": "Bu modülün lisans süresi doldu: lisans yenilenene kadar salt okunur.",
+  "passwordCommon": "Bu şifre çok yaygın ya da veri sızıntılarında görülmüş. Daha zor tahmin edilecek bir şifre seçin.",
+  "passwordPersonal": "Şifre adınızı ya da e-posta adresinizi içermemeli."
 }

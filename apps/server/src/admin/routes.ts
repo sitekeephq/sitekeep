@@ -1,13 +1,15 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, isNotNull } from "drizzle-orm";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { companyCodeProblem, normalizeCompanyCode, normalizeGoogleDomain } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { audit } from "../core/platform/audit.js";
 import { hashPassword, passwordProblem } from "../core/security/auth.js";
-import { companies, users } from "../db/schema.js";
+import { companies, users, userTwoFactor } from "../db/schema.js";
 import { badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
 import { prefsForPassword, toUserDto } from "../auth/dto.js";
+import { endSessions } from "../auth/sign-in-security.js";
+import { canReadSecurityRecords } from "../core/security/system-roles.js";
 import { getGoogleAuthSettings, putGoogleAuthSettings } from "../auth/google-settings.js";
 import { adminSettingsRoutes } from "./settings.js";
 import { adminStatus } from "./status.js";
@@ -143,7 +145,12 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
   api.get("/users", async (req) => {
     const rows = await db.select().from(users).orderBy(asc(users.name));
     // Non-admins get a directory without the disabled flag; nobody gets password hashes.
-    return rows.filter((u) => req.user!.isAdmin || !u.disabled).map(toUserDto);
+    if (!canReadSecurityRecords(req.user)) return rows.filter((u) => !u.disabled).map(toUserDto);
+    // System administrators and auditors also see who has two-factor on (reset, docs/features/SIGN_IN_SECURITY.md).
+    const withTwoFactor = new Set(
+      (await db.select({ id: userTwoFactor.userId }).from(userTwoFactor).where(isNotNull(userTwoFactor.enabledAt))).map((r) => r.id),
+    );
+    return rows.map((u) => ({ ...toUserDto(u), twoFactor: withTwoFactor.has(u.id) }));
   });
 
   api.post("/users", async (req) => {
@@ -155,10 +162,11 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
         password: z.string(),
         companyId: z.string().uuid().nullable().optional(),
         isAdmin: z.boolean().optional(),
+        isAuditor: z.boolean().optional(),
         mustChangePassword: z.boolean().optional(),
       })
       .parse(req.body);
-    const problem = passwordProblem(body.password);
+    const problem = passwordProblem(body.password, { email: body.email, name: body.name });
     if (problem) throw badRequest(problem);
     const prefs = prefsForPassword({}, body.password);
     if (body.mustChangePassword) prefs.mustChangePassword = true;
@@ -170,10 +178,18 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
         passwordHash: await hashPassword(body.password),
         companyId: body.companyId ?? null,
         isAdmin: body.isAdmin ?? false,
+        isAuditor: body.isAuditor ?? false,
         prefs,
       })
       .returning();
-    await audit(db, { userId: req.user!.id, action: "user.created", targetType: "user", targetId: row!.id });
+    // System roles given at creation are on the record (security log, the "new administrator" alert).
+    await audit(db, {
+      userId: req.user!.id,
+      action: "user.created",
+      targetType: "user",
+      targetId: row!.id,
+      ...((row!.isAdmin || row!.isAuditor) && { details: { ...(row!.isAdmin && { isAdmin: true }), ...(row!.isAuditor && { isAuditor: true }) } }),
+    });
     await refreshSeats(db);
     return toUserDto(row!);
   });
@@ -185,6 +201,8 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
         name: z.string().trim().min(1).optional(),
         companyId: z.string().uuid().nullable().optional(),
         isAdmin: z.boolean().optional(),
+        /** Read-only auditor (docs/features/SECURITY_LOG.md#auditor). */
+        isAuditor: z.boolean().optional(),
         disabled: z.boolean().optional(),
         password: z.string().optional(),
       })
@@ -195,26 +213,30 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
       name: body.name,
       companyId: body.companyId,
       isAdmin: body.isAdmin,
+      isAuditor: body.isAuditor,
       disabled: body.disabled,
       // Enabling an invited account by hand ends its invitation (the person signs in with the password set here).
       ...(body.disabled === false ? { pending: false } : {}),
     };
     if (body.password !== undefined) {
-      const problem = passwordProblem(body.password);
+      const [existing] = await db.select({ prefs: users.prefs, email: users.email, name: users.name }).from(users).where(eq(users.id, req.params.id));
+      const problem = passwordProblem(body.password, { email: existing?.email, name: body.name ?? existing?.name });
       if (problem) throw badRequest(problem);
-      const [existing] = await db.select({ prefs: users.prefs }).from(users).where(eq(users.id, req.params.id));
       patch.passwordHash = await hashPassword(body.password);
       patch.prefs = prefsForPassword(existing?.prefs, body.password);
     }
     const [row] = await db.update(users).set(patch).where(eq(users.id, req.params.id)).returning();
     if (body.disabled !== undefined) await refreshSeats(db);
     if (!row) throw notFound(msg("admin:entities.user"));
+    // A new password ends the user's sessions (G-4); an administrator setting their own keeps this one.
+    const sessionsEnded =
+      body.password !== undefined ? await endSessions(db, row.id, row.id === req.user!.id ? (req.user!.token?.id ?? null) : null) : undefined;
     await audit(db, {
       userId: req.user!.id,
       action: "user.updated",
       targetType: "user",
       targetId: row.id,
-      details: { ...body, password: body.password ? "***" : undefined },
+      details: { ...body, password: body.password ? "***" : undefined, ...(sessionsEnded !== undefined && { sessionsEnded }) },
     });
     return toUserDto(row);
   });

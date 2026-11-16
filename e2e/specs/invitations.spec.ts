@@ -40,8 +40,8 @@ async function accept(browser: Browser, link: string, name: string) {
   const card = page.getByTestId("accept-invitation");
   await expect(card.getByRole("heading", { name: "Daveti Kabul Edin" })).toBeVisible();
   await card.getByLabel("Adınız").fill(name);
-  await card.getByLabel("Şifre", { exact: true }).fill("Davetli-Sifre-2026");
-  await card.getByLabel("Şifre Tekrar").fill("Davetli-Sifre-2026");
+  await card.getByLabel("Şifre", { exact: true }).fill("Kabul-Gizli-2026");
+  await card.getByLabel("Şifre Tekrar").fill("Kabul-Gizli-2026");
   await card.getByRole("button", { name: "Kabul Et ve Giriş Yap" }).click();
   await expect(page).toHaveURL(/\/home$/);
   return { page, context };

@@ -1,0 +1,29 @@
+/* Delivery plan page (features/delivery-plan/DeliveryPlanPage.tsx). */
+.delivery-plan-page > * + * { margin-top: 12px; }
+.delivery-tabs { flex-wrap: wrap; overflow-x: auto; }
+.delivery-tab-late { margin-left: 6px; }
+.delivery-milestones h2, .delivery-team h2 { margin: 0; font-size: 15px; }
+.delivery-milestone-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.delivery-milestone-list li { display: inline-flex; align-items: center; gap: 8px; padding: 4px 4px 4px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); font-size: 13px; }
+.delivery-inline-label { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+.delivery-filters input[type="search"] { min-width: 200px; flex: 0 1 260px; }
+.delivery-scroll { overflow-x: auto; }
+.delivery-table { min-width: 900px; }
+.delivery-table td.mono { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; white-space: nowrap; }
+.delivery-table td { vertical-align: top; }
+.delivery-late-badge { margin-left: 6px; }
+.delivery-due-late { color: var(--danger); font-weight: 600; }
+.delivery-actions { white-space: nowrap; text-align: right; }
+.delivery-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.delivery-form-grid input, .delivery-form-grid select { width: 100%; }
+.delivery-form-wide { grid-column: 1 / -1; }
+.delivery-targets { margin: 16px 0 0; padding: 8px 12px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.delivery-targets legend { font-size: 12px; font-weight: 600; color: var(--text-2); padding: 0 4px; }
+.delivery-targets .row { margin-top: 6px; }
+.delivery-targets input { width: 90px; }
+.delivery-target-name { flex: 1; min-width: 0; font-size: 13px; }
+.delivery-import-report ul { margin: 4px 0 0; padding-left: 18px; }
+@media (max-width: 640px) {
+  .delivery-form-grid { grid-template-columns: minmax(0, 1fr); }
+  .delivery-filters input[type="search"] { flex: 1 1 100%; }
+}

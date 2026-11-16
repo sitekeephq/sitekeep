@@ -19,7 +19,7 @@ Community ([map](../MAP.md#2-community-or-enterprise)).
    sent while e-mail is switched off ([privacy](PRIVACY.md)).
 3. **Accept.** The link opens `/invite#<token>`. The token is in the fragment, so it is never sent to
    the server in a URL (no request log, no `Referer`). The page shows who invited the person to which
-   projects; the person sets a name and password (at least 10 characters), or, when
+   projects; the person sets a name and password ([password rules](SIGN_IN_SECURITY.md#password-rules-g-5)), or, when
    [Google sign-in](GOOGLE_SIGN_IN.md) is configured, continues with Google **with the same
    address**. The account becomes active, signed in, with the interface language the person accepted
    in. The memberships are already there, so the project is visible at once.

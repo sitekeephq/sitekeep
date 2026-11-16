@@ -51,7 +51,7 @@ the person is first added under **Administration → Users**.
 
 The setting is the `system_settings` key `auth.google`. Off by default, empty
 list. A subdomain (`mail.7dimensions.eu`) matches the parent domain; `not7dimensions.eu`
-does not. SSO / Entra is the long-term version of the same model.
+does not. Other identity providers (Entra ID, Keycloak, Okta…): [OpenID Connect sign-in](OIDC_SIGN_IN.md).
 
 ---
 

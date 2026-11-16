@@ -4,7 +4,8 @@
  * switched off on its own (test/auth/privacy-connections.test.ts fails otherwise):
  *
  *   - the core's own connections (CORE_CONNECTIONS): SMTP, office editor/converter, the report model
- *     (ai:env), sign-in with Google, and one "ai:<providerId>" per configured AI provider;
+ *     (ai:env), sign-in with Google, one "ai:<providerId>" per configured AI provider and one
+ *     "oidc:<providerId>" per OpenID Connect sign-in provider (auth/oidc.ts);
  *   - connections a module declares with registerPrivacyConnection() (SDK) while it loads, e.g. the
  *     Connect module's Autodesk APS/ACC sync. The SDK's outboundFetch()/outboundCall() refuse a
  *     module call whose connection is not declared (sdk/privacy.ts).
@@ -41,6 +42,9 @@ export const CORE_CONNECTIONS = ["ai:env", "smtp", "office:editor", "office:conv
 /** "ai:<providerId>": one per AI provider configured under Administration → AI (listed per provider). */
 export const AI_PROVIDER_CONNECTION = /^ai:[^:]+$/;
 
+/** "oidc:<providerId>": one per OpenID Connect provider under Administration → Sign-in Security. */
+export const OIDC_PROVIDER_CONNECTION = /^oidc:[^:]+$/;
+
 const ID = /^[a-z][a-z0-9_:-]{0,79}$/;
 const registered = new Map<string, RegisteredPrivacyConnection>();
 
@@ -50,7 +54,7 @@ const registered = new Map<string, RegisteredPrivacyConnection>();
  */
 export function registerPrivacyConnection(def: PrivacyConnectionDef): void {
   if (!def || typeof def.id !== "string" || !ID.test(def.id)) throw new Error(`registerPrivacyConnection: invalid id ${JSON.stringify(def?.id)}`);
-  if ((CORE_CONNECTIONS as readonly string[]).includes(def.id) || AI_PROVIDER_CONNECTION.test(def.id))
+  if ((CORE_CONNECTIONS as readonly string[]).includes(def.id) || AI_PROVIDER_CONNECTION.test(def.id) || OIDC_PROVIDER_CONNECTION.test(def.id))
     throw new Error(`registerPrivacyConnection: "${def.id}" is a connection of the core`);
   if (!def.name) throw new Error(`registerPrivacyConnection: "${def.id}" needs a name`);
   if (!Array.isArray(def.hosts) || !def.hosts.length || def.hosts.some((h) => typeof h !== "string" || !h.trim()))

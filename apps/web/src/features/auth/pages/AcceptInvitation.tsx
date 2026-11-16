@@ -16,6 +16,7 @@ import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 import { LanguageSwitcher } from "../../../app/layout/LanguageSwitcher";
 import { GoogleIcon } from "./Login";
 import { invitationToken } from "../invitation-token";
+import { PrivacyNoticePanel, noticeBlocks, noticeVersion, usePrivacyNotice } from "../components/PrivacyNotice";
 
 export function AcceptInvitationPage() {
   const { t } = useTranslation(["auth", "common"]);
@@ -28,6 +29,9 @@ export function AcceptInvitationPage() {
   const [password, setPassword] = useState("");
   const [repeat, setRepeat] = useState("");
   const [busy, setBusy] = useState(false);
+  const notice = usePrivacyNotice();
+  const [noticeRead, setNoticeRead] = useState(false);
+  const blocked = noticeBlocks(notice, noticeRead);
 
   useEffect(() => {
     if (!token) {
@@ -52,8 +56,13 @@ export function AcceptInvitationPage() {
     setBusy(true);
     setError(null);
     try {
-      await invitationsApi.accept(token, name.trim(), password);
+      const result = await invitationsApi.accept(token, name.trim(), password, noticeVersion(notice, noticeRead));
       window.history.replaceState({}, "", "/invite");
+      // Two-factor required for everyone: set it up on the sign-in page before the session starts.
+      if ("twoFactor" in result) {
+        navigate("/login?twoFactor=1", { replace: true });
+        return;
+      }
       await reloadUser();
       navigate("/home", { replace: true });
     } catch (err) {
@@ -66,7 +75,7 @@ export function AcceptInvitationPage() {
     setBusy(true);
     setError(null);
     try {
-      const { url } = await invitationsApi.google(token);
+      const { url } = await invitationsApi.google(token, noticeVersion(notice, noticeRead));
       window.location.assign(url);
     } catch (err) {
       setError((err as Error).message);
@@ -109,9 +118,10 @@ export function AcceptInvitationPage() {
                 : t("invite.introNoInviter", { projects: info.projects.map((p) => p.name).join(", ") || "—" })}
             </p>
             <p className="muted small">{t("invite.expires", { date: expires })}</p>
+            <PrivacyNoticePanel notice={notice} accepted={noticeRead} onAccepted={setNoticeRead} disabled={busy} />
             {info.google && (
               <>
-                <button type="button" className="login-google invite-google" disabled={busy} onClick={() => void google()}>
+                <button type="button" className="login-google invite-google" disabled={busy || blocked} onClick={() => void google()}>
                   <GoogleIcon />
                   {t("invite.actions.google")}
                 </button>
@@ -154,7 +164,7 @@ export function AcceptInvitationPage() {
                   {error}
                 </p>
               )}
-              <button className="primary" disabled={busy || !name.trim() || !password}>
+              <button className="primary" disabled={busy || blocked || !name.trim() || !password}>
                 {t("invite.actions.accept")}
               </button>
             </form>

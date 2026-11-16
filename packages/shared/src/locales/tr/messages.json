@@ -453,6 +453,7 @@
     "cdeDuplicateTransition": "CDE geçişi {{transition}} birden fazla kez yazılmış.",
     "partSlotUnknown": "{{where}}: \"{{slot}}\" şablonda ne bir taraf (rol) ne de proje rolü.",
     "duplicateTaskTeam": "cde.taskTeams: \"{{slot}}\" rolü birden fazla kez yazılmış.",
+    "duplicateMilestone": "deliveryPlan.milestones: \"{{name}}\" kilometre taşı birden fazla kez yazılmış.",
     "duplicateProjectRole": "\"{{key}}\" proje rolü iki kez tanımlanmış.",
     "stepProjectRoleUnknown": "\"{{name}}\" adım {{step}}: \"{{role}}\" proje rolü roles içinde tanımlı değil.",
     "partWorkflowUnknown": "{{where}}: şablonda \"{{name}}\" adlı akış yok.",

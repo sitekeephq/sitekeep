@@ -11,7 +11,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 3. Licence texts of the npm packages
 4. NOTICE files of the npm packages
 
-## 1. npm packages (276)
+## 1. npm packages (277)
 
 | Package | Version | Licence | Source |
 |---|---|---|---|
@@ -218,6 +218,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | process-warning | 4.0.1 | MIT | https://github.com/fastify/process-warning |
 | process-warning | 5.1.0 | MIT | https://github.com/fastify/process-warning |
 | proxy-addr | 2.0.8 | MIT | https://github.com/jshttp/proxy-addr |
+| qrcode-generator | 2.0.4 | MIT | https://github.com/kazuhikoarase/qrcode-generator |
 | qs | 6.17.1 | BSD-3-Clause | https://github.com/ljharb/qs |
 | quick-format-unescaped | 4.0.4 | MIT | https://github.com/davidmarkclements/quick-format |
 | range-parser | 1.3.0 | MIT | https://github.com/jshttp/range-parser |
@@ -410,6 +411,34 @@ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
 DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER
 DEALINGS IN THE FONT SOFTWARE.
+```
+
+### Common password list (apps/server/assets/passwords)
+
+`common-passwords.txt` is a data file derived from `Passwords/Common-Credentials/xato-net-10-million-passwords-1000000.txt` of SecLists (https://github.com/danielmiessler/SecLists, commit c205c36a445bff37f8e58a9ec829105cd4975c58), which compiles Mark Burnett's list of ten million passwords (xato.net, 2015). SiteKeep keeps the 50,000 most frequent entries of at least 10 characters, in lower case, and refuses them as new passwords (docs/features/SIGN_IN_SECURITY.md). SecLists is licensed under the MIT licence; the licence text, also in `apps/server/assets/passwords/LICENSE-SecLists.txt`, follows.
+
+```text
+MIT License
+
+Copyright (c) 2018 Daniel Miessler
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 ### Tesseract OCR engine and language data
@@ -4156,6 +4185,7 @@ These packages declare their licence in package.json only; the standard text of 
 - isarray@1.0.0: MIT, Julian Gruber
 - pg-types@2.2.0: MIT, Brian M. Carlson
 - pgpass@1.0.5: MIT, Hannes Hörl <hannes.hoerl+pgpass@snowreporter.com>
+- qrcode-generator@2.0.4: MIT, Kazuhiko Arase
 - tr46@0.0.3: MIT, Sebastian Mayr <npm@smayr.name>
 
 ### Pre-built binaries for one platform

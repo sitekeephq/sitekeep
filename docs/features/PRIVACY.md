@@ -19,10 +19,11 @@ In the default installation, the server makes no connections outside the network
 | AI provider (Ollama, vLLM, DeepSeek, Claude…) (`ai:<providerId>`) | When an AI feature is used | Prompt: the question, summaries of related records. Personal data is masked in prompts that leave the network. | `yapay_zeka:<sağlayıcı>` |
 | Report model (`AI_BASE_URL`) (`ai:env`) | When the report builder is used | Dataset schema and the request | `yapay_zeka:rapor` |
 | Personal Claude API / Cursor (`ai:personal:anthropic`, `ai:personal:cursor`; AI module) | When a user runs an AI feature with their own key | As for an AI provider | `yapay_zeka:anthropic`, `yapay_zeka:cursor` |
-| Email server (SMTP) (`smtp`) | When an official letter is sent with "Send"; when a person without an account is [invited](INVITATIONS.md) (or the invitation is sent again) | Letter text and PDF attachment, recipients; for an invitation: the invited address, the inviter's and the project's name and the single-use link | `eposta` (invitations: detail `kind: invitation`) |
+| Email server (SMTP) (`smtp`) | When an official letter is sent with "Send"; when a person without an account is [invited](INVITATIONS.md) (or the invitation is sent again); when a [security alert](SECURITY_LOG.md#e-mail) is raised and alert recipients are set | Letter text and PDF attachment, recipients; for an invitation: the invited address, the inviter's and the project's name and the single-use link; for a security alert: the alert's name, text and time to the configured addresses, no personal data | `eposta` (invitations: detail `kind: invitation`; alerts: `kind: security_alert`) |
 | Office editor (ONLYOFFICE / Collabora) (`office:editor`) | Editor settings and opening a file | Server: only the discovery request. The editor fetches the file from the CDE itself over WOPI. | `ofis:onlyoffice`, `ofis:collabora` |
 | Office → PDF converter (ONLYOFFICE, Collabora, Gotenberg) (`office:converter`) | Office file preview | The file to convert | `ofis:<dönüştürücü>` |
 | Sign in with Google (`google`) | When a user chooses Google sign-in | OAuth code to `oauth2.googleapis.com`; the verified email information is then read from `openidconnect.googleapis.com` | `giris:google` — [Sign in with Google](GOOGLE_SIGN_IN.md) |
+| Sign in with an OpenID Connect provider (Entra ID, Keycloak, Okta…) (`oidc:<providerId>`, one per provider) | When a user chooses the provider's button | Discovery document and signing keys (JWKS) are read from the provider; the sign-in code and PKCE verifier (with the client secret, if any) go to its token endpoint; the userinfo endpoint is asked only when the ID token has no e-mail address | `giris:oidc` — [Sign in with OpenID Connect](OIDC_SIGN_IN.md) |
 | Autodesk APS / ACC (`autodesk`; Connect module) | When a project administrator sets up the connection and when sync runs | OAuth code and read-only project API requests to `developer.api.autodesk.com`; file content is downloaded from the short-lived signed addresses Autodesk gives. ACC records are brought into the CDE | `entegrasyon:autodesk` |
 
 Switching **Email server (SMTP)** off in External Connections (or the kill switch, for a server outside
@@ -73,18 +74,57 @@ to one.
 - **Retention: 12 months by default.** Privacy Centre → Settings → **Audit Log Personal Data
   Retention (months)** (1 to 120). A daily job deletes the IP address, user agent and e-mail of rows
   older than that and records the count in the log (`audit.personal_expired`). The rows themselves
-  (who, what, when) are kept for the life of the installation: the log is append-only and
-  hash-chained, and the chain check still passes after the deletion. Screens and CSV then show
-  "deleted (retention)".
+  (who, what, when) are kept for the life of the installation unless an administrator sets an audit
+  log retention (Privacy Centre → Retention, at least one year; [retention and
+  truncation](AUDIT_LOG.md#retention-and-truncation)): the log is append-only and hash-chained, and
+  the chain check still passes after either deletion. Screens and CSV then show "deleted (retention)".
 - **Erasure:** one person's personal audit data (rows they wrote, rows naming their e-mail address)
   can be deleted on its own (`eraseAuditPersonal`, `audit.personal_erased`); their rows stay under
-  their user id. The "anonymise user" request (roadmap) uses it.
+  their user id. **Anonymise user** ([data subject rights](DATA_SUBJECT_RIGHTS.md#anonymise)) uses it,
+  including the addresses the account had before an e-mail correction.
 - **Rows from before this split** (migration 0049): rows from before the hash chain had theirs moved
   by the migration. Rows chained between migrations 0043 and 0049 still hold their IP address and
   user agent inside the chained content, because changing them would break the chain; they are not
   covered by retention or erasure until an administrator runs the audited **re-seal**
   (`npm run audit:reseal`, [re-seal](AUDIT_LOG.md#re-seal)). The migration records how many there are.
 - Background work (jobs, automatic steps) writes rows without IP address and user agent.
+
+## Sign-in security: personal data
+
+[Sign-in security](SIGN_IN_SECURITY.md) (failed-attempt limits, two-factor authentication, session
+lifetimes) processes:
+
+- **Failed-attempt counts:** the e-mail address typed and the client IP address with the time of each
+  failure, **in memory only**, for the set window (default 15 minutes); never written to disk, gone on
+  restart. A lock is written to the audit log (`auth.locked`) like a failed sign-in: the address in
+  `audit_personal` (retention above), its hash in the chain.
+- **Two-factor:** per user the authenticator secret (encrypted with the installation's secret key),
+  the hashes of the recovery codes, when it was turned on and the last used time step. Deleted when
+  the user turns it off, when an administrator resets it and with the account. Nothing is sent to
+  an external service: the QR code is drawn by the server.
+- **Sessions:** start, last use (at most once a minute) and expiry of each browser session; deleted
+  when the session ends (absolute or idle limit, sign-out, "sign out everywhere", password change)
+  by the daily retention job at the latest. No IP address or user agent is stored with a session.
+- **Password rules:** the new password is checked against a bundled list and against the person's
+  name and e-mail address on the server; nothing leaves the network.
+
+## Security log, alerts and the auditor: personal data
+
+The [security log](SECURITY_LOG.md) is a view of the audit log: it stores nothing of its own, and
+shows the IP address and user agent only while the audit log keeps them (retention above).
+
+- **Security alerts** (`security_alert`): the rule, counts and thresholds, the user id of the person
+  concerned (failed sign-ins of an account, bulk downloads, a new administrator), who handled it and
+  when; never an IP address or an e-mail address (an unknown address typed at sign-in is identified
+  by its keyed hash only). Alerts are kept like the audit log. The person's user id becomes a
+  pseudonym when the account is [anonymised](DATA_SUBJECT_RIGHTS.md#anonymise).
+- **Alert e-mail:** the recipient addresses are stored in `system_settings` (the audit row records
+  how many, not which); the e-mail carries no personal data. It goes out only over SMTP allowed in
+  External Connections.
+- **Auditor:** sees the same personal data as a system administrator in these screens (who signed in
+  from which address, the Privacy Centre's outbound log), read-only, and no file contents unless also
+  a project member. Give the role to the people who check compliance (DPO, internal audit) and
+  record it in the processing inventory.
 
 ## Data minimisation in AI
 
@@ -130,6 +170,11 @@ off is written to the audit log (`privacy.connection_updated`, with the connecti
 - **Sign in with Google** is listed even when it is not configured. Switched off (or with all external
   connections off) the sign-in and invitation pages show no Google button and the server refuses
   every step of the Google flow (`/login?authError=google_disabled`).
+- **OpenID Connect providers** are listed one per provider added under Administration → Sign-in
+  Security (`oidc:<providerId>`, host of the issuer). Switched off (or, for a provider outside the
+  network, with all external connections off) its button disappears from the sign-in page and every
+  step of its flow is refused before connecting (`/login?authError=oidc_disabled`)
+  ([OpenID Connect sign-in](OIDC_SIGN_IN.md)).
 - **Modules** declare their connections with `registerPrivacyConnection({ id, name, description, hosts,
   defaultEnabled })` from the SDK ([modules](../modules/README.md#outbound-connections)). The SDK's
   `outboundFetch` / `outboundCall` refuse a module call whose `connection` is not declared, so a
@@ -146,13 +191,44 @@ database. OAuth access and refresh tokens are kept encrypted with AES-GCM using 
 they are not written to the UI or the outbound connection log.
 
 - The mapping between the source record and the CDE record is kept; re-syncing the same record does not create a copy.
-- The default retention period is the project's retention period. Turning off the connection stops new syncs;
-  it does not automatically delete project records brought in earlier.
+- There is no separate retention period for imported records (and no per-project retention setting):
+  they are kept like records created in SiteKeep, until they are deleted in their module or the project
+  is deleted. Turning off the connection stops new syncs; it does not delete records brought in earlier.
+  The retention periods that exist are installation-wide, in Privacy Centre → Retention
+  ([data subject rights and retention](DATA_SUBJECT_RIGHTS.md#retention)).
 - A project administrator can turn off the connection in the project settings; imported local records are managed
   by the normal deletion/archiving rules of their own modules. When the project is deleted, the connection, the encrypted
   tokens, the raw sync records and the mappings are deleted relationally.
 - Transferring personal data from ACC to the CDE and setting the retention period are the responsibility of the
   data controller organisation.
+
+## Data subject rights and retention
+
+Requests of a person about their data, and how long data is kept, are described in
+[data subject rights and retention](DATA_SUBJECT_RIGHTS.md):
+
+- **Access and portability:** Administration → Users → **Personal Data** → export (ZIP of JSON and
+  CSV, built in the background); each person can also export their own data from My account.
+- **Rectification:** names and companies are edited in Administration → Users; the e-mail address with
+  **Change E-mail** (unique, audited, sessions end).
+- **Erasure:** **Anonymise User**: irreversible pseudonymisation; history stays under "Deleted user
+  #…". Personal data inside free text (comments, letters, descriptions) and inside file contents is
+  not removed automatically; that is the data controller's decision.
+- **Restriction of processing:** disabling an account (`PATCH /api/v1/users/:id` with
+  `{ "disabled": true }`, system administrators; audited `user.updated`) is the restriction: the person cannot sign in and no API key, OAuth token or session of theirs is accepted
+  (`apps/server/src/app/build-app.ts`), while their data stays unchanged and is not used further by
+  the account. Re-enable it to lift the restriction. No separate feature is needed.
+- **Retention:** Privacy Centre → **Retention**: recycle bin auto-purge (off by default), audit log
+  retention (unlimited by default), and cleanups that always run (expired sessions and keys, old
+  invitations, old exports); the daily job writes a **disposal record** that can be downloaded as CSV.
+
+## Privacy notice and compliance documents
+
+- **Privacy notice:** the organisation's notice ("aydınlatma metni") on the sign-in and invitation
+  pages, with an optional "I have read it" checkbox whose acceptance is recorded per version
+  ([privacy notice](PRIVACY_NOTICE.md)).
+- **For the data controller:** personal data inventory, records of processing and VERBİS helper, DPIA
+  helper, subprocessors and transfers, law mapping and the limits of masking: [compliance](../compliance/README.md).
 
 ## KVKK notes
 
@@ -170,6 +246,15 @@ KVKK is the Turkish Personal Data Protection Law.
   life of the installation ([above](#audit-log-ip-address-and-user-agent)); the organisation records
   both in its processing inventory. The keyed hashes that stay in the chain are pseudonymised data,
   not anonymous data, while the installation's secret key exists.
+- Security alerts (Administration, [security log](SECURITY_LOG.md#breach-notification-gdpr--kvkk))
+  mark when the organisation may have become aware of a breach: KVKK m.12(5) asks for notification of
+  the Board as soon as possible (72 hours by the Board's decision 2019/10), GDPR Art. 33 within 72
+  hours. A read-only **auditor** (the DPO, internal audit) can follow the security log and the
+  Privacy Centre without administrator rights.
+- The disposal record (Privacy Centre → Retention → CSV) lists what the retention job deleted, by
+  category, with counts and dates: a basis for the periodic destruction report of the Regulation on
+  the Deletion, Destruction or Anonymisation of Personal Data. The organisation's own retention and
+  destruction policy decides the periods.
 - Masking is a security layer, not full anonymisation. Indirect identifiers in free text (e.g. address, job title) are not masked.
 
 ## Security headers
@@ -182,10 +267,10 @@ OAuth paths (`/oauth2/*`, consent page) do not get COOP, for clients that use po
 
 ## Roadmap (phase 2)
 
-- On-disk encryption for stored files.
-- KVKK user data export and anonymisation (data subject requests); the audit log part is ready
-  (`eraseAuditPersonal`, [personal data](AUDIT_LOG.md#personal-data)).
-- Retention policies: duration and automatic deletion by project, folder and record type.
+- On-disk encryption for stored files. Until then, disk and backup encryption are the operator's
+  ([encryption at rest](../onprem/docker-compose.md#encryption-at-rest)).
+- Retention policies by project, folder and record type (the installation-wide periods exist:
+  [retention](DATA_SUBJECT_RIGHTS.md#retention)).
 - Full project export (in OpenCDE BCF and Documents API format): the customer can move their data to another CDE at any time.
-- Two-factor authentication (2FA) and enterprise single sign-on (SSO).
+- Enterprise single sign-on (SSO). Two-factor authentication is done: [sign-in security](SIGN_IN_SECURITY.md).
 - Masking of task queue prompts as well.

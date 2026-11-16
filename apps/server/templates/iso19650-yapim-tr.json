@@ -75,6 +75,35 @@
       }
     ]
   },
+  "deliveryPlan": {
+    "milestones": [
+      {
+        "code": "M1",
+        "name": "Konsept Tasarım",
+        "offsetDays": 60
+      },
+      {
+        "code": "M2",
+        "name": "Kesin Proje",
+        "offsetDays": 120
+      },
+      {
+        "code": "M3",
+        "name": "Uygulama Projesi",
+        "offsetDays": 210
+      },
+      {
+        "code": "M4",
+        "name": "Yapım Başlangıcı",
+        "offsetDays": 270
+      },
+      {
+        "code": "M5",
+        "name": "Teslim (Yapıldığı Gibi)",
+        "offsetDays": 720
+      }
+    ]
+  },
   "slots": [
     {
       "key": "idare",

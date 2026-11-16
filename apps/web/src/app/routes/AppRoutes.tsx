@@ -11,6 +11,7 @@ import { DocsPage } from "../../features/documents/DocsPage";
 import { DeletedPage } from "../../features/documents/pages/Deleted";
 import { PdfViewerPage } from "../../features/documents/pages/PdfViewer";
 import { SheetsPage } from "../../features/sheets/SheetsPage";
+import { DeliveryPlanPage } from "../../features/delivery-plan/DeliveryPlanPage";
 import { DocComparePage } from "../../features/documents/pages/DocCompare";
 import { AfterLoginPage, OAuthConsentPage } from "../../features/integrations/pages/OAuthConsent";
 import { OpenCdeSelectPage, OpenCdeUploadPage } from "../../features/integrations/pages/OpenCdeDocuments";
@@ -62,7 +63,7 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
       <Route element={<Shell />}>
         <Route index element={<Navigate to="/home" replace />} />
         <Route path="home" element={<ProjectsPage />} />
-        <Route path="administration" element={user.isAdmin ? <AdminPage /> : <Navigate to="/home" replace />} />
+        <Route path="administration" element={user.isAdmin || user.isAuditor ? <AdminPage /> : <Navigate to="/home" replace />} />
         <Route path="admin" element={<Navigate to="/administration" replace />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="about" element={<AboutPage signedIn />} />
@@ -79,6 +80,7 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
           <Route path="compare" element={<DocComparePage />} />
           <Route path="sheets" element={<SheetsPage />} />
           <Route path="sheets/:sheetId" element={<SheetsPage />} />
+          <Route path="delivery-plan" element={<DeliveryPlanPage />} />
           <Route
             path="open/:versionId"
             element={

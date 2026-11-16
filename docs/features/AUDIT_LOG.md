@@ -39,13 +39,36 @@ Document events that matter for ISO 19650:
 | `invitation.*` (created, resent, accepted, revoked, settings) | [Invitations](INVITATIONS.md) of people without an account |
 | `folder.updated`, `folder.settings_updated`, `cde.settings_updated` | Folder and CDE settings |
 | `review.*` | Reviews and their decisions |
+| `delivery_plan.*` | The delivery plan: milestones, TIDP leads, planned deliverables, import and export ([delivery plan](DELIVERY_PLAN.md#audit)) |
 | `audit.exported` | Someone downloaded the log as CSV (the filters are in `details.query`) |
+| `project.closeout_archive_created`, `project.closeout_archive_downloaded`, `project.closeout_archive_deleted` | A [close-out archive](CLOSEOUT_ARCHIVE.md) was built (with the audit head hash it recorded), downloaded or deleted |
+| `project.closed`, `project.reopened` | The project was closed (read-only) after its close-out archive, or reopened by a system administrator |
 | `audit.chain_started` | The genesis row written when the chain was switched on (migration 0043) |
 | `audit.personal_split` | Migration 0049 moved the personal data of the rows from before the chain; `details`: `legacyRowsMoved`, `chainedRowsWithPersonalData` (rows still to be [re-sealed](#re-seal)) |
 | `audit.personal_expired` | The daily job deleted personal data past its retention period; `details`: `deleted`, `before`, `retentionMonths` |
 | `audit.personal_erased` | One person's personal audit data was erased (`target_id`: the user); `details.deleted` |
 | `audit.resealed` | A [re-seal](#re-seal): the checkpoint the re-written segment ends in |
-| `auth.login_failed` | A failed sign-in: `details.emailHash` (the address itself in `audit_personal`), `user_id` when the address belongs to an account |
+| `auth.oidc_login` | A sign-in through an [OpenID Connect provider](OIDC_SIGN_IN.md): `details.provider` (its id), `provisioned`, `invitation`, `providerMfa`, `twoFactor` |
+| `auth.oidc_provider_created`, `auth.oidc_provider_updated`, `auth.oidc_provider_deleted` | A system administrator changed an OpenID Connect provider (`details`: id, issuer, account and trust settings; never the client secret) |
+| `auth.login_failed` | A failed sign-in: `details.emailHash` (the address itself in `audit_personal`), `user_id` when the address belongs to an account; `details.twoFactor` for a wrong second-step code |
+| `auth.locked` | Too many failed attempts locked an account or a client IP ([sign-in security](SIGN_IN_SECURITY.md#failed-sign-ins-g-1)); `details`: `scope`, `attempt`, `failures`, `windowMinutes`, `emailHash` for an account |
+| `auth.locks_cleared`, `auth.security_settings` | A system administrator lifted every lock / changed the sign-in security settings (`details`: each changed setting `from` → `to`) |
+| `auth.two_factor_enabled`, `auth.two_factor_disabled`, `auth.two_factor_recovery_codes`, `auth.two_factor_reset` | Two-factor turned on (`details.atSignIn` when required at sign-in), off, new recovery codes, reset by a system administrator (`target_id`: the user) |
+| `auth.sessions_ended` | "Sign out everywhere" (`target_id`: the user; `details.ended`, `byAdmin`) |
+| `audit.truncated` | The retention job deleted the oldest rows ([retention and truncation](#retention-and-truncation)): the checkpoint the chain now starts from; `details`: `truncationId`, `before`, `retentionYears`, `removedRows`, `removedPersonal`, `removedFromId`, `removedToId`, `removedHeadHash`, `newFirstId` |
+| `retention.completed` | The daily retention job deleted something; `details`: `runId`, `deleted` (count per category), `failed` ([data subject rights](DATA_SUBJECT_RIGHTS.md#retention)) |
+| `trash.auto_purged` | The recycle bin auto-purge deleted files / folders of the project; `details`: `before`, `trashPurgeDays`, counts, names (at most 100) |
+| `user.data_exported`, `user.data_export_downloaded` | A personal data export was built / downloaded (`target_id`: the person) |
+| `user.email_changed` | An administrator corrected a user's address: the new one in `audit_personal` (`details.emailHash`), the old one only as `previousEmailHash` |
+| `user.anonymised` | A user was anonymised ([data subject rights](DATA_SUBJECT_RIGHTS.md#anonymise)); `details`: the pseudonym and what was removed, never the old name or address |
+| `privacy.disposals_exported` | The disposal record was downloaded as CSV |
+| `user.created`, `user.updated` | A user was created / changed by a system administrator (`target_id`: the user); `details` holds the changed fields, `isAdmin` and `isAuditor` when the System Administrator or [Auditor](SECURITY_LOG.md#auditor-g-10) rights are set (a password only as `***`) |
+| `privacy.kill_switch_on`, `privacy.kill_switch_off`, `privacy.connection_updated` | "Turn Off All External Connections" switched on / off; one external connection switched (`details`: `id`, `enabled`) |
+| `security.alert_raised` | A [security alert](SECURITY_LOG.md#alerts-g-8) was raised (`target_type: security_alert`; `details`: `rule`, counts and thresholds, `auditId` of the row that raised it, `subjectUserId`); written without a person |
+| `security.alert_acknowledged`, `security.alert_dismissed` | A system administrator acknowledged / dismissed an alert (`details.rule`) |
+| `security.alert_settings` | The alert settings changed (`details`: each changed setting `from` → `to`; recipients only as a count) |
+| `privacy.notice_updated` | A system administrator changed the [privacy notice](PRIVACY_NOTICE.md); `details`: `version`, `textChanged`, `enabled`, `requireAck`, `reaskOnChange` and, for a new version, `text` (both languages) |
+| `privacy.notice_accepted` | A person ticked "I have read the privacy notice" at sign-in or on an invitation; `details`: `version`, `via` |
 
 The client is taken from the request automatically: an `onRequest` hook (`apps/server/src/app/build-app.ts`)
 puts it in an `AsyncLocalStorage` that `audit()` reads, so every row written while a request runs carries
@@ -67,7 +90,9 @@ embedded PGlite alike:
 - Because the lock is held until commit, writers are serialised and id order is chain order. A
   transaction that writes an audit row holds the lock until it ends, so keep such transactions short.
 - **Update / delete / truncate triggers** `audit_log_immutable`, `audit_log_no_truncate`: refuse every
-  change (`audit_log is append-only`). Nothing in SiteKeep updates or deletes audit rows: projects are
+  change (`audit_log is append-only`). Outside two audited maintenance operations that switch the
+  trigger off inside their own transaction (the [re-seal](#re-seal) and the opt-in
+  [retention truncation](#retention-and-truncation)), nothing in SiteKeep updates or deletes audit rows: projects are
   archived, not deleted; the recycle bin purges files and folders, not their log; the table has no
   foreign keys to other tables, so removing a user or a project never cascades into it. (Since 0049
   `audit_personal` references it, so a plain `TRUNCATE` is refused by that key, and
@@ -172,10 +197,50 @@ and the operation is done by the database itself in one transaction, but whoever
 database owner rights anyway. Record the old and new head hashes the script prints outside the
 server. A second run with nothing left to move does nothing.
 
-## Checking the chain
+## Retention and truncation
 
-- **API:** `GET /api/v1/admin/audit/verify` (system administrators).
-- **Screen:** Project Settings → Audit Log → **Check the Chain** (system administrators).
+By default audit rows are kept for the life of the installation (ISO 19650 and most contracts want
+the whole project). An administrator can set a retention period: Administration → Privacy Centre →
+**Retention** → **Audit log: keep for** (`auditLogRetentionYears` in `PUT /admin/privacy/settings`;
+empty = unlimited, the default; at least 1 year, at most 50). The daily retention job
+(`apps/server/src/privacy/retention.ts`) then deletes the rows written before the cutoff (the same
+calendar date that many years ago, UTC) with `truncateAuditLog` (`apps/server/src/audit/truncate.ts`).
+
+A hash chain can only lose a **prefix** without breaking, so the truncation is designed as one:
+
+1. Nothing happens unless some row is older than the cutoff. Then, in one transaction that takes the
+   same locks as the re-seal (table lock, then the chain's advisory lock), the whole chain must verify,
+   else the job refuses (and logs it).
+2. Every row up to the last one written before the cutoff is deleted, rows from before the chain
+   included; the head always stays. Their `audit_personal` records go first. The immutable trigger is
+   off only inside this transaction.
+3. **`audit_truncation`** (append-only, trigger) records the cutoff, the retention, the deleted id
+   range and counts, **`removed_head_hash`** (the hash of the last deleted chained row: the
+   `prev_hash` of the new first row) and `new_first_id`.
+4. The chained row **`audit.truncated`** records the same values.
+5. The chain must verify again, else everything is rolled back.
+
+**`audit:verify` after a truncation:** the walk starts at the first remaining chained row. When the
+latest `audit_truncation` row names it (`new_first_id`), its `prev_hash` must equal
+`removed_head_hash` (instead of being empty), and the chain must contain that checkpoint's
+`audit.truncated` row with the same `removedHeadHash` and `newFirstId`; otherwise
+`truncation_mismatch`. A start that no checkpoint explains is `prev_mismatch`, as before (rows
+removed by hand). The result carries `truncated: { id, before, removedHeadHash, newFirstId }`, and the
+Audit Log tab shows "starts after the retention cut-off of …".
+
+What this proves and what it does not: the remaining chain is intact and its start is accounted for
+by a checkpoint written by the same transaction that deleted the rows, inside the chain. A head hash
+recorded outside the server before the truncation stays checkable as long as that row is kept; for
+rows older than the retention period it no longer is, by design. Keep exported head hashes and the
+disposal record (`disposal_log`, CSV in the Privacy Centre) for as long as you need to show what was
+deleted and when. Re-seals and truncations combine: a re-seal archive digest is still checked for
+every `audit.resealed` row that is kept.
+
+- **API:** `GET /api/v1/admin/audit/verify` (system administrators and auditors).
+- **Daily:** the server walks the chain once a day (first five minutes after start); a break raises
+  the **Audit Chain Check Failed** [security alert](SECURITY_LOG.md#alerts-g-8).
+- **Screen:** Project Settings → Audit Log → **Check the Chain** (system administrators), and
+  Administration → Security Log (system administrators and auditors).
 - **CLI:** `npm run audit:verify -w @sitekeep/server` (development) or `node dist/scripts/audit-verify.js`
   in the server image. Uses `DATABASE_URL`, or `DATA_DIR/db` (PGlite; stop the server first, PGlite opens
   in one process only). Exit code 0 = intact, 2 = broken, 1 = could not run.
@@ -189,8 +254,9 @@ The check walks the chain in id order from the genesis row and reports the first
 | `hash_mismatch` | The row's fields do not hash to its stored hash: the row was changed |
 | `personal_mismatch` | The row's personal record does not match its `personal_hash` (or the row has none): the IP address, user agent or e-mail was changed or attached later |
 | `reseal_archive_mismatch` | An `audit.resealed` row's archive of old hashes no longer gives the digest it recorded |
+| `truncation_mismatch` | The chain starts after a [retention truncation](#retention-and-truncation) whose chained `audit.truncated` row is missing or records other values |
 
-Result: `{ ok, checked, legacyRows, head: { id, hash, at }, personalChecked, broken: { id, reason } | null }`.
+Result: `{ ok, checked, legacyRows, head: { id, hash, at }, personalChecked, broken: { id, reason } | null, truncated }`.
 `personalChecked` is the number of personal records compared with their hash; `null` when the check
 ran without the installation's key (the CLI reads `CDE_SECRET_KEY` or `DATA_DIR/secret.key` when
 present and never creates one).
@@ -202,8 +268,10 @@ present and never creates one).
 | `GET /projects/:pid/audit` | Project administrators | One page, newest first: `{ entries, nextCursor }` |
 | `GET /projects/:pid/audit.csv` | Project administrators | Every row of the same filters, streamed; writes `audit.exported` |
 | `GET /projects/:pid/files/:id/history` | Anyone who may view the file | Rows about the file and its versions; IP and user agent only for project administrators |
-| `GET /admin/audit`, `GET /admin/audit.csv` | System administrators | All projects and system rows; extra filter `projectId` |
-| `GET /admin/audit/verify` | System administrators | The chain check |
+| `GET /admin/audit`, `GET /admin/audit.csv` | System administrators, auditors | All projects and system rows; extra filter `projectId` |
+| `GET /admin/audit/projects` | System administrators, auditors | Every project (`id`, `code`, `name`) for that filter |
+| `GET /admin/audit/verify` | System administrators, auditors | The chain check |
+| `GET /admin/security-log`, `GET /admin/security-log.csv` | System administrators, auditors | The [security log](SECURITY_LOG.md): security events only; filters `type`, `userId`, `from`, `to`, `ip` |
 | `GET /projects/:pid/activity` | Project administrators | The older list (still used by the web app and reports) |
 
 Filters (query string): `from`, `to` (a date `YYYY-MM-DD` — `to` includes that whole day — or an ISO time),
@@ -217,6 +285,11 @@ names follow the reader's language (`lang` in the query, else `Accept-Language`;
 
 ## Screens
 
+- **Administration → Security Log** (system administrators and [auditors](SECURITY_LOG.md#auditor-g-10)):
+  the security events of the whole installation, rows written outside a project included, with
+  type, person, date and IP address filters and CSV; **All Events** shows the log of every project
+  and of the system (`GET /admin/audit`) with a project filter; the chain check
+  ([security log](SECURITY_LOG.md)).
 - **Project Settings → Audit Log** (advanced settings, project administrators): filters (from, to,
   action or action group, person, a target picked from a row), pages of 50 with **Load More**,
   **Download CSV**, the client's IP address (user agent on hover; "deleted (retention)" / "deleted (erased)"
@@ -230,9 +303,10 @@ names follow the reader's language (`lang` in the query, else `Accept-Language`;
 
 The IP address and the browser's user agent are personal data. They are stored for every row written
 during a request (decision D-9) to show who acted from where, outside the chain in `audit_personal`,
-and deleted after the retention period (default 12 months) or on erasure of the person, while the
-rows themselves are never deleted ([personal data](#personal-data)). Only project and system
-administrators see them. See [Privacy](PRIVACY.md#audit-log-ip-address-and-user-agent).
+and deleted after the retention period (default 12 months) or on erasure of the person
+([personal data](#personal-data)). The rows themselves are kept for the life of the installation
+unless an administrator sets an audit log retention ([retention and truncation](#retention-and-truncation)). Only project and system
+administrators (and [auditors](SECURITY_LOG.md#auditor-g-10)) see them. See [Privacy](PRIVACY.md#audit-log-ip-address-and-user-agent).
 
 ## Tests
 
@@ -247,6 +321,13 @@ administrators see them. See [Privacy](PRIVACY.md#audit-log-ip-address-and-user-
   retention job (count recorded, chain verifies, "deleted (retention)" in the API and CSV), migration
   0049 on a database with 6 001 rows from before the chain and chained rows with a client, the
   re-seal (archive, checkpoint, changed archive found) and a re-seal refused on a broken chain.
+- `apps/server/test/audit/data-subject-rights.test.ts` — the retention truncation: rows before the
+  cutoff deleted with their personal records, checkpoint and `audit.truncated` row, chain verifies with
+  `truncated`, the checkpoint is append-only, a row removed afterwards is found, a broken chain is not
+  truncated, a forged checkpoint without its chained row is `truncation_mismatch`; also the
+  `user.*` events of [data subject rights](DATA_SUBJECT_RIGHTS.md).
+- `apps/server/test/audit/security-log.test.ts` — the [security log](SECURITY_LOG.md#tests), its
+  alerts and the auditor's read-only access to `/admin/audit`, its CSV and the chain check.
 - `apps/server/test/cde/migration.test.ts` — the table is append-only after the migrations.
 - `apps/server/test/cde/iso19650-acceptance.test.ts` — the events of a whole ISO template project
   (review, transition, superseded, returned, withdrawn) and a tampered row found through the API.

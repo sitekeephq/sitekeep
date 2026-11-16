@@ -10,6 +10,7 @@ import type audit from "./locales/en/audit.json";
 import type auth from "./locales/en/auth.json";
 import type bcf from "./locales/en/bcf.json";
 import type cde from "./locales/en/cde.json";
+import type closeout from "./locales/en/closeout.json";
 import type coordination from "./locales/en/coordination.json";
 import type doccompare from "./locales/en/doccompare.json";
 import type docintel from "./locales/en/docintel.json";
@@ -58,6 +59,7 @@ export interface CoreServerResources {
   auth: typeof auth;
   bcf: typeof bcf;
   cde: typeof cde;
+  closeout: typeof closeout;
   coordination: typeof coordination;
   doccompare: typeof doccompare;
   docintel: typeof docintel;

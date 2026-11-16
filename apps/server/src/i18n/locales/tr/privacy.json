@@ -3,7 +3,15 @@
     "adminOnly": "Bu işlem sistem yöneticisi yetkisi gerektirir.",
     "invalidDate": "Tarih YYYY-AA-GG biçiminde olmalı.",
     "oauthManagedElsewhere": "OAuth uygulamaları Yönetim → OAuth Uygulamaları sayfasından açılıp kapatılır.",
-    "unknownConnection": "Bilinmeyen bağlantı."
+    "unknownConnection": "Bilinmeyen bağlantı.",
+    "exportRunning": "Bu kişinin verileri için bir dışa aktarma zaten hazırlanıyor.",
+    "exportNotReady": "Dışa aktarma henüz hazır değil.",
+    "anonymised": "Bu hesap anonimleştirildi.",
+    "anonymiseConfirm": "Onaylamak için hesabın e-posta adresini aynen yazın.",
+    "anonymiseSelf": "Kendi hesabınızı anonimleştiremezsiniz.",
+    "emailInUse": "Bu e-posta adresi başka bir hesapta kullanılıyor.",
+    "noticeRequired": "Devam etmek için aydınlatma metnini okuyun ve “Aydınlatma Metnini Okudum” kutusunu işaretleyin.",
+    "noticeEmpty": "Göstermeden önce aydınlatma metnini en az bir dilde yazın."
   },
   "outbound": {
     "killSwitch": "Tüm dış bağlantılar kapalı (Yönetim → Gizlilik Merkezi): {{host}} adresine bağlanılmadı.",
@@ -49,7 +57,10 @@
     "oauthApps_one": "{{count}} uygulama, {{enabled}} açık",
     "oauthApps_other": "{{count}} uygulama, {{enabled}} açık",
     "oauthManaged": "Yönetim → OAuth Uygulamaları'ndan yönetilir",
-    "comingSoon": "Yakında"
+    "comingSoon": "Yakında",
+    "oidc": "{{name}} ile Giriş (OpenID Connect)",
+    "oidcSends": "Sağlayıcının ayarlarını ve anahtarlarını okur, giriş kodunu değiştirir ve kimlik belirtecini doğrular (e-posta adresi, ad, gruplar); tarayıcı sağlayıcıya kendisi gider",
+    "oidcProviderOff": "Sağlayıcı Giriş Güvenliği altında kapalı"
   },
   "csv": {
     "fileName": "giden-baglanti-kaydi.csv",
@@ -74,5 +85,49 @@
     "external": "Dış",
     "yes": "Evet",
     "no": "Hayır"
+  },
+  "entities": {
+    "export": "Kişisel veri dışa aktarımı"
+  },
+  "anonymise": {
+    "name": "Silinmiş kullanıcı #{{id}}"
+  },
+  "export": {
+    "readme": "SiteKeep kişisel veri dışa aktarımı\nOluşturulma: {{date}}\n\nHer bölüm iki kez var: json/<bölüm>.json (makine tarafından okunabilir) ve csv/<bölüm>.csv (noktalı virgülle ayrılmış, UTF-8).\n\nBölümler (satır):\n{{sections}}\n\n{{files}}\n\nDahil olmayanlar: şifre özeti, erişim anahtarlarının değerleri, başka kişilerin kişisel verileri.\nBu dosya oluşturulduktan {{days}} gün sonra sunucudan silinir.\n",
+    "filesIncluded": "Yüklenen {{total}} dosya sürümünün {{count}} tanesinin içeriği files/ klasöründe (tam liste files.csv içinde).",
+    "filesListed": "Yüklenen dosyalar files.csv içinde listelenir; içerikleri dahil değildir."
+  },
+  "disposal": {
+    "fileName": "imha-kaydi.csv",
+    "columns": {
+      "time": "Zaman (UTC)",
+      "run": "Çalışma",
+      "category": "Kategori",
+      "description": "Açıklama",
+      "count": "Silinen kayıt",
+      "oldest": "En eski kayıt",
+      "newest": "En yeni kayıt",
+      "basis": "Kural",
+      "method": "Yöntem",
+      "details": "Ayrıntılar"
+    },
+    "methods": {
+      "delete": "Veritabanından silindi",
+      "deleteStorage": "Veritabanından ve dosya deposundan silindi"
+    },
+    "categories": {
+      "trash_files": "Çöp kutusu: kalıcı olarak silinen dosyalar (sürümleri ve depolanan içerikleriyle)",
+      "trash_folders": "Çöp kutusu: kalıcı olarak silinen klasörler",
+      "audit_log": "Saklama süresini aşan denetim kaydı satırları",
+      "audit_personal": "Denetim kaydındaki kişisel veriler (IP adresi, tarayıcı bilgisi, e-posta)",
+      "outbound_log": "Dış bağlantı günlüğü satırları",
+      "sessions": "Süresi dolmuş oturumlar",
+      "api_tokens": "Süresi dolmuş API erişim anahtarları",
+      "oauth_tokens": "Süresi dolmuş OAuth erişim anahtarları",
+      "oauth_codes": "Süresi dolmuş OAuth yetkilendirme kodları",
+      "oauth_refresh_tokens": "Süresi dolmuş OAuth yenileme anahtarları",
+      "invitations": "Kabul edilmemiş davetler (süresi dolmuş ya da geri alınmış)",
+      "personal_exports": "Kişisel veri dışa aktarımları (ZIP)"
+    }
   }
 }

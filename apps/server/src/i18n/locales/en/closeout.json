@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "archive": "Close-out archive"
+  },
+  "errors": {
+    "projectClosed": "This project is closed (read-only) after its close-out archive: files can be viewed and downloaded, but not uploaded or changed. A system administrator can reopen it.",
+    "busy": "A close-out archive of this project is being built. Wait until it is finished.",
+    "nothingToArchive": "There is nothing to archive: no file is in a Published or Archived folder (or Shared, when included).",
+    "tooLarge": "The archive would hold {{size}} GB, more than the limit of {{max}} GB (CDE_CLOSEOUT_MAX_GB).",
+    "noDiskSpace": "Not enough disk space for the archive: it needs about {{size}} GB plus a reserve of {{reserve}} GB, {{free}} GB is free.",
+    "notReady": "The archive is not ready to download.",
+    "expired": "The download period of this archive is over and its file was deleted. Build a new archive.",
+    "archiveFirst": "Build a complete close-out archive (no missing or changed files) before closing the project.",
+    "alreadyClosed": "The project is already closed.",
+    "notClosed": "The project is not closed.",
+    "reopenAdminOnly": "Only a system administrator can reopen a closed project."
+  },
+  "manifestCsv": {
+    "yes": "yes",
+    "no": "no",
+    "columns": {
+      "path": "Path",
+      "documentCode": "Document Code",
+      "containerId": "Container ID",
+      "fileId": "File ID",
+      "versionId": "Version ID",
+      "version": "Version",
+      "latest": "Latest",
+      "revision": "Revision",
+      "suitability": "Suitability",
+      "cdeState": "CDE State",
+      "cdeStatus": "CDE Status",
+      "size": "Size (bytes)",
+      "sha256": "SHA-256",
+      "integrity": "Integrity",
+      "uploadedBy": "Uploaded By",
+      "uploadedAt": "Uploaded At (UTC)",
+      "approvals": "Approvals",
+      "supersededBy": "Superseded By",
+      "supersedes": "Supersedes",
+      "namingStandard": "Naming Standard",
+      "namingResult": "Naming Check"
+    }
+  },
+  "readme": {
+    "title": "SiteKeep close-out archive",
+    "project": "Project: {{code}} {{name}}",
+    "created": "Created: {{at}} (UTC) by {{user}}",
+    "scope": "Published and Archived information",
+    "scopeWithShared": "Shared, Published and Archived information",
+    "versionsAll": "every version of each file",
+    "versionsLatest": "the current version of each file",
+    "scopeLine": "Contents: {{scope}}, {{versions}}",
+    "counts": "{{files}} files, {{versions}} versions, {{bytes}} bytes",
+    "purpose": "This package archives the project information model at project close-out (ISO 19650-2:2018, 5.8.1). It keeps the files in the project's folder structure with their metadata, approvals and supersession links, and the project's audit log.",
+    "contents": "Contents of the package:",
+    "files": "the files, in the project's folder structure; older versions as \"name (V2).ext\"",
+    "manifestJson": "one entry per version: document code, container, revision, suitability, CDE state, size, SHA-256, uploader, approvals, supersession links, naming standard check (schema {{schema}})",
+    "manifestCsv": "the same as a table, one row per version (\";\" separated, UTF-8)",
+    "auditCsv": "the project's audit log up to entry {{id}}, without IP addresses and browsers",
+    "auditVerify": "the audit chain check made when the archive was built",
+    "sums": "SHA-256 of every file in the package",
+    "chain": "Audit chain check: {{result}}",
+    "chainOk": "intact, {{count}} entries checked",
+    "chainBroken": "BROKEN at entry {{id}} ({{reason}})",
+    "head": "Latest audit entry: {{id}}, {{at}}, hash {{hash}}",
+    "noHead": "The audit log has no chained entries yet.",
+    "recordHead": "Keep this hash outside SiteKeep: any later change, removal or insertion of an audit entry up to it makes the chain check fail.",
+    "check": "To check the package: sha256sum -c SHA256SUMS (Linux, macOS: shasum -a 256 -c SHA256SUMS). The integrity column of the manifest says whether each file matched the SHA-256 stored when it was uploaded.",
+    "problems_one": "{{count}} file could not be archived as stored:",
+    "problems_other": "{{count}} files could not be archived as stored:",
+    "integrity": {
+      "missing": "missing from the storage",
+      "mismatch": "content does not match the stored SHA-256"
+    }
+  }
+}

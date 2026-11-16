@@ -18,6 +18,11 @@ export interface UserDto {
   email: string;
   name: string;
   isAdmin: boolean;
+  /**
+   * Read-only auditor (docs/features/SECURITY_LOG.md#auditor): sees the security log, the Privacy
+   * Centre and the audit log of every project, changes nothing; set by a system administrator.
+   */
+  isAuditor?: boolean;
   companyId: string | null;
   /** True until the user replaces the provisioned temporary password. */
   mustChangePassword?: boolean;
@@ -25,6 +30,8 @@ export interface UserDto {
   language?: string | null;
   /** Invited, has not accepted yet (no sign-in); listed for system administrators only. */
   pending?: boolean;
+  /** Two-factor authentication is on (listed for system administrators only). */
+  twoFactor?: boolean;
 }
 
 /** Password we set when creating accounts for someone else; first login must replace it. */
@@ -55,6 +62,8 @@ export interface ProjectDto {
   issueTypes?: { category: string; types: string[] }[];
   /** Dates, location and client given in the project set-up wizard. */
   details?: { startDate?: string; endDate?: string; location?: string; client?: string };
+  /** Closed after its close-out archive (read-only: no uploads or edits); docs/features/CLOSEOUT_ARCHIVE.md. */
+  closedAt?: string | null;
 }
 
 export interface MemberDto {
@@ -432,12 +441,18 @@ export interface AuditVerifyDto {
   /**
    * The first row that breaks the chain. `personal_mismatch`: the row's personal record does not
    * match its personal_hash; `reseal_archive_mismatch`: an `audit.resealed` row's archive of old
-   * hashes was changed.
+   * hashes was changed; `truncation_mismatch`: the chain starts after a deleted row but no
+   * retention truncation (checkpoint and chained `audit.truncated` row) accounts for it.
    */
   broken: {
     id: number;
-    reason: "missing_hash" | "prev_mismatch" | "hash_mismatch" | "personal_mismatch" | "reseal_archive_mismatch";
+    reason: "missing_hash" | "prev_mismatch" | "hash_mismatch" | "personal_mismatch" | "reseal_archive_mismatch" | "truncation_mismatch";
   } | null;
+  /**
+   * The chain starts after a retention truncation (docs/features/AUDIT_LOG.md#retention-and-truncation):
+   * rows before `before` were deleted; the first row points to `removedHeadHash`.
+   */
+  truncated?: { id: number; before: string; removedHeadHash: string | null; newFirstId: number } | null;
 }
 
 export interface ApiError {

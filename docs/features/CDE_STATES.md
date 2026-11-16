@@ -298,5 +298,6 @@ migration 0042): `DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.
 | Suitability and revision codes per version ([codes](#codes)) | done |
 | Unique document codes ([details](DOCUMENT_CODES.md)) | done |
 | Task teams and WIP visibility ([task teams](TASK_TEAMS.md)) | done |
+| Delivery plan: TIDP per task team, MIDP, status from the CDE (ISO-7, [delivery plan](DELIVERY_PLAN.md)) | done |
 | Audit trail: view events, hash chain, CSV ([details](AUDIT_LOG.md)) | done |
 | Conformance pack: clause map, tagged tests, acceptance scenario ([ISO 19650 conformance](../compliance/ISO19650.md)) | done |

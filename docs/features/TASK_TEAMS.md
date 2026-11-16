@@ -97,6 +97,8 @@ adds the reason `task_team_wip` for members outside the team, and the explanatio
   - who sees WIP (the policy) and whether administrators see all WIP;
   - the teams with their code, company, lead flag and members;
   - add, delete and lead actions, and "Create Teams for Companies".
+- **Delivery Plan** ([delivery plan](DELIVERY_PLAN.md)): one TIDP per task team, edited by its lead and
+  the project administrators, seen by its members.
 - **Folder settings** (`OwnerTeamField.tsx`): Owner Task Team, shown for WIP folders and editable by
   project administrators.
 - **Folder permissions:** the reason prompt for exception grants.

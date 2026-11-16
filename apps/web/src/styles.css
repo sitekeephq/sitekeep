@@ -1232,6 +1232,8 @@ button.link-button { border: 0; background: transparent; padding: 0; color: var(
 }
 .login-google:hover { border-color: #9ea8b4; background: #f9fafb; text-decoration: none; }
 .login-google svg { width: 19px; height: 19px; }
+.login-providers { display: flex; flex-direction: column; gap: 10px; }
+.oidc-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
 .login-divider {
   display: flex;
   align-items: center;
@@ -1303,6 +1305,11 @@ button.link-button { border: 0; background: transparent; padding: 0; color: var(
   font-size: 12px;
   line-height: 1.5;
 }
+/* Privacy notice (aydınlatma metni) on the sign-in and invitation pages: docs/features/PRIVACY_NOTICE.md */
+.privacy-notice { margin: 0 0 18px; padding: 10px 12px; border: 1px solid var(--border, #d9dee5); border-radius: 8px; font-size: 12px; }
+.privacy-notice-title { display: block; margin-bottom: 6px; font-size: 12px; }
+.privacy-notice-text { max-height: 180px; overflow: auto; color: #4b5664; }
+.privacy-notice .check { margin: 8px 0 0; font-size: 12px; }
 .login-help { margin: 25px 0 0; color: #7b8592; font-size: 11px; line-height: 1.5; text-align: center; }
 .login-help span { display: block; margin-top: 2px; color: #4b5664; font-weight: 600; }
 .login-footer { width: 100%; margin-top: 24px; color: #929ba6; font-size: 11px; text-align: center; }

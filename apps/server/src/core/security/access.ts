@@ -19,6 +19,8 @@ export interface AuthUser {
   email: string;
   name: string;
   isAdmin: boolean;
+  /** Read-only auditor (docs/features/SECURITY_LOG.md#auditor). */
+  isAuditor?: boolean;
   companyId: string | null;
   mustChangePassword?: boolean;
   /** Interface language from the profile (prefs.language); null = not chosen. */

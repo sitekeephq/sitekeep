@@ -44,8 +44,8 @@ test("iPhone: members screen invitations and the accept page fit the screen", as
   await expect(card.getByRole("heading", { name: "Daveti Kabul Edin" })).toBeVisible();
   await assertNoSidewaysScroll(phone);
   await card.getByLabel("Adınız").fill("Mobil Davetli");
-  await card.getByLabel("Şifre", { exact: true }).fill("Mobil-Davet-2026");
-  await card.getByLabel("Şifre Tekrar").fill("Mobil-Davet-2026");
+  await card.getByLabel("Şifre", { exact: true }).fill("Kabul-Gizli-2026");
+  await card.getByLabel("Şifre Tekrar").fill("Kabul-Gizli-2026");
   await card.getByRole("button", { name: "Kabul Et ve Giriş Yap" }).click();
   await expect(phone).toHaveURL(/\/home$/);
   await expect(phone.getByText(`Mobil Davet ${s}`).first()).toBeVisible();

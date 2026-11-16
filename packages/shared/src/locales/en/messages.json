@@ -453,6 +453,7 @@
     "cdeDuplicateTransition": "CDE transition {{transition}} is listed more than once.",
     "partSlotUnknown": "{{where}}: \"{{slot}}\" is neither a role (slot) nor a project role of the template.",
     "duplicateTaskTeam": "cde.taskTeams: role \"{{slot}}\" is listed more than once.",
+    "duplicateMilestone": "deliveryPlan.milestones: milestone \"{{name}}\" is listed more than once.",
     "duplicateProjectRole": "Project role \"{{key}}\" is defined twice.",
     "stepProjectRoleUnknown": "\"{{name}}\" step {{step}}: project role \"{{role}}\" is not defined in roles.",
     "partWorkflowUnknown": "{{where}}: no workflow named \"{{name}}\" in the template.",

@@ -311,10 +311,31 @@ export async function findOpenInvitation(
 export async function acceptInvitation(
   db: Db,
   token: string,
-  input: { name?: string | null; password?: string | null; provider: "password" | "google"; language?: string | null },
+  input: AcceptInput,
 ): Promise<UserRow> {
   const found = await findOpenInvitation(db, token);
   if (!found.ok) throw invitationError(found.problem);
+  return activate(db, found, input);
+}
+
+type AcceptInput = { name?: string | null; password?: string | null; provider: string; language?: string | null };
+
+/**
+ * Accepts the newest open invitation of a pending user without its token: an OpenID Connect provider
+ * confirmed the invited address (docs/features/OIDC_SIGN_IN.md). Null when the user has none open.
+ */
+export async function acceptInvitationOfUser(db: Db, userId: string, input: AcceptInput): Promise<UserRow | null> {
+  const [row] = await db
+    .select({ invitation: invitations, user: users })
+    .from(invitations)
+    .innerJoin(users, eq(users.id, invitations.userId))
+    .where(and(eq(invitations.userId, userId), eq(users.pending, true), isNull(invitations.acceptedAt), isNull(invitations.revokedAt), gt(invitations.expiresAt, new Date())))
+    .orderBy(desc(invitations.createdAt))
+    .limit(1);
+  return row ? activate(db, row, input) : null;
+}
+
+async function activate(db: Db, found: { invitation: InvitationRow; user: UserRow }, input: AcceptInput): Promise<UserRow> {
   const { invitation } = found;
   const passwordHash = input.password ? await hashPassword(input.password) : null;
   const now = new Date();

@@ -298,7 +298,7 @@ function AccountMenu() {
             <span className="menu-item-text">{t("topbar.about")}</span>
           </button>
           <LanguageMenuItems onChosen={() => setOpen(false)} />
-          {user?.isAdmin && (
+          {(user?.isAdmin || user?.isAuditor) && (
             <button role="menuitem" className="menu-item" onClick={() => goTo("/administration")}>
               <Icon name="layers" />
               <span className="menu-item-text">{t("topbar.systemAdmin")}</span>

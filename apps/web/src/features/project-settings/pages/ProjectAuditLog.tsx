@@ -170,7 +170,7 @@ export function AuditLog() {
 }
 
 /** Hash-chain check (system administrators): walks the whole log on the server. */
-function ChainStatus() {
+export function ChainStatus() {
   const { t } = useTranslation("projectSettings");
   const [result, setResult] = useState<AuditVerifyDto | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -197,6 +197,7 @@ function ChainStatus() {
         ) : (
           <span className="badge danger">{t("auditLog.chain.broken", { id: result.broken!.id, reason: t(`auditLog.chain.reasons.${result.broken!.reason}`) })}</span>
         ))}
+      {result?.truncated && <span className="muted small">{t("auditLog.chain.truncated", { date: result.truncated.before.slice(0, 10) })}</span>}
       {result?.head && (
         <span className="muted small mono" title={result.head.hash}>
           {t("auditLog.chain.head", { hash: result.head.hash.slice(0, 16) })}

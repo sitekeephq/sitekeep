@@ -39,13 +39,18 @@ describe("module label tables", () => {
     try {
       for (const entry of tables) {
         for (const [table, values] of Object.entries(entry.data as Record<string, Record<string, string>>)) {
-          const [key, english] = Object.entries(values)[0]!;
-          await setLanguage("en", { persist: false });
-          expect(label(table as never, key), `${table}.${key}`).toBe(english);
-          await setLanguage("tr", { persist: false });
-          const turkish = label(table as never, key);
-          expect(turkish, `${table}.${key} in Turkish`).not.toBe(key);
-          expect(turkish, `${table}.${key} in Turkish`).not.toBe(english);
+          // Every value shows in English; at least one differs in Turkish (format names such as
+          // "MS Project XML" are the same in both languages).
+          let translated = 0;
+          for (const [key, english] of Object.entries(values)) {
+            await setLanguage("en", { persist: false });
+            expect(label(table as never, key), `${table}.${key}`).toBe(english);
+            await setLanguage("tr", { persist: false });
+            const turkish = label(table as never, key);
+            expect(turkish, `${table}.${key} in Turkish`).not.toBe(key);
+            if (turkish !== english) translated++;
+          }
+          expect(translated, `${table}: no value is translated to Turkish`).toBeGreaterThan(0);
         }
       }
     } finally {

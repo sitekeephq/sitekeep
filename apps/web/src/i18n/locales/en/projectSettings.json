@@ -5,7 +5,12 @@
         "created": "Project created",
         "updated": "Project updated",
         "ai_updated": "AI setting changed",
-        "created_from_template": "Project created from template"
+        "created_from_template": "Project created from template",
+        "closeout_archive_created": "Close-out archive created",
+        "closeout_archive_downloaded": "Close-out archive downloaded",
+        "closeout_archive_deleted": "Close-out archive deleted",
+        "closed": "Project closed (read-only)",
+        "reopened": "Project reopened"
       },
       "member": {
         "added": "Member added",
@@ -197,7 +202,12 @@
       },
       "audit": {
         "exported": "Audit log exported",
-        "chain_started": "Audit chain started"
+        "chain_started": "Audit chain started",
+        "personal_split": "Personal data moved out of the chain",
+        "personal_expired": "Personal data past retention deleted",
+        "personal_erased": "Personal data of a person erased",
+        "resealed": "Audit chain re-sealed",
+        "truncated": "Old audit entries deleted (retention)"
       },
       "sheet": {
         "updated": "Sheet details edited",
@@ -226,6 +236,86 @@
         "accepted": "Invitation accepted",
         "revoked": "Invitation revoked",
         "settings": "Invitation setting changed"
+      },
+      "delivery_plan": {
+        "milestone_created": "Delivery milestone added",
+        "milestone_updated": "Delivery milestone changed",
+        "milestone_deleted": "Delivery milestone deleted",
+        "lead_set": "Delivery plan lead set",
+        "deliverable_created": "Planned deliverable added",
+        "deliverable_updated": "Planned deliverable changed",
+        "deliverable_deleted": "Planned deliverable deleted",
+        "imported": "Delivery plan imported",
+        "exported": "Delivery plan exported"
+      },
+      "auth": {
+        "login": "Signed in",
+        "login_failed": "Failed sign-in",
+        "locked": "Sign-in locked",
+        "locks_cleared": "Sign-in locks lifted",
+        "password_changed": "Password changed",
+        "security_settings": "Sign-in security settings changed",
+        "google_settings": "Google sign-in settings changed",
+        "oidc_login": "Signed in with OpenID Connect",
+        "oidc_provider_created": "OpenID Connect provider added",
+        "oidc_provider_updated": "OpenID Connect provider changed",
+        "oidc_provider_deleted": "OpenID Connect provider deleted",
+        "sessions_ended": "Sessions ended",
+        "token_created": "Access key created",
+        "two_factor_enabled": "Two-factor turned on",
+        "two_factor_disabled": "Two-factor turned off",
+        "two_factor_recovery_codes": "New recovery codes",
+        "two_factor_reset": "Two-factor reset by an administrator"
+      },
+      "user": {
+        "created": "User created",
+        "updated": "User changed",
+        "anonymised": "User anonymised",
+        "email_changed": "E-mail address corrected",
+        "data_exported": "Personal data export prepared",
+        "data_export_downloaded": "Personal data export downloaded"
+      },
+      "privacy": {
+        "kill_switch_on": "All external connections turned off",
+        "kill_switch_off": "External connections turned on again",
+        "connection_updated": "External connection changed",
+        "disposals_exported": "Disposal record exported"
+      },
+      "security": {
+        "alert_raised": "Security alert raised",
+        "alert_acknowledged": "Security alert acknowledged",
+        "alert_dismissed": "Security alert dismissed",
+        "alert_settings": "Security alert settings changed"
+      },
+      "settings": {
+        "privacy_updated": "Privacy settings changed",
+        "mcp_updated": "MCP settings changed",
+        "office_updated": "Office settings changed",
+        "office_tested": "Office connection tested",
+        "sheets_ocr_updated": "Sheet text recognition settings changed"
+      },
+      "oauth": {
+        "authorize": "OAuth authorisation requested",
+        "consent_granted": "OAuth access granted",
+        "consent_denied": "OAuth access refused",
+        "revoked": "OAuth access revoked",
+        "client_created": "OAuth application added",
+        "client_deleted": "OAuth application removed",
+        "client_secret_rotated": "OAuth application secret renewed",
+        "code_reused": "OAuth code reused",
+        "refresh_reused": "OAuth refresh token reused",
+        "token_issued": "OAuth token issued",
+        "token_refreshed": "OAuth token refreshed"
+      },
+      "license": {
+        "installed": "Licence installed",
+        "removed": "Licence removed"
+      },
+      "retention": {
+        "completed": "Retention job deleted data"
+      },
+      "trash": {
+        "auto_purged": "Recycle bin emptied automatically"
       }
     },
     "columns": {
@@ -786,12 +876,66 @@
         "prev_mismatch": "an entry is missing or out of order",
         "hash_mismatch": "the entry was changed",
         "personal_mismatch": "the IP address, browser or e-mail of the entry was changed",
-        "reseal_archive_mismatch": "the archive of a re-seal was changed"
-      }
+        "reseal_archive_mismatch": "the archive of a re-seal was changed",
+        "truncation_mismatch": "the start of the chain is not covered by a retention checkpoint"
+      },
+      "truncated": "Starts after the retention cut-off of {{date}}"
     },
     "personalRemoved": {
       "retention": "deleted (retention)",
       "erased": "deleted (erased)"
+    }
+  },
+  "closeout": {
+    "heading": "Close-out Archive",
+    "description": "At project close-out (ISO 19650-2 §5.8.1) build one ZIP of the project information: the Published and Archived files in their folders, a manifest of every version (document code, container, revision, suitability, state, SHA-256, approvals, supersession links, naming check), the audit log with its chain check, and SHA256SUMS. The archive is built in the background; it can be downloaded for {{days}} days, then its file is deleted.",
+    "options": {
+      "includeShared": "Include Shared Information",
+      "versions": "Versions",
+      "latest": "Current Version of Each File",
+      "all": "All Versions",
+      "closeProject": "Close the Project (Read-Only) When the Archive Is Complete"
+    },
+    "estimate": "{{files}} files, {{versions}} versions, {{size}}.",
+    "limit": "Limit: {{size}}.",
+    "create": "Create Close-out Archive",
+    "scope": "Published and Archived",
+    "scopeWithShared": "Shared, Published and Archived",
+    "counts": "{{files}} versions, {{size}}",
+    "auditHead": "Audit entry {{id}}, hash {{hash}}…",
+    "download": "Download",
+    "expires": "Download until {{date}}",
+    "closedSince": "The project is closed (read-only) since {{date}} ({{name}}). Files can be viewed and downloaded; uploads and changes are refused.",
+    "columns": {
+      "created": "Created",
+      "contents": "Contents",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "queued": "Waiting",
+      "running": "Building: {{done}} / {{total}} files",
+      "progress": "Progress",
+      "done": "Ready",
+      "problems_one": "Ready, {{count}} file missing or changed",
+      "problems_other": "Ready, {{count}} files missing or changed",
+      "failed": "Failed",
+      "expired": "Expired (file deleted)"
+    },
+    "close": {
+      "action": "Close Project",
+      "title": "Close the project?",
+      "confirm": "The project becomes read-only: files can still be viewed and downloaded, but nobody can upload or change anything. Only a system administrator can reopen it."
+    },
+    "reopen": {
+      "action": "Reopen Project",
+      "title": "Reopen the project?",
+      "reason": "Reason (recorded in the audit log, optional)"
+    },
+    "remove": {
+      "action": "Delete File",
+      "title": "Delete the archive file?",
+      "confirm": "The ZIP is deleted now instead of at the end of its download period. The record of the archive stays in the list and in the audit log."
     }
   }
 }

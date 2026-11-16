@@ -8,9 +8,12 @@ import { Snippet, mcpUrl } from "../../../shared/ai/AiBits";
 import { webCapability } from "../../../sdk/capabilities";
 
 import { oauthApi } from "../../../shared/api/api-oauth";
+import { subjectApi } from "../../../shared/api/api-privacy";
+import { ExportCard } from "../../admin/pages/AdminDataSubject";
 import { viewerAboutText } from "../../../shared/lib/about";
 import { useAsk } from "../../../shared/ui/Ask";
 import { useLabel } from "../../../i18n";
+import { SessionsCard, TwoFactorCard } from "../components/AccountSecurity";
 
 
 export function AccountPage() {
@@ -33,6 +36,13 @@ export function AccountPage() {
       <TokensCard />
 
       <ConnectedAppsCard />
+
+      <ExportCard
+        title={t("account.myData.title")}
+        list={() => subjectApi.myExports()}
+        request={(files) => subjectApi.requestMyExport(files)}
+        url={(id) => subjectApi.myDownloadUrl(id)}
+      />
 
       <div className="card">
         <h2>{t("account.password.heading")}</h2>
@@ -59,6 +69,10 @@ export function AccountPage() {
           </div>
         </form>
       </div>
+
+      <TwoFactorCard />
+
+      <SessionsCard />
 
       <div className="card">
         <h2>{t("account.about.heading")}</h2>

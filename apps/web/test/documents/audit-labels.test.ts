@@ -10,6 +10,12 @@ describe("ISO19650-2 5.1.7(d) audit labels", () => {
     expect(auditActionLabel("x.unknown")).toBe("x.unknown");
   });
 
+  it("labels the delivery plan events (ISO-7)", () => {
+    expect(auditActionLabel("delivery_plan.deliverable_created")).toBe("Planlanan teslim eklendi");
+    expect(auditActionLabel("delivery_plan.imported")).toBe("Teslim planı içe aktarıldı");
+    expect(auditSummary({ action: "delivery_plan.deliverable_updated", details: { code: "P-A-0001", title: "Plan", changed: ["dueShared"] } })).toBe("title: Plan");
+  });
+
   it("summarises transitions, views and other details", () => {
     expect(auditSummary({ action: "cde.transition", targetName: "A.pdf", details: { fromState: "wip", toState: "shared", mode: "direct" } })).toBe(
       "A.pdf · Çalışma → Paylaşılan · Doğrudan",

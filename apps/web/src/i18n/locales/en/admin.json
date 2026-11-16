@@ -21,7 +21,9 @@
     "privacy": "Privacy Centre",
     "status": "System Status",
     "forma": "Forma Sync",
-    "license": "Licence"
+    "license": "Licence",
+    "security": "Sign-in Security",
+    "securityLog": "Security Log"
   },
   "users": {
     "title": "Users",
@@ -29,13 +31,56 @@
       "add": "+ User",
       "setPassword": "Set Password",
       "revokeAdmin": "Remove Administrator Rights",
-      "makeAdmin": "Make Administrator"
+      "makeAdmin": "Make Administrator",
+      "endSessions": "Sign Out Everywhere",
+      "resetTwoFactor": "Reset Two-Factor",
+      "makeAuditor": "Make Auditor",
+      "revokeAuditor": "Remove Auditor Rights"
     },
     "columns": {
       "systemAdmin": "System Administrator"
     },
     "passwordPrompt": "New password for {{name}} (at least 10 characters).",
-    "pending": "Invited"
+    "pending": "Invited",
+    "anonymised": "Anonymised",
+    "personal": {
+      "open": "Personal Data",
+      "title": "Personal data: {{name}}",
+      "emailTitle": "E-mail address",
+      "changeEmail": "Change E-mail",
+      "changeEmailPrompt": "New e-mail address for {{name}}. It must not be used by another account.",
+      "emailChanged": "E-mail address changed. The person's sessions were ended.",
+      "emailHelp": "Correcting the address ends the person's sessions; they sign in again with the new address. An account that signs in with Google is matched by address, so it then signs in with the Google account of the new address.",
+      "exportTitle": "Export personal data",
+      "exportHelp": "A ZIP with the person's profile, company, project memberships and roles, issues and comments, works and correspondence, review steps, audit log rows, outbound log rows, access keys (without their values) and uploaded files, each as JSON and CSV. Prepared in the background; kept for 7 days.",
+      "includeFiles": "Include the contents of uploaded files",
+      "export": "Prepare Export",
+      "download": "Download",
+      "columns": {
+        "requested": "Requested",
+        "status": "Status",
+        "size": "Size"
+      },
+      "status": {
+        "queued": "Waiting",
+        "running": "Preparing",
+        "done": "Ready",
+        "failed": "Failed"
+      },
+      "anonymise": "Anonymise User",
+      "anonymiseHelp": "Irreversible. The name becomes \"Deleted user #…\", the e-mail address an invalid one; the password, sessions, access keys, preferences, open invitations and the personal part of the audit and outbound logs are removed. Records the person created stay under the pseudonym; files are not changed. Personal data inside free text (comments, letters) and file contents is not removed automatically.",
+      "anonymiseWarning": "{{name}} will be anonymised. This cannot be undone and the account can no longer sign in.",
+      "anonymiseContinue": "Continue",
+      "anonymiseType": "To confirm, type the account's e-mail address: {{email}}",
+      "anonymiseConfirm": "Anonymise",
+      "anonymised": "The account is now \"{{name}}\"."
+    },
+    "twoFactorBadge": "2FA",
+    "twoFactorOn": "Two-factor authentication is on",
+    "endSessionsConfirm": "All browser sessions of {{name}} end. Their API access tokens keep working.",
+    "resetTwoFactorConfirm": "Two-factor authentication of {{name}} is removed and their sessions end. Where it is required, they set it up again at their next sign-in. This is recorded in the audit log.",
+    "auditorBadge": "Auditor",
+    "auditorHelp": "Read-only auditor: security log, Privacy Centre and every project's audit log; no changes, no files."
   },
   "companies": {
     "title": "Companies",
@@ -76,7 +121,8 @@
     "fields": {
       "fullName": "Full Name",
       "initialPassword": "Initial Password (at least 10 characters — the user changes it under My Account)",
-      "systemAdmin": "System Administrator"
+      "systemAdmin": "System Administrator",
+      "auditor": "Auditor (read-only: security log, Privacy Centre, audit logs)"
     }
   },
   "capacity": {
@@ -376,7 +422,9 @@
     "tabs": {
       "summary": "Summary",
       "connections": "External Connections",
-      "log": "Outbound Connection Log"
+      "log": "Outbound Connection Log",
+      "retention": "Retention",
+      "notice": "Privacy Notice"
     },
     "kill": {
       "title": "Turn Off All External Connections",
@@ -491,6 +539,53 @@
       },
       "empty": "No entries. The server made no external connection matching this filter.",
       "count": "{{shown}} / {{total}} entries"
+    },
+    "retention": {
+      "title": "Retention periods",
+      "intro": "A daily job deletes what is older than these periods and writes the counts to the audit log and the disposal record.",
+      "fields": {
+        "trash": "Recycle bin: delete for good after",
+        "auditLog": "Audit log: keep for"
+      },
+      "off": "Never (off)",
+      "unlimited": "Unlimited",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "years_one": "{{count}} year",
+      "years_other": "{{count}} years",
+      "trashHelp": "Files and folders deleted longer ago than this are deleted for good, with their versions and stored contents. Items still used elsewhere (e.g. in a review) stay.",
+      "auditLogHelp": "At least {{min}} year (ISO 19650 and contracts usually require the whole project). Older rows are deleted with a checkpoint, so the chain check still passes.",
+      "alwaysTitle": "Always cleaned up",
+      "always": {
+        "outbound": "Outbound connection log rows after {{days}} days (Summary → Settings)",
+        "auditPersonal": "IP address, user agent and e-mail in the audit log after {{months}} months (Summary → Settings)",
+        "credentials": "Expired sessions, API keys and OAuth tokens and codes",
+        "invitations": "Invitations not accepted, 30 days after they expired or were revoked",
+        "exports": "Personal data exports, 7 days after they were prepared"
+      },
+      "disposalTitle": "Disposal record",
+      "disposalHelp": "What the daily job deleted, by category, with counts and the time span of the deleted records (never the records themselves). Basis for the periodic destruction report (KVKK).",
+      "disposalCsv": "Download CSV"
+    },
+    "notice": {
+      "title": "Privacy Notice",
+      "intro": "Text shown on the sign-in page and on the invitation page, for example the privacy notice your organisation gives as data controller (GDPR Art. 13, KVKK m.10). Write it in English and Turkish; each page shows the language the person chose, or the other one when that is empty.",
+      "fields": {
+        "enabled": "Show on the Sign-in and Invitation Pages",
+        "requireAck": "Require “I Have Read the Privacy Notice” Before Sign-in",
+        "reask": "Ask Again When the Text Changes",
+        "text_en": "Text (English)",
+        "text_tr": "Text (Turkish)"
+      },
+      "actions": {
+        "preview": "Preview",
+        "hidePreview": "Hide Preview"
+      },
+      "markupHelp": "Light markup: blank line between paragraphs, # heading, - list item, **bold**, *italic*, [link](https://…). HTML is shown as text.",
+      "version": "Version {{version}}, saved {{date}} by {{name}}. Accepted by {{count}} people.",
+      "noVersion": "No text saved yet.",
+      "newVersion": "Saving the changed text makes a new version. Its text is written to the audit log.",
+      "newVersionReask": "Saving the changed text makes a new version; everyone accepts it again at their next sign-in. Its text is written to the audit log."
     }
   },
   "ai": {
@@ -835,5 +930,225 @@
     "title": "Invitations",
     "description": "People without an account can be invited to a project by e-mail (Project Settings → Members and the set-up wizard). System administrators can always invite. Off by default: project administrators can only add people who already have an account.",
     "projectAdmins": "Project Administrators May Invite People Without an Account"
+  },
+  "security": {
+    "title": "Sign-in Security",
+    "description": "Limits for failed sign-ins, session lifetimes and two-factor authentication. Changes are recorded in the audit log.",
+    "saved": "Saved.",
+    "twoFactor": {
+      "heading": "Two-factor authentication",
+      "require": "Require two-factor authentication for",
+      "options": {
+        "off": "Nobody (each person decides)",
+        "admins": "All system administrators",
+        "all": "All users"
+      },
+      "help": "People it covers who have not set it up yet do so at their next sign-in, before their session starts. Sessions already open continue. API access tokens and OAuth applications are not affected."
+    },
+    "limits": {
+      "heading": "Failed sign-ins and sessions"
+    },
+    "fields": {
+      "failureLimit": "Failed attempts per account",
+      "ipFailureLimit": "Failed attempts per IP address",
+      "failureWindowMinutes": "Time window (minutes)",
+      "sessionAbsoluteDays": "Session length (days)",
+      "sessionIdleHours": "Idle timeout (hours)"
+    },
+    "help": {
+      "failureLimit": "Then the account is locked until the oldest failure leaves the window (default 10).",
+      "ipFailureLimit": "Across all accounts; a whole office may share one address (default 50).",
+      "failureWindowMinutes": "Failures older than this no longer count (default 15).",
+      "sessionAbsoluteDays": "A session ends this long after sign-in, however active (default 14).",
+      "sessionIdleHours": "A session ends after this long without use; 0 turns it off (default 12)."
+    },
+    "unlock": {
+      "heading": "Locked sign-ins",
+      "description": "Lift every current lock now, for example after a person mistyped their password too often.",
+      "action": "Lift All Locks",
+      "done": "All locks were lifted."
+    }
+  },
+  "auditor": {
+    "notice": "You are signed in as an auditor: you can read the security log, the audit log of every project and the Privacy Centre, and download them as CSV. You cannot change anything."
+  },
+  "securityLog": {
+    "title": "Security Log",
+    "description": "Sign-ins and failed sign-ins, lockouts, two-factor changes, users and their rights, permission and settings changes, external connections, access keys and OAuth grants, exports of the logs and security alerts, across every project and outside projects, newest first. The IP address and browser are shown while they are kept (Privacy Centre → Retention).",
+    "allDescription": "The audit log of every project and of the system, newest first.",
+    "scopes": {
+      "security": "Security Events",
+      "all": "All Events"
+    },
+    "onlyEntry": "Only entry {{id}}.",
+    "filters": {
+      "type": "Type",
+      "ip": "IP Address",
+      "project": "Project"
+    },
+    "types": {
+      "sign_in": "Sign-In",
+      "two_factor": "Two-Factor Authentication",
+      "users": "Users",
+      "permissions": "Permissions and Roles",
+      "settings": "Settings",
+      "connections": "External Connections",
+      "api_access": "Access Keys and OAuth",
+      "audit": "Logs and Retention",
+      "alerts": "Security Alerts"
+    },
+    "columns": {
+      "project": "Project"
+    }
+  },
+  "securityAlerts": {
+    "badge": "Security Alert",
+    "person": "Person: {{name}}",
+    "occurrences_one": "Seen again {{count}} time, last {{date}}",
+    "occurrences_other": "Seen {{count}} times, last {{date}}",
+    "mailed": "E-mail sent",
+    "notification": "If an alert may be a personal data breach, the GDPR (Art. 33) requires notifying the supervisory authority within 72 hours of becoming aware of it, and the KVKK (Art. 12) requires notifying the Board as soon as possible. Acknowledging or dismissing an alert is recorded in the audit log.",
+    "actions": {
+      "acknowledge": "Acknowledge",
+      "dismiss": "Dismiss",
+      "showEvent": "Show Event"
+    },
+    "history": "Recent Security Alerts",
+    "columns": {
+      "time": "Time",
+      "alert": "Alert",
+      "person": "Person",
+      "status": "Status"
+    },
+    "status": {
+      "open": "Open",
+      "acknowledged": "Acknowledged",
+      "dismissed": "Dismissed"
+    },
+    "handledBy": "by {{name}}",
+    "rules": {
+      "failed_sign_ins_account": {
+        "title": "Many Failed Sign-Ins for One Account",
+        "body": "{{count}} failed sign-ins for one account within {{minutes}} minutes (threshold {{threshold}})."
+      },
+      "failed_sign_ins_global": {
+        "title": "Many Failed Sign-Ins",
+        "body": "{{count}} failed sign-ins on the installation within {{minutes}} minutes (threshold {{threshold}})."
+      },
+      "bulk_download": {
+        "title": "Bulk Download",
+        "body": "One person downloaded {{count}} files within {{minutes}} minutes (threshold {{threshold}})."
+      },
+      "new_admin": {
+        "title": "New System Administrator",
+        "body": "A user was given System Administrator rights."
+      },
+      "kill_switch_off": {
+        "title": "External Connections Turned On Again",
+        "body": "\"Turn Off All External Connections\" was switched off: external connections are allowed again."
+      },
+      "two_factor_off": {
+        "title": "Two-Factor Requirement Turned Off",
+        "body": "Two-factor authentication is no longer required at sign-in."
+      },
+      "audit_chain_broken": {
+        "title": "Audit Chain Check Failed",
+        "body": "The daily check of the audit log's hash chain failed at entry {{id}} ({{reason}})."
+      }
+    },
+    "settings": {
+      "title": "Security Alerts",
+      "description": "Alerts appear as cards at the top of the Administration page until a system administrator acknowledges or dismisses them. The audit log is checked every minute and the hash chain once a day. Changes are recorded in the audit log.",
+      "rules": "Rules",
+      "thresholds": "Thresholds",
+      "fields": {
+        "failedSignInsAccount": "Failed Sign-Ins per Account",
+        "failedSignInsGlobal": "Failed Sign-Ins in Total",
+        "failedSignInsWindowMinutes": "Sign-In Window (Minutes)",
+        "bulkDownloadFiles": "Files Downloaded by One Person",
+        "bulkDownloadWindowMinutes": "Download Window (Minutes)"
+      },
+      "email": "E-mail",
+      "emailTo": "Send Alerts To",
+      "emailHelp": "One address per line, at most 10. The e-mail names the alert and its time only, no personal data.",
+      "mail": {
+        "ok": "E-mail can be sent.",
+        "smtp_not_configured": "No e-mail is sent: SMTP is not configured (CDE_SMTP_URL, CDE_SMTP_FROM).",
+        "smtp_disabled": "No e-mail is sent: SMTP is switched off in the Privacy Centre."
+      }
+    }
+  },
+  "oidc": {
+    "title": "OpenID Connect Sign-in",
+    "description": "Sign-in with your organisation's identity provider (Entra ID, Keycloak, Okta, Google Workspace, Authentik …). Each provider gets a button on the sign-in page and its own switch in the Privacy Centre. Changes are recorded in the audit log.",
+    "empty": "No provider yet.",
+    "off": "turned off",
+    "saved": "Saved.",
+    "testOk": "Discovery works: {{issuer}} (signatures: {{algorithms}}).",
+    "deleteTitle": "Delete Provider",
+    "deleteConfirm": "Delete {{name}}? Its sign-in button disappears; the accounts stay.",
+    "secretStored": "Stored — leave empty to keep it",
+    "secretNone": "None (public client with PKCE)",
+    "noCompany": "No company",
+    "actions": {
+      "add": "Add Provider",
+      "test": "Test"
+    },
+    "columns": {
+      "provider": "Provider",
+      "issuer": "Issuer",
+      "accounts": "Accounts"
+    },
+    "accounts": {
+      "create": "Created at first sign-in",
+      "existing": "Existing and invited only"
+    },
+    "dialog": {
+      "newTitle": "New OpenID Connect Provider",
+      "editTitle": "Edit {{name}}"
+    },
+    "sections": {
+      "button": "Sign-in Button",
+      "accounts": "Who Can Sign In",
+      "claims": "Claims",
+      "trust": "Trust"
+    },
+    "fields": {
+      "id": "Short Id",
+      "name": "Display Name",
+      "issuer": "Issuer URL",
+      "clientId": "Client Id",
+      "clientSecret": "Client Secret",
+      "scopes": "Scopes",
+      "redirectUri": "Redirect URI (register it at the provider)",
+      "buttonLabel": "Button Label",
+      "buttonColor": "Icon Colour",
+      "allowedDomains": "Allowed E-mail Domains",
+      "defaultCompany": "Company of New Accounts",
+      "emailClaim": "E-mail Claim",
+      "nameClaim": "Name Claim",
+      "groupsClaim": "Groups Claim",
+      "adminGroup": "System Administrator Group"
+    },
+    "placeholder": {
+      "buttonLabel": "Sign in with Contoso",
+      "adminGroup": "Off (empty)"
+    },
+    "options": {
+      "enabled": "Provider On",
+      "createAccounts": "Create Accounts at First Sign-in",
+      "trustUnverifiedEmail": "Trust Unverified E-mail Addresses",
+      "trustProviderMfa": "Trust the Provider's Multi-factor Sign-in"
+    },
+    "help": {
+      "id": "Lower-case letters, digits and hyphens; used in the redirect URI and cannot be changed later.",
+      "issuer": "SiteKeep reads the issuer URL followed by /.well-known/openid-configuration. https:// is required (http:// only for localhost).",
+      "redirectUri": "After saving, the redirect URI to register at the provider is shown here.",
+      "allowedDomains": "Separated by commas; subdomains match. Empty: any domain.",
+      "createAccounts": "Off (recommended): only existing users and people with an open invitation can sign in. On: a new person becomes a normal user.",
+      "adminGroup": "When set, members of this group (in the groups claim) become system administrators at sign-in. It is never taken away automatically.",
+      "trustUnverifiedEmail": "Off: the address must be verified by the provider (email_verified). Turn on only for a provider whose addresses the organisation itself assigns.",
+      "trustProviderMfa": "On: when the provider reports a multi-factor sign-in (amr), SiteKeep does not ask for its own two-factor code. Off: two-factor applies as after a password."
+    }
   }
 }

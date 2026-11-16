@@ -8,12 +8,14 @@
     "selfLockout": "Kendi yönetici yetkinizi kaldıramaz veya hesabınızı kapatamazsınız.",
     "loadTestOff": "Tam yük testi bu kurulumda kapalı (CAPACITY_LOAD_TEST=0).",
     "reportWhileRunning": "Test bitmeden rapor alınamaz.",
-    "runActive": "Bir kapasite testi zaten çalışıyor."
+    "runActive": "Bir kapasite testi zaten çalışıyor.",
+    "adminOrAuditorOnly": "Bu sayfa için sistem yöneticisi ya da denetçi yetkisi gerekir."
   },
   "entities": {
     "user": "Kullanıcı",
     "capacityRun": "Kapasite testi",
-    "company": "Firma"
+    "company": "Firma",
+    "securityAlert": "Güvenlik uyarısı"
   },
   "capacity": {
     "stage": {
@@ -126,6 +128,42 @@
       "payload": "Lisansın içeriği okunamıyor.",
       "other_installation": "Bu lisans başka bir kuruluma ait. Lisans isterken bu kurulumun kimliğini gönderin.",
       "build_after_support": "Bu SiteKeep sürümü destek süreniz bittikten sonra çıktı. Önceki sürüme dönün veya desteği yenileyin."
+    }
+  },
+  "securityAlerts": {
+    "rules": {
+      "failed_sign_ins_account": {
+        "title": "Bir Hesapta Çok Sayıda Başarısız Giriş",
+        "body": "Bir hesapta {{minutes}} dakika içinde {{count}} başarısız giriş (eşik {{threshold}})."
+      },
+      "failed_sign_ins_global": {
+        "title": "Çok Sayıda Başarısız Giriş",
+        "body": "Kurulumda {{minutes}} dakika içinde {{count}} başarısız giriş (eşik {{threshold}})."
+      },
+      "bulk_download": {
+        "title": "Toplu İndirme",
+        "body": "Bir kişi {{minutes}} dakika içinde {{count}} dosya indirdi (eşik {{threshold}})."
+      },
+      "new_admin": {
+        "title": "Yeni Sistem Yöneticisi",
+        "body": "Bir kullanıcıya sistem yöneticisi yetkisi verildi."
+      },
+      "kill_switch_off": {
+        "title": "Dış Bağlantılar Yeniden Açıldı",
+        "body": "\"Tüm Dış Bağlantıları Kapat\" kapatıldı: dış bağlantılara yeniden izin veriliyor."
+      },
+      "two_factor_off": {
+        "title": "İki Adımlı Doğrulama Zorunluluğu Kaldırıldı",
+        "body": "Girişte iki adımlı doğrulama artık zorunlu değil."
+      },
+      "audit_chain_broken": {
+        "title": "Denetim Zinciri Denetimi Başarısız",
+        "body": "Denetim kaydının hash zincirinin günlük denetimi {{id}} numaralı satırda başarısız oldu ({{reason}})."
+      }
+    },
+    "mail": {
+      "subject": "[SiteKeep] Güvenlik uyarısı: {{title}}",
+      "body": "SiteKeep bir güvenlik uyarısı verdi.\n\n{{title}}\n{{body}}\nZaman (UTC): {{time}}\n\nAyrıntılar, ilgili kişi ve istemci IP adresi Yönetim → Güvenlik Kaydı ekranındadır. Bu ileti kişisel veri içermez.\n\nBu bir kişisel veri ihlali olabilirse: GDPR (m.33) denetim makamına ihlalin öğrenilmesinden sonra 72 saat içinde bildirim ister; KVKK (m.12) de Kurul'a en kısa sürede bildirim yapılmasını ister.\n"
     }
   }
 }

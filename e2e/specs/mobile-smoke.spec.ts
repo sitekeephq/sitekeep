@@ -214,6 +214,162 @@ test("iPhone schedule import draws Gantt bars", async ({ page, diagnostics }) =>
   await assertNoSidewaysScroll(page);
 });
 
+test("iPhone time–distance view and location wizard fit the screen", async ({ page, diagnostics }) => {
+  needsModules("planning");
+  void diagnostics;
+  const { project } = await runState();
+
+  await page.goto(`/projects/${project.id}/schedule?v=td`);
+  await expect(page.getByRole("button", { name: "Zaman–Mesafe" })).toBeVisible();
+  await expect(page.getByTestId("time-distance")).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await page.getByRole("button", { name: /^Konum Ata/ }).click();
+  const dialog = page.getByRole("dialog", { name: "Konum Atama Sihirbazı" });
+  await expect(dialog.getByRole("button", { name: "Km Tablosu Yükle" })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(dialog).toHaveCount(0);
+});
+
+test("iPhone schedule resources dialog and histogram fit the screen", async ({ page, diagnostics }) => {
+  needsModules("planning");
+  void diagnostics;
+  const { project } = await runState();
+  const code = `M${Date.now() % 100_000}`;
+
+  await page.goto(`/projects/${project.id}/schedule`);
+  await page.getByRole("button", { name: "Filtre" }).click();
+  await page.getByRole("menuitem", { name: "Kaynaklar" }).click();
+  const dialog = page.getByRole("dialog", { name: "Kaynaklar" });
+  await expect(dialog.getByRole("button", { name: "Kaynak Kütüphanesi" })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+
+  await dialog.getByRole("button", { name: "+ Kaynak" }).click();
+  await dialog.getByLabel("Kaynak Kodu").fill(code);
+  await dialog.getByLabel("Kaynak Adı").fill("Ray döşeme ekibi");
+  await dialog.getByLabel("Birim", { exact: true }).fill("kişi");
+  await dialog.getByLabel("Günlük Kapasite (boşsa sınırsız)").fill("12");
+  await dialog.getByRole("button", { name: "Kaydet" }).click();
+  await expect(dialog.getByText(code, { exact: true })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+
+  await dialog.getByRole("button", { name: "Histogram", exact: true }).click();
+  await expect(dialog.getByLabel("Kaynak", { exact: true })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await dialog.getByRole("button", { name: "Kapat" }).click();
+  await expect(dialog).toHaveCount(0);
+});
+
+test("iPhone schedule translations dialog fits the screen", async ({ page, diagnostics }) => {
+  needsModules("planning");
+  void diagnostics;
+  const { project } = await runState();
+
+  await page.goto(`/projects/${project.id}/schedule`);
+  await page.getByRole("button", { name: "İşlemler" }).click();
+  await page.getByRole("menuitem", { name: "Çeviriler" }).click();
+  const dialog = page.getByRole("dialog", { name: "Faaliyet Adı Çevirileri" });
+  await expect(dialog.getByRole("combobox", { name: "Dil" })).toHaveValue("en");
+  await expect(dialog.getByRole("button", { name: "Şablonu İndir" })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Yapay Zekâ ile Çevir" })).toBeVisible();
+  await expect(dialog.getByTestId("translations-table")).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await dialog.getByLabel("Eksik").check();
+  await assertNoSidewaysScroll(page);
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(dialog).toHaveCount(0);
+});
+
+test("iPhone schedule checks and duration basis dialogs fit the screen", async ({ page, diagnostics }) => {
+  needsModules("planning");
+  void diagnostics;
+  const { project } = await runState();
+
+  await page.goto(`/projects/${project.id}/schedule`);
+  await page.getByRole("button", { name: "İşlemler" }).click();
+  await page.getByRole("menuitem", { name: "Program Kontrolü" }).click();
+  const checks = page.getByRole("dialog", { name: "Program Kontrolü" });
+  await expect(checks.getByLabel("Önem")).toBeVisible();
+  await expect(checks.getByRole("button", { name: "Excel'e Aktar" })).toBeVisible();
+  await expect(checks.getByTestId("checks-list")).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await checks.getByRole("button", { name: /Süre Dayanağı Eksik/ }).click();
+  await assertNoSidewaysScroll(page);
+  await checks.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(checks).toHaveCount(0);
+
+  await page.getByRole("button", { name: "İşlemler" }).click();
+  await page.getByRole("menuitem", { name: "Süre Dayanağı" }).click();
+  const basis = page.getByRole("dialog", { name: "Süre Dayanağı" });
+  await expect(basis.getByRole("button", { name: "Şablonu İndir" })).toBeVisible();
+  await expect(basis.getByTestId("basis-table")).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await basis.getByLabel("Eksik").check();
+  await assertNoSidewaysScroll(page);
+  await basis.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(basis).toHaveCount(0);
+});
+
+test("iPhone schedule activity codes and payments dialogs fit the screen", async ({ page, diagnostics }) => {
+  needsModules("planning");
+  void diagnostics;
+  const { project } = await runState();
+
+  await page.goto(`/projects/${project.id}/schedule`);
+  await page.getByRole("button", { name: "İşlemler" }).click();
+  await page.getByRole("menuitem", { name: "Faaliyet Kodları" }).click();
+  const codes = page.getByRole("dialog", { name: "Faaliyet Kodları" });
+  await expect(codes.getByRole("button", { name: "+ Kod Türü" })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await codes.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(codes).toHaveCount(0);
+
+  await page.getByRole("button", { name: "İşlemler" }).click();
+  await page.getByRole("menuitem", { name: "Ödeme Çizelgesi" }).click();
+  const pay = page.getByRole("dialog", { name: "Ödeme Çizelgesi" });
+  await expect(pay.getByRole("button", { name: "Şablonu İndir" })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await pay.getByRole("button", { name: "+ Ödeme Kalemi" }).click();
+  await pay.getByLabel("Kalem Kodu", { exact: true }).fill("M-1");
+  await pay.getByLabel("Tutar", { exact: true }).fill("1000");
+  await assertNoSidewaysScroll(page);
+  await pay.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(pay.getByText("Kaydedildi.")).toBeVisible();
+  await expect(pay.getByRole("cell", { name: "M-1" })).toBeVisible();
+  for (const tab of ["Nakit Akışı", "İzlenebilirlik"]) {
+    await pay.getByRole("button", { name: tab, exact: true }).click();
+    await assertNoSidewaysScroll(page);
+  }
+  await pay.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(pay).toHaveCount(0);
+});
+
+test("iPhone schedule KPI dashboard and monthly report fit the screen", async ({ page, diagnostics }) => {
+  needsModules("planning");
+  void diagnostics;
+  const { project } = await runState();
+
+  await page.goto(`/projects/${project.id}/schedule?v=kpi`);
+  const view = page.getByTestId("kpi-view");
+  await expect(view.getByRole("heading", { name: "KPI Panosu" })).toBeVisible();
+  await expect(view.getByTestId("kpi-spi")).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await view.getByRole("button", { name: "Bildirim Ekle" }).click();
+  const delay = page.getByRole("dialog", { name: "Yeni Gecikme Bildirimi" });
+  await delay.getByLabel("Açıklama").fill("Erişim gecikti");
+  await assertNoSidewaysScroll(page);
+  await delay.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(delay).toHaveCount(0);
+  await expect(view.getByText("Erişim gecikti").first()).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await view.getByRole("button", { name: "Aylık Rapor" }).click();
+  const dlg = page.getByRole("dialog", { name: "Aylık Rapor" });
+  await expect(dlg.getByRole("button", { name: "Rapor Oluştur" })).toBeVisible();
+  await assertNoSidewaysScroll(page);
+  await dlg.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(dlg).toHaveCount(0);
+});
+
 test("iPhone document upload, delete and restore stay tappable", async ({ page, diagnostics }) => {
   void diagnostics;
   const { project } = await runState();

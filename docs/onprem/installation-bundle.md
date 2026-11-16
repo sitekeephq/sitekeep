@@ -135,6 +135,14 @@ from the proxy.
 The backup stays on the same disk; the README tells the customer to copy it off the server. Remote targets
 (SFTP / S3 / NAS) will come with the engine in [backups.md](backups.md).
 
+**Encryption is the operator's responsibility.** The bundle does not encrypt the database, the files
+or the backups (only secrets are, with `CDE_SECRET_KEY`); in-app encryption is planned. Install the server
+on an encrypted disk (LUKS: the "encrypt" option of the Ubuntu / RHEL installer; on a VM, the
+hypervisor's or cloud provider's disk encryption, BitLocker on a Hyper-V host) so that `/opt/sitekeep`
+and `/var/lib/docker` are covered, and encrypt each copy of a backup that leaves the server (`gpg
+--symmetric`, `age`, restic). `config/app.env` holds `CDE_SECRET_KEY`: keep an encrypted copy apart
+from the backups. Details: [encryption at rest](docker-compose.md#encryption-at-rest).
+
 ## 5. Smoke test
 
 ```bash

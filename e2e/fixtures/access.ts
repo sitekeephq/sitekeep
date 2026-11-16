@@ -30,7 +30,7 @@ export const test = base.extend<AccessFixtures>({
     const { project } = await runState();
     const suffix = randomUUID().slice(0, 8);
     const email = `e2e-member-${suffix}@7d-cde.localhost`;
-    const password = `Member-Only!${suffix}#2026`;
+    const password = `Quiet-Harbour!${randomUUID().slice(0, 8)}#2026`; // never derived from the name or e-mail (password rule)
 
     const user = await request.post("/api/v1/users", {
       data: { email, name: `E2E Member ${suffix}`, password, isAdmin: false },

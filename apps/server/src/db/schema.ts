@@ -28,6 +28,8 @@ import type {
   OAuthScope,
   PermissionLevel,
   ProjectSettings,
+  SecurityAlertRule,
+  SecurityAlertStatus,
   SubjectType,
   UserPrefs,
 } from "@sitekeep/shared";
@@ -55,6 +57,11 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   /** System administrator: manages users, companies and every project. */
   isAdmin: boolean("is_admin").notNull().default(false),
+  /**
+   * Read-only auditor (docs/features/SECURITY_LOG.md#auditor): the security log, the Privacy Centre,
+   * every project's audit log and the chain check; changes nothing, no file access of its own.
+   */
+  isAuditor: boolean("is_auditor").notNull().default(false),
   companyId: uuid("company_id").references(() => companies.id),
   disabled: boolean("disabled").notNull().default(false),
   /**
@@ -110,6 +117,9 @@ export const projects = pgTable(
   createdAt: createdAt(),
   /** Project settings set by project administrators: module switches (ProjectSettings). */
   settings: jsonb("settings").$type<ProjectSettings>().notNull().default({}),
+  /** Closed after its close-out archive (ISO 19650-2 §5.8.1): read-only until a system administrator reopens it. */
+  closedAt: timestamp("closed_at", { withTimezone: true }),
+  closedBy: uuid("closed_by").references(() => users.id, { onDelete: "set null" }),
   },
   (t) => [uniqueIndex("projects_code_active").on(t.code).where(sql`archived = false`)],
 );
@@ -398,6 +408,8 @@ export const auditLog = pgTable(
     index("audit_project_action_idx").on(t.projectId, t.action, t.at),
     index("audit_target_idx").on(t.targetType, t.targetId),
     index("audit_user_idx").on(t.userId, t.at),
+    // The security log and its alert rules read by action across projects.
+    index("audit_action_idx").on(t.action, t.at),
   ],
 );
 
@@ -422,7 +434,13 @@ export const auditPersonal = pgTable(
     /** Lower-case e-mail address moved out of details (details keep emailHash). */
     email: text("email"),
   },
-  (t) => [index("audit_personal_at_idx").on(t.at), index("audit_personal_user_idx").on(t.userId), index("audit_personal_email_idx").on(t.email)],
+  (t) => [
+    index("audit_personal_at_idx").on(t.at),
+    index("audit_personal_user_idx").on(t.userId),
+    index("audit_personal_email_idx").on(t.email),
+    // Security log: filter by client IP address.
+    index("audit_personal_ip_idx").on(t.ip),
+  ],
 );
 
 /**
@@ -460,6 +478,35 @@ export const auditResealHashes = pgTable(
   (t) => [primaryKey({ columns: [t.resealId, t.rowId] }), index("audit_reseal_hash_old_idx").on(t.oldHash)],
 );
 
+/**
+ * Security alerts (docs/features/SECURITY_LOG.md#alerts): raised by the rules in
+ * audit/security-alerts.ts, shown on the Administration page until a system administrator
+ * acknowledges or dismisses them. While one is open, later matches of the same rule and subject
+ * count up `occurrences` instead of raising another.
+ */
+export const securityAlerts = pgTable(
+  "security_alert",
+  {
+    id: id(),
+    rule: text("rule").$type<SecurityAlertRule>().notNull(),
+    status: text("status").$type<SecurityAlertStatus>().notNull().default("open"),
+    /** What the alert is about, for de-duplication: "user:<id>", "email:<hash>", "all", "chain". */
+    subjectKey: text("subject_key").notNull(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    /** Counts, thresholds and windows; never an IP address or an e-mail address. */
+    details: jsonb("details").$type<Record<string, unknown>>().notNull().default({}),
+    /** The audit row that raised it (null for the chain check). */
+    auditId: bigint("audit_id", { mode: "number" }),
+    occurrences: integer("occurrences").notNull().default(1),
+    createdAt: createdAt(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    handledBy: uuid("handled_by").references(() => users.id, { onDelete: "set null" }),
+    handledAt: timestamp("handled_at", { withTimezone: true }),
+    mailedAt: timestamp("mailed_at", { withTimezone: true }),
+  },
+  (t) => [index("security_alert_status_idx").on(t.status, t.createdAt), index("security_alert_subject_idx").on(t.rule, t.subjectKey, t.createdAt)],
+);
+
 export * from "./schema-workflow.js";
 export * from "./schema-docs.js";
 export * from "./schema-markup.js";
@@ -486,3 +533,7 @@ export * from "./schema-cde.js";
 export * from "./schema-sheets.js";
 export * from "./schema-model-markup.js";
 export * from "./schema-invitations.js";
+export * from "./schema-two-factor.js";
+export * from "./schema-privacy-notice.js";
+export * from "./schema-retention.js";
+export * from "./schema-closeout.js";

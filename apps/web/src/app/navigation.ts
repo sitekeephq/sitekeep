@@ -16,6 +16,7 @@ const CORE_NAV: { titleKey: ShellKey; items: CoreNavItem[] }[] = [
       { to: "works", labelKey: "projectNav.items.works", icon: "inbox" },
       { to: "files", labelKey: "projectNav.items.files", icon: "folder" },
       { to: "sheets", labelKey: "projectNav.items.sheets", icon: "sheets" },
+      { to: "delivery-plan", labelKey: "projectNav.items.deliveryPlan", icon: "calendar" },
       { to: "reviews", labelKey: "projectNav.items.reviews", icon: "check" },
     ],
   },

@@ -70,6 +70,27 @@ docker run --rm -v sitekeep_cdedata:/data -v "$PWD":/yedek alpine tar -czf /yede
 The volume name starts with the Compose project name (the folder name; `docker volume ls`). The database and the files are only meaningful
 together. The installation bundle handles the nightly backup and restore itself ([backups.md](backups.md)).
 
+## Encryption at rest
+
+SiteKeep encrypts its secrets (AI provider keys, two-factor secrets, OAuth tokens: AES-256-GCM with
+`CDE_SECRET_KEY`). It does **not** encrypt the database or the stored files: anyone who gets the disk,
+a disk image or a backup can read them. **Encrypting the disks and the backups is the operator's
+responsibility** (GDPR Art. 32, KVKK m.12). Encryption inside the application is planned.
+
+- **Disks:** put the Docker data directory (`/var/lib/docker`, which holds the `pgdata` and `cdedata`
+  volumes; or the directories you bind-mount instead) on an encrypted volume. Linux: LUKS
+  (`cryptsetup luksFormat`, usually chosen at installation: "encrypt the disk" in the Ubuntu / RHEL
+  installer). Windows Server running Docker Desktop or a Hyper-V VM: BitLocker on the drive that holds
+  the VM disk. Cloud servers: the provider's disk encryption (on by default at most providers; prefer
+  customer-managed keys).
+- **Backups:** encrypt every copy that leaves the server, for example
+  `… | gzip | gpg --symmetric --cipher-algo AES256 -o backup.sql.gz.gpg` or `age -p`, or a tool that
+  encrypts by itself (restic, Borg). Keep the passphrase apart from the backups, and test a restore.
+- **Keys:** keep `.env` (database password, `CDE_SECRET_KEY`) out of the backups of files and store it
+  encrypted, in a second place; without `CDE_SECRET_KEY` a restored database cannot decrypt its secrets.
+
+Record these measures in your [records of processing](../compliance/RECORDS_OF_PROCESSING.md).
+
 ## Building from source
 
 ```bash
