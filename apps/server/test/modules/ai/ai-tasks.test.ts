@@ -1,5 +1,8 @@
 import { mkdtempSync, rmSync } from "node:fs";
-import { hasField, hasManage } from "../../helpers/modules.js"; // these steps use Field (forms)
+import { hasField, hasManage, installed } from "../../helpers/modules.js"; // these steps use Field (forms)
+
+// Report tasks save dashboards: they need the Platform module (report builder).
+const hasPlatform = installed("platform");
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -8,7 +11,8 @@ import { eq } from "drizzle-orm";
 import { buildApp } from "../../../src/app/build-app.js";
 import { hashPassword } from "../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
-import { auditLog, dashboards, notifications, users } from "../../../src/db/schema.js";
+import { auditLog, notifications, users } from "../../../src/db/schema.js";
+import { moduleTable } from "../../../src/app/modules.js";
 import { aiTasks } from "@7dimensions-project/sitekeep-ee-ai/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
@@ -144,7 +148,7 @@ describe("AI task queue (Yapay Zekâya Gönder) and Claude-as-AI write tools", (
 
   let taskId: string;
 
-  it("queues a report request, the client claims it with the app's prompt and schema", async () => {
+  it.skipIf(!hasPlatform)("queues a report request, the client claims it with the app's prompt and schema", async () => {
     const bad = await alice("POST", `/projects/${pid}/ai-tasks`, { kind: "report_generate", input: { prompt: "x" } });
     expect(bad.status).toBe(400);
     const adminOnly = await alice("POST", `/projects/${pid}/ai-tasks`, { kind: "form_template_from_text", input: { description: "Beton döküm kontrol formu" } });
@@ -175,7 +179,7 @@ describe("AI task queue (Yapay Zekâya Gönder) and Claude-as-AI write tools", (
     expect(claim.json.tools).toContain("cde_report_datasets");
   });
 
-  it("returns the app's validation errors, then applies a valid result as the requester", async () => {
+  it.skipIf(!hasPlatform)("returns the app's validation errors, then applies a valid result as the requester", async () => {
     const invalid = await tool(claimer, "cde_ai_task_complete", { projectId: pid, taskId, result: { name: "X", queries: [{ id: "q", spec: { dataset: "yok" } }], html: "<div></div>" } });
     expect(invalid.isError, invalid.text).toBe(false);
     expect(invalid.json.ok).toBe(false);
@@ -187,6 +191,8 @@ describe("AI task queue (Yapay Zekâya Gönder) and Claude-as-AI write tools", (
     const t = (await alice("GET", `/projects/${pid}/ai-tasks/${taskId}`)).body;
     expect(t).toMatchObject({ status: "done", clientName: "Claude Code" });
     expect(t.link).toMatch(new RegExp(`^/projects/${pid}/reports/`));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dashboards = moduleTable<any>("platform", "dashboards")!;
     const [d] = await handle.db.select().from(dashboards).where(eq(dashboards.id, t.result.dashboardId));
     const [aliceRow] = await handle.db.select().from(users).where(eq(users.email, "alice@7d.test"));
     expect(d).toMatchObject({ ownerId: aliceRow!.id, sharing: "private", name: "Açık Sorunlar" });
@@ -198,7 +204,7 @@ describe("AI task queue (Yapay Zekâya Gönder) and Claude-as-AI write tools", (
     expect(audits).toEqual(expect.arrayContaining(["ai_task.created", "ai_task.claimed", "ai_task.rejected", "ai_task.completed"]));
   });
 
-  it("never applies with more rights than the requester has", async () => {
+  it.skipIf(!hasPlatform)("never applies with more rights than the requester has", async () => {
     // Alice may run a report but not see the 'activity' dataset (project admins only).
     const t = (await alice("POST", `/projects/${pid}/ai-tasks`, { kind: "report_generate", input: { prompt: "Proje etkinlik kaydı" } })).body;
     const r = await tool(claimer, "cde_ai_task_complete", {
@@ -261,14 +267,14 @@ describe("AI task queue (Yapay Zekâya Gönder) and Claude-as-AI write tools", (
     expect(flow.json.draftSchema.properties.steps).toBeDefined();
   });
 
-  it("offers form, minutes, RFI and parameter-change features only with their modules", async () => {
-    const moduleBound = ["form_flow", "form_fields_naming", "form_template_from_text", "minutes_actions", "rfi_draft", "record_from_file", "param_change"];
+  it("offers form, minutes, RFI, parameter-change and report features only with their modules", async () => {
+    const moduleBound = ["form_flow", "form_fields_naming", "form_template_from_text", "minutes_actions", "rfi_draft", "record_from_file", "param_change", "report_generate", "report_repair"];
     const saved = process.env.SITEKEEP_MODULES;
     process.env.SITEKEEP_MODULES = "ai";
     try {
       const only = await tool(readToken, "cde_ai_schemas", {});
       const kinds = only.json.features.map((f: any) => f.kind);
-      expect(kinds).toEqual(expect.arrayContaining(["report_generate", "letter_translate", "today_summary"]));
+      expect(kinds).toEqual(expect.arrayContaining(["letter_translate", "today_summary"]));
       for (const k of moduleBound) expect(kinds, k).not.toContain(k);
       expect(only.json.save.formTemplate).toBeUndefined();
       expect(only.json.save.formFlow).toBeUndefined();
@@ -283,7 +289,7 @@ describe("AI task queue (Yapay Zekâya Gönder) and Claude-as-AI write tools", (
     for (const k of moduleBound) expect(all, k).toContain(k);
   });
 
-  it("saves a report dashboard with checked queries", async () => {
+  it.skipIf(!hasPlatform)("saves a report dashboard with checked queries", async () => {
     const unused = await tool(claimer, "cde_report_save", { projectId: pid, ...REPORT, html: "<div></div>" });
     expect(unused.isError).toBe(true);
     expect(unused.text).toContain("acik");

@@ -1,23 +1,30 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import {
+  applySetupOverrides,
   checkAttributeDefinition,
+  checkSetupDetails,
+  checkSetupPeople,
   checkProjectTemplate,
   checkStandard,
   countTemplate,
   dimensionDtos,
   expandGrants,
   expandProjectTemplate,
+  isGroupAddress,
   previewTree,
   rank,
   resolveModules,
   resolveNamingTokens,
+  sharedText,
   templateDimensions,
   type AttributeDefinition,
   type ExpandedFolder,
   type FinalOutcomeMap,
   type NamingStandard,
   type PermissionLevel,
+  type ProjectSetupPersonReportDto,
+  type ProjectSetupPreviewDto,
   type ProjectTemplate,
   type ReviewChainConfig,
   type TemplateAssignee,
@@ -45,16 +52,19 @@ import {
   folderSettings,
   folderVirtualChildren,
   folders,
+  memberRoles,
   namingStandards,
   projectMembers,
   projectSlots,
   projectTemplateOrigins,
   projects,
+  users,
   workflowTemplates,
 } from "../db/schema.js";
 import { normaliseChainTemplate, withRuleAssignees } from "../workflow/chain-template.js";
 import { checkTemplate as checkWorkflowSteps } from "../workflow/engine.js";
 import { templateFromRequest } from "./template-built-ins.js";
+import { parseProjectTemplate } from "./template-schemas.js";
 import { applyTemplateCde } from "../cde/settings.js";
 import { assignWipOwnerTeams, ensureCompanyTeams, type TeamSeedCompany } from "../cde/teams.js";
 import { applyTemplateParts, insertTemplateRoles, templatePartAvailabilityOf } from "./template-parts.js";
@@ -111,9 +121,22 @@ function findExpanded(list: ExpandedFolder[], names: string[]): ExpandedFolder[]
   return chain.length ? chain : null;
 }
 
-async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, projectCode: string, lang: string): Promise<Prepared> {
+/**
+ * The template of a request with the set-up wizard's choices applied (`setup`), and the problems of
+ * the choices, the project details and the people. The result is parsed again, so a wizard project
+ * goes through exactly the checks of a template project.
+ */
+function requestTemplate(req: PreviewRequest, language: string, lang: string): { template: ProjectTemplate; templateId: string | null; errors: string[] } {
+  const { template: base, templateId } = templateFromRequest(req, language);
+  const applied = req.setup ? applySetupOverrides(base, req.setup, lang) : { template: base, errors: [] };
+  const template = req.setup ? parseProjectTemplate(applied.template) : base;
+  const errors = [...applied.errors, ...checkSetupDetails(req.details, lang), ...checkSetupPeople(req.people, template, lang)];
+  return { template, templateId, errors };
+}
+
+async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, projectCode: string, lang: string, setupErrors: string[] = []): Promise<Prepared> {
   const t = tFor(lang);
-  const errors = checkProjectTemplate(template, req.dimensions, lang);
+  const errors = [...setupErrors, ...checkProjectTemplate(template, req.dimensions, lang)];
   const warnings: string[] = [];
   const slotKeys = new Set(template.slots.map((s) => s.key));
   for (const key of Object.keys(req.slotCompanies)) if (!slotKeys.has(key)) errors.push(t("projects:errors.roleNotInTemplate", { key }));
@@ -285,8 +308,8 @@ async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, p
  */
 export async function previewProjectTemplate(db: Db, body: unknown, lang: string = DEFAULT_LANGUAGE): Promise<TemplatePreviewDto> {
   const req = previewRequestSchema.parse(body);
-  const { template } = templateFromRequest(req, req.language ?? lang);
-  const prepared = await prepare(db, template, req, req.code || "PROJE", lang);
+  const { template, errors } = requestTemplate(req, req.language ?? lang, lang);
+  const prepared = await prepare(db, template, req, req.code || "PROJE", lang, errors);
   const { dimensions } = templateDimensions(template, req.dimensions);
   return {
     ok: prepared.errors.length === 0,
@@ -299,6 +322,56 @@ export async function previewProjectTemplate(db: Db, body: unknown, lang: string
     counts: prepared.counts,
     tree: previewTree(prepared.folders),
     parts: templatePartAvailabilityOf(template),
+  };
+}
+
+/** People of the wizard by e-mail: existing users are added, others are reported (no invitations by e-mail yet). */
+async function resolvePeople(db: Db, people: PreviewRequest["people"], lang: string) {
+  const list = people ?? [];
+  const emails = [...new Set(list.map((p) => p.email))];
+  const rows = emails.length ? await db.select().from(users).where(inArray(users.email, emails)) : [];
+  const byEmail = new Map(rows.filter((u) => !u.disabled).map((u) => [u.email, u]));
+  const report: ProjectSetupPersonReportDto[] = [];
+  const warnings: string[] = [];
+  const add: { person: NonNullable<PreviewRequest["people"]>[number]; userId: string; companyId: string | null }[] = [];
+  for (const person of list) {
+    const user = byEmail.get(person.email);
+    if (isGroupAddress(person.email)) {
+      report.push({ email: person.email, status: "group_address" });
+      warnings.push(sharedText(lang, "setup.groupAddress", { email: person.email }));
+    } else if (!user) {
+      report.push({ email: person.email, status: "no_account" });
+      warnings.push(sharedText(lang, "setup.noAccount", { email: person.email }));
+    } else {
+      report.push({ email: person.email, status: "added", userId: user.id, name: user.name });
+      add.push({ person, userId: user.id, companyId: user.companyId });
+    }
+  }
+  return { report, warnings, add };
+}
+
+/**
+ * The set-up wizard's dry run: the template preview with the wizard's choices, plus what only the
+ * server knows (the project code is free, the accounts of the people). Nothing is written.
+ */
+export async function dryRunProjectSetup(db: Db, body: unknown, lang: string = DEFAULT_LANGUAGE): Promise<ProjectSetupPreviewDto> {
+  const req = previewRequestSchema.parse(body);
+  const preview = await previewProjectTemplate(db, req, lang);
+  const errors = [...preview.errors];
+  if (req.code) {
+    const [taken] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(and(eq(projects.code, req.code), eq(projects.archived, false)));
+    if (taken) errors.push(sharedText(lang, "setup.codeTaken", { code: req.code }));
+  }
+  const people = await resolvePeople(db, req.people, lang);
+  return {
+    ...preview,
+    ok: errors.length === 0,
+    errors,
+    warnings: [...new Set([...preview.warnings, ...people.warnings])],
+    people: people.report,
   };
 }
 
@@ -325,10 +398,12 @@ export async function assertProjectCodeFree(db: Db, code: string, selfId?: strin
 export async function createProjectFromTemplate(db: Db, user: AuthUser, body: unknown, lang: string = DEFAULT_LANGUAGE) {
   const req: CreateRequest = createRequestSchema.parse(body);
   const language = req.language ?? lang;
-  const { template, templateId } = templateFromRequest(req, language);
-  const prepared = await prepare(db, template, req, req.code, lang);
+  const { template, templateId, errors: setupErrors } = requestTemplate(req, language, lang);
+  const prepared = await prepare(db, template, req, req.code, lang, setupErrors);
   if (prepared.errors.length) throw badRequest(prepared.errors.join(" "), prepared.errors);
   await assertProjectCodeFree(db, req.code);
+  const people = await resolvePeople(db, req.people, lang);
+  const details = req.details && Object.fromEntries(Object.entries(req.details).filter(([, v]) => v));
 
   const projectId = randomUUID();
   const rootId = randomUUID();
@@ -414,6 +489,7 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
         settings: {
           modules: resolveModules(template.modules),
           language,
+          ...(details && Object.keys(details).length ? { details } : {}),
           ...(template.issues && resolveModules(template.modules).issues
             ? {
                 issueTypes: template.issues.categories,
@@ -484,23 +560,36 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
       templateName: template.name,
       dimensions: Object.keys(req.dimensions).length ? prepared.dimensions : null,
     });
+    // People of the set-up wizard: members in the company of their party, with their project roles.
+    const added = people.add.filter((p) => p.userId !== user.id || p.person.slot || p.person.roles?.length || p.person.projectAdmin);
+    for (const { person, userId, companyId } of added) {
+      const slotCompany = person.slot ? prepared.slots.get(person.slot)?.companyId : null;
+      const values = { companyId: slotCompany ?? companyId, isProjectAdmin: userId === user.id || !!person.projectAdmin };
+      await tx
+        .insert(projectMembers)
+        .values({ projectId, userId, ...values })
+        .onConflictDoUpdate({ target: [projectMembers.projectId, projectMembers.userId], set: values });
+      const roles = (person.roles ?? []).map((key) => prepared.roleIds.get(key)).filter((id): id is string => !!id);
+      if (roles.length) await tx.insert(memberRoles).values(roles.map((roleId) => ({ projectId, userId, roleId }))).onConflictDoNothing();
+    }
+    const txDb = tx as unknown as Db;
+    const roleIds = await ensureDefaultProjectRoles(txDb, projectId, rootId);
+    const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
+    if (adminRoleId) await ensureProjectAdminsHoldAdminRole(txDb, projectId, adminRoleId);
+    // ISO 19650 task teams (ISO-5): one per slot company (code from the slot), or per slot listed in
+    // the template's cde.taskTeams (with the lead flag), and the creator's company; WIP folders
+    // granted to one slot company belong to its team. Members of a team's company join it.
+    const teamSlots = template.cde?.taskTeams;
+    const slotTeams: TeamSeedCompany[] = teamSlots
+      ? teamSlots.flatMap((team) => {
+          const slot = prepared.slots.get(team.slot);
+          return slot?.companyId ? [{ companyId: slot.companyId, code: slot.code, lead: !!team.lead }] : [];
+        })
+      : [...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code }));
+    const { teams } = await ensureCompanyTeams(txDb, projectId, [...slotTeams, ...(user.companyId ? [{ companyId: user.companyId }] : [])]);
+    await assignWipOwnerTeams(txDb, projectId, teams);
     return { row: row!, workflowIds };
   });
-  const roleIds = await ensureDefaultProjectRoles(db, projectId, rootId);
-  const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
-  if (adminRoleId) await ensureProjectAdminsHoldAdminRole(db, projectId, adminRoleId);
-  // ISO 19650 task teams (ISO-5): one per slot company (code from the slot), or per slot listed in
-  // the template's cde.taskTeams (with the lead flag), and the creator's company; WIP folders
-  // granted to one slot company belong to its team.
-  const teamSlots = template.cde?.taskTeams;
-  const slotTeams: TeamSeedCompany[] = teamSlots
-    ? teamSlots.flatMap((team) => {
-        const slot = prepared.slots.get(team.slot);
-        return slot?.companyId ? [{ companyId: slot.companyId, code: slot.code, lead: !!team.lead }] : [];
-      })
-    : [...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code }));
-  const { teams } = await ensureCompanyTeams(db, projectId, [...slotTeams, ...(user.companyId ? [{ companyId: user.companyId }] : [])]);
-  await assignWipOwnerTeams(db, projectId, teams);
   // Template format v2 parts: transmittal (core), RFI, submittals, meetings (Manage), forms (Field).
   const parts = await applyTemplateParts(db, template, {
     projectId,
@@ -527,8 +616,16 @@ export async function createProjectFromTemplate(db: Db, user: AuthUser, body: un
       slotCompanies: req.slotCompanies,
       counts: prepared.counts,
       language,
+      ...(req.setup ? { setup: req.setup } : {}),
+      ...(people.report.length ? { people: people.report.map((p) => ({ email: p.email, status: p.status })) } : {}),
       parts: parts.map((p) => ({ part: p.part, status: p.status, ...(p.reason ? { reason: p.reason } : {}) })),
     },
   });
-  return { project, warnings: prepared.warnings, counts: prepared.counts, parts };
+  return {
+    project,
+    warnings: [...new Set([...prepared.warnings, ...people.warnings])],
+    counts: prepared.counts,
+    parts,
+    people: people.report,
+  };
 }

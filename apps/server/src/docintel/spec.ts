@@ -15,7 +15,7 @@ import {
   type SubmittalTypeCode,
 } from "@sitekeep/shared";
 import { DEFAULT_LANGUAGE, tFor, type MsgKey } from "../i18n/index.js";
-import { extractJson } from "../reports/llm.js";
+import { extractJson } from "../ai/json.js";
 import { pdfErrorText } from "./extract.js";
 import type { WorkerOutput } from "./pdf-worker.js";
 import type { ChatProvider } from "./suggest.js";

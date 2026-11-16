@@ -7,6 +7,7 @@ import { msg, requestLanguage } from "../i18n/index.js";
 import {
   builtInTemplates,
   createProjectFromTemplate,
+  dryRunProjectSetup,
   exportProjectTemplate,
   materializeFolders,
   previewProjectTemplate,
@@ -40,11 +41,24 @@ export async function templateRoutes(api: FastifyInstance, { db }: AppDeps) {
   /** Validates a template (built-in id or JSON) with an optional slot mapping; returns counts and the tree. */
   api.post("/templates/preview", async (req) => previewProjectTemplate(db, req.body, requestLanguage(req)));
 
-  /** Creates a project with folders, grants, naming, attributes and workflows in one transaction. */
+  /**
+   * The set-up wizard's dry run (docs/features/PROJECT_SETUP_WIZARD.md): the preview with the wizard's
+   * choices, the project code and the people's accounts checked. Writes nothing. Same permission as
+   * creating a project.
+   */
+  api.post("/projects/setup/preview", async (req) => {
+    if (!req.user!.isAdmin) throw forbidden(msg("templates:errors.adminRequired"));
+    return dryRunProjectSetup(db, req.body, requestLanguage(req));
+  });
+
+  /**
+   * Creates a project with folders, grants, naming, attributes, workflows, task teams and the
+   * wizard's people in one transaction; the v2 parts are applied after it and reported.
+   */
   api.post("/projects/from-template", async (req) => {
     if (!req.user!.isAdmin) throw forbidden(msg("templates:errors.adminRequired"));
     const r = await createProjectFromTemplate(db, req.user!, req.body, requestLanguage(req));
-    return { ...toProjectDto(r.project, true), warnings: r.warnings, counts: r.counts, parts: r.parts };
+    return { ...toProjectDto(r.project, true), warnings: r.warnings, counts: r.counts, parts: r.parts, people: r.people };
   });
 
   /** The project's structure as a template JSON (no files, records or people). */

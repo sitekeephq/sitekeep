@@ -19,6 +19,7 @@ import type { ViewerEngine } from "@7dimensions-project/bim-viewer";
 import { useLabel } from "../../../i18n";
 import { AiTaskButton } from "../../../shared/ai/AiTaskButton";
 import { webModules } from "../../../app/modules";
+import { webCapability } from "../../../sdk/capabilities";
 
 type Result = ModelQueryResultDto & Partial<Pick<ModelAskResultDto, "source" | "model" | "aiError" | "cached" | "question" | "ms">>;
 type Mode = "color" | "isolate" | "none";
@@ -260,13 +261,16 @@ export function ModelAskPanel({
     void run(q);
   }
 
+  // Saving the answer as a report dashboard needs the Platform module (report builder).
+  const dashboards = webCapability("platform.reports");
+
   async function saveReport() {
-    if (!result) return;
+    if (!result || !dashboards) return;
     setSaving(true);
     setError(null);
     try {
       const d = await api.modelReportDraft(projectId, primaryId, result.query, result.question ?? modelQueryChips(result.query, i18n.language).map((c) => c.text).join(", "));
-      const created = await api.createReport(projectId, { ...d, sharing: "private" });
+      const created = await dashboards.createDashboard(projectId, { ...d, sharing: "private" });
       setSaved(created.id);
     } catch (e) {
       setError((e as Error).message);
@@ -469,7 +473,7 @@ export function ModelAskPanel({
                 </button>
               ))}
             </div>
-            {!compareFrom && !allMode && (
+            {!compareFrom && !allMode && dashboards && (
               <button type="button" className="small" disabled={saving} onClick={() => void saveReport()}>
                 {saving ? t("common:status.saving") : t("modelAsk.actions.saveReport")}
               </button>

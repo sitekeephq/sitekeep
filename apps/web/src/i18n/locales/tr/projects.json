@@ -121,7 +121,9 @@
       "badges": {
         "gate": "Yalnızca Onaylı İnceleme"
       },
-      "grant": "{{role}}: {{level}}"
+      "grant": "{{role}}: {{level}}",
+      "collapse": "{{name}} daralt",
+      "expand": "{{name}} genişlet"
     },
     "errors": {
       "templateProblem": "Şablonda sorun var: {{errors}}",
@@ -131,6 +133,246 @@
     "creating": "Oluşturuluyor…",
     "actions": {
       "create": "Projeyi Oluştur"
+    }
+  },
+  "setup": {
+    "entry": {
+      "lead": "Projeyi sihirbazla adım adım kurun ya da bir şablondan hızlıca oluşturup ayarları sonra değiştirin.",
+      "wizard": "Kurulum Sihirbazı",
+      "wizardHint": "11 adım: dil, şablon, taraflar ve görev ekipleri, kişiler, klasörler, doküman kodları, iş akışları ve ISO 19650 kuralları.",
+      "quick": "Hızlı Oluştur",
+      "quickHint": "Bir şablon, bir ad ve bir kod; geri kalan her şey şablondaki gibi."
+    },
+    "quick": {
+      "template": "Şablon"
+    },
+    "stepsLabel": "Kurulum adımları",
+    "steps": {
+      "language": "Dil",
+      "template": "Şablon",
+      "basics": "Proje Bilgileri",
+      "parties": "Taraflar ve Görev Ekipleri",
+      "people": "Kişiler ve Roller",
+      "folders": "Klasör Yapısı",
+      "naming": "Doküman Kodları",
+      "codes": "Revizyon ve Uygunluk Kodları",
+      "workflows": "İş Akışları",
+      "rules": "ISO 19650 Kuralları",
+      "summary": "Özet"
+    },
+    "stepHeading": "Adım {{current}} / {{total}}: {{name}}",
+    "restored": "Yarım kalan kurulumunuz bu tarayıcıdan geri yüklendi.",
+    "actions": {
+      "startOver": "Baştan Başla"
+    },
+    "leads": {
+      "language": "Projenin klasör, iş akışı ve liste adlarının dili. Herkesin arayüz dili kendi seçimi olarak kalır.",
+      "template": "Şablon klasörleri, yetkileri, kodlamaları, iş akışlarını ve ISO 19650 ayarlarını getirir. Bir Enterprise modülüne ait parçalar, modül kurulu değilse atlanır.",
+      "basics": "Proje kodu doküman kodlarına yazılır; kısa tutun.",
+      "parties": "Şablondaki her tarafı bir firmayla eşleyin. Klasör yetkileri ve onay adımları bu firmalara verilir; görev ekibi olan her tarafın kendi çalışma alanı olur. Baş yükleniciyi (lider) seçin.",
+      "people": "SiteKeep hesabı olan kişileri ekleyin. Kişi, tarafının firmasına, onun görev ekibine ve seçtiğiniz proje rollerine katılır.",
+      "folders": "Klasör ağacı şablondan gelir. Şablon klasörlerinin altına klasör ekleyebilir, ISO 19650 durumu taşımayan klasörleri çıkarabilirsiniz.",
+      "naming": "Doküman kodu standardı her dokümana çalışma aşamasından itibaren tekil bir kod verir. Liste alanlarının kodlarını düzenleyin ve örnek bir adı deneyin.",
+      "codes": "Revizyon ve uygunluk kodları her sürümde tutulur. ISO 19650 P01 / C01 revizyonlarını kullanır; eski düzen sahada yaygın olan R00, R01 … düzenidir.",
+      "workflows": "ISO 19650 geçiş tablosu ve şablonun iş akışları. Her adımı kimin onaylayacağını seçin: bir tarafın görev ekibi, bir proje rolü ya da proje yöneticileri.",
+      "rules": "Zorunlu kılma, geçiş tablosunu baştan bağlayıcı yapar. Bir görev ekibinin çalışma alanı diğer ekiplere kapatılabilir.",
+      "summary": "Sunucu, hiçbir şey oluşturmadan önce kurulumun tamamını denetler."
+    },
+    "language": {
+      "legend": "Proje dili",
+      "hint": {
+        "en": "İngilizce klasör adları; ISO 19650 rol kodları (A, S, M …).",
+        "tr": "Türkçe klasör adları; 3 harfli disiplin kodları (MIM, INS …)."
+      },
+      "uiNote": "Arayüz dilini herkes kendi profilinde seçer."
+    },
+    "template": {
+      "listLabel": "Şablonlar",
+      "partCount_one": "{{count}} parça",
+      "partCount_other": "{{count}} parça",
+      "brings": "“{{name}}” neler getiriyor",
+      "slots_one": "{{count}} taraf: {{names}}",
+      "slots_other": "{{count}} taraf: {{names}}",
+      "naming_one": "{{count}} kodlama",
+      "naming_other": "{{count}} kodlama",
+      "workflowList_one": "{{count}} iş akışı",
+      "workflowList_other": "{{count}} iş akışı",
+      "isoRules": "ISO 19650 kuralları baştan açık (geçişler, görev ekibi çalışma alanı, tekil doküman kodları)"
+    },
+    "parts": {
+      "part": "Parça",
+      "appliedBy": "Uygulayan",
+      "include": "Dahil",
+      "core": "SiteKeep Community",
+      "byModule": "SiteKeep {{module}}",
+      "requiresModule": "SiteKeep {{module}} Gerekli",
+      "willSkip": "Bu sunucuda atlanır; şablonun geri kalanı kurulur.",
+      "always": "Her Zaman",
+      "expected": "Beklenen",
+      "willApply": "Uygulanacak",
+      "names": {
+        "roles": "Proje Rolleri",
+        "issues": "Sorun Tipleri",
+        "transmittal": "Gönderim Formu Ayarları",
+        "rfi": "Bilgi Talebi Ayarları",
+        "submittals": "Teknik Onay Ayarları",
+        "meetings": "Toplantı Şablonları",
+        "forms": "Form Şablonları"
+      },
+      "reasons": {
+        "module_not_installed": "Modül kurulu değil",
+        "module_off": "Kapalı",
+        "unsupported": "Kurulu modül sürümü bu parçayı uygulamıyor",
+        "error": "Başarısız"
+      }
+    },
+    "basics": {
+      "codeHint": "Yalnız harf ve rakam; ayırıcıyı ({{delimiter}}) içeremez.",
+      "codeHintPlain": "Yalnız harf ve rakam.",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "location": "Konum",
+      "locationPlaceholder": "İl, ilçe ya da şantiye adresi",
+      "client": "İşveren"
+    },
+    "parties": {
+      "team": "Görev Ekibi",
+      "lead": "Lider",
+      "hasTeam": "Görev Ekibi",
+      "isLead": "Lider",
+      "companyFor": "{{party}} firması",
+      "codeFor": "{{party}} kodu",
+      "teamsHint": "Baş yüklenicinin ekibi bilgiyi paylaşılmadan önce yetkilendirir. Firması olmayan tarafa ekip açılmaz.",
+      "addHeading": "Taraf Ekle",
+      "partyName": "Taraf Adı",
+      "partyType": "Taraf Tipi",
+      "add": "Taraf Ekle"
+    },
+    "people": {
+      "emails": "E-posta Adresleri",
+      "emailsPlaceholder": "bir ya da daha çok adres, virgül ya da satır başıyla ayrılmış",
+      "add": "Ekle",
+      "hint": "Hesabı olmayan kişiler listelenir ama eklenmez; ortak posta kutuları (info@, noreply@ …) eklenmez.",
+      "empty": "Henüz kimse eklenmedi. Kişileri sonra Proje Ayarları → Üyeler'den de ekleyebilirsiniz.",
+      "email": "E-posta",
+      "party": "Taraf",
+      "partyFor": "{{email}} tarafı",
+      "roles": "Proje Rolleri",
+      "rolesChosen_one": "{{count}} rol",
+      "rolesChosen_other": "{{count}} rol",
+      "rolesNone": "Rol Seçin",
+      "noRoles": "Şablonda bu taraf için rol yok.",
+      "admin": "Yönetici",
+      "isAdmin": "Proje Yöneticisi",
+      "ownCompany": "Kendi firması",
+      "noAccount": "Bu adresle SiteKeep hesabı yok: eklenmeyecek.",
+      "groupAddress": "Ortak posta kutusu: eklenmeyecek."
+    },
+    "folders": {
+      "addHeading": "Klasör Ekle",
+      "parent": "Altına",
+      "chooseParent": "Bir klasör seçin",
+      "name": "Klasör Adı",
+      "add": "Klasör Ekle",
+      "removeHeading": "Klasör Çıkar",
+      "removeLabel": "Klasör",
+      "chooseRemove": "Bir klasör seçin",
+      "leaveOut": "Çıkar",
+      "keep": "Geri Al",
+      "limits": "ISO 19650 durumu olan klasörler, üretilen klasörler ve şablonun kullandığı klasörler (arşiv, inceleme kopyaları, toplantı tutanakları) kalır.",
+      "preview": "Klasör Ağacı",
+      "counts": "Şimdi {{now}} klasör, ilk dosyada {{later}} klasör."
+    },
+    "naming": {
+      "none": "Şablonda kodlama yok.",
+      "fields_one": "{{count}} alan, ayırıcı {{delimiter}}",
+      "fields_other": "{{count}} alan, ayırıcı {{delimiter}}",
+      "show": "Alanları Gösterilen",
+      "field": "Alan",
+      "type": "Tip",
+      "values": "Kodlar",
+      "types": {
+        "list": "Liste",
+        "text": "Metin",
+        "number": "Sayı"
+      },
+      "codesOf": "{{field}} kodları",
+      "codesHint_one": "{{count}} kod; her satırda bir kod, ardından açıklama.",
+      "codesHint_other": "{{count}} kod; her satırda bir kod, ardından açıklama.",
+      "fromParties": "proje ve taraf kodlarından",
+      "digits_one": "{{count}} hane",
+      "digits_other": "{{count}} hane",
+      "freeText": "Serbest metin",
+      "sample": "Örnek Ad",
+      "sampleOk": "Örnek ad standarda uyuyor."
+    },
+    "codes": {
+      "suitability": "Uygunluk Kodları",
+      "revision": "Revizyon",
+      "customHint": "Projeye özel uygunluk listesi sonra Proje Ayarları → CDE'den tanımlanabilir."
+    },
+    "workflows": {
+      "transitions": "Durum Geçişleri (ISO 19650)",
+      "transitionWorkflow": "{{transition}} iş akışı",
+      "team": "Ekip: {{name}}",
+      "role": "Rol: {{name}}",
+      "days": "Gün",
+      "rule": "Kural",
+      "approvers": "Onaycılar",
+      "removeApprover": "{{name}} kaldır",
+      "addApprover": "+ Onaycı ekle…",
+      "addApproverTo": "{{step}} adımına onaycı ekle",
+      "byAttribute": "ve dosyanın {{attribute}} değerine göre"
+    },
+    "rules": {
+      "enforceOff": "Kapalı: geçişler saklanır ama zorunlu değildir; yönetici sonra açabilir.",
+      "adminSeesWipHint": "“Yalnız Sahip Görev Ekibi” ile proje yöneticileri bir ekibin çalışma alanını yalnız bu açıkken görür."
+    },
+    "summary": {
+      "project": "Proje",
+      "language": "Dil",
+      "template": "Şablon",
+      "dates": "Tarihler",
+      "people": "Kişiler",
+      "teams": "Görev Ekipleri",
+      "noCompany": "firma yok: ekip açılmaz",
+      "check": "Denetim",
+      "ready": "Her şey uygun. Proje oluşturulabilir.",
+      "parts": "Şablon Parçaları"
+    },
+    "report": {
+      "created": "{{code}} · {{name}} projesi oluşturuldu.",
+      "parts": "Kurulanlar",
+      "status": "Durum",
+      "notes": "Notlar",
+      "count_one": "({{count}} kayıt)",
+      "count_other": "({{count}} kayıt)",
+      "statuses": {
+        "applied": "Uygulandı",
+        "partial": "Kısmen Uygulandı",
+        "skipped": "Atlandı",
+        "failed": "Başarısız"
+      },
+      "people": "Kişiler",
+      "personStatus": {
+        "added": "Eklendi",
+        "no_account": "Hesap Yok",
+        "group_address": "Ortak Posta Kutusu"
+      },
+      "open": "Projeyi Aç"
+    },
+    "problems": {
+      "language": "Proje dilini seçin.",
+      "template": "Bir şablon seçin.",
+      "templateLoading": "Şablon yükleniyor…",
+      "codeRequired": "Proje kodunu yazın.",
+      "codeChars": "Proje kodunda yalnız harf, rakam, _ ve . olabilir.",
+      "codeLength": "Proje kodu 40 karakteri geçiyor.",
+      "nameRequired": "Proje adını yazın.",
+      "teamSlot": "Bilinmeyen bir tarafın görev ekibi: {{slot}}.",
+      "slotCode": "{{code}} taraf kodunda yalnız büyük harf ve rakam olabilir.",
+      "emailRequired": "Boş e-posta satırlarını doldurun ya da kaldırın.",
+      "standard": "{{name}} kodlaması şablonda yok."
     }
   }
 }

@@ -290,7 +290,7 @@
       "coordination": "Model sets, clash tests and information requirement checks (IDS).",
       "schedule": "Schedule, Gantt chart and 4D.",
       "spec": "A draft submittal register from a specification PDF.",
-      "reports": "Report dashboards and ready-made report templates."
+      "reports": "Reports: a list per area with CSV export; with the Platform module also report dashboards and templates."
     }
   },
   "naming": {
@@ -362,24 +362,6 @@
     "disciplineEmpty": "Discipline is empty.",
     "disciplineUnknown": "Discipline not recognised: \"{{value}}\".",
     "descriptionEmpty": "Description is empty."
-  },
-  "reports": {
-    "warnings": {
-      "network": "Network calls (fetch/XHR/WebSocket) are blocked in the dashboard; data comes only through CDE.data.",
-      "inlineHandlers": "Inline event attributes (such as onclick=…) do not work in the dashboard; use addEventListener.",
-      "externalResources": "External resources (CDN, image, font links) cannot be loaded; everything must be inline.",
-      "navigation": "The dashboard tries to navigate away or open a connection; this code is stopped for security reasons."
-    },
-    "frame": {
-      "blank": "(empty)",
-      "noData": "No data to show.",
-      "noRecords": "No records.",
-      "more_one": "+{{count}} more row",
-      "more_other": "+{{count}} more rows",
-      "cannotShow": "This section cannot be shown",
-      "panelError": "Dashboard error: {{message}}",
-      "targetNotFound": "CDE: target not found: {{target}}"
-    }
   },
   "roles": {
     "packages": {
@@ -536,5 +518,38 @@
         "noAccess": "{{name}} cannot see this folder: {{reason}}."
       }
     }
+  },
+  "setup": {
+    "tooManyParties": "At most {{max}} parties can be added.",
+    "partyKeyInvalid": "Party key \"{{key}}\" is invalid (lower-case letters, digits, - and _).",
+    "partyKeyTaken": "Party key \"{{key}}\" is already used by the template.",
+    "partyLabelEmpty": "Party \"{{key}}\" has no name.",
+    "oneLead": "Only one task team can be the lead appointed party.",
+    "tooManyFolderEdits": "At most {{max}} folders can be added or left out.",
+    "folderNotFound": "Folder \"{{path}}\" is not in the template.",
+    "folderHasState": "\"{{path}}\" carries an ISO 19650 state or generated folders and cannot be left out.",
+    "folderReferenced": "\"{{path}}\" is used by the template (archive, review copy target or meeting minutes) and cannot be left out.",
+    "folderNameInvalid": "Folder name \"{{name}}\" is invalid: it must not be empty, start or end with a space, be longer than 200 characters or contain \\ / : * ? \" < > |.",
+    "folderExists": "Folder \"{{path}}\" already exists.",
+    "namingFieldNotFound": "Naming standard \"{{standard}}\" has no field \"{{field}}\".",
+    "namingFieldNotList": "Field \"{{field}}\" is not a list; only list codes can be changed here.",
+    "namingValuesEmpty": "Field \"{{field}}\" needs at least one code, and no code may be empty.",
+    "namingValueDuplicate": "Field \"{{field}}\": code \"{{code}}\" is listed twice.",
+    "stepNotFound": "Workflow \"{{workflow}}\" has no step {{step}}.",
+    "stepNoAssignee": "\"{{workflow}}\", step \"{{step}}\": choose at least one approver.",
+    "stepDays": "\"{{workflow}}\", step \"{{step}}\": the duration must be 0–365 days.",
+    "transitionNotFound": "The transition table of the template has no row {{transition}}.",
+    "transitionNotReview": "Transition {{transition}} is not made through a review; only review transitions take a workflow.",
+    "dateInvalid": "\"{{value}}\" is not a date (YYYY-MM-DD).",
+    "endBeforeStart": "The end date is before the start date.",
+    "tooLong": "{{field}} is longer than {{max}} characters.",
+    "tooManyPeople": "At most {{max}} people can be added while the project is created.",
+    "emailInvalid": "\"{{email}}\" is not an e-mail address.",
+    "emailDuplicate": "{{email}} is listed twice.",
+    "personSlotUnknown": "{{email}}: party \"{{slot}}\" is not in the template.",
+    "personRoleUnknown": "{{email}}: project role \"{{role}}\" is not in the template.",
+    "codeTaken": "Project code {{code}} is already used by another project.",
+    "noAccount": "{{email}} has no SiteKeep account; create the user in Administration → Users and add them to the project later.",
+    "groupAddress": "{{email}} looks like a shared mailbox and is not added; add the people behind it."
   }
 }

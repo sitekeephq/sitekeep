@@ -8,7 +8,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { test } from "@playwright/test";
 
-export type ModuleId = "cost" | "field" | "coordinate" | "planning" | "ai" | "manage" | "connect";
+export type ModuleId = "cost" | "field" | "coordinate" | "planning" | "ai" | "manage" | "connect" | "platform";
 
 const root = path.resolve(__dirname, "../..");
 const cache = new Map<ModuleId, boolean>();

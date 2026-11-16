@@ -20,7 +20,7 @@ import {
 import type { AiProvider } from "../ai/provider.js";
 import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
 import { pdfErrorText } from "./extract.js";
-import { extractJson } from "../reports/llm.js";
+import { extractJson } from "../ai/json.js";
 import {
   composeName,
   extensionOf,

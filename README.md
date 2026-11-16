@@ -12,8 +12,8 @@ It follows ISO 19650 and implements the buildingSMART OpenCDE and BCF standards.
 
 | Edition | What it is |
 |---|---|
-| **SiteKeep Community** | This repository, free under the [AGPL-3.0](LICENSE): documents, folder permissions, versions, naming standards, review workflows, issues and BCF, model viewer, transmittals and correspondence, reports, OpenCDE APIs. No licence, no limits. |
-| **SiteKeep Enterprise** | Community plus paid modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect ([modules](docs/modules/README.md)). Licensed per installation; the modules are not in this repository. |
+| **SiteKeep Community** | This repository, free under the [AGPL-3.0](LICENSE): documents, folder permissions, versions, naming standards, review workflows, issues and BCF, model viewer, transmittals and correspondence, report lists with CSV export, OpenCDE APIs. No licence, no limits. |
+| **SiteKeep Enterprise** | Community plus paid modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect, Platform ([modules](docs/modules/README.md)). Licensed per installation; the modules are not in this repository. |
 
 The user interface is available in English and Turkish.
 
@@ -31,7 +31,7 @@ The user interface is available in English and Turkish.
 | Reviews | Review and approval chains on documents |
 | ISO 19650 | Per-project rules: state transitions only through review, archive on publication, suitability and revision codes, unique document codes, task-team WIP; clause map and test pack in [ISO 19650 conformance](docs/compliance/ISO19650.md) |
 | Audit | Every write, view and download is recorded in an append-only, hash-chained audit log with CSV export |
-| Reports | Personal report dashboards from templates or HTML, sharing, version history, PDF export |
+| Reports | A list per area (documents, issues, works, reviews …) with the viewer's permissions and CSV export; report dashboards (templates, AI, sharing, versions) come with the Enterprise Platform module |
 | Integrations | REST API (`/api/v1`), OpenCDE, an MCP endpoint (`/mcp`) for AI assistants, office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora) |
 | Privacy | The server sends nothing out on its own; every outbound connection is listed in the Privacy Centre, logged and can be switched off |
 

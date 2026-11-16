@@ -15,12 +15,14 @@ import { users } from "../../../src/db/schema.js";
 import { activityLinks } from "@7dimensions-project/sitekeep-ee-planning/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { saveVersionIndex, type IndexFile } from "../../../src/jobs/version-index.js";
-import { MODULE_TEMPLATES } from "../../../src/reports/templates-modules.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
 import { moduleIds } from "../../../src/app/modules.js";
 
 /** 5D is the Cost module's: its steps run when Cost is installed (SITEKEEP_MODULES). */
 const hasCost = moduleIds().includes("cost");
+/** The "Maliyet (5D)" template is the Platform module's (report builder). */
+const hasPlatform = moduleIds().includes("platform");
+const PLATFORM_TEMPLATES = "@7dimensions-project/sitekeep-ee-platform/internal/templates-modules.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const IFC_V1 = readFileSync(path.join(here, "../../fixtures/model-query.ifc"));
@@ -336,8 +338,9 @@ describe("4D / 5D API", () => {
     expect(flow.body.points.find((p: { date: string }) => p.date === "2026-02-10")).toBeTruthy();
   });
 
-  it.skipIf(!hasCost)("serves the report datasets and the Maliyet (5D) template", async () => {
-    const tpl = MODULE_TEMPLATES.find((t) => t.id === "cost-5d")!;
+  it.skipIf(!hasCost || !hasPlatform)("serves the report datasets and the Maliyet (5D) template", async () => {
+    const { MODULE_TEMPLATES } = (await import(PLATFORM_TEMPLATES)) as { MODULE_TEMPLATES: () => import("@sitekeep/shared").ReportTemplateDto[] };
+    const tpl = MODULE_TEMPLATES().find((t) => t.id === "cost-5d")!;
     expect(tpl.name).toBe("Maliyet (5D)");
     const res = await member.post(`${P()}/reports/query`, { queries: tpl.queries });
     expect(res.status, JSON.stringify(res.body)).toBe(200);

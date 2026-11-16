@@ -91,8 +91,8 @@ export function registerReportTools(tool: ToolAdder, call: CdeCall): void {
   tool(
     "cde_report_run",
     "Runs a report on current data with the caller's permissions and returns its query results (rows capped). " +
-      "Give reportId (saved dashboard), template (built-in template id), or `name` (a saved dashboard or template name, e.g. 'Yazışma Durumu', 'yazışma raporu'). " +
-      "Or give `queries` (ad-hoc report queries: [{id, spec: {dataset, filters, groupBy, metrics, fields, sort, limit}}]).",
+      "Give reportId (saved dashboard), template (built-in template id), or `name` (a saved dashboard or template name, e.g. 'Yazışma Durumu', 'yazışma raporu'); " +
+      "saved dashboards and templates need the Platform module. Or give `queries` (ad-hoc report queries: [{id, spec: {dataset, filters, groupBy, metrics, fields, sort, limit}}]).",
     {
       projectId: pid,
       reportId: z.string().uuid().optional().describe("Saved dashboard id (cde_reports_list)."),
@@ -111,7 +111,8 @@ export function registerReportTools(tool: ToolAdder, call: CdeCall): void {
       let template: Any | undefined;
       if (a.reportId) saved = { id: a.reportId };
       else {
-        const [list, cat] = await Promise.all([call<Any[]>("GET", base), call<Any>("GET", `${base}/catalog`)]);
+        // Without the Platform module there are no saved dashboards (404) and no templates.
+        const [list, cat] = await Promise.all([call<Any[]>("GET", base).catch(() => [] as Any[]), call<Any>("GET", `${base}/catalog`)]);
         if (a.template) template = (cat.templates as Any[]).find((t) => t.id === a.template) ?? matchByName(cat.templates as Any[], a.template);
         else if (a.name) {
           saved = matchByName(list, a.name);
@@ -119,7 +120,9 @@ export function registerReportTools(tool: ToolAdder, call: CdeCall): void {
         }
         if (!saved && !template)
           return {
-            error: "Rapor bulunamadı. Kayıtlı panellerden veya şablonlardan birini seçin.",
+            error: list.length || (cat.templates as Any[]).length
+              ? "Rapor bulunamadı. Kayıtlı panellerden veya şablonlardan birini seçin."
+              : "Kayıtlı rapor paneli ve şablon yok; `queries` ile veri kümelerini sorgulayın (cde_report_datasets).",
             saved: list.map((d) => d.name),
             templates: (cat.templates as Any[]).map((t) => t.name),
           };

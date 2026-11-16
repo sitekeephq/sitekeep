@@ -145,8 +145,10 @@ export const LEGACY_URLS: { url: string; place: NavPlace; redirect?: string; mod
   { url: "param-changes", place: { nav: "model", modelTab: "params" }, module: "coordinate" },
   { url: "param-changes/0f8c6d8e-1111-4222-8333-444455556666", place: { nav: "model", modelTab: "params" }, module: "coordinate" },
   { url: "reports", place: { nav: "raporlar" } },
-  { url: "reports/0f8c6d8e-1111-4222-8333-444455556666", place: { nav: "raporlar" } },
+  // Saved dashboards and templates are the Platform module's; without it "reports" shows the fixed lists.
+  { url: "reports/0f8c6d8e-1111-4222-8333-444455556666", place: { nav: "raporlar" }, module: "platform" },
   { url: "reports?template=issue-status", place: { nav: "raporlar" } },
+  { url: "reports?view=lists&dataset=issues", place: { nav: "raporlar" } },
   { url: "locations", place: { nav: "ayarlar", settingsTab: "konumlar" }, redirect: "settings?sekme=konumlar" },
   { url: "settings", place: { nav: "ayarlar" } },
 ];

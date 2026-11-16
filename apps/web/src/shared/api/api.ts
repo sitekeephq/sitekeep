@@ -16,17 +16,10 @@ import type {
   CapacityRunMode,
   GoogleAuthSettings,
   CompanyDto,
-  DashboardDto,
-  DashboardSummaryDto,
-  DashboardVersionDto,
   ReportCatalogDto,
   ReportDataResult,
   ReportDraft,
-  ReportGenerateResult,
-  ReportModule,
   ReportQueryRef,
-  ReportRepairResult,
-  ReportSharing,
   ReportStampDto,
   FileVersionDto,
   FinalOutcomeMap,
@@ -57,7 +50,11 @@ import type {
   ReviewChainConfig,
   VersionCompareDto,
   CreateFromTemplateRequest,
+  ProjectSetupPersonReportDto,
+  ProjectSetupPreviewDto,
+  ProjectSetupRequest,
   ProjectTemplate,
+  TemplatePartReportDto,
   TemplateCounts,
   TemplatePreviewDto,
   TemplateSummaryDto,
@@ -505,11 +502,18 @@ export const api = {
   createProject: (p: { code: string; name: string; description?: string; template: "empty" | "iso19650" }) =>
     post<ProjectDto>("/projects", p),
   deleteProject: (pid: string) => del<{ ok: boolean }>(`/projects/${pid}`),
-  templates: () => get<TemplateSummaryDto[]>("/templates"),
+  templates: (language?: string) => get<TemplateSummaryDto[]>(`/templates${language ? `?language=${encodeURIComponent(language)}` : ""}`),
+  template: (id: string, language?: string) =>
+    get<ProjectTemplate>(`/templates/${encodeURIComponent(id)}${language ? `?language=${encodeURIComponent(language)}` : ""}`),
+  /** The set-up wizard's dry run: nothing is written (docs/features/PROJECT_SETUP_WIZARD.md). */
+  setupPreview: (body: Omit<ProjectSetupRequest, "name" | "code"> & { code?: string }) =>
+    post<ProjectSetupPreviewDto>("/projects/setup/preview", body),
   previewTemplate: (body: Omit<CreateFromTemplateRequest, "name" | "code"> & { code?: string }) =>
     post<TemplatePreviewDto>("/templates/preview", body),
-  createProjectFromTemplate: (body: CreateFromTemplateRequest) =>
-    post<ProjectDto & { warnings: string[]; counts: TemplateCounts }>("/projects/from-template", body),
+  createProjectFromTemplate: (body: ProjectSetupRequest) =>
+    post<
+      ProjectDto & { warnings: string[]; counts: TemplateCounts; parts: TemplatePartReportDto[]; people: ProjectSetupPersonReportDto[] }
+    >("/projects/from-template", body),
   exportTemplate: (pid: string) => get<ProjectTemplate>(`/projects/${pid}/export-template`),
   members: (pid: string) => get<MemberDto[]>(`/projects/${pid}/members`),
   addMember: (pid: string, m: { email: string; companyId?: string | null; isProjectAdmin: boolean; roleId?: string }) =>
@@ -718,25 +722,12 @@ export const api = {
 
   // Form templates (the Field module's own client: sitekeep-field web/api.ts)
   formTemplates: (pid: string) => get<FormTemplateDto[]>(`/projects/${pid}/form-templates`),
+  // Report datasets (Community): catalog, queries, fixed lists. Dashboards are the Platform module's (its own client).
   reportCatalog: (pid: string) => get<ReportCatalogDto>(`/projects/${pid}/reports/catalog`),
-  reports: (pid: string) => get<DashboardSummaryDto[]>(`/projects/${pid}/reports`),
-  report: (pid: string, id: string) => get<DashboardDto>(`/projects/${pid}/reports/${id}`),
-  createReport: (
-    pid: string,
-    r: Partial<ReportDraft> & { templateId?: string; sharing?: ReportSharing },
-  ) => post<DashboardDto>(`/projects/${pid}/reports`, r),
-  updateReport: (
-    pid: string,
-    id: string,
-    r: Partial<ReportDraft> & { sharing?: ReportSharing; baseVersion?: number },
-  ) => patch<DashboardDto>(`/projects/${pid}/reports/${id}`, r),
-  deleteReport: (pid: string, id: string) => del(`/projects/${pid}/reports/${id}`),
-  reportData: (pid: string, id: string) => get<ReportDataResult>(`/projects/${pid}/reports/${id}/data`),
-  reportVersions: (pid: string, id: string) => get<DashboardVersionDto[]>(`/projects/${pid}/reports/${id}/versions`),
-  restoreReportVersion: (pid: string, id: string, v: number) =>
-    post<DashboardDto>(`/projects/${pid}/reports/${id}/versions/${v}/restore`),
   runReportQueries: (pid: string, queries: ReportQueryRef[]) =>
     post<ReportDataResult>(`/projects/${pid}/reports/query`, { queries, strict: false }),
+  /** CSV of one dataset's fixed list (every field, the rows the caller may see). */
+  reportListCsvUrl: (pid: string, dataset: string) => `/api/v1/projects/${pid}/reports/datasets/${encodeURIComponent(dataset)}/csv`,
   // Document intelligence (title block, naming suggestion, specification register)
   specRegisters: (pid: string) => get<SubmittalRegisterSummaryDto[]>(`/projects/${pid}/docintel/spec-registers`),
   specRegister: (pid: string, rid: string) => get<SubmittalRegisterDto>(`/projects/${pid}/docintel/spec-registers/${rid}`),
@@ -774,18 +765,9 @@ export const api = {
     const m = /filename\*=UTF-8''([^;]+)/.exec(cd);
     return { blob: await res.blob(), name: m ? decodeURIComponent(m[1]!) : "karsilastirma.pdf" };
   },
-  generateReport: (
-    pid: string,
-    r: { prompt: string; dashboardId?: string; current?: ReportDraft; module?: ReportModule; datasets?: string[] },
-  ) => post<ReportGenerateResult>(`/projects/${pid}/reports/generate`, r),
-  /** Change stamp of a saved dashboard's data (live refresh polls this). */
-  reportStamp: (pid: string, id: string) => get<ReportStampDto>(`/projects/${pid}/reports/${id}/stamp`),
-  /** Change stamp of the data behind some datasets (unsaved drafts). */
+  /** Change stamp of the data behind some datasets. */
   reportStampFor: (pid: string, datasets: string[]) =>
     get<ReportStampDto>(`/projects/${pid}/reports/stamp?datasets=${encodeURIComponent(datasets.join(","))}`),
-  /** "Yapay zekâ ile onar": a corrected spec for one broken query (not saved). */
-  repairReportQuery: (pid: string, id: string, queryId: string) =>
-    post<ReportRepairResult>(`/projects/${pid}/reports/${id}/repair`, { queryId }),
 
   // Model coordination
   modelSets: (pid: string) => get<ModelSetDto[]>(`/projects/${pid}/model-sets`),

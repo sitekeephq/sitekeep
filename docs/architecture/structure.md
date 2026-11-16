@@ -349,7 +349,7 @@ Domain ownership:
 - `forms`: form, PDF and PDF source contracts; `workflow`: workflow, roles, assignee and review chain contracts.
 - `works`: work catalog, access, numbering, letters, intake and summaries; `schedule`: schedule and sim contracts.
 - `contracts`: contract card, bill of quantities with unit prices, addenda, guarantee and progress payment (hakediş) DTOs; the pure `calculateProgressPaymentTotals` (cumulative totals, advance deduction, retention, withholding tax, stamp duty, VAT and partial VAT withholding).
-- `reports`: report and report-frame contracts; `viewers`: viewer, markup and office contracts.
+- `reports`: report dataset, query and dashboard contracts (the dashboard frame is the Platform module's); `viewers`: viewer, markup and office contracts.
 - `platform`: hub, OAuth, privacy, templates, locations, terms and AI presets.
 
 ### 4.5 `packages/cde-tools`
@@ -1333,7 +1333,7 @@ Good:
 
 ```text
 features/reports/pages/Reports.tsx
-features/reports/components/ReportFrame.tsx
+features/reports/pages/SpecAnalysis.tsx
 ```
 
 Bad:

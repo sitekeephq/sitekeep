@@ -16,13 +16,14 @@ published as a versioned package and pulled into the application at a pinned ver
 | **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (private) | `@7dimensions-project/sitekeep-ee-field` | `0.4.0` | Separate repository, GitHub Packages. [Details](field.md) |
 | **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/7Dimensions-Project/sitekeep-coordinate) (private) | `@7dimensions-project/sitekeep-ee-coordinate` | `0.3.1` | Separate repository, GitHub Packages. [Details](coordinate.md) |
 | **Planning**: Schedule (P6, MS Project, Excel), versions, 4D | [sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private) | `@7dimensions-project/sitekeep-ee-planning` | `0.3.1` | Separate repository, GitHub Packages. [Details](planning.md) |
-| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/7Dimensions-Project/sitekeep-ai) (private) | `@7dimensions-project/sitekeep-ee-ai` | `0.4.1` | Separate repository, GitHub Packages. [Details](ai.md) |
+| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/7Dimensions-Project/sitekeep-ai) (private) | `@7dimensions-project/sitekeep-ee-ai` | `0.4.2` | Separate repository, GitHub Packages. [Details](ai.md) |
 | **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (private) | `@7dimensions-project/sitekeep-ee-manage` | `0.4.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
 | **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/7Dimensions-Project/sitekeep-connect) (private) | `@7dimensions-project/sitekeep-ee-connect` | `0.3.3` | Separate repository; Office conversion is in the core. [Details](connect.md) |
+| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | sitekeep-platform (private; to be created) | `@7dimensions-project/sitekeep-ee-platform` | `0.1.0` (pin after the first publish) | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
 
 | Package | Source | Version |
 |---|---|---|
-| `@7dimensions-project/sitekeep-sdk` | this repository, `packages/sdk` | `0.13.0` |
+| `@7dimensions-project/sitekeep-sdk` | this repository, `packages/sdk` | `0.14.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 
@@ -150,6 +151,8 @@ the consumer hides the feature; the provider may not be installed.
 | `field.newFormDialog` (web) | Field | Works "+ New" → Form | Option hidden |
 | `cost` (web) | Cost | 4D panel (cost colour mode, cash flow, element cost), Schedule "Cost" dialog | Cost buttons and colour mode hidden |
 | `cost.takeoff` (web) | Cost | PDF viewer "2D Take-off", saving a DWG measurement to the take-off | Button hidden, measurement only measures |
+| `platform.reports` (server) | Platform | `GET /reports/catalog`: templates, example prompts, `aiAvailable` | Catalog without builder parts (empty templates, `aiAvailable: false`) |
+| `platform.reports` (web) | Platform | "Raporlar" Dashboards tab, "Rapor" shortcuts open the builder, "Save as report" in Modele Sor | Fixed lists only; shortcuts open the module's lists; button hidden |
 | `manage.templateApply` (server) | Manage | Project from a template (format v2): the template's `rfi`, `submittals`, `meetings` ([project templates](../features/PROJECT_TEMPLATES.md#module-hook)) | The part is skipped and reported (`module_not_installed`, or `unsupported` for a version without the handler) |
 | `field.templateApply` (server) | Field | Project from a template (format v2): the template's `forms` | As above |
 
@@ -182,7 +185,7 @@ repository** (Read).
 | Package | Repositories that need to read it |
 |---|---|
 | `bim-viewer` | `7d-cde` and module repositories that use the viewer types (`sitekeep-coordinate`, `sitekeep-planning` …) |
-| `sitekeep-sdk` | `sitekeep-cost`, `sitekeep-field`, `sitekeep-coordinate`, `sitekeep-planning`, `sitekeep-ai`, `sitekeep-manage`, `sitekeep-connect` (and later module repositories) |
+| `sitekeep-sdk` | `sitekeep-cost`, `sitekeep-field`, `sitekeep-coordinate`, `sitekeep-planning`, `sitekeep-ai`, `sitekeep-manage`, `sitekeep-connect`, `sitekeep-platform` (and later module repositories) |
 | `sitekeep-ee-cost` | `7d-cde` |
 | `sitekeep-ee-field` | `7d-cde` |
 | `sitekeep-ee-coordinate` | `7d-cde` |
@@ -190,6 +193,7 @@ repository** (Read).
 | `sitekeep-ee-ai` | `7d-cde` |
 | `sitekeep-ee-manage` | `7d-cde` |
 | `sitekeep-ee-connect` | `7d-cde` |
+| `sitekeep-ee-platform` | `7d-cde` |
 
 Developer machines and the production server use a personal token with `read:packages` (`NODE_AUTH_TOKEN`, `.npmrc`).
 

@@ -240,7 +240,7 @@
       "coordination": "Model sets, clash tests and information requirements checks (IDS).",
       "schedule": "Schedule, Gantt chart and 4D.",
       "spec": "Draft submittal register from a specification PDF.",
-      "reports": "Report dashboards and ready-made report templates."
+      "reports": "Reports: a list per area with CSV export; with the Platform module also report dashboards and templates."
     },
     "messages": {
       "saved": "Saved."

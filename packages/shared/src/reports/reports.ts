@@ -1,4 +1,16 @@
-/** Report dashboards: query spec types and DTOs shared by the server and the web app. */
+/**
+ * Report datasets and dashboards: query spec types and DTOs shared by the server, the web app and
+ * the Platform module (report builder; its iframe runtime is its own, docs/modules/platform.md).
+ */
+import { FOLDER_STATE_LABELS_TR, ISSUE_PRIORITY_LABELS_TR, ISSUE_STATUS_LABELS_TR } from "../core/types.js";
+
+/** Code → Turkish label maps of the core datasets' coded values (the dashboard frame applies them to categories). */
+export const REPORT_VALUE_LABELS_TR: Record<string, Record<string, string>> = {
+  status: { ...ISSUE_STATUS_LABELS_TR },
+  priority: { ...ISSUE_PRIORITY_LABELS_TR },
+  derivativeStatus: { none: "Yok", pending: "Bekliyor", processing: "İşleniyor", ready: "Hazır", failed: "Hatalı" },
+  folderState: { ...FOLDER_STATE_LABELS_TR },
+};
 
 export const REPORT_FILTER_OPS = [
   "eq",
@@ -146,6 +158,8 @@ export interface ReportDatasetDto {
   adminOnly?: boolean;
   /** Module family (templates, "Rapor" shortcuts, AI dataset routing). */
   module?: ReportModule;
+  /** Rows only for a query that names its scope (e.g. one IFC model): no fixed list. */
+  scoped?: boolean;
 }
 
 export interface ReportTemplateDto {
@@ -166,6 +180,11 @@ export interface ReportModuleDto {
   examples: string[];
 }
 
+/**
+ * GET /reports/catalog. The datasets and module families are the core's; `aiAvailable`, `templates`,
+ * `examplePrompts` and the families' `examples` come from the Platform module (report builder) and
+ * are false / empty without it.
+ */
 export interface ReportCatalogDto {
   aiAvailable: boolean;
   datasets: ReportDatasetDto[];

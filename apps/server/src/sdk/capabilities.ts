@@ -6,6 +6,8 @@
 import type {
   ActivityDto,
   FormStatus,
+  ReportModule,
+  ReportTemplateDto,
   TemplateForm,
   TemplateMeeting,
   TemplatePartResult,
@@ -14,6 +16,7 @@ import type {
 } from "@sitekeep/shared";
 import type { ProjectAccess } from "../core/security/access.js";
 import type { Db } from "../db/index.js";
+import type { AppDeps } from "../app/deps.js";
 import type { AuthUser } from "../core/security/access.js";
 import type { AiProvider, AiProviderSelection, ProviderConfig } from "../ai/provider.js";
 import { loadingModule } from "../app/module-owner.js";
@@ -149,6 +152,17 @@ export interface Capabilities {
   /** AI: the task queue ("Yapay Zekâya Gönder"): the user's open task of a kind in a project. */
   "ai.tasks": {
     open(db: Db, projectId: string, userId: string, kind: string): Promise<{ id: string; status: "pending" | "claimed" } | null>;
+  };
+  /**
+   * Platform: the report builder's part of GET /reports/catalog (docs/modules/platform.md). The core
+   * filters the templates by the caller's datasets and the project's modules.
+   */
+  "platform.reports": {
+    catalog(
+      deps: AppDeps,
+      access: ProjectAccess,
+      lang: string,
+    ): Promise<{ aiAvailable: boolean; templates: ReportTemplateDto[]; examplePrompts: string[]; examples: Partial<Record<ReportModule, string[]>> }>;
   };
   /** Field: forms that mirror records of an outside system (Autodesk forms), in one read-only template per project. */
   "field.externalForms": {

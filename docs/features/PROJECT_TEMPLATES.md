@@ -4,8 +4,10 @@ A project template is a project's structure as one JSON document, without files,
 folders and their permissions, naming standards, attributes, review workflows, the ISO 19650 CDE
 settings and, since format v2, project roles, issue types, transmittal settings and the settings of
 the Enterprise modules (RFI, submittals, meetings, forms). A project is created from a template in one
-step (Projects → **New Project**, or `POST /api/v1/projects/from-template`), and any project can be
-exported as a template (Project Settings → **Export as Template**).
+step (Projects → **New Project** → Quick Create, or `POST /api/v1/projects/from-template`) or with the
+[project set-up wizard](PROJECT_SETUP_WIZARD.md), which adds explicit choices (parties and task teams,
+people, folders, codes, approvers, ISO 19650 rules) on top of the template; any project can be exported
+as a template (Project Settings → **Export as Template**).
 
 Templates are Community ([map](../MAP.md#2-community-or-enterprise)): ISO 19650 requirements that are
 documents (BEP, information requirements, delivery plans) are delivered as template folders, not as
@@ -164,8 +166,9 @@ it could not apply.
 |---|---|---|
 | GET | `/api/v1/templates?language=` | Built-in templates: id, name, description, `language`, `family`, `parts`, slots, dimensions, counts |
 | GET | `/api/v1/templates/:id?language=` | The template JSON, per-language values resolved |
-| POST | `/api/v1/templates/preview` | `{ templateId \| template, code?, slotCompanies, slotCodes, dimensions, language? }` → errors, warnings, counts, folder tree, `parts` |
-| POST | `/api/v1/projects/from-template` | The same plus `code`, `name`, `description` (system administrators) → the project, `warnings`, `counts`, `parts` |
+| POST | `/api/v1/templates/preview` | `{ templateId \| template, code?, slotCompanies, slotCodes, dimensions, language?, setup? }` → errors, warnings, counts, folder tree, `parts` |
+| POST | `/api/v1/projects/setup/preview` | The set-up wizard's dry run (system administrators): the preview plus the project code and the people's accounts ([wizard](PROJECT_SETUP_WIZARD.md#server)) |
+| POST | `/api/v1/projects/from-template` | The same plus `code`, `name`, `description`, and the wizard's `setup`, `details`, `people` (system administrators) → the project, `warnings`, `counts`, `parts`, `people` |
 | GET | `/api/v1/projects/:pid/export-template` | The project as a template: folders, grants by slot, naming, attributes, workflows (project-role steps as `{ projectRole }`), `roles`, `modules`, `cde` (with `containerStandard`) |
 
 ## Authoring with the generator
@@ -198,8 +201,8 @@ passes `checkProjectTemplate` and previews without errors.
   Climate Change (ÇŞB) coding; the Turkish construction template uses the 3-letter discipline codes
   common on sites.
 - Issue custom fields.
-- The project set-up wizard (language, project type, naming, parties, disciplines, approvals,
-  modules, people, summary, verification) on top of the preview and create APIs above.
+- The set-up wizard is done ([project set-up wizard](PROJECT_SETUP_WIZARD.md)); its planned additions
+  (invitations, disciplines step, verification run) are listed there.
 
 ## Tests
 

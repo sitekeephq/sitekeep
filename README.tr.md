@@ -8,8 +8,8 @@
 
 | Sürüm | Ne |
 |---|---|
-| **SiteKeep Community** | Bu depodaki çekirdek: dokümanlar, klasör yetkileri, sürümler, isimlendirme, onay akışları, sorunlar ve BCF, model görüntüleyici, İşler (yazışma, transmittal), raporlar, OpenCDE. Modülsüz kurulum (`SITEKEEP_MODULES=""`). |
-| **SiteKeep Enterprise** | Community + ücretli modüller: Cost, Field, Coordinate, Planning, AI, Manage, Connect ([modüller](docs/modules/README.md)). Herhangi bir modül kuruluysa uygulama kendini "SiteKeep Enterprise" olarak gösterir. |
+| **SiteKeep Community** | Bu depodaki çekirdek: dokümanlar, klasör yetkileri, sürümler, isimlendirme, onay akışları, sorunlar ve BCF, model görüntüleyici, İşler (yazışma, transmittal), rapor listeleri (CSV), OpenCDE. Modülsüz kurulum (`SITEKEEP_MODULES=""`). |
+| **SiteKeep Enterprise** | Community + ücretli modüller: Cost, Field, Coordinate, Planning, AI, Manage, Connect, Platform ([modüller](docs/modules/README.md)). Herhangi bir modül kuruluysa uygulama kendini "SiteKeep Enterprise" olarak gösterir. |
 
 Marka dosyaları ve kullanım kuralları: [docs/brand/README.md](docs/brand/README.md).
 
@@ -34,7 +34,7 @@ Docs ve Issues tarafının açık formatlı karşılığı; 3B/BIM tarafı [That
 | Denetim | Her yazma, görüntüleme ve indirme işlemi değiştirilemez, hash zincirli denetim kaydına düşer; CSV olarak alınabilir |
 | Entegrasyon | REST API (`/api/v1`), sunucuda MCP ucu (`/mcp`) ve stdio MCP sunucusu (24 araç, Forma MCP ile aynı biçim), kapsamlı API erişim anahtarları, AECPilot teslimi için naming kontrol + yükleme uçları |
 | Yapay zekâ | Yönetici kontrollü sağlayıcılar (Ollama/vLLM/LM Studio, DeepSeek, Claude), tam yerel mod, proje bazlı politika |
-| Raporlar | Kişisel rapor panelleri: yapay zekâ ile, şablondan veya HTML ile; paylaşım, sürüm geçmişi, PDF çıktısı |
+| Raporlar | Her alan için sabit liste (dokümanlar, sorunlar, işler, incelemeler …), görenin yetkisiyle, CSV çıktısı; rapor panelleri (şablon, yapay zekâ, paylaşım, sürümler) Enterprise Platform modülüyle gelir |
 | Doküman zekâsı | PDF antetinden ad, öznitelik ve revizyon önerisi; revizyon tutarlılık uyarıları; şartnameden taslak teknik onay listesi (CSV/XLSX/JSON) |
 
 ## Hızlı başlangıç (Docker)
@@ -84,7 +84,10 @@ npm run e2e
 
 Ayrıntılar için [E2E test rehberine](e2e/README.md) bakın.
 
-## Rapor panelleri
+## Rapor panelleri (Enterprise: Platform modülü)
+
+Community'de **Raporlar** her veri kümesi için sabit bir liste ve CSV çıktısı sunar. Aşağıdaki panel oluşturucu
+(şablonlar, yapay zekâ, paylaşım, sürümler) Platform modülündedir ([platform](docs/modules/platform.md)).
 
 Her kullanıcı kendi panelini kurar: **Raporlar → Yapay zekâ ile oluştur** kutusuna ne görmek istediğini Türkçe yazar
 ("Firmalara göre açık issue sayısı, termini geçenler ayrı"), panel önizlenir, beğenilirse kaydedilir. Sonraki
@@ -120,7 +123,6 @@ Yapay zekâ (OpenAI uyumlu uç; Ollama, vLLM, LM Studio, llama.cpp):
 Ollama varsayılan olarak 4.096 token bağlamla çalışır ve fazlasını sessizce keser; sunucuyu
 `OLLAMA_CONTEXT_LENGTH=16384` ile başlatın (veya modeli `num_ctx 16384` ile bir Modelfile'dan oluşturun).
 
-Yerel modeli denemek için (testlere dahil değil): `npm run build && AI_ENABLED=1 node apps/server/scripts/report-llm-smoke.mjs "istek" --out panel.html`.
 İsteklerin metni denetim kaydına yazılmaz; yalnızca uzunluğu ve sonucu yazılır.
 
 ## Doküman zekâsı (antet ve şartname)

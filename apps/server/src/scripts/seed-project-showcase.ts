@@ -4,8 +4,6 @@ import { PDFDocument, StandardFonts } from "pdf-lib";
 import { openDb, type Db } from "../db/index.js";
 import { moduleTable } from "../app/modules.js";
 import {
-  dashboards,
-  dashboardVersions,
   fileVersions,
   files,
   folders,
@@ -73,6 +71,15 @@ const planning = (name: string): any => {
 const schedules = planning("schedules");
 const scheduleActivities = planning("scheduleActivities");
 const scheduleDependencies = planning("scheduleDependencies");
+// Platform's tables (report dashboards; the showcase needs the Platform module too).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const platform = (name: string): any => {
+  const t = moduleTable("platform", name);
+  if (!t) throw new Error("seed-project-showcase needs the Platform module (SITEKEEP_MODULES)");
+  return t;
+};
+const dashboards = platform("dashboards");
+const dashboardVersions = platform("dashboardVersions");
 
 async function seed(db: Db) {
   const [existing] = await db
@@ -303,7 +310,7 @@ async function seed(db: Db) {
       }
       await track("schedule", schedule!.id);
 
-      const [dashboard] = await tx
+      const [dashboard] = (await tx
         .insert(dashboards)
         .values({
           projectId: project.id,
@@ -317,7 +324,7 @@ async function seed(db: Db) {
           ],
           html: `<section><h1>DEMO Proje yönetim özeti</h1><p>${DEMO}</p><div id="issues"></div><div id="models"></div><script>CDE.table("#issues", d.issues, {title:"Issue durumu"}); CDE.table("#models", d.models, {title:"Model durumu"});</script></section>`,
         })
-        .returning();
+        .returning()) as { id: string; name: string; description: string | null; queries: unknown; html: string; sharing: string }[];
       await tx.insert(dashboardVersions).values({
         dashboardId: dashboard!.id,
         version: 1,

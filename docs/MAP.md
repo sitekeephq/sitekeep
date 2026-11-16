@@ -17,7 +17,7 @@ If a change does not fit any row below, open an issue and ask before writing cod
 | **SiteKeep Community**: the core | This repository (`apps/`, `packages/`) | AGPL-3.0 |
 | 3D viewer engine | `@7dimensions-project/bim-viewer` ([structure](architecture/structure.md#221-external-private-package-7dimensions-projectbim-viewer)) | AGPL-3.0 |
 | Module SDK | `packages/sdk` | MIT |
-| **SiteKeep Enterprise** modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect | One closed repository per module (`sitekeep-<id>`), installed as `@7dimensions-project/sitekeep-ee-<id>` | Commercial |
+| **SiteKeep Enterprise** modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect, Platform | One closed repository per module (`sitekeep-<id>`), installed as `@7dimensions-project/sitekeep-ee-<id>` | Commercial |
 
 Community must always build, run and pass its tests **without any module** installed. Enterprise is
 Community plus one or more modules, unlocked by a licence.
@@ -45,12 +45,13 @@ Decide with these rules, in this order:
 | AI providers, Ask the project, AI task queue, AI tools over MCP | **AI** |
 | RFI, submittals, meetings, correspondence tools, Drop and save | **Manage** (the Works engine itself is core) |
 | Autodesk Forma / ACC sync and import, Office editing in the browser (WOPI) | **Connect** (Office-to-PDF conversion is core) |
+| Report dashboards: the report builder (AI, templates, HTML editor), the dashboard frame and charts, sharing, version history, PDF snapshots | **Platform** (the report datasets, queries, fixed lists and CSV are core) |
 
 5. **A new area that is not in this table** is a product decision. Ask first.
 
 Module details: [Modules](modules/README.md) and one page per module ([cost](modules/cost.md),
 [field](modules/field.md), [coordinate](modules/coordinate.md), [planning](modules/planning.md),
-[ai](modules/ai.md), [manage](modules/manage.md), [connect](modules/connect.md)).
+[ai](modules/ai.md), [manage](modules/manage.md), [connect](modules/connect.md), [platform](modules/platform.md)).
 
 ## 3. Where the code goes
 
@@ -58,12 +59,13 @@ Module details: [Modules](modules/README.md) and one page per module ([cost](mod
 
 | You are adding | Put it in | Read first |
 |---|---|---|
-| An API endpoint, service or job | `apps/server/src/<area>/` (`projects`, `files`, `workflow`, `works`, `coordination`, `bcf`, `opencde`, `reports`, `docintel`, `jobs` …) | [structure](architecture/structure.md) |
+| An API endpoint, service or job | `apps/server/src/<area>/` (`projects`, `files`, `workflow`, `works`, `coordination`, `bcf`, `opencde`, `reports` (datasets, lists), `docintel`, `jobs` …) | [structure](architecture/structure.md) |
 | A database table or column | `apps/server/src/db` schema + a migration in `apps/server/drizzle` | [structure](architecture/structure.md) |
 | A screen or component | `apps/web/src/features/<area>/` (shared UI in `apps/web/src/shared`) | [structure](architecture/structure.md), [theme](product/THEME.md) |
 | A rule, type or DTO used by both server and web | `packages/shared/src/<area>/` | [structure](architecture/structure.md) |
 | An MCP tool | `packages/cde-tools/src/tools/` | [developer MCP](onboarding/DEVELOPER_MCP.md) |
 | A project template (folders, naming, workflows, roles, module settings) | `apps/server/templates/*.json` (generated ones from `apps/server/templates/src/`) | [project templates](features/PROJECT_TEMPLATES.md), [concept](product/CONCEPT.md) |
+| A choice of the project set-up wizard | `packages/shared/src/platform/project-setup.ts` (override + check), `apps/web/src/features/projects/setup/` (step) | [project set-up wizard](features/PROJECT_SETUP_WIZARD.md) |
 | A file viewer (PDF, DWG, Office) | `apps/web/src/viewers/`, server side in `apps/server/src/previews` | [viewers](features/VIEWERS.md) |
 | Something a module must be able to use | the SDK: `apps/server/src/sdk`, `apps/web/src/sdk`, then `packages/sdk` | [module contract](modules/README.md#module-contract) |
 
@@ -94,7 +96,7 @@ Module details: [Modules](modules/README.md) and one page per module ([cost](mod
 | Install and run | [Docker Compose](onprem/docker-compose.md), [installation package](onprem/installation-bundle.md), [backups](onprem/backups.md), [monitoring](onprem/monitoring.md), [capacity](onprem/capacity.md) |
 | Architecture | [repository structure](architecture/structure.md), [modules](modules/README.md), [i18n](architecture/i18n.md), [tests](architecture/tests.md) |
 | Product language | [concept](product/CONCEPT.md), [terminology](product/TERMINOLOGY.md), [simplification](product/SIMPLIFICATION.md), [theme](product/THEME.md), [brand](brand/README.md) |
-| Features | [project templates](features/PROJECT_TEMPLATES.md), [CDE states (ISO 19650)](features/CDE_STATES.md), [task teams](features/TASK_TEAMS.md), [unique document codes](features/DOCUMENT_CODES.md), [audit log](features/AUDIT_LOG.md), [OpenCDE](features/OPENCDE.md), [BCF](features/BCF.md), [viewers](features/VIEWERS.md), [Works](features/WORKS.md), [correspondence](features/CORRESPONDENCE.md), [reports](features/REPORTS.md), [document comparison](features/DOCUMENT_COMPARISON.md), [drawing sheets](features/SHEETS.md), [privacy](features/PRIVACY.md), [office integration](features/OFFICE_INTEGRATION.md), [Google sign-in](features/GOOGLE_SIGN_IN.md), [AI providers](features/AI_PROVIDERS.md), [model markup](features/MODEL_MARKUP.md) |
+| Features | [project templates](features/PROJECT_TEMPLATES.md), [CDE states (ISO 19650)](features/CDE_STATES.md), [task teams](features/TASK_TEAMS.md), [unique document codes](features/DOCUMENT_CODES.md), [audit log](features/AUDIT_LOG.md), [OpenCDE](features/OPENCDE.md), [BCF](features/BCF.md), [viewers](features/VIEWERS.md), [Works](features/WORKS.md), [correspondence](features/CORRESPONDENCE.md), [reports](features/REPORTS.md), [document comparison](features/DOCUMENT_COMPARISON.md), [drawing sheets](features/SHEETS.md), [privacy](features/PRIVACY.md), [office integration](features/OFFICE_INTEGRATION.md), [Google sign-in](features/GOOGLE_SIGN_IN.md), [AI providers](features/AI_PROVIDERS.md), [model markup](features/MODEL_MARKUP.md), [project set-up wizard](features/PROJECT_SETUP_WIZARD.md) |
 | Enterprise features | [quantities](features/QUANTITIES.md), [quantity approval](features/QUANTITY_APPROVAL.md), [2D take-off](features/2D_TAKEOFF.md), [4D / 5D](features/4D_5D.md), [Suggest Items](features/POZ_SUGGEST.md), [form PDF](features/FORM_PDF.md), [parameter change](features/PARAMETER_CHANGE.md), [Forma sync](features/FORMA_SYNC.md) |
 | Compliance | [ISO 19650 conformance](compliance/ISO19650.md) |
 | Getting started | [demo data](onboarding/DEMO_DATA.md), [developer MCP](onboarding/DEVELOPER_MCP.md), [local Google sign-in](onboarding/GOOGLE_SIGN_IN.md), [contributing](../CONTRIBUTING.md) |

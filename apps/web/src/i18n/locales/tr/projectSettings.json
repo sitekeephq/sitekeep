@@ -240,7 +240,7 @@
       "coordination": "Model setleri, çakışma testleri ve bilgi gereksinimi kontrolleri (IDS).",
       "schedule": "İş programı, Gantt şeması ve 4D.",
       "spec": "Şartname PDF'inden taslak teknik onay listesi.",
-      "reports": "Rapor panelleri ve hazır rapor şablonları."
+      "reports": "Raporlar: her alan için liste ve CSV çıktısı; Platform modülüyle rapor panelleri ve şablonlar da."
     },
     "messages": {
       "saved": "Kaydedildi."

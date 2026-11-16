@@ -64,6 +64,10 @@ sunucusu", a tool server for AI clients).
 | CDE (Common Data Environment) | CDE (en: CDE) | Project Settings tab; the abbreviation stays. [CDE states](../features/CDE_STATES.md) |
 | Suitability code / revision code | Uygunluk kodu / Revizyon kodu (en: Suitability Code / Revision Code) | Per version (ISO 19650) |
 | Task team | Görev ekibi (en: Task Team) | A kind of project role |
+| Lead appointed party | Lider (en: Lead) | The task team that authorises before sharing; "Baş yüklenici (lider)" in help texts |
+| Party (template slot) | Taraf (en: Party) | Client, consultant, designer, contractor … of a project template; mapped to a company |
+| Project setup wizard / quick create | Kurulum Sihirbazı / Hızlı Oluştur (en: Setup Wizard / Quick Create) | Projects → Yeni proje ([wizard](../features/PROJECT_SETUP_WIZARD.md)) |
+| Shared mailbox (group address) | Ortak posta kutusu (en: Shared Mailbox) | info@, noreply@ …: not added as people by the wizard |
 | State transition | Durum geçişi (en: State Transition) | Modes: Doğrudan / İnceleme ile / Otomatik / Yasak (Direct / Through Review / Automatic / Forbidden) |
 | Returned / Superseded / Withdrawn | Geri Döndü / Yenisi Yayınlandı / Geri Çekildi | Document status flags beside the state |
 | Shared for Review / Shared for Approval | İnceleme için / Onay için (en, latter only: For Approval) | Sub-status label in project templates |

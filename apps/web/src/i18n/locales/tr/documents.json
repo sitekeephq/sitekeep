@@ -233,6 +233,7 @@
     "comparePrevious": "Önceki sürümle karşılaştır"
   },
   "reportShortcut": {
+    "hintLists": "{{module}} listeleri: görüntüleyin veya CSV olarak indirin",
     "hint": "{{module}} için rapor: yapay zekâ ile oluşturun veya hazır şablonu seçin"
   },
   "cards": {

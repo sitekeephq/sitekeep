@@ -135,6 +135,7 @@ export class DatasetRegistry {
         adminOnly: d.adminOnly || undefined,
         dynamicPrefix: d.dynamicPrefix,
         module: d.module,
+        scoped: d.loadFor ? true : undefined,
         fields: Object.entries(d.fields).map(([fname, f]) => ({
           name: fname,
           type: f.type,

@@ -13,6 +13,7 @@ export { builtInTemplates, templateSummaries } from "./template-built-ins.js";
 export {
   assertProjectCodeFree,
   createProjectFromTemplate,
+  dryRunProjectSetup,
   previewProjectTemplate,
 } from "./template-apply.js";
 export { exportProjectTemplate } from "./template-export.js";

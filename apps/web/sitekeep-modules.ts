@@ -40,7 +40,7 @@ function localeEntries(pkg: string): { lang: string; ns: string; file: string }[
   });
 }
 
-export const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect"]; // apps/server/src/app/modules.ts
+export const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect", "platform"]; // apps/server/src/app/modules.ts
 
 /** SITEKEEP_MODULES, or when it is not set every installed module package (a Community build has none). */
 export function moduleIds(env: string | undefined = process.env.SITEKEEP_MODULES): string[] {

@@ -51,6 +51,8 @@ export interface ProjectDto {
   modules?: ProjectModuleState;
   /** Issue types of the project by category (from its template); missing = the built-in types. */
   issueTypes?: { category: string; types: string[] }[];
+  /** Dates, location and client given in the project set-up wizard. */
+  details?: { startDate?: string; endDate?: string; location?: string; client?: string };
 }
 
 export interface MemberDto {

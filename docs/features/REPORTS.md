@@ -1,7 +1,24 @@
-# Reports: a dashboard for every module, live refresh
+# Reports: lists for every area (Community), dashboards with live refresh (Enterprise)
 
-Date: 10.10.2026 · Code: `apps/server/src/reports/`, `apps/web/src/features/reports/pages/Reports.tsx`,
-`apps/web/src/features/reports/pages/ReportView.tsx`, `apps/web/src/features/reports/components/ReportFrame.tsx`, `packages/cde-tools/src/tools/report.ts`
+Date: 10.10.2026, split 16.11.2026 (issue #82 §2) · Community code: `apps/server/src/reports/` (datasets, engine,
+stamps, catalog, lists), `apps/web/src/features/reports/pages/Reports.tsx`, `packages/cde-tools/src/tools/report.ts` ·
+Enterprise code: the Platform module (`sitekeep-platform`: `server/`, `shared/report-frame.ts`, `web/`), [platform](../modules/platform.md)
+
+## 0. Community and Enterprise
+
+| | SiteKeep Community (core) | SiteKeep Enterprise (Platform module) |
+|---|---|---|
+| Datasets | Every dataset below, registered by the core and by installed modules, with each dataset's own permission rule | Same |
+| "Raporlar" page | **Lists**: one fixed list per dataset, grouped by area (Documents, Issues, Works, Reviews …), the caller's rows only, up to 5,000; area and list in the URL (`?module=…&dataset=…`) | **Dashboards** tab first, Lists second |
+| Export | **CSV** per list (`GET /projects/:pid/reports/datasets/:name/csv`: every field, localised headers and value labels, `;` separated, UTF-8 BOM; audited as `report.exported`) | Plus PDF snapshot of a dashboard |
+| "Rapor" button on module pages | Opens that area's lists | Opens the builder scoped to the module |
+| Queries | `POST /reports/query`, `GET /reports/stamp`, `GET /reports/catalog` (no templates, `aiAvailable: false`) | The catalog also carries templates, example prompts, `aiAvailable` |
+| Saved dashboards, sharing, versions, templates, AI builder, "Repair with AI", live refresh of dashboards | — | Sections 1–8 below |
+| MCP | `cde_report_datasets`, `cde_report_run` with `queries` | Also `cde_reports_list`, `cde_report_save`, `cde_report_run` by dashboard / template name |
+
+Datasets with a required scope (`model_elements`: one IFC model) have no fixed list (`scoped` in the catalog).
+Sections 1–8 describe the dashboards (Enterprise); the datasets (§2), permissions and change stamps (§4, server)
+are the core's and serve the lists too.
 
 The user's question: *"The AI should be able to produce reports for each module; saved report formats should refresh
 as the data is updated."* This document describes how both needs are met, the limits and the measurements.
@@ -233,8 +250,12 @@ the answer.
 
 ## 9. Tests
 
-- `apps/server/test/report-modules.test.ts`: datasets (permissions and row format), router and prompt upper bound,
-  template scripts, all templates running without errors on sample data, change stamp (writes increment, reads do not,
-  unrelated scopes are not affected, statements that change no rows do not increment), refresh endpoint, broken-field message and repair,
-  module-scoped generation, MCP tools and Ask routing.
-- `apps/server/test/reports.test.ts`: earlier report tests (updated for the new templates and dataset names).
+- Community, `apps/server/test/reports/`: `reports.test.ts` (query engine, registry, file / issue / activity
+  permissions, catalog without builder parts, CSV lists, stamps, no dashboard routes without the module),
+  `report-modules.test.ts` (module datasets and their permissions, change stamps, MCP tools with ad-hoc queries),
+  `platform-upgrade.test.ts` (dashboards created before the split survive the upgrade, with and without the module).
+- Enterprise, `apps/server/test/modules/platform/` (runs when the module is installed): `dashboards.test.ts`
+  (frame, model client, sharing, versions, AI builder with a fake model), `report-modules.test.ts` (router and
+  prompt cap, templates on seeded data, dashboard live refresh, broken-field message and repair, MCP by name, Ask routing).
+- The module's own unit tests: `sitekeep-platform/test` (router, repair, draft ids, frame).
+- e2e: `e2e/specs/reports.spec.ts` (Community lists and CSV; the blank-dashboard journey needs `platform`).

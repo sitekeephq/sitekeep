@@ -13,6 +13,7 @@ import { findProject, requireTestProject, updateRegistry, type ProjectRow } from
 import { PNG_1X1, pdfDrawing, pdfForm } from "./samples.js";
 import { uploadFile } from "./upload.js";
 import { projectPath } from "@sitekeep/shared";
+import { moduleInstalled } from "../app/module-ids.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;
@@ -409,6 +410,8 @@ async function formPdf(sc: Sc) {
 }
 
 async function rapor(sc: Sc) {
+  // Community: the fixed lists (datasets, queries, CSV, stamps); dashboards need the Platform module.
+  if (!moduleInstalled("platform")) return raporListe(sc);
   let dash: Any;
   let stamp = "";
   await sc.step("Şablondan rapor paneli", async () => {
@@ -428,6 +431,22 @@ async function rapor(sc: Sc) {
     const s2 = await sc.admin<Any>("GET", P(sc, `/reports/${dash.id}/stamp`));
     expect(s2.stamp && s2.stamp !== stamp, "Damga değişmedi.");
     return sc.url(`reports/${dash.id}`);
+  });
+}
+
+async function raporListe(sc: Sc) {
+  let stamp = "";
+  await sc.step("Sorun listesi (veri kümesi)", async () => {
+    const r = await sc.admin<Any>("POST", P(sc, "/reports/query"), { queries: [{ id: "rows", spec: { dataset: "issues" } }], strict: false });
+    expect(Array.isArray(r.results?.rows), "Liste sorgusu cevap vermedi.");
+    stamp = r.stamp;
+    return sc.url("reports?view=lists&dataset=issues");
+  });
+  await sc.step("Yazınca damga değişir", async () => {
+    await (await sc.as(sc.a.contractor.userId))("POST", P(sc, "/issues"), { title: "Senaryo sorunu", priority: "high", dueDate: dayOffset(3) });
+    const s2 = await sc.admin<Any>("GET", P(sc, "/reports/stamp?datasets=issues"));
+    expect(s2.stamp && s2.stamp !== stamp, "Damga değişmedi.");
+    return sc.url("reports?view=lists&dataset=issues");
   });
 }
 
@@ -556,11 +575,13 @@ async function gorunum(sc: Sc) {
   });
   await sc.step("Proje müdürü: Rapor aç", async () => {
     const cat = await pm<Any>("GET", P(sc, "/reports/catalog"));
+    // Templates come with the Platform module; Community opens the works list.
     const t = (cat.templates as Any[])[0];
-    expect(t, "Rapor şablonu yok.");
-    const r = await pm<Any>("POST", P(sc, "/reports/query"), { queries: t.queries, strict: false });
+    expect(t || !moduleInstalled("platform"), "Rapor şablonu yok.");
+    const queries = t ? t.queries : [{ id: "rows", spec: { dataset: "works" } }];
+    const r = await pm<Any>("POST", P(sc, "/reports/query"), { queries, strict: false });
     expect(r.results, "Rapor sorgusu cevap vermedi.");
-    return sc.url(`reports?template=${t.id}`);
+    return sc.url(t ? `reports?template=${t.id}` : "reports?view=lists&dataset=works");
   });
   await sc.step("Proje müdürü: Onay ver", async () => {
     const it = await saha<Any>("POST", P(sc, "/works"), {

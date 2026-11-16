@@ -121,7 +121,9 @@
       "badges": {
         "gate": "Approved Review Only"
       },
-      "grant": "{{role}}: {{level}}"
+      "grant": "{{role}}: {{level}}",
+      "collapse": "Collapse {{name}}",
+      "expand": "Expand {{name}}"
     },
     "errors": {
       "templateProblem": "The template has problems: {{errors}}",
@@ -131,6 +133,246 @@
     "creating": "Creating…",
     "actions": {
       "create": "Create Project"
+    }
+  },
+  "setup": {
+    "entry": {
+      "lead": "Set up the project step by step with the wizard, or create it quickly from a template and change the settings later.",
+      "wizard": "Setup Wizard",
+      "wizardHint": "11 steps: language, template, parties and task teams, people, folders, document codes, workflows and the ISO 19650 rules.",
+      "quick": "Quick Create",
+      "quickHint": "A template, a name and a code; everything else as the template sets it."
+    },
+    "quick": {
+      "template": "Template"
+    },
+    "stepsLabel": "Setup steps",
+    "steps": {
+      "language": "Language",
+      "template": "Template",
+      "basics": "Project Basics",
+      "parties": "Parties and Task Teams",
+      "people": "People and Roles",
+      "folders": "Folder Structure",
+      "naming": "Document Codes",
+      "codes": "Revision and Suitability Codes",
+      "workflows": "Workflows",
+      "rules": "ISO 19650 Rules",
+      "summary": "Summary"
+    },
+    "stepHeading": "Step {{current}} of {{total}}: {{name}}",
+    "restored": "Your unfinished setup was restored from this browser.",
+    "actions": {
+      "startOver": "Start Over"
+    },
+    "leads": {
+      "language": "The language of the project's folder, workflow and list names. Each person's interface language stays their own.",
+      "template": "A template brings folders, permissions, naming standards, workflows and the ISO 19650 settings. Parts that belong to an Enterprise module are skipped when the module is not installed.",
+      "basics": "The project code is written into the document codes, so keep it short.",
+      "parties": "Map each party of the template to a company. Folder permissions and approval steps go to these companies; every party with a task team gets its own work-in-progress area. Choose the lead appointed party.",
+      "people": "Add people who already have a SiteKeep account. They join the company of their party, its task team and the project roles you choose.",
+      "folders": "The folder tree comes from the template. Add folders below the template's folders, or leave out folders that carry no ISO 19650 state.",
+      "naming": "The document code standard gives every document a unique code from work in progress on. Adjust the codes of the list fields and check a sample name.",
+      "codes": "Revision and suitability codes are kept per version. ISO 19650 uses P01 / C01 revisions; the legacy profile R00, R01 … as on many sites.",
+      "workflows": "The ISO 19650 transition table and the template's workflows. Choose who approves each step: a party's task team, a project role or the project administrators.",
+      "rules": "Enforcement makes the transition table binding from the start. A task team's work in progress can be closed to the other teams.",
+      "summary": "The server checks the whole setup before anything is created."
+    },
+    "language": {
+      "legend": "Project language",
+      "hint": {
+        "en": "English folder names; ISO 19650 role codes (A, S, M …).",
+        "tr": "Turkish folder names; 3-letter discipline codes (MIM, INS …)."
+      },
+      "uiNote": "The interface language is chosen by each person in their profile."
+    },
+    "template": {
+      "listLabel": "Templates",
+      "partCount_one": "{{count}} part",
+      "partCount_other": "{{count}} parts",
+      "brings": "What “{{name}}” brings",
+      "slots_one": "{{count}} party: {{names}}",
+      "slots_other": "{{count}} parties: {{names}}",
+      "naming_one": "{{count}} naming standard",
+      "naming_other": "{{count}} naming standards",
+      "workflowList_one": "{{count}} workflow",
+      "workflowList_other": "{{count}} workflows",
+      "isoRules": "ISO 19650 rules on from the start (transitions, task team WIP, unique document codes)"
+    },
+    "parts": {
+      "part": "Part",
+      "appliedBy": "Applied By",
+      "include": "Include",
+      "core": "SiteKeep Community",
+      "byModule": "SiteKeep {{module}}",
+      "requiresModule": "Requires SiteKeep {{module}}",
+      "willSkip": "Skipped on this server; the rest of the template is set up.",
+      "always": "Always",
+      "expected": "Expected",
+      "willApply": "Will Be Applied",
+      "names": {
+        "roles": "Project Roles",
+        "issues": "Issue Types",
+        "transmittal": "Transmittal Settings",
+        "rfi": "RFI Settings",
+        "submittals": "Submittal Settings",
+        "meetings": "Meeting Templates",
+        "forms": "Form Templates"
+      },
+      "reasons": {
+        "module_not_installed": "The module is not installed",
+        "module_off": "Switched Off",
+        "unsupported": "The installed module version does not apply it",
+        "error": "Failed"
+      }
+    },
+    "basics": {
+      "codeHint": "Letters and digits only; it must not contain the separator ({{delimiter}}).",
+      "codeHintPlain": "Letters and digits only.",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "location": "Location",
+      "locationPlaceholder": "City, district or site address",
+      "client": "Client"
+    },
+    "parties": {
+      "team": "Task Team",
+      "lead": "Lead",
+      "hasTeam": "Task Team",
+      "isLead": "Lead",
+      "companyFor": "Company of {{party}}",
+      "codeFor": "Code of {{party}}",
+      "teamsHint": "The lead appointed party's team authorises information before it is shared. A party without a company gets no team.",
+      "addHeading": "Add a Party",
+      "partyName": "Party Name",
+      "partyType": "Party Type",
+      "add": "Add Party"
+    },
+    "people": {
+      "emails": "E-mail Addresses",
+      "emailsPlaceholder": "one or more addresses, separated by commas or new lines",
+      "add": "Add",
+      "hint": "People without an account are listed but not added; shared mailboxes (info@, noreply@ …) are not added.",
+      "empty": "Nobody added yet. You can add people later in Project Settings → Members.",
+      "email": "E-mail",
+      "party": "Party",
+      "partyFor": "Party of {{email}}",
+      "roles": "Project Roles",
+      "rolesChosen_one": "{{count}} role",
+      "rolesChosen_other": "{{count}} roles",
+      "rolesNone": "Choose Roles",
+      "noRoles": "The template has no roles for this party.",
+      "admin": "Administrator",
+      "isAdmin": "Project Administrator",
+      "ownCompany": "Their own company",
+      "noAccount": "No SiteKeep account with this address: not added.",
+      "groupAddress": "A shared mailbox: not added."
+    },
+    "folders": {
+      "addHeading": "Add a Folder",
+      "parent": "Below",
+      "chooseParent": "Choose a folder",
+      "name": "Folder Name",
+      "add": "Add Folder",
+      "removeHeading": "Leave Out a Folder",
+      "removeLabel": "Folder",
+      "chooseRemove": "Choose a folder",
+      "leaveOut": "Leave Out",
+      "keep": "Keep",
+      "limits": "Folders with an ISO 19650 state, generated folders and folders the template uses (archive, review copies, meeting minutes) stay.",
+      "preview": "Folder Tree",
+      "counts": "{{now}} folders now, {{later}} on first file."
+    },
+    "naming": {
+      "none": "The template has no naming standard.",
+      "fields_one": "{{count}} field, separator {{delimiter}}",
+      "fields_other": "{{count}} fields, separator {{delimiter}}",
+      "show": "Fields Of",
+      "field": "Field",
+      "type": "Type",
+      "values": "Codes",
+      "types": {
+        "list": "List",
+        "text": "Text",
+        "number": "Number"
+      },
+      "codesOf": "Codes of {{field}}",
+      "codesHint_one": "{{count}} code; one per line, code then description.",
+      "codesHint_other": "{{count}} codes; one per line, code then description.",
+      "fromParties": "from the project and party codes",
+      "digits_one": "{{count}} digit",
+      "digits_other": "{{count}} digits",
+      "freeText": "Free text",
+      "sample": "Sample Name",
+      "sampleOk": "The sample follows the standard."
+    },
+    "codes": {
+      "suitability": "Suitability Codes",
+      "revision": "Revision",
+      "customHint": "A project's own suitability list can be set later in Project Settings → CDE."
+    },
+    "workflows": {
+      "transitions": "State Transitions (ISO 19650)",
+      "transitionWorkflow": "Workflow of {{transition}}",
+      "team": "Team: {{name}}",
+      "role": "Role: {{name}}",
+      "days": "Days",
+      "rule": "Rule",
+      "approvers": "Approvers",
+      "removeApprover": "Remove {{name}}",
+      "addApprover": "+ Add approver…",
+      "addApproverTo": "Add an approver to {{step}}",
+      "byAttribute": "and by the file's {{attribute}}"
+    },
+    "rules": {
+      "enforceOff": "Off: the transitions are stored but not enforced; an administrator can switch them on later.",
+      "adminSeesWipHint": "With “Owning Task Team Only”, project administrators outside a team see its work in progress only when this is on."
+    },
+    "summary": {
+      "project": "Project",
+      "language": "Language",
+      "template": "Template",
+      "dates": "Dates",
+      "people": "People",
+      "teams": "Task Teams",
+      "noCompany": "no company: no team",
+      "check": "Check",
+      "ready": "Everything checks out. The project can be created.",
+      "parts": "Template Parts"
+    },
+    "report": {
+      "created": "Project {{code}} · {{name}} was created.",
+      "parts": "What Was Set Up",
+      "status": "Status",
+      "notes": "Notes",
+      "count_one": "({{count}} record)",
+      "count_other": "({{count}} records)",
+      "statuses": {
+        "applied": "Applied",
+        "partial": "Partly Applied",
+        "skipped": "Skipped",
+        "failed": "Failed"
+      },
+      "people": "People",
+      "personStatus": {
+        "added": "Added",
+        "no_account": "No Account",
+        "group_address": "Shared Mailbox"
+      },
+      "open": "Open Project"
+    },
+    "problems": {
+      "language": "Choose the project language.",
+      "template": "Choose a template.",
+      "templateLoading": "The template is loading…",
+      "codeRequired": "Enter the project code.",
+      "codeChars": "The project code may contain letters, digits, _ and . only.",
+      "codeLength": "The project code is longer than 40 characters.",
+      "nameRequired": "Enter the project name.",
+      "teamSlot": "Task team of an unknown party: {{slot}}.",
+      "slotCode": "Party code {{code}} may contain capital letters and digits only.",
+      "emailRequired": "Fill in or remove the empty e-mail rows.",
+      "standard": "Naming standard {{name}} is not in the template."
     }
   }
 }

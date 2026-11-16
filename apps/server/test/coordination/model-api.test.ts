@@ -1,5 +1,5 @@
 /** "Modele sor" and the AI comparison summary over HTTP, with a fake local model. */
-import { hasAi } from "../helpers/modules.js"; // AI steps run when the AI module is installed
+import { hasAi, installed } from "../helpers/modules.js"; // AI steps run when the AI module is installed
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -259,9 +259,16 @@ describe("Modele sor and comparison summary", () => {
     const draft = await semih.post(`${P()}/versions/${v1}/model-query/report-draft`, { query, question: "kaç m² döşeme var" });
     expect(draft.status, draft.body?.message).toBe(200);
     expect(draft.body.queries.map((q: { id: string }) => q.id)).toEqual(["items", "summary"]);
-    const created = await semih.post(`${P()}/reports`, { ...draft.body, sharing: "private" });
-    expect(created.status, created.body?.message).toBe(200);
-    const data = await semih.get(`${P()}/reports/${created.body.id}/data`);
+    // Saving a dashboard needs the Platform module; without it the draft's queries run as an ad-hoc report.
+    let data;
+    if (installed("platform")) {
+      const created = await semih.post(`${P()}/reports`, { ...draft.body, sharing: "private" });
+      expect(created.status, created.body?.message).toBe(200);
+      data = await semih.get(`${P()}/reports/${created.body.id}/data`);
+    } else {
+      expect((await semih.post(`${P()}/reports`, { ...draft.body, sharing: "private" })).status).toBe(404);
+      data = await semih.post(`${P()}/reports/query`, { queries: draft.body.queries, strict: false });
+    }
     expect(data.status).toBe(200);
     expect(data.body.errors).toEqual({});
     // Follows the newest version (V2 has the same two slabs).

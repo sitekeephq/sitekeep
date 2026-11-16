@@ -8,6 +8,7 @@ import { msg } from "../../i18n/index.js";
 const READ_ONLY_POSTS = new Set([
   "/api/v1/projects/:pid/naming/validate",
   "/api/v1/templates/preview",
+  "/api/v1/projects/setup/preview",
   // "Sor" assistant: reads with the caller's rights; its own tool calls are read-only.
   "/api/v1/projects/:pid/ask",
   "/api/v1/projects/:pid/ask/:jobId/cancel",

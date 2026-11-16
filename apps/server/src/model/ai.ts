@@ -14,7 +14,7 @@ import {
   type ModelVocabDto,
 } from "@sitekeep/shared";
 import type { AiProvider } from "../ai/provider.js";
-import { extractJson } from "../reports/llm.js";
+import { extractJson } from "../ai/json.js";
 import { modelQuerySchema, normalizeQuery } from "./query.js";
 import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
 

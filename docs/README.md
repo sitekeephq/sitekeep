@@ -15,7 +15,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 ## Architecture
 
 - [Repository structure](architecture/structure.md)
-- [Modules](modules/README.md): the boundary between the core and paid modules, the SDK, capabilities; [Cost](modules/cost.md), [Field](modules/field.md), [Coordinate](modules/coordinate.md), [Planning](modules/planning.md), [AI](modules/ai.md), [Manage](modules/manage.md), [Connect](modules/connect.md)
+- [Modules](modules/README.md): the boundary between the core and paid modules, the SDK, capabilities; [Cost](modules/cost.md), [Field](modules/field.md), [Coordinate](modules/coordinate.md), [Planning](modules/planning.md), [AI](modules/ai.md), [Manage](modules/manage.md), [Connect](modules/connect.md), [Platform](modules/platform.md)
 - [Tests: unit, e2e and smoke](architecture/tests.md)
 
 ## Customer installation (on-prem, licensed product)

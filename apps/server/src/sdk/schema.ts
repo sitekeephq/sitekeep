@@ -4,7 +4,6 @@
  */
 export {
   companies,
-  dashboards,
   fileVersions,
   files,
   folders,
@@ -33,3 +32,10 @@ export {
   workTypes,
   works,
 } from "../db/schema.js";
+
+/**
+ * @deprecated The report dashboards table belongs to the Platform module since SDK 0.14.0 (its own
+ * migrations; docs/modules/platform.md). Kept for modules built against older SDKs (the AI module's
+ * evaluation fixture); new code asks the Platform module.
+ */
+export { dashboards } from "./legacy-tables.js";

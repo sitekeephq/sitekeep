@@ -233,6 +233,7 @@
     "comparePrevious": "Compare with previous version"
   },
   "reportShortcut": {
+    "hintLists": "Lists of {{module}}, to view or download as CSV",
     "hint": "Report for {{module}}: create it with AI or choose a ready-made template"
   },
   "cards": {

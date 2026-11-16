@@ -22,4 +22,7 @@ export const TOOL_MODULES: Readonly<Record<string, string>> = {
   // AI: task queue and its schemas, AI evaluation
   cde_ai_schemas: "ai", cde_ai_tasks_list: "ai", cde_ai_task_claim: "ai", cde_ai_task_complete: "ai", cde_ai_task_fail: "ai",
   cde_dev_ai_eval: "ai", cde_dev_ai_check: "ai",
+  // Platform: saved report dashboards and templates (cde_report_run and cde_report_datasets are core:
+  // ad-hoc queries over the datasets; saved ones and templates only with the module)
+  cde_reports_list: "platform", cde_report_save: "platform",
 };

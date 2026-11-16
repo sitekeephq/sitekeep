@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { licensedModules } from "../license/state.js";
 
 /** Modules SiteKeep knows (Enterprise). Which are installed depends on the build. */
-export const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect"] as const;
+export const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect", "platform"] as const;
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const installedCache = new Map<string, boolean>();

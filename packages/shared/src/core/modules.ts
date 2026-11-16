@@ -10,6 +10,7 @@ import type { ParamChangeSettings } from "../coordination/param-change.js";
 import type { ReportModule } from "../reports/reports.js";
 import type { WorkCategory } from "../works/work-catalog.js";
 import type { TemplateIssueCategory, TemplateIssueField } from "../platform/template-v2.js";
+import type { ProjectSetupDetails } from "../platform/project-setup.js";
 import { type ProjectModule, type ProjectModuleState } from "./module-state.js";
 import { SHARED_DEFAULT_LANGUAGE, labelText, sharedText } from "../platform/i18n.js";
 
@@ -47,6 +48,8 @@ export interface ProjectSettings {
   issueFields?: TemplateIssueField[];
   /** Parameter change requests (Değişiklik Talebi): approval switch and approver role. */
   paramChange?: Partial<ParamChangeSettings>;
+  /** Start and end dates, location and client given in the project set-up wizard. */
+  details?: ProjectSetupDetails;
 }
 
 /** Module a work category belongs to; generic works belong to none and are always available. */

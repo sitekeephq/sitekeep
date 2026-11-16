@@ -290,7 +290,7 @@
       "coordination": "Model setleri, çakışma testleri ve bilgi gereksinimi kontrolleri (IDS).",
       "schedule": "İş programı, Gantt şeması ve 4D.",
       "spec": "Şartname PDF'inden taslak teknik onay listesi.",
-      "reports": "Rapor panelleri ve hazır rapor şablonları."
+      "reports": "Raporlar: her alan için liste ve CSV çıktısı; Platform modülüyle rapor panelleri ve şablonlar da."
     }
   },
   "naming": {
@@ -362,24 +362,6 @@
     "disciplineEmpty": "Disiplin boş.",
     "disciplineUnknown": "Disiplin tanınmadı: \"{{value}}\".",
     "descriptionEmpty": "Açıklama boş."
-  },
-  "reports": {
-    "warnings": {
-      "network": "Ağ çağrısı (fetch/XHR/WebSocket) panelde engellidir; veri yalnızca CDE.data üzerinden gelir.",
-      "inlineHandlers": "Satır içi olay öznitelikleri (onclick=… gibi) panelde çalışmaz; addEventListener kullanın.",
-      "externalResources": "Dış kaynak (CDN, resim, font bağlantısı) yüklenemez; her şey satır içi olmalı.",
-      "navigation": "Panel sayfa dışına yönlendirme veya bağlantı kurmaya çalışıyor; bu kod güvenlik nedeniyle durdurulur."
-    },
-    "frame": {
-      "blank": "(boş)",
-      "noData": "Gösterilecek veri yok.",
-      "noRecords": "Kayıt yok.",
-      "more_one": "+{{count}} satır daha",
-      "more_other": "+{{count}} satır daha",
-      "cannotShow": "Bu bölüm gösterilemiyor",
-      "panelError": "Panel hatası: {{message}}",
-      "targetNotFound": "CDE: hedef bulunamadı: {{target}}"
-    }
   },
   "roles": {
     "packages": {
@@ -536,5 +518,38 @@
         "noAccess": "{{name}} bu klasörü göremez: {{reason}}."
       }
     }
+  },
+  "setup": {
+    "tooManyParties": "En fazla {{max}} taraf eklenebilir.",
+    "partyKeyInvalid": "\"{{key}}\" taraf anahtarı geçersiz (küçük harf, rakam, - ve _).",
+    "partyKeyTaken": "\"{{key}}\" taraf anahtarı şablonda zaten var.",
+    "partyLabelEmpty": "\"{{key}}\" tarafının adı yok.",
+    "oneLead": "Yalnız bir görev ekibi lider (baş yüklenici) olabilir.",
+    "tooManyFolderEdits": "En fazla {{max}} klasör eklenebilir ya da çıkarılabilir.",
+    "folderNotFound": "\"{{path}}\" klasörü şablonda yok.",
+    "folderHasState": "\"{{path}}\" bir ISO 19650 durumu ya da üretilen klasörler taşıyor; çıkarılamaz.",
+    "folderReferenced": "\"{{path}}\" şablonda kullanılıyor (arşiv, inceleme kopya hedefi ya da toplantı tutanağı); çıkarılamaz.",
+    "folderNameInvalid": "\"{{name}}\" klasör adı geçersiz: boş olamaz, boşlukla başlayıp bitemez, 200 karakteri geçemez, \\ / : * ? \" < > | içeremez.",
+    "folderExists": "\"{{path}}\" klasörü zaten var.",
+    "namingFieldNotFound": "\"{{standard}}\" kodlamasında \"{{field}}\" alanı yok.",
+    "namingFieldNotList": "\"{{field}}\" alanı liste değil; burada yalnız liste kodları değiştirilebilir.",
+    "namingValuesEmpty": "\"{{field}}\" alanında en az bir kod olmalı ve kodlar boş olamaz.",
+    "namingValueDuplicate": "\"{{field}}\" alanı: \"{{code}}\" kodu iki kez yazılmış.",
+    "stepNotFound": "\"{{workflow}}\" iş akışında {{step}}. adım yok.",
+    "stepNoAssignee": "\"{{workflow}}\", \"{{step}}\" adımı: en az bir onaycı seçin.",
+    "stepDays": "\"{{workflow}}\", \"{{step}}\" adımı: süre 0–365 gün olmalı.",
+    "transitionNotFound": "Şablonun geçiş tablosunda {{transition}} satırı yok.",
+    "transitionNotReview": "{{transition}} geçişi inceleme ile yapılmıyor; iş akışı yalnız inceleme geçişlerine seçilir.",
+    "dateInvalid": "\"{{value}}\" bir tarih değil (YYYY-AA-GG).",
+    "endBeforeStart": "Bitiş tarihi başlangıçtan önce.",
+    "tooLong": "{{field}} {{max}} karakteri geçiyor.",
+    "tooManyPeople": "Proje kurulurken en fazla {{max}} kişi eklenebilir.",
+    "emailInvalid": "\"{{email}}\" bir e-posta adresi değil.",
+    "emailDuplicate": "{{email}} iki kez yazılmış.",
+    "personSlotUnknown": "{{email}}: \"{{slot}}\" tarafı şablonda yok.",
+    "personRoleUnknown": "{{email}}: \"{{role}}\" proje rolü şablonda yok.",
+    "codeTaken": "{{code}} proje kodu başka bir projede kullanılıyor.",
+    "noAccount": "{{email}} için SiteKeep hesabı yok; kullanıcıyı Yönetim → Kullanıcılar'da açıp projeye sonra ekleyin.",
+    "groupAddress": "{{email}} ortak bir posta kutusu gibi görünüyor, eklenmedi; arkasındaki kişileri ekleyin."
   }
 }

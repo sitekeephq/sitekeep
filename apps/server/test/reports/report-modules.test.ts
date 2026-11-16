@@ -1,9 +1,9 @@
 /**
  * Module report datasets (works, reviews, forms, locations, schedule, clashes, comparisons, spec
- * registers), the dataset router and prompt size, change stamps / live refresh, the broken-field
- * message and "Yapay zekâ ile onar".
+ * registers), change stamps and the MCP tools over them (Community). The report builder's side
+ * (router, prompt, templates, dashboards, repair) is in test/modules/platform.
  */
-import { hasAi, hasCoordinate, hasField, hasManage, hasPlanning } from "../helpers/modules.js"; // these steps use Field (forms), Coordinate (clashes) and Planning (schedule)
+import { hasCoordinate, hasField, hasManage, hasPlanning } from "../helpers/modules.js"; // these steps use Field (forms), Coordinate (clashes) and Planning (schedule)
 
 const hasModules = hasField && hasCoordinate && hasPlanning;
 import { moduleTable } from "../../src/app/modules.js";
@@ -17,13 +17,10 @@ import type { FastifyInstance } from "fastify";
 import { REPORT_MODULES, isTitleCaseTr, type ReportRow } from "@sitekeep/shared";
 import { cdeParseArgs, cdeResult, cdeToolDefinitions, type CdeCall } from "@sitekeep/cde-tools";
 // The AI module's internals load only when it is installed (a Community install has none).
-const AI_ASSISTANT = "@7dimensions-project/sitekeep-ee-ai/internal/assistant.js";
-const { routeTools } = hasAi ? await import(AI_ASSISTANT) : ({} as Record<string, never>);
 import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
 import {
-  dashboards,
   docComparisons,
   fileVersions,
   files,
@@ -35,31 +32,13 @@ import {
 import { JobQueue } from "../../src/jobs/queue.js";
 import { LocalStorage } from "../../src/core/platform/storage.js";
 import { reportDatasets } from "../../src/reports/all.js";
-import { SYSTEM_PROMPT_TOKEN_CAP, buildSystemPrompt, estimateTokens, planMessages } from "../../src/reports/prompt.js";
-import { MAX_PROMPT_DATASETS, routeDatasets } from "../../src/reports/router.js";
-import { applyFieldMap, missingFields } from "../../src/reports/repair.js";
-import { REPORT_TEMPLATES } from "../../src/reports/templates.js";
-import type { ReportLlm, ReportLlmMessage } from "../../src/reports/llm.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fx = (n: string) => readFileSync(path.join(here, "../fixtures", n));
 const PW = "Sifre-1234567";
 
-class FakeLlm implements ReportLlm {
-  calls: ReportLlmMessage[][] = [];
-  answers: string[] = [];
-  async complete(messages: ReportLlmMessage[]): Promise<string> {
-    this.calls.push(messages.map((m) => ({ ...m })));
-    const a = this.answers.shift();
-    if (a === undefined) throw new Error("no more answers");
-    return a;
-  }
-}
-
 let handle: DbHandle;
 let app: FastifyInstance;
-let aiApp: FastifyInstance;
-let fake: FakeLlm;
 let dataDir: string;
 
 beforeAll(async () => {
@@ -68,14 +47,11 @@ beforeAll(async () => {
   const storage = new LocalStorage(path.join(dataDir, "storage"));
   const jobs = new JobQueue(handle.db, storage);
   app = await buildApp({ db: handle.db, storage, jobs });
-  fake = new FakeLlm();
-  aiApp = await buildApp({ db: handle.db, storage, jobs, reportLlm: fake });
   await handle.db.insert(users).values({ email: "admin@7d.test", name: "Admin", passwordHash: await hashPassword(PW), isAdmin: true });
 });
 
 afterAll(async () => {
   await app.close();
-  await aiApp.close();
   await handle.close();
   rmSync(dataDir, { recursive: true, force: true });
 });
@@ -102,7 +78,6 @@ function api(cookie: string, target: () => FastifyInstance = () => app) {
     post: (u: string, p?: unknown) => call("POST", u, p ?? {}),
     put: (u: string, p: unknown) => call("PUT", u, p),
     patch: (u: string, p: unknown) => call("PATCH", u, p),
-    ai: () => api(cookie, () => aiApp),
     upload: async (url: string, name: string, data: string | Buffer, fields: Record<string, string> = {}) => {
       const form = new FormData();
       for (const [k, v] of Object.entries(fields)) form.append(k, v);
@@ -124,7 +99,7 @@ const RFI_FIELDS = { soru: "Kolon ölçüsü nedir?", kategori: "Tasarım Koordi
 
 // ---- Pure: router and prompt ----------------------------------------------------------------------
 
-describe("dataset router and prompt size", () => {
+describe("module datasets", () => {
   const catalog = reportDatasets.describe();
   const names = catalog.map((d) => d.name);
 
@@ -139,86 +114,13 @@ describe("dataset router and prompt size", () => {
     for (const m of REPORT_MODULES) expect(catalog.some((d) => d.module === m), m).toBe(true);
     const labels = catalog.flatMap((d) => [d.label, ...d.fields.map((f) => f.label)]);
     expect(labels.filter((l) => !isTitleCaseTr(l))).toEqual([]);
-    expect(REPORT_TEMPLATES.map((t) => t.name).filter((n) => !isTitleCaseTr(n))).toEqual([]);
   });
 
-  it.skipIf(!hasModules || !hasManage)("routes Turkish requests to the datasets they need", () => {
-    const route = (prompt: string, extra: object = {}) => routeDatasets({ prompt, available: names, ...extra }).datasets;
-    expect(route("Cevap bekleyen yazılar firma bazında")).toEqual(["correspondence"]);
-    expect(route("Sıradaki tarafa göre açık bilgi talepleri")[0]).toBe("rfis");
-    expect(route("Teknik onay sonuçları ve revizyon sayıları")).toEqual(["submittals"]);
-    expect(route("Toplantılarda sorumlu firmaya göre açık eylemler")).toEqual(["meetings", "actions"]);
-    expect(route("İncelemelerde hangi firma ne kadar bekletti?")).toEqual(["reviews", "review_files", "workflow_steps"]);
-    expect(route("Konuma göre başarısız form maddeleri")).toEqual(["locations", "forms"]);
-    expect(route("Geciken kritik faaliyetler ve S-eğrisi")).toEqual(["schedule_activities"]);
-    expect(route("İş programında geciken ve kritik faaliyetler, iş kırılımına göre gecikme sayıları")).toEqual(["schedule_activities"]);
-    expect(route("Sınıf çiftlerine göre açık çakışmalar")).toEqual(["clash_results"]);
-    expect(route("Antet uyarısı olan karşılaştırmalar")).toEqual(["doc_comparisons"]);
-    expect(route("Doküman yükleme aktivitesi haftalık")).toEqual(["files", "versions"]);
-    expect(route("Firmalara göre açık sorun sayısı")).toEqual(["issues"]);
-    // Module scope ("Rapor" shortcut) and fallbacks.
-    expect(route("Genel bir özet", { moduleDatasets: ["correspondence"], module: "correspondence" })).toEqual(["correspondence"]);
-    expect(route("Genel bir özet")).toEqual(["works", "issues", "files"]);
-    // The edited dashboard's datasets always stay; only usable datasets; at most MAX_PROMPT_DATASETS.
-    expect(route("bunu aylık yap", { current: [{ id: "a", spec: { dataset: "forms" } }] })[0]).toBe("forms");
-    expect(route("Aktivite kaydı", { available: names.filter((n) => n !== "activity") })).not.toContain("activity");
-    expect(route("yazışma, bilgi talebi, teknik onay, toplantı, form, çakışma")).toHaveLength(MAX_PROMPT_DATASETS);
-  });
-
-  it.skipIf(!hasModules || !hasManage)("keeps the system prompt small and under the cap", () => {
-    const project = { code: "ZAVM", name: "Zirve" };
-    const all = buildSystemPrompt(catalog, project);
-    const routed = planMessages(catalog, project, "Cevap bekleyen yazılar firma bazında");
-    expect(routed.datasets).toEqual(["correspondence"]);
-    expect(routed.example).toBe("correspondence-status");
-    expect(routed.messages[0]!.content).toContain("### correspondence");
-    expect(routed.messages[0]!.content).not.toContain("### issues");
-    expect(routed.systemTokens).toBeLessThan(estimateTokens(all) / 3);
-    // Worst case (four big datasets) still fits under the cap.
-    const wide = planMessages(catalog, project, "yazışma, bilgi talebi, teknik onay, iş programı");
-    expect(wide.systemTokens).toBeLessThanOrEqual(SYSTEM_PROMPT_TOKEN_CAP);
-    for (const m of REPORT_MODULES) {
-      const p = planMessages(catalog, project, "özet", undefined, { module: m });
-      expect(p.systemTokens, m).toBeLessThanOrEqual(SYSTEM_PROMPT_TOKEN_CAP);
-    }
-  });
-
-  it("repairs a query by a field mapping that keeps the rest of the query", () => {
-    const spec = {
-      dataset: "works",
-      filters: [{ field: "eskiDurum", op: "eq" as const, value: "acik" }, { field: "isOpen", op: "eq" as const, value: true }],
-      groupBy: ["firma", { field: "createdAt", bucket: "month" as const }],
-      metrics: [{ op: "count" as const }, { op: "avg" as const, field: "acikGun" }],
-      sort: [{ field: "firma" }, { field: "avg_acikGun", dir: "desc" as const }],
-      limit: 7,
-    };
-    const def = reportDatasets.get("works")!;
-    expect(missingFields(spec, def)).toEqual(["eskiDurum", "firma", "acikGun"]);
-    const fixed = applyFieldMap(spec, { eskiDurum: null, firma: "ballInCourt", acikGun: "daysOpen" });
-    expect(fixed).toEqual({
-      dataset: "works",
-      filters: [{ field: "isOpen", op: "eq", value: true }],
-      groupBy: ["ballInCourt", { field: "createdAt", bucket: "month" }],
-      metrics: [{ op: "count" }, { op: "avg", field: "daysOpen", as: "avg_acikGun" }],
-      sort: [{ field: "ballInCourt" }, { field: "avg_acikGun", dir: "desc" }],
-      limit: 7,
-    });
-    expect(missingFields(fixed, def)).toEqual([]);
-  });
-
-  it("ships template scripts that parse", () => {
-    for (const t of REPORT_TEMPLATES) {
-      const scripts = [...t.html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]!);
-      expect(scripts.length, t.id).toBeGreaterThan(0);
-      for (const s of scripts) expect(() => new Function(s), t.id).not.toThrow();
-      for (const q of t.queries) expect(t.html, `${t.id} uses ${q.id}`).toMatch(new RegExp(`d\\.${q.id}\\b`));
-    }
-  });
 });
 
 // ---- API with seeded module data -------------------------------------------------------------------
 
-describe.skipIf(!hasModules)("module datasets, live refresh and repair", () => {
+describe.skipIf(!hasModules)("module datasets and live refresh", () => {
   // Field's forms table (the suite runs only with Field installed).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const forms = moduleTable<any>("field", "forms")!;
@@ -490,33 +392,14 @@ describe.skipIf(!hasModules)("module datasets, live refresh and repair", () => {
     expect(await rows(murat, "spec_registers")).toEqual([]);
   });
 
-  it.skipIf(!hasManage)("runs every template without errors on the seeded data", async () => {
-    for (const t of REPORT_TEMPLATES) {
-      const c = await admin.post(`${P()}/reports`, { templateId: t.id });
-      expect(c.status, t.id).toBe(200);
-      const r = await admin.get(`${P()}/reports/${c.body.id}/data`);
-      expect(r.status, t.id).toBe(200);
-      expect(r.body.errors, t.id).toEqual({});
-    }
-    // Templates come grouped by module in the catalog; non-admins do not get admin-only ones.
-    const cat = (await semih.get(`${P()}/reports/catalog`)).body;
-    expect(cat.modules.find((m: any) => m.key === "correspondence")).toMatchObject({ label: "Yazışmalar", datasets: ["correspondence"] });
-    expect(cat.templates.every((t: any) => typeof t.module === "string")).toBe(true);
-  });
-
-  let dashId: string;
-
-  it.skipIf(!hasManage)("bumps the change stamp on writes, not on reads, and the dashboard refreshes only then", async () => {
+  it.skipIf(!hasManage)("bumps the change stamp on writes, not on reads", async () => {
     const stampRows = async () =>
       Object.fromEntries(
         (await handle.db.select().from(reportChangeStamps).where(eq(reportChangeStamps.projectId, pid))).map((r) => [r.scope, r.counter]),
       );
-    const d = await semih.post(`${P()}/reports`, { templateId: "correspondence-status" });
-    dashId = d.body.id;
-    const first = await semih.get(`${P()}/reports/${dashId}/data`);
-    expect(first.body.stamp).toMatch(/^members:\d+,works:\d+\|\d{4}-\d{2}-\d{2}$/);
-    const s0 = (await semih.get(`${P()}/reports/${dashId}/stamp`)).body;
-    expect(s0.stamp).toBe(first.body.stamp);
+    const stamp = async () => (await semih.get(`${P()}/reports/stamp?datasets=correspondence`)).body;
+    const s0 = await stamp();
+    expect(s0.stamp).toMatch(/^members:\d+,works:\d+\|\d{4}-\d{2}-\d{2}$/);
     expect(s0.changedAt).toBeTruthy();
 
     // Reads (lists, details, report data, other datasets) change nothing.
@@ -524,127 +407,44 @@ describe.skipIf(!hasModules)("module datasets, live refresh and repair", () => {
     await semih.get(`${P()}/works`);
     await semih.get(`${P()}/reviews`);
     await semih.get(`${P()}/forms`);
-    await semih.get(`${P()}/reports/${dashId}/data`);
     await q(admin, [{ id: "a", dataset: "workflow_steps" }, { id: "b", dataset: "schedule_activities" }, { id: "c", dataset: "clash_results" }]);
     expect(await stampRows()).toEqual(before);
-    expect((await semih.get(`${P()}/reports/${dashId}/stamp`)).body.stamp).toBe(s0.stamp);
+    expect((await stamp()).stamp).toBe(s0.stamp);
 
-    // A write to an unrelated scope (forms) leaves this dashboard's stamp alone…
+    // A write to an unrelated scope (forms) leaves the stamp alone…
     await handle.db.update(forms).set({ failedCount: 3 }).where(eq(forms.projectId, pid));
     expect((await stampRows()).forms).toBe(before.forms! + 1);
-    expect((await semih.get(`${P()}/reports/${dashId}/stamp`)).body.stamp).toBe(s0.stamp);
+    expect((await stamp()).stamp).toBe(s0.stamp);
 
-    // …a new letter changes it, and the data shows the new row.
+    // …a new letter changes it, and the list shows the new row.
+    const count = async () => (await q(semih, [{ id: "n", dataset: "correspondence", metrics: [{ op: "count" }] }])).body.results.n[0].count;
+    const n0 = await count();
     const w = await semih.post(`${P()}/works`, { typeKey: "giden-yazi", title: "Yeni yazı", toCompanyIds: [ids.ZRT] });
     expect(w.status).toBe(200);
-    const s1 = (await semih.get(`${P()}/reports/${dashId}/stamp`)).body.stamp;
-    expect(s1).not.toBe(s0.stamp);
-    const after = await semih.get(`${P()}/reports/${dashId}/data`);
-    expect(after.body.stamp).toBe(s1);
-    expect(CDE_sum(after.body.results.totals)).toBe(CDE_sum(first.body.results.totals) + 1);
+    expect((await stamp()).stamp).not.toBe(s0.stamp);
+    expect(await count()).toBe(n0 + 1);
 
     // Statements that change no rows do not bump (INSERT … ON CONFLICT DO NOTHING, UPDATE of nothing).
     const mid = await stampRows();
     await handle.db.execute(sql`UPDATE works SET title = title WHERE id = '00000000-0000-0000-0000-000000000000'`);
     expect(await stampRows()).toEqual(mid);
-
-    // Other projects are not affected; the stamp endpoint checks visibility.
-    expect((await murat.get(`${P()}/reports/${dashId}/stamp`)).status).toBe(404);
     expect((await semih.get(`${P()}/reports/stamp?datasets=forms,clash_results`)).body.stamp).toMatch(/^coordination:\d+,files:\d+,forms:\d+,locations:\d+,members:\d+,workflow:\d+\|/);
   });
 
-  it.skipIf(!hasManage)("shows a clear Turkish message on a widget whose field was renamed, and repairs it with AI", async () => {
-    // Simulate a saved dashboard from before a field rename (stored directly: saving validates).
-    const [d] = await handle.db.select().from(dashboards).where(eq(dashboards.id, dashId));
-    const broken = d!.queries.map((x) => (x.id === "byCompany" ? { ...x, spec: { ...x.spec, groupBy: ["karsiFirma", "direction"] } } : x));
-    await handle.db.update(dashboards).set({ queries: broken }).where(eq(dashboards.id, dashId));
-    const r = await semih.get(`${P()}/reports/${dashId}/data`);
-    expect(r.status).toBe(200);
-    expect(r.body.errorKinds).toEqual({ byCompany: "invalid" });
-    expect(r.body.errors.byCompany).toMatch(/^Kayıtlı sorgu güncel veri yapısına uymuyor/);
-    expect(r.body.errors.byCompany).toContain("'karsiFirma' alanı yok");
-    expect(r.body.errors.byCompany).not.toContain("alanlar:");
-    // The other widgets keep working.
-    expect(r.body.results.awaiting.length).toBeGreaterThan(0);
-
-    // Repair: only the broken query, its error and the dataset's fields go to the model.
-    fake.answers = [JSON.stringify({ spec: { dataset: "correspondence", filters: [{ field: "isOpen", op: "eq", value: true }], groupBy: ["counterparty", "direction"], metrics: [{ op: "count" }] }, note: "karsiFirma → counterparty" })];
-    fake.calls = [];
-    expect((await murat.ai().post(`${P()}/reports/${dashId}/repair`, { queryId: "byCompany" })).status).toBe(404);
-    const fix = await semih.ai().post(`${P()}/reports/${dashId}/repair`, { queryId: "byCompany" });
-    expect(fix.status, JSON.stringify(fix.body)).toBe(200);
-    expect(fix.body.spec.groupBy).toEqual(["counterparty", "direction"]);
-    const sent = fake.calls[0]!.map((m) => m.content).join("\n");
-    expect(sent).toContain("### correspondence");
-    expect(sent).toContain("'karsiFirma' alanı yok");
-    expect(sent).not.toContain("<script>");
-    expect(sent.length).toBeLessThan(12_000);
-    // Preferred answer: a field mapping applied to the saved query (filters, metrics, sort, limit kept).
-    fake.answers = ['{"replace": {"karsiFirma": "counterparty"}, "note": "karsiFirma yerine counterparty"}'];
-    const mapped = await semih.ai().post(`${P()}/reports/${dashId}/repair`, { queryId: "byCompany" });
-    expect(mapped.status, JSON.stringify(mapped.body)).toBe(200);
-    expect(mapped.body.spec).toEqual({ ...broken.find((x) => x.id === "byCompany")!.spec, groupBy: ["counterparty", "direction"] });
-    expect(fake.calls.at(-1)!.at(-1)!.content).toContain("Missing fields: karsiFirma");
-    // A valid query has nothing to repair.
-    expect((await semih.ai().post(`${P()}/reports/${dashId}/repair`, { queryId: "awaiting" })).status).toBe(400);
-
-    // Applying the fix is a normal save.
-    const queries = broken.map((x) => (x.id === "byCompany" ? { id: x.id, spec: fix.body.spec } : x));
-    expect((await semih.patch(`${P()}/reports/${dashId}`, { queries, baseVersion: d!.version })).status).toBe(200);
-    expect((await semih.get(`${P()}/reports/${dashId}/data`)).body.errors).toEqual({});
-  });
-
-  it.skipIf(!hasManage)("MCP tools list the module datasets and run a report by name", async () => {
+  it.skipIf(!hasManage)("MCP tools list the module datasets and run ad-hoc queries", async () => {
     const call: CdeCall = async <T,>(method: string, url: string, body?: unknown) => {
       const res = await app.inject({ method: method as "GET", url: `/api/v1${url}`, headers: { cookie: semihCookie }, payload: body as object });
       return cdeResult<T>(res.statusCode, res.body, false);
     };
-    const defs = new Map(cdeToolDefinitions(call, { readOnly: true }).map((d) => [d.name, d]));
+    const defs = new Map(cdeToolDefinitions(call, { readOnly: true, modules: [] }).map((d) => [d.name, d]));
+    // Without the Platform module there are no saved dashboards or templates to list.
+    expect(defs.has("cde_reports_list")).toBe(false);
     const tool = (name: string) => defs.get(name)!;
     const run = (name: string, args: Record<string, unknown>) => tool(name).run(cdeParseArgs(tool(name), { projectId: pid, ...args })) as Promise<any>;
     const ds = await run("cde_report_datasets", {});
     expect(ds.map((d: any) => d.name)).toEqual(expect.arrayContaining(["correspondence", "rfis", "workflow_steps", "clash_results"]));
     expect((await run("cde_report_datasets", { dataset: "rfis" })).fields.map((f: any) => f.name)).toContain("ballInCourt");
-    const list = await run("cde_reports_list", {});
-    expect(list.templates.find((t: any) => t.id === "correspondence-status")).toMatchObject({ module: "correspondence" });
-    const r = await run("cde_report_run", { name: "Yazışma raporunu göster" });
-    expect(r.report.name).toBe("Yazışma Durumu");
-    expect(r.results.awaiting.rows[0]).toMatchObject({ title: "Şaft ölçüleri" });
-    const t = await run("cde_report_run", { template: "rfi-log", maxRows: 5 });
-    expect(t.report).toMatchObject({ template: true, name: "Bilgi Talepleri" });
-    expect(t.results.byBic.rows).toEqual([{ ballInCourt: "HLL", count: 1 }]);
-    expect((await run("cde_report_run", { name: "olmayan pano" })).error).toMatch(/bulunamadı/);
-  });
-
-  it.skipIf(!hasManage)("routes the AI builder by module and keeps the prompt small", async () => {
-    fake.answers = [
-      JSON.stringify({
-        name: "Yazışmalar",
-        queries: [{ id: "byFirm", spec: { dataset: "correspondence", groupBy: ["counterparty"] } }],
-        html: "<div id='c'></div><script>CDE.onData(function(d){CDE.bar('#c', d.byFirm, {x:'counterparty', y:'count'})})</script>",
-      }),
-    ];
-    fake.calls = [];
-    const r = await semih.ai().post(`${P()}/reports/generate`, { prompt: "Genel durum", module: "correspondence" });
-    expect(r.status, JSON.stringify(r.body)).toBe(200);
-    expect(r.body.stamp).toMatch(/works:/);
-    const system = fake.calls[0]![0]!.content;
-    expect(system).toContain("### correspondence");
-    expect(system).not.toContain("### files");
-    expect(estimateTokens(system)).toBeLessThanOrEqual(SYSTEM_PROMPT_TOKEN_CAP);
+    const r = await run("cde_report_run", { queries: [{ id: "byBic", spec: { dataset: "rfis", groupBy: ["ballInCourt"] } }], maxRows: 5 });
+    expect(r.results.byBic.rows).toEqual([{ ballInCourt: "HLL", count: 1 }]);
   });
 });
-
-describe.skipIf(!hasAi)("MCP and Sor", () => {
-  it("routes report requests to cde_report_run in Sor", () => {
-    expect(routeTools("Yazışma raporunu göster").tools).toEqual(expect.arrayContaining(["cde_report_run", "cde_reports_list"]));
-    // A report request does not also pull in the file tools (smaller prompt for the local model).
-    expect(routeTools("Yazışma raporunu göster").groups).not.toContain("files");
-    expect(routeTools("Bilgi talebi raporu").groups).toContain("reports");
-    expect(routeTools("Gizli rapor nerede?").groups).not.toContain("reports");
-  });
-});
-
-function CDE_sum(rows: ReportRow[]): number {
-  return rows.reduce((a, r) => a + Number(r.count ?? 0), 0);
-}

@@ -145,10 +145,13 @@ test("iPhone hamburger, ask panel and create dialogs stay clickable", async ({ p
   await page.getByRole("button", { name: "+ Yeni Model Seti" }).click();
   await openAndCloseDialog(page, "Yeni Model Seti");
 
-  await page.goto(`${base}/reports`);
-  await page.getByRole("button", { name: "Diğer" }).click();
-  await page.getByRole("menuitem", { name: "Şablondan" }).click();
-  await openAndCloseDialog(page, "Şablondan Panel Oluştur");
+  // Dashboards from templates are the Platform module's (report builder).
+  if (moduleInstalled("platform")) {
+    await page.goto(`${base}/reports`);
+    await page.getByRole("button", { name: "Diğer" }).click();
+    await page.getByRole("menuitem", { name: "Şablondan" }).click();
+    await openAndCloseDialog(page, "Şablondan Panel Oluştur");
+  }
 
   await page.goto(`${base}/issues`);
   await page.getByRole("button", { name: "Diğer" }).click();

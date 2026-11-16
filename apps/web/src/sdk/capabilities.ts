@@ -7,7 +7,7 @@ import type { ComponentType, ReactNode } from "react";
 import type { SelectedItem, ViewerEngine } from "@7dimensions-project/bim-viewer";
 import type { AiTaskButtonProps } from "../shared/ai/AiTaskButton";
 import type { AiTaskButtonMode } from "../shared/ai/ai-tasks";
-import type { CashflowDto, CompanyDto, CostLineDto, ElementCostsDto, FormTemplateDto, LocationDto, MemberDto, TakeoffDto, WorkDetailDto, WorkFieldValues } from "@sitekeep/shared";
+import type { CashflowDto, CompanyDto, ReportDraft, ReportSharing, CostLineDto, ElementCostsDto, FormTemplateDto, LocationDto, MemberDto, TakeoffDto, WorkDetailDto, WorkFieldValues } from "@sitekeep/shared";
 
 export interface WebCapabilities {
   /** Connect: editing office files in the browser (WOPI) and Forma Eşitleme in Yönetim. */
@@ -80,6 +80,14 @@ export interface WebCapabilities {
   };
   /** Field: the "new form" dialog, also offered by "+ Yeni" in İşler. */
   "field.newFormDialog": ComponentType<NewFormDialogProps>;
+  /**
+   * Platform: report dashboards (docs/modules/platform.md). "Raporlar" shows `Dashboards` as its first
+   * tab; "Save as report" in Modele Sor saves through `createDashboard`. Without it: fixed lists only.
+   */
+  "platform.reports": {
+    Dashboards: ComponentType;
+    createDashboard(projectId: string, draft: Partial<ReportDraft> & { sharing?: ReportSharing }): Promise<{ id: string }>;
+  };
 }
 
 /** What the viewer needs of a clash (Coordinate's ClashDetail has more). */

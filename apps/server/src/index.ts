@@ -15,7 +15,6 @@ import { upgradeSeededLabels } from "./projects/seeded-labels.js";
 import { seedTaskTeams } from "./cde/teams.js";
 import { startDueReminders } from "./workflow/reminders.js";
 import { LocalStorage } from "./core/platform/storage.js";
-import { reportLlmFromEnv } from "./reports/llm.js";
 import { mailerFromEnv } from "./works/letter.js";
 import { startOutboundCleanup } from "./privacy/outbound.js";
 import { FALLBACK_LANGUAGE, render } from "./i18n/index.js";
@@ -34,7 +33,7 @@ import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
  *   SECURE_COOKIES     "1" behind HTTPS
  *   CDE_SECRET_KEY     32-byte key (hex or base64) encrypting AI provider API keys at rest;
  *                      when unset, DATA_DIR/secret.key is generated once (back it up with the database)
- *   AI_BASE_URL        OpenAI-compatible endpoint for the report builder (default http://127.0.0.1:11434/v1)
+ *   AI_BASE_URL        Platform module: OpenAI-compatible endpoint for the report builder (default http://127.0.0.1:11434/v1)
  *   AI_MODEL           default qwen3:8b; the builder is on when AI_BASE_URL or AI_MODEL is set, or AI_ENABLED=1
  *   AI_API_KEY         optional bearer key; AI_TIMEOUT_MS optional; AI_ENABLED=0 turns the builder off
  *   REPORT_TZ          time zone of report date buckets (default Europe/Istanbul)
@@ -104,7 +103,6 @@ const app = await buildApp({
   trustProxy: trustProxyFromEnv(process.env.CDE_TRUST_PROXY),
   secretKey: loadSecretKey(dataDir),
   logger: true,
-  reportLlm: reportLlmFromEnv(),
   mailer: mailerFromEnv(),
   dbKind: kind,
   dataLocation: { database: databaseLocation(), storage: `Yerel disk: ${path.join(dataDir, "storage")}` },

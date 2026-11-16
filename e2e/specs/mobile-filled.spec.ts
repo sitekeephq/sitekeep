@@ -388,8 +388,13 @@ test("iPhone form-template and reports AI boundary stay usable", async ({ page, 
   }
 
   await page.goto(`/projects/${project.id}/reports`);
-  await expect(page.getByRole("button", { name: "Yapay Zekâ ile Oluştur" })).toBeDisabled();
-  await expect(page.getByText(/Yapay zekâ yapılandırılmamış/)).toBeVisible();
+  if (moduleInstalled("platform")) {
+    // The AI builder is the Platform module's.
+    await expect(page.getByRole("button", { name: "Yapay Zekâ ile Oluştur" })).toBeDisabled();
+    await expect(page.getByText(/Yapay zekâ yapılandırılmamış/)).toBeVisible();
+  } else {
+    await expect(page.getByRole("combobox", { name: "Liste" })).toBeVisible();
+  }
   await assertNoSidewaysScroll(page);
 });
 

@@ -806,7 +806,8 @@
       "cost": "Cost",
       "ai": "AI",
       "manage": "Manage",
-      "connect": "Connect"
+      "connect": "Connect",
+      "platform": "Platform"
     },
     "uploadTitle": "Install a Licence",
     "replaceTitle": "Replace the Licence",

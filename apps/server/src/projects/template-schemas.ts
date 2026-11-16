@@ -1,7 +1,13 @@
 import { z } from "zod";
 import {
   ATTRIBUTE_TYPES,
+  CDE_STATES,
+  CDE_WIP_POLICIES,
   OUTCOME_CODES,
+  PROJECT_SETUP_CODE_SCHEMES,
+  PROJECT_SETUP_MAX_EXTRA_PARTIES,
+  PROJECT_SETUP_MAX_FOLDER_EDITS,
+  PROJECT_SETUP_MAX_PEOPLE,
   PARTIES,
   PERMISSION_LEVELS,
   PROJECT_MODULES,
@@ -216,6 +222,71 @@ const slotMapSchema = z.record(z.string().max(64), z.string().uuid().nullable())
 const slotCodeSchema = z.record(z.string().max(64), z.string().trim().max(20)).default({});
 const dimensionOverrideSchema = z.record(z.string().max(100), z.array(z.string().max(200)).max(2000)).default({});
 
+/**
+ * The set-up wizard's choices (ProjectSetupOverrides in @sitekeep/shared). Structure only: the
+ * references are checked by applySetupOverrides and checkProjectTemplate on the resulting template.
+ */
+const setupSchema = z.object({
+  parties: z.array(slotSchema).max(PROJECT_SETUP_MAX_EXTRA_PARTIES).optional(),
+  taskTeams: z.array(z.object({ slot: key64, lead: z.boolean().optional() })).max(30).optional(),
+  folders: z
+    .object({
+      add: z.array(z.object({ parent: z.string().trim().min(1).max(2000), name: z.string().max(200) })).max(PROJECT_SETUP_MAX_FOLDER_EDITS).optional(),
+      remove: z.array(z.string().trim().min(1).max(2000)).max(PROJECT_SETUP_MAX_FOLDER_EDITS).optional(),
+    })
+    .optional(),
+  containerStandard: z.string().trim().min(1).max(200).optional(),
+  naming: z
+    .array(
+      z.object({
+        standard: z.string().trim().min(1).max(200),
+        field: z.string().trim().min(1).max(100),
+        values: z.array(z.object({ code: z.string().max(100), description: z.string().max(500).optional() })).max(5000),
+      }),
+    )
+    .max(50)
+    .optional(),
+  workflows: z
+    .array(
+      z.object({
+        workflow: z.string().trim().min(1).max(200),
+        step: z.number().int().min(0).max(19),
+        assignees: z.array(assigneeSchema).max(50).optional(),
+        days: z.number().int().optional(),
+        rule: z.enum(["any", "all"]).optional(),
+      }),
+    )
+    .max(500)
+    .optional(),
+  transitions: z
+    .array(z.object({ from: z.enum(CDE_STATES).nullable(), to: z.enum(CDE_STATES), workflow: z.string().trim().min(1).max(200).nullable() }))
+    .max(40)
+    .optional(),
+  cde: z
+    .object({
+      codeScheme: z.enum(PROJECT_SETUP_CODE_SCHEMES).optional(),
+      enforceTransitions: z.boolean().optional(),
+      wipPolicy: z.enum(CDE_WIP_POLICIES).optional(),
+      adminSeesWip: z.boolean().optional(),
+    })
+    .optional(),
+  modules: z.partialRecord(z.enum(PROJECT_MODULES), z.boolean()).optional(),
+});
+
+const detailsSchema = z.object({
+  startDate: z.string().trim().max(10).optional(),
+  endDate: z.string().trim().max(10).optional(),
+  location: z.string().trim().max(200).optional(),
+  client: z.string().trim().max(200).optional(),
+});
+
+const personSchema = z.object({
+  email: z.string().trim().toLowerCase().max(320),
+  slot: key64.nullable().optional(),
+  roles: z.array(key64).max(50).optional(),
+  projectAdmin: z.boolean().optional(),
+});
+
 export const previewRequestSchema = z.object({
   code: z.string().trim().max(40).optional(),
   templateId: z.string().max(100).optional(),
@@ -225,6 +296,11 @@ export const previewRequestSchema = z.object({
   dimensions: dimensionOverrideSchema,
   /** Project language: picks the template's per-language values (default: the requester's language). */
   language: z.string().trim().min(2).max(10).optional(),
+  /** The set-up wizard's choices, applied to the template before it is checked. */
+  setup: setupSchema.optional(),
+  /** Project details and people of the set-up wizard (checked by the dry run, applied by create). */
+  details: detailsSchema.optional(),
+  people: z.array(personSchema).max(PROJECT_SETUP_MAX_PEOPLE).optional(),
 });
 
 export const createRequestSchema = previewRequestSchema.extend({

@@ -1,78 +1,28 @@
 {
-  "frame": {
-    "frameName": "Rapor paneli",
-    "errors": {
-      "escaped": "Panel kendi sayfasının dışına gitmeye çalıştı ve durduruldu. Panel kodunu (HTML) kontrol edin."
-    },
-    "actions": {
-      "reload": "Yeniden Yükle"
-    }
-  },
-  "list": {
+  "lists": {
     "title": "Raporlar",
+    "tabs": {
+      "lists": "Listeler",
+      "dashboards": "Paneller"
+    },
+    "intro": "Her liste, modülün kendi sayfasındaki yetkilerle görebildiğiniz kayıtları gösterir. Listeyi CSV olarak indirip tablo programında çalışabilirsiniz.",
+    "module": "Alan",
+    "allModules": "Tüm alanlar",
+    "dataset": "Liste",
+    "choose": "Bir liste seçin.",
+    "empty": "Kayıt yok.",
+    "none": "Bu projede görebileceğiniz bir liste yok.",
+    "rows_one": "{{count}} kayıt",
+    "rows_other": "{{count}} kayıt",
+    "shown": "İlk {{shown}} kayıt gösteriliyor (toplam {{count}}); CSV dosyasında hepsi var (en çok {{max}}).",
+    "capped": "Yalnızca ilk {{max}} kayıt listelenir.",
+    "yes": "Evet",
+    "no": "Hayır",
     "actions": {
-      "createWithAi": "✨ Yapay Zekâ ile Oluştur",
-      "fromTemplate": "Şablondan",
-      "blank": "Boş Panel"
+      "csv": "CSV İndir",
+      "refresh": "Yenile"
     },
-    "defaultName": "Yeni panel",
-    "messages": {
-      "aiNotConfiguredShort": "Yapay zekâ yapılandırılmamış; şablon veya boş panel kullanın.",
-      "aiNotConfigured": "Yapay zekâ yapılandırılmamış. Hazır şablonlarla veya HTML düzenleyiciyle panel oluşturabilirsiniz.",
-      "localAiNotConfigured": "Yerel yapay zekâ yapılandırılmamış. İsteğinizi bağlı yapay zekâ istemcisine (Claude, ChatGPT…) gönderebilir veya hazır şablonları kullanabilirsiniz."
-    },
-    "mine": {
-      "title": "Panellerim",
-      "empty": "Henüz paneliniz yok. Yapay zekâya ne görmek istediğinizi yazın veya bir şablon seçin."
-    },
-    "shared": {
-      "title": "Benimle Paylaşılanlar",
-      "empty": "Sizinle paylaşılan panel yok."
-    },
-    "description": "Paneller her açılışta güncel veriyle hesaplanır ve açıkken veriler değiştikçe kendiliğinden yenilenir. Her modülün sayfasındaki Rapor düğmesi, o modülün verileriyle panel oluşturmayı başlatır."
-  },
-  "template": {
-    "title": "Şablondan Panel Oluştur",
-    "description": "Hazır şablonlar yapay zekâ gerektirmez. Oluşturulan panel sizin kopyanızdır; her açılışta güncel veriyle hesaplanır.",
-    "other": {
-      "title": "Diğer"
-    },
-    "actions": {
-      "use": "Bu Şablonla Oluştur"
-    }
-  },
-  "prompt": {
-    "messages": {
-      "busy": "Yerel model çalışıyor, bu biraz sürebilir…"
-    }
-  },
-  "aiCreate": {
-    "title": "Yapay Zekâ ile Panel",
-    "badges": {
-      "scope": "Kapsam: {{module}}"
-    },
-    "scopeHint": "Yalnızca bu modülün verileri yapay zekâya tanıtılır; istekte başka bir modül adı geçerse o da eklenir.",
-    "actions": {
-      "removeScope": "Kapsamı Kaldır"
-    },
-    "templatesHint": "Hazır şablon (yapay zekâsız):",
-    "ask": {
-      "title": "Ne Görmek İstiyorsunuz?"
-    },
-    "refine": {
-      "title": "Değiştirmek İster Misiniz?"
-    },
-    "nameLabel": "Panel adı",
-    "examples": {
-      "monthly": "Grafiği aylık yap",
-      "excludeClosed": "Kapalı kayıtları hariç tut",
-      "addTable": "Bir tablo da ekle"
-    },
-    "placeholder": "ör. Firmalara göre açık sorun sayısı ve termini geçenler",
-    "placeholderRefine": "ör. firmaları ayrı göster, grafiği aylık yap",
-    "placeholderScoped": "ör. {{example}}",
-    "defaultScopedExample": "Firmalara göre dağılım",
-    "description": "Panel yalnızca sizin görebildiğiniz verilerle çalışır. Paylaştığınız kişiler kendi yetkileri kadarını görür."
+    "enterprise": "Rapor panelleri (grafikler, şablonlar, yapay zekâ, paylaşım, sürümler) SiteKeep Enterprise ile gelir (Platform modülü)."
   },
   "spec": {
     "title": "Şartname Analizi",
@@ -148,84 +98,5 @@
     },
     "keywords": "Anahtar: {{list}}",
     "empty": "Filtreye uyan kalem yok."
-  },
-  "view": {
-    "actions": {
-      "back": "← Raporlar",
-      "snapshot": "Anlık Görüntü Al (PDF)",
-      "versions": "Sürümler"
-    },
-    "liveHint": "Açık panel veriler değiştikçe kendiliğinden yenilenir (sekme görünürken).",
-    "lastUpdated": "Son güncelleme: {{time}}",
-    "status": {
-      "refreshed": "Yenilendi"
-    },
-    "snapshotHint": "Panelin şu anki hâlini PDF olarak kaydedin (yazdır → PDF olarak kaydet). Kayıtlı panel her açılışta güncel veriyi gösterir.",
-    "delete": {
-      "title": "Paneli Sil",
-      "confirm": "\"{{name}}\" paneli silinsin mi?"
-    },
-    "loadingData": "Veriler yükleniyor…",
-    "dataTime": "Veri zamanı: {{time}}. Veriler sizin yetkilerinizle ve her zaman güncel kayıtlarla (dosyaların, iş programlarının ve modellerin en yeni versiyonlarıyla) hesaplanır; panel açıkken veriler değişirse kendiliğinden yenilenir."
-  },
-  "broken": {
-    "actions": {
-      "aiRepair": "Yapay Zekâ ile Onar"
-    },
-    "messages": {
-      "aiWorking": "Yapay zekâ çalışıyor…"
-    },
-    "manualFix": "Düzenle → Gelişmiş bölümünden sorguyu düzeltin.",
-    "proposal": {
-      "title": "Önerilen Düzeltme",
-      "fields": {
-        "newQuery": "Yeni Sorgu ({{id}})"
-      },
-      "hint": "Uygulandığında panelin yeni bir sürümü kaydedilir; eski sürüme Sürümler düğmesinden dönebilirsiniz.",
-      "actions": {
-        "applyAndSave": "Uygula ve Kaydet"
-      }
-    }
-  },
-  "edit": {
-    "title": "Paneli Düzenle",
-    "promptHint": "Yapay zekâya değişikliği yazın",
-    "examples": {
-      "showHill": "Hill'i ayrı göster",
-      "addSummary": "Bir özet tablo ekle"
-    },
-    "placeholder": "ör. grafiği aylık yap, kapalı sorunları gösterme",
-    "noAi": "Yapay zekâ yapılandırılmamış; panel HTML ve sorgularını Gelişmiş bölümünden düzenleyebilirsiniz.",
-    "fields": {
-      "sharing": "Paylaşım",
-      "html": "Panel HTML'i (CDE.onData, CDE.bar, CDE.line, CDE.pie, CDE.kpi, CDE.table)",
-      "queries": "Sorgular (JSON)"
-    },
-    "ownerOnly": "Paylaşımı yalnızca panelin sahibi değiştirebilir.",
-    "advanced": {
-      "title": "Gelişmiş: HTML ve Sorgular"
-    },
-    "actions": {
-      "preview": "Önizle"
-    },
-    "errors": {
-      "queriesNotArray": "Sorgular bir JSON dizisi olmalı: [{\"id\": …, \"spec\": {…}}]",
-      "queries": "Sorgular: {{message}}"
-    }
-  },
-  "versions": {
-    "title": "Sürüm Geçmişi",
-    "columns": {
-      "version": "Sürüm",
-      "name": "Ad",
-      "savedBy": "Kaydeden",
-      "date": "Tarih"
-    },
-    "status": {
-      "current": "Güncel"
-    },
-    "actions": {
-      "restore": "Geri Yükle"
-    }
   }
 }

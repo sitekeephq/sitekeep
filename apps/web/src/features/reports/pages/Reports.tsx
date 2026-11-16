@@ -1,414 +1,195 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+/**
+ * "Raporlar" (docs/features/REPORTS.md). Community: a fixed list per report dataset the user may use
+ * (the rows the module's own page would show them), grouped by area, with CSV export. With the
+ * Platform module the dashboards (builder, templates, AI, sharing, versions) come first and the lists
+ * are the second tab; the module serves its own pages (`reports/:rid`).
+ *
+ * Deep links: ?module=<family> (a module page's "Rapor" shortcut; with the builder ?new=ai too),
+ * ?dataset=<name>, ?view=lists. Without the Platform module ?new and ?template are ignored, so the
+ * builder's links never end on a dead page.
+ */
+import { useMemo, useState } from "react";
+import { NavLink, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  REPORT_MODULES,
-  isReportModule,
-  reportQueryDatasets,
-  reportValueLabels,
-  type DashboardSummaryDto,
-  type ReportCatalogDto,
-  type ReportGenerateResult,
-  type ReportModule,
-  type ReportTemplateDto,
-} from "@sitekeep/shared";
-import { api, formatDate } from "../../../shared/api/api";
-import { Dialog } from "../../../shared/ui/Dialog";
-import { ReportFrame } from "../components/ReportFrame";
+import { REPORT_MAX_ROWS, isReportModule, type ReportDatasetDto, type ReportFieldDto, type ReportScalar } from "@sitekeep/shared";
+import { api } from "../../../shared/api/api";
+import { formatDate, formatNumber } from "../../../shared/lib/format";
 import { useLoad, useProject } from "../../../app/context/project";
-import { AiTaskButton, useAiTaskMode } from "../../../shared/ai/AiTaskButton";
-import { MoreMenu } from "../../../shared/ui/MoreMenu";
-import { usePhoneWidth } from "../../../shared/ui/RecordCards";
-import { useLabel } from "../../../i18n";
+import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
+import { webCapability } from "../../../sdk/capabilities";
+
+/** Rows shown on the page; the CSV file has all of them (up to REPORT_MAX_ROWS). */
+const SHOWN_ROWS = 500;
 
 export function ReportsPage() {
   const { t } = useTranslation(["reports", "common"]);
   const project = useProject();
-  const navigate = useNavigate();
-  const [search, setSearch] = useSearchParams();
-  const { data: list, error } = useLoad(() => api.reports(project.id), [project.id]);
-  const { data: catalog } = useLoad(() => api.reportCatalog(project.id), [project.id]);
-  const [dialog, setDialog] = useState<"ai" | "template" | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
-  const queueMode = useAiTaskMode(project.id);
-  const aiUsable = !!catalog?.aiAvailable || queueMode !== "hidden";
-
-  // Deep links: ?new=ai&module=correspondence (module pages' "Rapor"), ?template=<id> (Sor, MCP).
-  const moduleParam = search.get("module");
-  const scope: ReportModule | undefined = isReportModule(moduleParam) ? moduleParam : undefined;
-  const highlight = search.get("template") ?? undefined;
-  useEffect(() => {
-    if (!catalog) return;
-    if (search.get("new") === "ai") setDialog(catalog.aiAvailable || queueMode !== "hidden" ? "ai" : "template");
-    else if (search.get("new") === "template" || highlight) setDialog("template");
-  }, [catalog, search, highlight, queueMode]);
-
-  const closeDialog = () => {
-    setDialog(null);
-    if (search.has("new") || search.has("module") || search.has("template")) setSearch(new URLSearchParams(), { replace: true });
-  };
-
-  const phone = usePhoneWidth();
-  const mine = list?.filter((d) => d.isMine) ?? [];
-  const shared = list?.filter((d) => !d.isMine) ?? [];
-
-  async function create(body: Parameters<typeof api.createReport>[1], edit = false) {
-    setMsg(null);
-    try {
-      const d = await api.createReport(project.id, body);
-      navigate(`/projects/${project.id}/reports/${d.id}${edit ? "?edit=1" : ""}`);
-    } catch (e) {
-      setMsg((e as Error).message);
-    }
-  }
-
+  const [search] = useSearchParams();
+  const platform = webCapability("platform.reports");
+  const lists = !platform || search.get("view") === "lists";
+  const base = `/projects/${project.id}/reports`;
   return (
     <div className="page">
-      <div className="row wrap" style={{ marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>{t("list.title")}</h1>
-        <div className="spacer" />
-        <button
-          className="primary"
-          disabled={!aiUsable}
-          title={catalog && !aiUsable ? t("list.messages.aiNotConfiguredShort") : undefined}
-          onClick={() => setDialog("ai")}
-        >
-          {t("list.actions.createWithAi")}
-        </button>
-        {phone ? (
-          <MoreMenu
-            items={[
-              { key: "template", label: t("list.actions.fromTemplate") },
-              { key: "blank", label: t("list.actions.blank") },
-            ]}
-            onSelect={(key) => {
-              if (key === "template") setDialog("template");
-              else if (key === "blank") void create({ name: t("list.defaultName") }, true);
-            }}
-          />
-        ) : (
-          <>
-            <button onClick={() => setDialog("template")}>{t("list.actions.fromTemplate")}</button>
-            <button onClick={() => void create({ name: t("list.defaultName") }, true)}>{t("list.actions.blank")}</button>
-          </>
-        )}
+      {platform && (
+        <div className="row wrap" style={{ borderBottom: "1px solid var(--border)", marginBottom: 14 }}>
+          <nav className="tabs">
+            <NavLink to={base} end className={() => (lists ? "" : "active")}>
+              {t("lists.tabs.dashboards")}
+            </NavLink>
+            <NavLink to={`${base}?view=lists`} className={() => (lists ? "active" : "")}>
+              {t("lists.tabs.lists")}
+            </NavLink>
+          </nav>
+        </div>
+      )}
+      {lists || !platform ? <ReportLists /> : <platform.Dashboards />}
+    </div>
+  );
+}
+
+/** Fixed lists: one per dataset, grouped by area, CSV per list. */
+export function ReportLists() {
+  const { t } = useTranslation(["reports", "common"]);
+  const project = useProject();
+  const [search, setSearch] = useSearchParams();
+  const { data: catalog, error } = useLoad(() => api.reportCatalog(project.id), [project.id]);
+  const moduleParam = search.get("module");
+  const area = isReportModule(moduleParam) ? moduleParam : "";
+  const datasets = useMemo(() => (catalog?.datasets ?? []).filter((d) => !d.scoped && (!area || d.module === area)), [catalog, area]);
+  const wanted = search.get("dataset");
+  const current = datasets.find((d) => d.name === wanted) ?? datasets[0];
+
+  const set = (patch: Record<string, string | null>) => {
+    const next = new URLSearchParams(search);
+    for (const [k, v] of Object.entries(patch)) if (v) next.set(k, v);
+      else next.delete(k);
+    // Builder deep links have no meaning on the lists.
+    next.delete("new");
+    next.delete("template");
+    setSearch(next, { replace: true });
+  };
+
+  return (
+    <>
+      <div className="row wrap" style={{ marginBottom: 12 }}>
+        <h1 style={{ margin: 0 }}>{t("lists.title")}</h1>
       </div>
-      {catalog && !catalog.aiAvailable && (
-        <p className="notice small">
-          {queueMode === "hidden"
-            ? t("list.messages.aiNotConfigured")
-            : t("list.messages.localAiNotConfigured")}
+      <p className="muted small" style={{ marginTop: 0 }}>
+        {t("lists.intro")}
+      </p>
+      {error && <p className="error">{error}</p>}
+      {!catalog && !error && <LoadingIndicator />}
+      {catalog && !catalog.datasets.some((d) => !d.scoped) && <p className="muted">{t("lists.none")}</p>}
+      {catalog && catalog.datasets.some((d) => !d.scoped) && (
+        <>
+          <div className="row wrap" style={{ marginBottom: 12 }}>
+            <label className="row" style={{ gap: 6 }}>
+              <span className="muted small">{t("lists.module")}</span>
+              <select aria-label={t("lists.module")} value={area} onChange={(e) => set({ module: e.target.value || null, dataset: null })}>
+                <option value="">{t("lists.allModules")}</option>
+                {(catalog.modules ?? []).map((m) => (
+                  <option key={m.key} value={m.key}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="row" style={{ gap: 6 }}>
+              <span className="muted small">{t("lists.dataset")}</span>
+              <select aria-label={t("lists.dataset")} value={current?.name ?? ""} onChange={(e) => set({ dataset: e.target.value })}>
+                {datasets.map((d) => (
+                  <option key={d.name} value={d.name}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {current ? <DatasetList key={current.name} dataset={current} /> : <p className="muted">{t("lists.choose")}</p>}
+        </>
+      )}
+      {!webCapability("platform.reports") && (
+        <p className="muted small" style={{ marginTop: 24 }}>
+          {t("lists.enterprise")}
         </p>
       )}
-      {error && <p className="error">{error}</p>}
-      {msg && <p className="error">{msg}</p>}
-
-      <h2>{t("list.mine.title")}</h2>
-      <DashboardCards items={mine} empty={t("list.mine.empty")} />
-      <h2 style={{ marginTop: 24 }}>{t("list.shared.title")}</h2>
-      <DashboardCards items={shared} empty={t("list.shared.empty")} />
-      <p className="muted small" style={{ marginTop: 24 }}>
-        {t("list.description")}
-      </p>
-
-      {dialog === "template" && catalog && (
-        <TemplateDialog
-          catalog={catalog}
-          focus={scope}
-          highlight={highlight}
-          onClose={closeDialog}
-          onPick={(id) => void create({ templateId: id })}
-        />
-      )}
-      {dialog === "ai" && catalog && (
-        <AiCreateDialog catalog={catalog} module={scope} onClose={closeDialog} onPickTemplate={(id) => void create({ templateId: id })} />
-      )}
-    </div>
+    </>
   );
 }
 
-function DashboardCards({ items, empty }: { items: DashboardSummaryDto[]; empty: string }) {
-  const project = useProject();
-  const label = useLabel();
-  if (!items.length) return <p className="muted">{empty}</p>;
-  return (
-    <div className="grid-cards">
-      {items.map((d) => (
-        <Link key={d.id} to={`/projects/${project.id}/reports/${d.id}`} className="card report-card">
-          <strong>{d.name}</strong>
-          {d.description && <div className="muted small">{d.description}</div>}
-          <div className="row wrap small" style={{ marginTop: 8 }}>
-            <span className={`badge${d.sharing === "private" ? "" : " info"}`}>{label("reportSharing", d.sharing)}</span>
-            {!d.isMine && <span className="muted">{d.ownerName}</span>}
-            <span className="muted">{formatDate(d.updatedAt)}</span>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-/** Templates grouped by module family; the module the user came from first. */
-export function groupTemplates(templates: ReportTemplateDto[], focus?: ReportModule): { module: ReportModule | null; items: ReportTemplateDto[] }[] {
-  const order = new Map<ReportModule | null, ReportTemplateDto[]>();
-  if (focus) order.set(focus, []);
-  for (const t of templates) {
-    const key = t.module ?? null;
-    if (!order.has(key)) order.set(key, []);
-    order.get(key)!.push(t);
-  }
-  const rank = (m: ReportModule | null) => (m === focus ? -1 : m ? REPORT_MODULES.indexOf(m) : REPORT_MODULES.length);
-  return [...order.entries()]
-    .filter(([, items]) => items.length)
-    .sort(([a], [b]) => rank(a) - rank(b))
-    .map(([module, items]) => ({ module, items }));
-}
-
-function TemplateDialog({
-  catalog,
-  focus,
-  highlight,
-  onClose,
-  onPick,
-}: {
-  catalog: ReportCatalogDto;
-  focus?: ReportModule;
-  highlight?: string;
-  onClose(): void;
-  onPick(id: string): void;
-}) {
-  const { t } = useTranslation(["reports", "common"]);
-  const label = useLabel();
-  const groups = useMemo(() => groupTemplates(catalog.templates, focus), [catalog.templates, focus]);
-  return (
-    <Dialog title={t("template.title")} onClose={onClose} wide>
-      <p className="muted small" style={{ marginTop: 0 }}>
-        {t("template.description")}
-      </p>
-      {groups.map((g) => (
-        <section key={g.module ?? "diger"} className="template-group">
-          <h3>{g.module ? label("reportModule", g.module) : t("template.other.title")}</h3>
-          <div className="grid-cards">
-            {g.items.map((tpl) => (
-              <div key={tpl.id} className={`card${tpl.id === highlight ? " highlighted" : ""}`}>
-                <strong>{tpl.name}</strong>
-                <p className="muted small">{tpl.description}</p>
-                <button className="primary small" onClick={() => onPick(tpl.id)}>
-                  {t("template.actions.use")}
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
-    </Dialog>
-  );
-}
-
-/** Prompt box with example prompts; used for new dashboards and for edits. */
-export function PromptBox({
-  examples,
-  busy,
-  placeholder,
-  submitLabel,
-  onSubmit,
-  actions,
-  submitHidden,
-}: {
-  examples?: string[];
-  busy: boolean;
-  placeholder: string;
-  submitLabel: string;
-  onSubmit(prompt: string): void;
-  /** Extra buttons next to the submit (e.g. "Yapay Zekâya Gönder"), given the current prompt. */
-  actions?: (prompt: string) => ReactNode;
-  /** No in-app model: only the extra actions are offered. */
-  submitHidden?: boolean;
-}) {
-  const { t } = useTranslation(["reports", "common"]);
-  const [prompt, setPrompt] = useState("");
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (prompt.trim().length >= 3 && !submitHidden) onSubmit(prompt.trim());
-      }}
-    >
-      <textarea
-        value={prompt}
-        placeholder={placeholder}
-        onChange={(e) => setPrompt(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && prompt.trim().length >= 3 && !submitHidden) onSubmit(prompt.trim());
-        }}
-      />
-      {examples && (
-        <div className="row wrap" style={{ marginTop: 6 }}>
-          {examples.map((x) => (
-            <button key={x} type="button" className="small chip" onClick={() => setPrompt(x)}>
-              {x}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="dialog-actions" style={{ marginTop: 8 }}>
-        {busy && <span className="muted small">{t("prompt.messages.busy")}</span>}
-        {actions?.(prompt.trim())}
-        {!submitHidden && (
-          <button className="primary" disabled={busy || prompt.trim().length < 3}>
-            {submitLabel}
-          </button>
-        )}
-      </div>
-    </form>
-  );
-}
-
-function AiCreateDialog({
-  catalog,
-  module: initialModule,
-  onClose,
-  onPickTemplate,
-}: {
-  catalog: ReportCatalogDto;
-  module?: ReportModule;
-  onClose(): void;
-  onPickTemplate(id: string): void;
-}) {
+function DatasetList({ dataset }: { dataset: ReportDatasetDto }) {
   const { t } = useTranslation(["reports", "common"]);
   const project = useProject();
-  const navigate = useNavigate();
-  const [module, setModule] = useState<ReportModule | undefined>(initialModule);
-  const [result, setResult] = useState<ReportGenerateResult | null>(null);
-  const [name, setName] = useState("");
+  const { data, error, reload } = useLoad(
+    () => api.runReportQueries(project.id, [{ id: "rows", spec: { dataset: dataset.name, limit: REPORT_MAX_ROWS } }]),
+    [project.id, dataset.name],
+  );
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [frameError, setFrameError] = useState<string | null>(null);
-  const scope = module ? catalog.modules?.find((m) => m.key === module) : undefined;
-  const moduleTemplates = module ? catalog.templates.filter((tpl) => tpl.module === module) : [];
-  const labels = useMemo(
-    () => (result ? reportValueLabels(catalog.datasets, reportQueryDatasets(result.draft.queries)) : undefined),
-    [catalog.datasets, result],
-  );
-
-  async function generate(prompt: string) {
-    setBusy(true);
-    setMsg(null);
-    setFrameError(null);
-    try {
-      const r = await api.generateReport(project.id, { prompt, current: result?.draft, module });
-      setResult(r);
-      setName(r.draft.name);
-    } catch (e) {
-      setMsg((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function save() {
-    if (!result) return;
-    try {
-      const d = await api.createReport(project.id, { ...result.draft, name: name.trim() || result.draft.name });
-      navigate(`/projects/${project.id}/reports/${d.id}`);
-    } catch (e) {
-      setMsg((e as Error).message);
-    }
-  }
-
+  const rows = data?.results.rows ?? [];
+  const failure = error ?? data?.errors.rows;
   return (
-    <Dialog title={t("aiCreate.title")} onClose={onClose} wide>
-      {scope && (
-        <div className="row wrap small" style={{ marginBottom: 8 }}>
-          <span className="badge info">{t("aiCreate.badges.scope", { module: scope.label })}</span>
-          <span className="muted">{t("aiCreate.scopeHint")}</span>
-          <button type="button" className="small ghost" onClick={() => setModule(undefined)} disabled={busy}>
-            {t("aiCreate.actions.removeScope")}
-          </button>
-        </div>
-      )}
-      {!result && moduleTemplates.length > 0 && (
-        <div className="row wrap small" style={{ marginBottom: 8 }}>
-          <span className="muted">{t("aiCreate.templatesHint")}</span>
-          {moduleTemplates.map((tpl) => (
-            <button key={tpl.id} type="button" className="small" onClick={() => onPickTemplate(tpl.id)} disabled={busy}>
-              {tpl.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {!result && <h3>{t("aiCreate.ask.title")}</h3>}
-      {result && (
-        <div className="stack">
-          <div className="row">
-            <input value={name} onChange={(e) => setName(e.target.value)} aria-label={t("aiCreate.nameLabel")} />
-            <button className="primary" onClick={() => void save()} disabled={busy}>
-              {t("common:actions.save")}
-            </button>
+    <section>
+      <div className="row wrap" style={{ marginBottom: 8 }}>
+        <h2 style={{ margin: 0 }}>{dataset.label}</h2>
+        {data && !failure && <span className="muted small">{t("lists.rows", { count: rows.length })}</span>}
+        <div className="spacer" />
+        <button
+          className="small"
+          disabled={busy}
+          onClick={() => {
+            setBusy(true);
+            reload();
+            setTimeout(() => setBusy(false), 300);
+          }}
+        >
+          {t("lists.actions.refresh")}
+        </button>
+        <a className="btn small" href={api.reportListCsvUrl(project.id, dataset.name)} download>
+          {t("lists.actions.csv")}
+        </a>
+      </div>
+      {dataset.description && <p className="muted small">{dataset.description}</p>}
+      {failure && <p className="error">{failure}</p>}
+      {!data && !failure && <LoadingIndicator />}
+      {data && !failure && !rows.length && <p className="muted">{t("lists.empty")}</p>}
+      {data && !failure && rows.length > 0 && (
+        <>
+          {rows.length > SHOWN_ROWS && (
+            <p className="muted small">{t("lists.shown", { shown: SHOWN_ROWS, count: rows.length, max: REPORT_MAX_ROWS })}</p>
+          )}
+          {rows.length === REPORT_MAX_ROWS && <p className="muted small">{t("lists.capped", { max: REPORT_MAX_ROWS })}</p>}
+          <div className="table-wrap" style={{ overflowX: "auto" }}>
+            <table className="report-list" data-dataset={dataset.name}>
+              <thead>
+                <tr>
+                  {dataset.fields.map((f) => (
+                    <th key={f.name} title={f.description}>
+                      {f.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.slice(0, SHOWN_ROWS).map((r, i) => (
+                  <tr key={i}>
+                    {dataset.fields.map((f) => (
+                      <td key={f.name}>{cellText(r[f.name], f, t)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          {Object.keys(result.errors).length > 0 && <QueryErrors errors={result.errors} />}
-          {frameError && <p className="error small">{frameError}</p>}
-          <div className="report-stage">
-            <ReportFrame
-              html={result.draft.html}
-              data={result.results}
-              errors={result.errors}
-              generatedAt={result.generatedAt}
-              project={project}
-              labels={labels}
-              onError={setFrameError}
-            />
-          </div>
-          <h3>{t("aiCreate.refine.title")}</h3>
-        </div>
+        </>
       )}
-      <PromptBox
-        busy={busy}
-        examples={
-          result
-            ? [t("aiCreate.examples.monthly"), t("aiCreate.examples.excludeClosed"), t("aiCreate.examples.addTable")]
-            : (scope?.examples ?? catalog.examplePrompts)
-        }
-        placeholder={
-          result
-            ? t("aiCreate.placeholderRefine")
-            : scope
-              ? t("aiCreate.placeholderScoped", { example: scope.examples[0] ?? t("aiCreate.defaultScopedExample") })
-              : t("aiCreate.placeholder")
-        }
-        submitLabel={result ? t("common:actions.apply") : t("common:actions.create")}
-        onSubmit={(p) => void generate(p)}
-        submitHidden={!catalog.aiAvailable}
-        actions={(p) =>
-          !result && (
-            <AiTaskButton
-              projectId={project.id}
-              kind="report_generate"
-              input={p.length >= 3 ? { prompt: p, ...(module && { module }) } : null}
-              disabled={busy}
-              onResult={(r) => {
-                // The connected AI client's draft was validated and saved as your private dashboard.
-                const link = (r as { link?: string } | null)?.link;
-                if (link) navigate(link);
-              }}
-            />
-          )
-        }
-      />
-      {msg && <p className="error">{msg}</p>}
-      <p className="muted small">{t("aiCreate.description")}</p>
-    </Dialog>
+    </section>
   );
 }
 
-export function QueryErrors({ errors }: { errors: Record<string, string> }) {
-  return (
-    <div className="notice small">
-      {Object.entries(errors).map(([id, m]) => (
-        <div key={id}>
-          <strong>{id}:</strong> {m}
-        </div>
-      ))}
-    </div>
-  );
+function cellText(v: ReportScalar | undefined, f: ReportFieldDto, t: (key: "lists.yes" | "lists.no") => string): string {
+  if (v === null || v === undefined || v === "") return "";
+  if (typeof v === "boolean") return v ? t("lists.yes") : t("lists.no");
+  if (typeof v === "number") return formatNumber(v);
+  if (f.type === "date" && /^\d{4}-\d{2}-\d{2}/.test(v)) return v.length > 10 ? formatDate(v) : v;
+  return f.values?.[v] ?? v;
 }

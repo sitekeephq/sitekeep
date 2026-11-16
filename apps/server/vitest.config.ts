@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig } from "vitest/config";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect"]; // app/modules.ts
+const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect", "platform"]; // app/modules.ts
 const packageInstalled = (id: string) => {
   for (let dir = here; ; dir = path.dirname(dir)) {
     if (existsSync(path.join(dir, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`, "package.json"))) return true;

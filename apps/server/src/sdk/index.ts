@@ -19,7 +19,7 @@ export {
 } from "./capabilities.js";
 
 // App, database, storage
-export type { AppDeps, ResolvedDeps } from "../app/deps.js";
+export type { AppDeps, ReportLlm, ReportLlmMessage, ResolvedDeps } from "../app/deps.js";
 export type { Db } from "../db/index.js";
 export type { Storage } from "../core/platform/storage.js";
 export * from "./schema.js";
@@ -36,7 +36,7 @@ export { DEFAULT_LANGUAGE, intlLocale, labelFor, msg, profileLanguage, render, r
 // Formats
 export { readXlsx, writeXlsx, type Cell, type Sheet } from "../core/formats/xlsx.js";
 export { pdfFontBytes } from "../core/formats/pdf-fonts.js";
-export { extractJson } from "../reports/llm.js";
+export { extractJson } from "../ai/json.js";
 export { buildLines, type Segment } from "../docintel/text.js";
 
 // Documents
@@ -72,6 +72,15 @@ export { indexForVersionId } from "../model/service.js";
 
 // Reports: dataset registry
 export { fileVisibility, folderInfo, iso, labelValues, reportDatasets, type FolderInfo, type ReportContext } from "../reports/datasets.js";
+// Reports: the dataset query engine, change stamps and the query schemas (the Platform module's
+// report builder runs saved dashboards and AI drafts on them; docs/modules/platform.md)
+export { REPORT_TIME_ZONE, createReportContext, type DatasetRegistry } from "../reports/datasets.js";
+export { invalidQueryMessage, queryProblems, runQueries, type QueryProblem, type RunResult } from "../reports/run.js";
+export { fieldInfo, type FieldSource } from "../reports/engine.js";
+export { htmlSchema, normalizeQueryRefs, queryRefsSchema, querySpecSchema, zodMessages } from "../reports/spec.js";
+export { STAMP_SCOPES, readStamp, type StampScope, type StampValue } from "../reports/stamp.js";
+export { PROMPT_LANGUAGE } from "../reports/prompt-language.js";
+export { enabledDatasets } from "../reports/enabled.js";
 
 // Locations (location tree and links of issues, forms and files)
 export { loadLocations, requireLocation, setLocationLink, subtreeIds } from "../locations/location-links.js";

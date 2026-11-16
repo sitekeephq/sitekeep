@@ -17,7 +17,6 @@ import { LocationsPage } from "../../features/project-settings/pages/Locations";
 import { ProjectSettingsPage } from "../../features/project-settings/pages/ProjectSettings";
 import { ProjectsPage } from "../../features/projects/pages/Projects";
 import { ReportsPage } from "../../features/reports/pages/Reports";
-import { ReportViewPage } from "../../features/reports/pages/ReportView";
 import { SpecAnalysisPage } from "../../features/reports/pages/SpecAnalysis";
 import { ReviewsPage } from "../../features/reviews/pages/Reviews";
 import { webModules } from "../modules";
@@ -95,7 +94,6 @@ export function AppRoutes({ user }: { user: UserDto | null }) {
           <Route path="reviews/:rid" element={<ReviewsPage />} />
           <Route path="locations" element={<LocationsPage />} />
           <Route path="reports" element={<ReportsPage />} />
-          <Route path="reports/:rid" element={<ReportViewPage />} />
           <Route
             path="viewer"
             element={

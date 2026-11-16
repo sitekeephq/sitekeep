@@ -118,7 +118,7 @@ Scenarios: `yazisma-dongusu`, `bilgi-talebi`, `teknik-onay`, `toplanti`, `incele
 | Tool | What it does |
 |---|---|
 | `cde_ai_schemas` | JSON schemas and short instructions of the application's own AI prompts (report, form fields, workflow, model query, translation…). |
-| `cde_report_save` | A report dashboard from `{name, description, queries, html}`. Queries are checked against the datasets; private dashboard by default. |
+| `cde_report_save` | A report dashboard from `{name, description, queries, html}` (Platform module). Queries are checked against the datasets; private dashboard by default. |
 | `cde_form_template_save` | Form template from field JSON; optional PDF source and field boxes. Project manager. |
 | `cde_form_flow_save` | Workflow: a draft in the local model's answer format (names are matched to the project; unknown roles come back with suggestions) or a full workflow. |
 | `cde_work_draft` | A draft work from the open types: with letter data and links. Sends nothing. |

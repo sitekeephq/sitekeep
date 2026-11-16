@@ -1,7 +1,6 @@
 import type { AskBridge } from "../core/platform/ask-bridge.js";
 import type { Converters } from "../previews/converters.js";
 import type { OfficeIntegration } from "../office/service.js";
-import type { ReportLlm } from "../reports/llm.js";
 import type { LetterMailer } from "../works/letter.js";
 import type { JobQueue } from "../jobs/queue.js";
 import type { Storage } from "../core/platform/storage.js";
@@ -30,7 +29,11 @@ export interface AppDeps {
    * see secrets.ts. When omitted a random key is used for this process only.
    */
   secretKey?: Buffer;
-  /** Language model for the AI report builder; without it /reports/generate answers 503. */
+  /**
+   * A chat model the report builder calls directly instead of the project's AI provider: tests pass a
+   * fake; the Platform module fills it from AI_BASE_URL / AI_MODEL when unset (docs/modules/platform.md).
+   * Gizlilik Merkezi lists its endpoint (`baseUrl`).
+   */
   reportLlm?: ReportLlm;
   /** AI module: tests may replace the external Claude/Cursor credential probe; production uses the real provider call. */
   personalAiTest?: (
@@ -99,5 +102,17 @@ export type ResolvedDeps = Omit<AppDeps, "oauth"> & {
   devTools: boolean;
   webUrl: string;
 };
+
+export interface ReportLlmMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+/** The report builder's direct chat model (AppDeps.reportLlm). */
+export interface ReportLlm {
+  complete(messages: ReportLlmMessage[]): Promise<string>;
+  /** Endpoint, listed in Gizlilik Merkezi → Dış Bağlantılar (AI_BASE_URL). */
+  readonly baseUrl?: string;
+}
 
 export const SESSION_COOKIE = "cde_session";

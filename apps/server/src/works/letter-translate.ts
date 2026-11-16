@@ -4,7 +4,7 @@
  */
 import { z } from "zod";
 import type { AiProvider } from "../ai/provider.js";
-import { extractJson } from "../reports/llm.js";
+import { extractJson } from "../ai/json.js";
 import { HttpError } from "../core/platform/http.js";
 import { msg } from "../i18n/index.js";
 
