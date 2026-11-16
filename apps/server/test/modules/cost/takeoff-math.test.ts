@@ -1,7 +1,7 @@
 /** 2B metraj: calibration, quantities and group totals (Cost's shared helpers). */
 import type { TakeoffPoint } from "@sitekeep/shared";
 import { describe, expect, it } from "vitest";
-import { calibrationScale, takeoffGroups, takeoffMinPoints, takeoffQuantity } from "@7dimensions-project/sitekeep-ee-cost/shared/takeoff.js";
+import { calibrationScale, takeoffGroups, takeoffMinPoints, takeoffQuantity } from "@sitekeephq/sitekeep-ee-cost/shared/takeoff.js";
 
 const square: TakeoffPoint[] = [[0, 0], [10, 0], [10, 10], [0, 10]];
 

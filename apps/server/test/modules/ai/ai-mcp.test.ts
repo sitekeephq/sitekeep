@@ -13,7 +13,7 @@ import { isPrivateHost } from "../../../src/ai/hosts.js";
 import { AiError, resolveProvider, stripThinking } from "../../../src/ai/provider.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { auditLog, systemSettings, users } from "../../../src/db/schema.js";
-import { userAiCredentials } from "@7dimensions-project/sitekeep-ee-ai/internal/schema-tables.js";
+import { userAiCredentials } from "@sitekeephq/sitekeep-ee-ai/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { decryptSecret } from "../../../src/core/platform/secrets.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";

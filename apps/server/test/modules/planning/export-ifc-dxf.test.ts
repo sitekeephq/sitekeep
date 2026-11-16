@@ -1,10 +1,10 @@
 /** IFC4X3 work schedule and time–distance DXF exporters. */
 import { describe, expect, it } from "vitest";
-import type { ActivityDto, DependencyDto } from "@7dimensions-project/sitekeep-ee-planning/shared/schedule.js";
-import type { ActivityLocationDto, LinearCategory } from "@7dimensions-project/sitekeep-ee-planning/shared/linear.js";
-import type { ExportModel } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/model.js";
-import { compressGuid, isoDays, stepReal, stepString, writeIfcSchedule } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/ifc.js";
-import { dxfText, nearestAci, writeTimeDistanceDxf } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/dxf.js";
+import type { ActivityDto, DependencyDto } from "@sitekeephq/sitekeep-ee-planning/shared/schedule.js";
+import type { ActivityLocationDto, LinearCategory } from "@sitekeephq/sitekeep-ee-planning/shared/linear.js";
+import type { ExportModel } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/model.js";
+import { compressGuid, isoDays, stepReal, stepString, writeIfcSchedule } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/ifc.js";
+import { dxfText, nearestAci, writeTimeDistanceDxf } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/dxf.js";
 
 const TR = "Köprü İmalatı ğüşıöç";
 

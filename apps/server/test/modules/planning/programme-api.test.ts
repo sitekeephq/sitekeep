@@ -10,7 +10,7 @@ import { buildApp } from "../../../src/app/build-app.js";
 import { hashPassword } from "../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { auditLog, users } from "../../../src/db/schema.js";
-import { scheduleSeriesSettings } from "@7dimensions-project/sitekeep-ee-planning/internal/schema-tables.js";
+import { scheduleSeriesSettings } from "@sitekeephq/sitekeep-ee-planning/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
 

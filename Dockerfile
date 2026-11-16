@@ -29,7 +29,7 @@ COPY apps/mcp/package.json apps/mcp/
 RUN npm ci
 RUN case "$EDITION" in \
       ""|enterprise) ;; \
-      community) rm -rf node_modules/@7dimensions-project/sitekeep-ee-* ;; \
+      community) rm -rf node_modules/@sitekeephq/sitekeep-ee-* ;; \
       *) echo "EDITION must be community or enterprise" >&2; exit 1 ;; \
     esac
 COPY packages packages
@@ -39,10 +39,10 @@ COPY tools/harden-dist.mjs tools/third-party-notices.mjs tools/
 # declarations; developer seed / load scripts stay out of the image (docs/onprem/installation-bundle.md).
 # Modules (docs/modules/README.md) are published packages installed by npm ci: the server loads
 # them by package name at run time, the web build bundles them. SITEKEEP_MODULES unset = all of them.
-RUN npm run build -w @7dimensions-project/bim-viewer \
+RUN npm run build -w @sitekeephq/bim-viewer \
  && npm run build -w @sitekeep/shared \
  && npm run build -w @sitekeep/cde-tools \
- && npm run build -w @7dimensions-project/sitekeep-sdk \
+ && npm run build -w @sitekeephq/sitekeep-sdk \
  && npm run build -w @sitekeep/server \
  && npm run build -w @sitekeep/web \
  && npm run build -w @sitekeep/mcp \
@@ -54,7 +54,7 @@ RUN npm run build -w @7dimensions-project/bim-viewer \
  && test -s node_modules/@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz \
  && test -s node_modules/@tesseract.js-data/tur/4.0.0_best_int/tur.traineddata.gz \
  && if [ "$EDITION" = community ]; then \
-      rm -rf node_modules/@7dimensions-project/sitekeep-ee-* \
+      rm -rf node_modules/@sitekeephq/sitekeep-ee-* \
       && node tools/third-party-notices.mjs --ee-only | xargs -r rm -rf \
       && find node_modules -mindepth 1 -maxdepth 1 -name '@*' -type d -empty -delete; \
     fi

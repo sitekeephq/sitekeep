@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { xerCalendar } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/xer.js";
-import { parseMspdi } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/mspdi.js";
-import { writeMspdi } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/mspdi.js";
+import { xerCalendar } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/xer.js";
+import { parseMspdi } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/mspdi.js";
+import { writeMspdi } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/mspdi.js";
 
 const day = (d: number, work: boolean) => `(0||${d}()(${work ? "(0||0(s|08:00|f|17:00)())" : ""}))`;
 

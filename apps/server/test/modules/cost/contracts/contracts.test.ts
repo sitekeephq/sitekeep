@@ -14,8 +14,8 @@ import {
   projects,
   users,
 } from "../../../../src/db/schema.js";
-import { contractItems, costItems, progressPayments } from "@7dimensions-project/sitekeep-ee-cost/internal/schema/index.js";
-import { runGuaranteeReminders } from "@7dimensions-project/sitekeep-ee-cost/internal/contracts/reminders.js";
+import { contractItems, costItems, progressPayments } from "@sitekeephq/sitekeep-ee-cost/internal/schema/index.js";
+import { runGuaranteeReminders } from "@sitekeephq/sitekeep-ee-cost/internal/contracts/reminders.js";
 import { JobQueue } from "../../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../../src/core/platform/storage.js";
 

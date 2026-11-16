@@ -14,7 +14,7 @@ import { users } from "../../../src/db/schema.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
 import { parseChainage, formatChainage } from "@sitekeep/shared";
-import { templateSimilarity } from "@7dimensions-project/sitekeep-ee-field/shared/forms.js";
+import { templateSimilarity } from "@sitekeephq/sitekeep-ee-field/shared/forms.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const IFC = readFileSync(path.join(here, "../../fixtures/sample-wall.ifc"));

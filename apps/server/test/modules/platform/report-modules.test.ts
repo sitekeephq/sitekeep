@@ -17,7 +17,7 @@ import type { FastifyInstance } from "fastify";
 import { REPORT_MODULES, isTitleCaseTr, type ReportRow } from "@sitekeep/shared";
 import { cdeParseArgs, cdeResult, cdeToolDefinitions, type CdeCall } from "@sitekeep/cde-tools";
 // The AI module's internals load only when it is installed (a Community install has none).
-const AI_ASSISTANT = "@7dimensions-project/sitekeep-ee-ai/internal/assistant.js";
+const AI_ASSISTANT = "@sitekeephq/sitekeep-ee-ai/internal/assistant.js";
 const { routeTools } = hasAi ? await import(AI_ASSISTANT) : ({} as Record<string, never>);
 import { buildApp } from "../../../src/app/build-app.js";
 import { hashPassword } from "../../../src/core/security/auth.js";
@@ -36,10 +36,10 @@ import { LocalStorage } from "../../../src/core/platform/storage.js";
 import { reportDatasets } from "../../../src/reports/all.js";
 import type { ReportLlm, ReportLlmMessage } from "../../../src/app/deps.js";
 // The Platform module's internals (its builder: prompt, router, repair, templates).
-const { SYSTEM_PROMPT_TOKEN_CAP, buildSystemPrompt, estimateTokens, planMessages } = await import("@7dimensions-project/sitekeep-ee-platform/internal/prompt.js");
-const { MAX_PROMPT_DATASETS, routeDatasets } = await import("@7dimensions-project/sitekeep-ee-platform/internal/router.js");
-const { applyFieldMap, missingFields } = await import("@7dimensions-project/sitekeep-ee-platform/internal/repair.js");
-const { defaultTemplates } = (await import("@7dimensions-project/sitekeep-ee-platform/internal/templates.js")) as { defaultTemplates: () => import("@sitekeep/shared").ReportTemplateDto[] };
+const { SYSTEM_PROMPT_TOKEN_CAP, buildSystemPrompt, estimateTokens, planMessages } = await import("@sitekeephq/sitekeep-ee-platform/internal/prompt.js");
+const { MAX_PROMPT_DATASETS, routeDatasets } = await import("@sitekeephq/sitekeep-ee-platform/internal/router.js");
+const { applyFieldMap, missingFields } = await import("@sitekeephq/sitekeep-ee-platform/internal/repair.js");
+const { defaultTemplates } = (await import("@sitekeephq/sitekeep-ee-platform/internal/templates.js")) as { defaultTemplates: () => import("@sitekeep/shared").ReportTemplateDto[] };
 const REPORT_TEMPLATES = defaultTemplates();
 // The module's dashboards table (adopted from the core's former schema).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

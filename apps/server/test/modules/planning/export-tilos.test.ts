@@ -3,11 +3,11 @@
  * calendar, route profile, escaping and Turkish text.
  */
 import { describe, expect, it } from "vitest";
-import type { ActivityDto, DependencyDto } from "@7dimensions-project/sitekeep-ee-planning/shared/schedule.js";
-import type { ActivityLocationDto } from "@7dimensions-project/sitekeep-ee-planning/shared/linear.js";
+import type { ActivityDto, DependencyDto } from "@sitekeephq/sitekeep-ee-planning/shared/schedule.js";
+import type { ActivityLocationDto } from "@sitekeephq/sitekeep-ee-planning/shared/linear.js";
 import { child, children, childText, findFirst, parseXml, type XmlNode } from "../../../src/core/formats/xml.js";
-import type { ExportModel } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/model.js";
-import { TILOS_CALENDAR_UID, writeTilosXml } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/tilos.js";
+import type { ExportModel } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/model.js";
+import { TILOS_CALENDAR_UID, writeTilosXml } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/tilos.js";
 
 const TR = "Köprü İmalatı ğüşıöç";
 

@@ -7,10 +7,10 @@ Feature documents: [4D / 5D](../features/4D_5D.md), [time–distance and program
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private); local clone `~/Desktop/7dimensions/sitekeep-planning` |
-| Package | `@7dimensions-project/sitekeep-ee-planning` (GitHub Packages) |
-| Version in this repository | `0.4.0` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private); local clone `~/Desktop/7dimensions/sitekeep-planning` |
+| Package | `@sitekeephq/sitekeep-ee-planning` (GitHub Packages) |
+| Version in this repository | `0.5.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `planning` (`SITEKEEP_MODULES`) |
 
 The history before the move is in this repository (`apps/server/src/{schedule,sim}`,

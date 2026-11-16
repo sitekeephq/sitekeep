@@ -6,10 +6,10 @@ Feature document: [Form PDF](../features/FORM_PDF.md).
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (private); local clone `~/Desktop/7dimensions/sitekeep-field` |
-| Package | `@7dimensions-project/sitekeep-ee-field` (GitHub Packages) |
-| Version in this repository | `0.3.2` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private); local clone `~/Desktop/7dimensions/sitekeep-field` |
+| Package | `@sitekeephq/sitekeep-ee-field` (GitHub Packages) |
+| Version in this repository | `0.5.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `field` (`SITEKEEP_MODULES`) |
 
 Unlike Cost, the three steps were done in one go (the infrastructure was ready). The history before the move is in this

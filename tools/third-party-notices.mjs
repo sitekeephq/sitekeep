@@ -52,7 +52,7 @@ export const ALLOWED_LICENCES = new Set([
 
 /** Packages whose licence field is not used as is, with the reason (shown in the notices). */
 export const LICENCE_EXCEPTIONS = {
-  "@7dimensions-project/bim-viewer": {
+  "@sitekeephq/bim-viewer": {
     licence: "AGPL-3.0-only",
     reason: "SiteKeep 3D viewer, part of SiteKeep (AGPL-3.0-only, the same licence as SiteKeep; text in LICENSE).",
   },
@@ -89,10 +89,10 @@ const entryFor = (table, name) => {
 
 /** Our own packages: not third-party, not listed. */
 export const isOwnPackage = (name) =>
-  name.startsWith("@sitekeep/") || name === "@7dimensions-project/sitekeep-sdk" || isEnterpriseModule(name);
-export const isEnterpriseModule = (name) => name.startsWith("@7dimensions-project/sitekeep-ee-");
+  name.startsWith("@sitekeep/") || name === "@sitekeephq/sitekeep-sdk" || isEnterpriseModule(name);
+export const isEnterpriseModule = (name) => name.startsWith("@sitekeephq/sitekeep-ee-");
 
-const VIEWER = "@7dimensions-project/bim-viewer";
+const VIEWER = "@sitekeephq/bim-viewer";
 /** SOURCE_REPOSITORY_URL of packages/shared/src/platform/source.ts (the one place for the address). */
 const PUBLIC_REPO = /SOURCE_REPOSITORY_URL = "([^"]+)"/.exec(fs.readFileSync(path.join(ROOT, "packages/shared/src/platform/source.ts"), "utf8"))[1];
 

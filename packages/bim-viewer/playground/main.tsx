@@ -1,5 +1,5 @@
 /**
- * Playground host for the e2e suite. It wires the package the way a product does (7D CDE's
+ * Playground host for the e2e suite. It wires the package the way a product does (SiteKeep's
  * Viewer page): load buttons, "Sığdır", the properties panel, the phone "⋯ Diğer" menu built from
  * toolMoreItems, a remount button and an optional extension (?ext=1). window.__pg holds small
  * read-only probes for the specs (screen position of an IFC point, a canvas pixel).

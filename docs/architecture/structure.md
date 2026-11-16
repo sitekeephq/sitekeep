@@ -38,7 +38,7 @@ The repository is a single monorepo using npm workspaces. Root:
 ├── packages/
 │   ├── shared/
 │   ├── cde-tools/
-│   └── sdk/              the package through which modules access the core (@7dimensions-project/sitekeep-sdk)
+│   └── sdk/              the package through which modules access the core (@sitekeephq/sitekeep-sdk)
 ├── docs/                 server/ (our production), onprem/ (customer installation), product/, features/…
 ├── deploy/               deploy.sh (to production), onprem/ (installation bundle, docs/onprem/installation-bundle.md)
 ├── tools/                harden-dist.mjs (shrinks the release build; Dockerfile)
@@ -72,14 +72,14 @@ Allowed main directions:
 
 ```text
 apps/web ────────────────> packages/shared
-apps/web ────────────────> @7dimensions-project/bim-viewer
+apps/web ────────────────> @sitekeephq/bim-viewer
 apps/server ─────────────> packages/shared
 apps/server ─────────────> packages/cde-tools
 apps/mcp ────────────────> packages/cde-tools
 packages/cde-tools ──────> packages/shared
 packages/shared ─────────> external runtime-independent libraries
-sitekeep-<id> (module repository) → @7dimensions-project/sitekeep-sdk (reaches the core only through the SDK; docs/modules/README.md)
-apps/server, apps/web ───> @7dimensions-project/sitekeep-ee-<id> only by package name, at runtime (app/modules.ts)
+sitekeep-<id> (module repository) → @sitekeephq/sitekeep-sdk (reaches the core only through the SDK; docs/modules/README.md)
+apps/server, apps/web ───> @sitekeephq/sitekeep-ee-<id> only by package name, at runtime (app/modules.ts)
 ```
 
 Forbidden directions:
@@ -102,13 +102,13 @@ import type { WorkSummary } from "@sitekeep/shared";
 import type { WorkSummary } from "../../../packages/shared/src/works/work-summary";
 ```
 
-### 2.2.1 External private package: `@7dimensions-project/bim-viewer`
+### 2.2.1 External private package: `@sitekeephq/bim-viewer`
 
 The IFC / 3D model engine is not in this monorepo. `apps/web` consumes it from GitHub Packages
 as a versioned dependency:
 
-- package: `@7dimensions-project/bim-viewer`
-- source repository: https://github.com/7Dimensions-Project/7dimensions-bim-viewer
+- package: `@sitekeephq/bim-viewer`
+- source repository: https://github.com/sitekeephq/bim-viewer
 - setup: root `.npmrc` → `npm.pkg.github.com`; `NODE_AUTH_TOKEN` + `read:packages`
 - pin: `apps/web/package.json` (`--save-exact`; the current version is recorded there, `0.4.6` as of 08.11.2026)
 
@@ -251,7 +251,7 @@ Ownership:
 - `src/cde/`: ISO 19650 CDE settings, the guards every write path calls, the audit events and task teams (seeding, owner teams; the WIP rule itself lives in `FolderTree`) ([CDE states](../features/CDE_STATES.md), [task teams](../features/TASK_TEAMS.md)).
 - `src/integrations/`: third-party adapters.
 - `test/`: category-based backend integration and behaviour tests.
-- `src/sdk/`: the only surface modules can use from the core (`bind.ts` exposes it to modules); `src/app/modules.ts`: loads installed modules (`SITEKEEP_MODULES`) by package name. Modules live in their own repositories and arrive as pinned-version packages (`@7dimensions-project/sitekeep-ee-<id>`). Rules and capabilities: [Modules](../modules/README.md).
+- `src/sdk/`: the only surface modules can use from the core (`bind.ts` exposes it to modules); `src/app/modules.ts`: loads installed modules (`SITEKEEP_MODULES`) by package name. Modules live in their own repositories and arrive as pinned-version packages (`@sitekeephq/sitekeep-ee-<id>`). Rules and capabilities: [Modules](../modules/README.md).
 
 ### 4.2 `apps/web`
 
@@ -302,7 +302,7 @@ Ownership:
 - `app`: composition, router, providers, layout and global context; `features`: domain pages, components, hooks and domain APIs.
 - `sdk`: the only surface modules can use from the web core; `app/modules.ts`: installed modules (`virtual:sitekeep-modules`, `sitekeep-modules.ts`) ([Modules](../modules/README.md)).
 - `shared/api`: transport and API adapters used by more than one feature; `shared/ui`: domain-independent UI primitives.
-- `shared/lib`: pure, domain-independent frontend helpers; `viewers`: CAD/office and the general viewer lifecycle. The IFC/3D engine is `@7dimensions-project/bim-viewer` (see §2.2.1).
+- `shared/lib`: pure, domain-independent frontend helpers; `viewers`: CAD/office and the general viewer lifecycle. The IFC/3D engine is `@sitekeephq/bim-viewer` (see §2.2.1).
 - `features/admin`: Administration (users, AI, Office, OAuth, Privacy, System Status, Forma Sync). System Status: §4.8. Forma: §4.9.
 - `features/auth`: `/login`. The Google button depends on the `google` flag from `GET /auth/methods` (§7.1).
 - `pdf`: PDF.js, comparison and the worker boundary.
@@ -838,7 +838,7 @@ A feature API:
 A domain label or workflow component is not made shared just because it is used in two places. `shared/lib` is for pure, small, domain-independent helpers. No `utils.ts` dumping ground is created.
 
 ### 13.4 Viewer and PDF
-The IFC / 3D engine lives in the `@7dimensions-project/bim-viewer` package (§2.2.1). `apps/web`
+The IFC / 3D engine lives in the `@sitekeephq/bim-viewer` package (§2.2.1). `apps/web`
 owns the wrapper, the project context, the model list and the CDE tools. `viewers` owns CAD/office
 and the general viewer lifecycle. `pdf` owns PDF.js and the PDF comparison
 workers. Rules:
@@ -1237,7 +1237,7 @@ npm ci
 ```
 
 The Node output must be 22 or later. `.npmrc` downloads the private
-`@7dimensions-project/bim-viewer` package from GitHub Packages
+`@sitekeephq/bim-viewer` package from GitHub Packages
 (§2.2.1); `NODE_AUTH_TOKEN` must therefore have `read:packages` permission, and its real
 value must never be written to a file or a commit.
 

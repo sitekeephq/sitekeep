@@ -4,14 +4,14 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { pozQuantityFor } from "@7dimensions-project/sitekeep-ee-cost/shared/poz.js";
+import { pozQuantityFor } from "@sitekeephq/sitekeep-ee-cost/shared/poz.js";
 import type { AiProvider } from "../../../src/ai/provider.js";
 import { runIfcWorker } from "../../../src/jobs/queue.js";
 import type { IndexFile } from "../../../src/jobs/version-index.js";
 import { ModelAiError } from "../../../src/model/ai.js";
 import { ModelIndex } from "../../../src/model/model-index.js";
-import type { CostItemRow } from "@7dimensions-project/sitekeep-ee-cost/internal/fived/cost.js";
-import { aiPozPick, fromKeywords, fromMemory, pozGroups, sortSuggestions, type PozGroup, type PozMemoryRow } from "@7dimensions-project/sitekeep-ee-cost/internal/fived/poz.js";
+import type { CostItemRow } from "@sitekeephq/sitekeep-ee-cost/internal/fived/cost.js";
+import { aiPozPick, fromKeywords, fromMemory, pozGroups, sortSuggestions, type PozGroup, type PozMemoryRow } from "@sitekeephq/sitekeep-ee-cost/internal/fived/poz.js";
 import { matchRule } from "../../../src/model/rule-match.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));

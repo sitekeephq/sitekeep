@@ -44,7 +44,7 @@ export const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "
 
 /** SITEKEEP_MODULES, or when it is not set every installed module package (a Community build has none). */
 export function moduleIds(env: string | undefined = process.env.SITEKEEP_MODULES): string[] {
-  if (env === undefined) return KNOWN_MODULES.filter((id) => packageDir(`@7dimensions-project/sitekeep-ee-${id}`) !== null);
+  if (env === undefined) return KNOWN_MODULES.filter((id) => packageDir(`@sitekeephq/sitekeep-ee-${id}`) !== null);
   return env
     .split(",")
     .map((s) => s.trim())
@@ -60,11 +60,11 @@ export function sitekeepModules(): Plugin {
     load(id) {
       if (id !== `\0${ID}`) return null;
       const ids = moduleIds();
-      const locales = ids.flatMap((m) => localeEntries(`@7dimensions-project/sitekeep-ee-${m}`).map((l) => ({ ...l, module: m })));
+      const locales = ids.flatMap((m) => localeEntries(`@sitekeephq/sitekeep-ee-${m}`).map((l) => ({ ...l, module: m })));
       const english = locales.filter((l) => l.lang === "en");
       const others = locales.filter((l) => l.lang !== "en");
       return [
-        ...ids.map((m, i) => `import m${i} from "@7dimensions-project/sitekeep-ee-${m}/web";`),
+        ...ids.map((m, i) => `import m${i} from "@sitekeephq/sitekeep-ee-${m}/web";`),
         ...english.map((l, i) => `import l${i} from ${JSON.stringify(l.file)};`),
         // Every module this build carries; the app turns on those the server runs (app/modules.ts).
         `export const bundledModules = [${ids.map((_, i) => `m${i}`).join(", ")}];`,

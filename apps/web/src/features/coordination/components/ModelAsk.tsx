@@ -15,7 +15,7 @@ import {
   type ModelVocabDto,
 } from "@sitekeep/shared";
 import { ApiError, api, formatNumber, type AiProviderSelection, type ProjectAiDto } from "../../../shared/api/api";
-import type { ViewerEngine } from "@7dimensions-project/bim-viewer";
+import type { ViewerEngine } from "@sitekeephq/bim-viewer";
 import { useLabel } from "../../../i18n";
 import { AiTaskButton } from "../../../shared/ai/AiTaskButton";
 import { webModules } from "../../../app/modules";

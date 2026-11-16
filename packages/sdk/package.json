@@ -1,6 +1,6 @@
 {
-  "name": "@7dimensions-project/sitekeep-sdk",
-  "version": "0.15.0",
+  "name": "@sitekeephq/sitekeep-sdk",
+  "version": "0.16.0",
   "license": "MIT",
   "description": "The SiteKeep core's surface for modules: the core provides the implementation at run time (apps/*/src/sdk/bind.ts); this package forwards it and carries the core's type declarations.",
   "repository": {

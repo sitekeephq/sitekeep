@@ -13,10 +13,10 @@ import { hashPassword } from "../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { auditLog, notifications, users } from "../../../src/db/schema.js";
 import { moduleTable } from "../../../src/app/modules.js";
-import { aiTasks } from "@7dimensions-project/sitekeep-ee-ai/internal/schema-tables.js";
+import { aiTasks } from "@sitekeephq/sitekeep-ee-ai/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
-import { repairErrors } from "@7dimensions-project/sitekeep-ee-ai/internal/features.js";
+import { repairErrors } from "@sitekeephq/sitekeep-ee-ai/internal/features.js";
 
 const PW = "Sifre-1234567";
 

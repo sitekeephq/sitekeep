@@ -12,9 +12,9 @@ import { encryptSecret } from "../../../src/core/platform/secrets.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { fileVersions, files, users } from "../../../src/db/schema.js";
-import { autodeskConnections, autodeskFileImports, externalEntities, externalEntityLinks } from "@7dimensions-project/sitekeep-ee-connect/internal/schema-tables.js";
-import { parseStorageId } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/documents.js";
-import { resumeInterruptedImports } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/file-import.js";
+import { autodeskConnections, autodeskFileImports, externalEntities, externalEntityLinks } from "@sitekeephq/sitekeep-ee-connect/internal/schema-tables.js";
+import { parseStorageId } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/documents.js";
+import { resumeInterruptedImports } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/file-import.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 
 const API = "https://developer.api.autodesk.com";

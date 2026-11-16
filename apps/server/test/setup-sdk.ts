@@ -13,7 +13,7 @@ import { registerLegacyConnections } from "../src/privacy/legacy-connections.js"
 const here = path.dirname(fileURLToPath(import.meta.url));
 for (const id of moduleIds()) {
   for (let dir = here; path.dirname(dir) !== dir; dir = path.dirname(dir)) {
-    const pkg = path.join(dir, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`);
+    const pkg = path.join(dir, "node_modules/@sitekeephq", `sitekeep-ee-${id}`);
     if (existsSync(path.join(pkg, "package.json"))) {
       registerLocaleFolder(path.join(pkg, "locales/server"));
       registerLocaleFolder(path.join(pkg, "locales/shared"));

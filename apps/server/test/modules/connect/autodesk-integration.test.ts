@@ -9,13 +9,13 @@ import { LocalStorage } from "../../../src/core/platform/storage.js";
 import { hashPassword } from "../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { issues, locations, projectMembers, projects, users } from "../../../src/db/schema.js";
-import { autodeskConnections, integrationSyncRuns, externalEntities, externalEntityLinks } from "@7dimensions-project/sitekeep-ee-connect/internal/schema-tables.js";
-import { projectAutodeskEntities } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/projection.js";
-import { startAutodeskScheduler } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/sync.js";
-import { AutodeskApiError, AutodeskClient } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/client.js";
-import { appAccessToken, validAccessToken, type OAuthState } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/oauth.js";
-import { listHubProjects } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/documents.js";
-import { fetchAutodeskResources } from "@7dimensions-project/sitekeep-ee-connect/internal/autodesk/adapters.js";
+import { autodeskConnections, integrationSyncRuns, externalEntities, externalEntityLinks } from "@sitekeephq/sitekeep-ee-connect/internal/schema-tables.js";
+import { projectAutodeskEntities } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/projection.js";
+import { startAutodeskScheduler } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/sync.js";
+import { AutodeskApiError, AutodeskClient } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/client.js";
+import { appAccessToken, validAccessToken, type OAuthState } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/oauth.js";
+import { listHubProjects } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/documents.js";
+import { fetchAutodeskResources } from "@sitekeephq/sitekeep-ee-connect/internal/autodesk/adapters.js";
 import { decryptSecret, encryptSecret } from "../../../src/core/platform/secrets.js";
 
 describe("Autodesk integration", () => {

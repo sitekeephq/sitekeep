@@ -16,7 +16,7 @@ import { hashPassword } from "../../src/core/security/auth.js";
 import { isExternalUrl } from "../../src/ai/hosts.js";
 import { AiError, resolveProvider } from "../../src/ai/provider.js";
 // The AI module's internals load only when it is installed (a Community install has none).
-const AI_PROVIDER = "@7dimensions-project/sitekeep-ee-ai/internal/provider.js";
+const AI_PROVIDER = "@sitekeephq/sitekeep-ee-ai/internal/provider.js";
 const { createProvider } = hasAi ? await import(AI_PROVIDER) : ({} as Record<string, never>);
 import { getAiTaskQueueSettings } from "../../src/ai/settings.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";

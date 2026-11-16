@@ -17,7 +17,7 @@ import {
   projectMembers,
   users,
 } from "../../../src/db/schema.js";
-import { pozMappings } from "@7dimensions-project/sitekeep-ee-cost/internal/schema/index.js";
+import { pozMappings } from "@sitekeephq/sitekeep-ee-cost/internal/schema/index.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
 

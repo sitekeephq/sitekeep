@@ -16,10 +16,10 @@ import { reportDatasets } from "../../../src/reports/datasets.js";
 import type { ReportLlm, ReportLlmMessage } from "../../../src/app/deps.js";
 import { extractJson } from "../../../src/ai/json.js";
 // The Platform module's internals: model client, templates, the dashboard frame.
-const { reportLlmFromEnv, stripThinking, OpenAiCompatibleReportLlm } = await import("@7dimensions-project/sitekeep-ee-platform/internal/llm.js");
-const { defaultTemplates } = (await import("@7dimensions-project/sitekeep-ee-platform/internal/templates.js")) as { defaultTemplates: () => import("@sitekeep/shared").ReportTemplateDto[] };
+const { reportLlmFromEnv, stripThinking, OpenAiCompatibleReportLlm } = await import("@sitekeephq/sitekeep-ee-platform/internal/llm.js");
+const { defaultTemplates } = (await import("@sitekeephq/sitekeep-ee-platform/internal/templates.js")) as { defaultTemplates: () => import("@sitekeep/shared").ReportTemplateDto[] };
 const REPORT_TEMPLATES = defaultTemplates();
-const { REPORT_CSP, REPORT_RUNTIME_JS, buildReportSrcdoc, cleanDashboardHtml, reportHtmlWarnings } = await import("@7dimensions-project/sitekeep-ee-platform/shared/report-frame.js");
+const { REPORT_CSP, REPORT_RUNTIME_JS, buildReportSrcdoc, cleanDashboardHtml, reportHtmlWarnings } = await import("@sitekeephq/sitekeep-ee-platform/shared/report-frame.js");
 
 describe("templates", () => {
   it("every built-in template is valid against the registry", () => {

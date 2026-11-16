@@ -6,10 +6,10 @@ SiteKeep editions and modules §2, §3.2.
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (private); local clone `~/Desktop/7dimensions/sitekeep-manage` |
-| Package | `@7dimensions-project/sitekeep-ee-manage` (GitHub Packages) |
-| Version in this repository | `0.3.1` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private); local clone `~/Desktop/7dimensions/sitekeep-manage` |
+| Package | `@sitekeephq/sitekeep-ee-manage` (GitHub Packages) |
+| Version in this repository | `0.5.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `manage` (`SITEKEEP_MODULES`) |
 
 ## Boundary: the Works engine is in the core

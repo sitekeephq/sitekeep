@@ -6,24 +6,24 @@ that is, how a module connects to the core.
 
 The target is the same layout we use for the viewer: each module is developed in its own repository,
 published as a versioned package and pulled into the application at a pinned version
-([bim-viewer](../architecture/structure.md#221-external-private-package-7dimensions-projectbim-viewer)).
+([bim-viewer](../architecture/structure.md#221-external-private-package-sitekeephqbim-viewer)).
 
 ## Status
 
 | Module | Repository | Package | Version in this repository | Status |
 |---|---|---|---|---|
-| **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/7Dimensions-Project/sitekeep-cost) (private) | `@7dimensions-project/sitekeep-ee-cost` | `0.6.2` | Separate repository, GitHub Packages. [Details](cost.md) |
-| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/7Dimensions-Project/sitekeep-field) (private) | `@7dimensions-project/sitekeep-ee-field` | `0.4.0` | Separate repository, GitHub Packages. [Details](field.md) |
-| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/7Dimensions-Project/sitekeep-coordinate) (private) | `@7dimensions-project/sitekeep-ee-coordinate` | `0.3.1` | Separate repository, GitHub Packages. [Details](coordinate.md) |
-| **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/7Dimensions-Project/sitekeep-planning) (private) | `@7dimensions-project/sitekeep-ee-planning` | `0.4.0` | Separate repository, GitHub Packages. [Details](planning.md) |
-| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/7Dimensions-Project/sitekeep-ai) (private) | `@7dimensions-project/sitekeep-ee-ai` | `0.4.2` | Separate repository, GitHub Packages. [Details](ai.md) |
-| **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/7Dimensions-Project/sitekeep-manage) (private) | `@7dimensions-project/sitekeep-ee-manage` | `0.4.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
-| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/7Dimensions-Project/sitekeep-connect) (private) | `@7dimensions-project/sitekeep-ee-connect` | `0.3.4` | Separate repository; Office conversion is in the core. [Details](connect.md) |
-| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | sitekeep-platform (private; to be created) | `@7dimensions-project/sitekeep-ee-platform` | `0.1.0` (pin after the first publish) | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
+| **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/sitekeephq/sitekeep-cost) (private) | `@sitekeephq/sitekeep-ee-cost` | `0.7.0` | Separate repository, GitHub Packages. [Details](cost.md) |
+| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private) | `@sitekeephq/sitekeep-ee-field` | `0.5.0` | Separate repository, GitHub Packages. [Details](field.md) |
+| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private) | `@sitekeephq/sitekeep-ee-coordinate` | `0.4.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
+| **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private) | `@sitekeephq/sitekeep-ee-planning` | `0.5.0` | Separate repository, GitHub Packages. [Details](planning.md) |
+| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private) | `@sitekeephq/sitekeep-ee-ai` | `0.5.0` | Separate repository, GitHub Packages. [Details](ai.md) |
+| **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private) | `@sitekeephq/sitekeep-ee-manage` | `0.5.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
+| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private) | `@sitekeephq/sitekeep-ee-connect` | `0.4.0` | Separate repository; Office conversion is in the core. [Details](connect.md) |
+| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | [sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private) | `@sitekeephq/sitekeep-ee-platform` | `0.2.0` | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
 
 | Package | Source | Version |
 |---|---|---|
-| `@7dimensions-project/sitekeep-sdk` | this repository, `packages/sdk` | `0.14.0` |
+| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.16.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 
@@ -31,17 +31,17 @@ Steps (each a separate PR, tests green):
 
 1. **SDK and boundary:** the module connects to the core only through the SDK; the core knows the module only from the module list. Behaviour does not change. (Cost: #24)
 2. **Package:** the module becomes `packages/ee-<id>`: server, web, schema, migrations. The core loads it by package name; CI builds and tests without modules (Community). (Cost: #26)
-3. **Repository:** `7Dimensions-Project/sitekeep-<id>` (private); the package is published to GitHub Packages, this repository uses it at a pinned version, and `packages/ee-<id>` is deleted.
+3. **Repository:** `sitekeephq/sitekeep-<id>` (private); the package is published to GitHub Packages, this repository uses it at a pinned version, and `packages/ee-<id>` is deleted.
 
 ## Parts
 
 | Part | Location | What |
 |---|---|---|
 | SDK (core side) | `apps/server/src/sdk/index.ts`, `apps/web/src/sdk/index.ts` | The only surface a module can use from the core |
-| SDK package | `packages/sdk` → `@7dimensions-project/sitekeep-sdk/server`, `/web`, `/shared` | The only name modules import. At runtime it forwards the object bound by the core (`server.js`, `web.js`, `shared.js`, generated). The published package contains the core's type declarations (`types/`, `.d.ts` only) |
+| SDK package | `packages/sdk` → `@sitekeephq/sitekeep-sdk/server`, `/web`, `/shared` | The only name modules import. At runtime it forwards the object bound by the core (`server.js`, `web.js`, `shared.js`, generated). The published package contains the core's type declarations (`types/`, `.d.ts` only) |
 | Binding | `apps/*/src/sdk/bind.ts` | Puts the SDK and `packages/shared` on `globalThis[Symbol.for("sitekeep.sdk.server" / ".web" / ".shared")]`; loaded before the modules |
 | Module list | `apps/server/src/app/modules.ts`, `apps/web/src/app/modules.ts` + `apps/web/sitekeep-modules.ts` | Loads the modules in `SITEKEEP_MODULES` by package name |
-| Module | `sitekeep-<id>` repository → `node_modules/@7dimensions-project/sitekeep-ee-<id>` | `dist/server`, `dist/web/index.js`, `migrations/`, `locales/` (strings, [i18n §9](../architecture/i18n.md)); `exports`: `./server`, `./web`, `./internal/*` (core tests only) |
+| Module | `sitekeep-<id>` repository → `node_modules/@sitekeephq/sitekeep-ee-<id>` | `dist/server`, `dist/web/index.js`, `migrations/`, `locales/` (strings, [i18n §9](../architecture/i18n.md)); `exports`: `./server`, `./web`, `./internal/*` (core tests only) |
 
 Why this bridge: a module package must build without knowing the core's source, but at runtime it must
 share the same objects as the core (report registry, capabilities, React contexts, i18n).
@@ -53,7 +53,7 @@ It is the same pattern as VS Code extensions and the `vscode` module.
 
 | Value | Result |
 |---|---|
-| undefined | All installed module packages (`node_modules/@7dimensions-project/sitekeep-ee-*`). Modules are **optional** dependencies in `apps/server` and `apps/web` (`optionalDependencies`): an install that cannot reach the packages (`npm ci` without credentials) skips them and starts as Community |
+| undefined | All installed module packages (`node_modules/@sitekeephq/sitekeep-ee-*`). Modules are **optional** dependencies in `apps/server` and `apps/web` (`optionalDependencies`): an install that cannot reach the packages (`npm ci` without credentials) skips them and starts as Community |
 | `""` (empty) | None: **Community** |
 | `cost` | Cost only |
 
@@ -67,7 +67,7 @@ Core tests that rely on a module's internal code load the module only if it is i
 
 ## Boundary rules
 
-- A module uses the core **only** through `@7dimensions-project/sitekeep-sdk/server`, `/web` and `/shared`; it does not import `@sitekeep/*` packages directly.
+- A module uses the core **only** through `@sitekeephq/sitekeep-sdk/server`, `/web` and `/shared`; it does not import `@sitekeep/*` packages directly.
 - It does not leave its package via relative paths and does not import another module. Anything one module needs from another is offered as a **capability** and is optional.
 - The core **never** imports a module's code; `app/modules.ts` loads modules by package name.
 - Enforced by tests: on the module side in the module repository (`scripts/check-boundary.mjs`); in this repository `apps/server/test/architecture/module-boundary.test.ts` (the core does not import module code, modules are pinned packages) and `sdk-shim.test.ts` (the SDK package forwards the same names as the core's SDK and `shared`).
@@ -162,7 +162,7 @@ New capability: add the type to `sdk/capabilities.ts`, the providing module regi
 ## Adding to the SDK and releasing
 
 If a module needs something new from the core, add an explicit export to `apps/*/src/sdk/index.ts`
-(with a comment saying which section it belongs to), then `npm run build -w @7dimensions-project/sitekeep-sdk` regenerates
+(with a comment saying which section it belongs to), then `npm run build -w @sitekeephq/sitekeep-sdk` regenerates
 the shims (`sdk-shim.test.ts` catches it if you forget).
 
 The SDK uses semver: an addition is a minor version; removing an export or changing a signature is a major version. Throughout 0.x, modules write `>=<version they use> <1.0.0` in `peerDependencies` (npm treats `^0.1.0` as incompatible with `0.2.0`).
@@ -176,7 +176,7 @@ A module that connects to another server declares the connection when it loads, 
 server entry (so it is attributed to the module), and passes its id on every call:
 
 ```ts
-import { msg, outboundFetch, registerPrivacyConnection } from "@7dimensions-project/sitekeep-sdk/server";
+import { msg, outboundFetch, registerPrivacyConnection } from "@sitekeephq/sitekeep-sdk/server";
 
 registerPrivacyConnection({
   id: "autodesk",                                   // the `connection` of its calls
@@ -230,7 +230,7 @@ node tools/third-party-notices.mjs --module ../sitekeep-ai [--out ../sitekeep-ai
 ## Upgrading a module version
 
 1. In the module repository: PR → merge → version → `vX.Y.Z` tag (CI publishes). A module with its own `THIRD_PARTY_NOTICES.md`: `npm run notices:check` first ([above](#third-party-notices-of-a-module)).
-2. Here: `npm install @7dimensions-project/sitekeep-ee-<id>@X.Y.Z --save-exact -w @sitekeep/server -w @sitekeep/web`, the version row in this document → PR → green CI → merge.
+2. Here: `npm install @sitekeephq/sitekeep-ee-<id>@X.Y.Z --save-exact -w @sitekeep/server -w @sitekeep/web`, the version row in this document → PR → green CI → merge.
 3. Production: deploy (the `.npm_token` on the server must have read access).
 
 ## GitHub Packages access
@@ -258,7 +258,7 @@ Developer machines and the production server use a personal token with `read:pac
 
 1. List what the module takes from the core; find the places where the core connects to it directly (routes, reminders, tasks, reports, menus, buttons on other pages).
 2. Add what is needed to the SDK; turn the links from the core to the module into contract fields or capabilities.
-3. Move the code to `packages/ee-<id>` (`server/`, `web/`), take its schema and migrations (idempotent), add it to `KNOWN_MODULES` (server, web, vitest); access the core only through `@7dimensions-project/sitekeep-sdk/*`.
+3. Move the code to `packages/ee-<id>` (`server/`, `web/`), take its schema and migrations (idempotent), add it to `KNOWN_MODULES` (server, web, vitest); access the core only through `@sitekeephq/sitekeep-sdk/*`.
 4. Move its tests to `apps/*/test/modules/<id>`; in mixed tests, make the module steps depend on the module being installed.
 5. `npm test` and `SITEKEEP_MODULES="" npm test`, e2e, Dockerfile.
 6. Create the `sitekeep-<id>` repository using `sitekeep-cost` as the model, publish the package, delete `packages/ee-<id>` here and add the pinned version; grant package access; update this document and the module page.

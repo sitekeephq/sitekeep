@@ -84,7 +84,7 @@ live, shared, customer, or production data.
 ## Enterprise modules and SiteKeep Community
 
 The suite runs both with the Enterprise module packages installed and in SiteKeep Community, where no
-`@7dimensions-project/sitekeep-ee-*` package is installed (delete them from `node_modules`, `apps/server/node_modules`
+`@sitekeephq/sitekeep-ee-*` package is installed (delete them from `node_modules`, `apps/server/node_modules`
 and `apps/web/node_modules`, rebuild `@sitekeep/web`, run the suite). `e2e/support/modules.ts` reads which packages are installed: `moduleInstalled(id)` checks one
 module, `needsModules(...ids)` skips the file (at top level) or the test (inside it) with the reason
 "needs SiteKeep Enterprise module(s): …", and `withInstalled(list)` drops the entries of a route, tab or

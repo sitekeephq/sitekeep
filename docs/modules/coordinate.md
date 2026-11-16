@@ -6,10 +6,10 @@ SiteKeep editions and modules §2. Feature document:
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-coordinate](https://github.com/7Dimensions-Project/sitekeep-coordinate) (private); local clone `~/Desktop/7dimensions/sitekeep-coordinate` |
-| Package | `@7dimensions-project/sitekeep-ee-coordinate` (GitHub Packages) |
-| Version in this repository | `0.3.0` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private); local clone `~/Desktop/7dimensions/sitekeep-coordinate` |
+| Package | `@sitekeephq/sitekeep-ee-coordinate` (GitHub Packages) |
+| Version in this repository | `0.4.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `coordinate` (`SITEKEEP_MODULES`) |
 
 The history before the move is in this repository (`apps/server/src/{coordination,param-change}`,

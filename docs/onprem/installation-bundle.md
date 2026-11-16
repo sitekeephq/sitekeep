@@ -226,7 +226,7 @@ no release is created and no image is published.
 Trial run without a tag: Actions → Release → *Run workflow* → version (e.g. `1.0.0-rc2`). Same build and
 tests; no release is created, and the bundle stays as a workflow artifact for one week.
 
-Since the viewer package (`@7dimensions-project/bim-viewer`) is in the same organisation, the workflow reads it
+Since the viewer package (`@sitekeephq/bim-viewer`) is in the same organisation, the workflow reads it
 with `GITHUB_TOKEN` (`packages: read`); no separate secret is needed.
 
 ### 8.2 How the team gets the bundle

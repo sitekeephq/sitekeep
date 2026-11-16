@@ -12,7 +12,7 @@ import { PROJECT_MODULES } from "@sitekeep/shared";
 import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 // The AI module's internals load only when it is installed (a Community install has none).
-const AI_ASSISTANT = "@7dimensions-project/sitekeep-ee-ai/internal/assistant.js";
+const AI_ASSISTANT = "@sitekeephq/sitekeep-ee-ai/internal/assistant.js";
 const { buildAskTools, Refs, SHARED_ASK_TOOLS, TOOL_MODULES } = hasAi ? await import(AI_ASSISTANT) : ({} as Record<string, never>);
 import { openDb, type DbHandle } from "../../src/db/index.js";
 import { users } from "../../src/db/schema.js";

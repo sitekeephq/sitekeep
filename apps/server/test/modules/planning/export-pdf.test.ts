@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFNumber } from "pdf-lib";
-import { DEFAULT_SERIES_SETTINGS, MILESTONE_TYPES, type ActivityLocationDto } from "@7dimensions-project/sitekeep-ee-planning/shared/linear.js";
-import { OPERATIONS } from "@7dimensions-project/sitekeep-ee-planning/shared/operations.js";
-import { computeCpm } from "@7dimensions-project/sitekeep-ee-planning/shared/cpm.js";
-import { type ActivityDto } from "@7dimensions-project/sitekeep-ee-planning/shared/schedule.js";
-import { programmeAssumptions, weekdayRanges } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/assumptions.js";
-import { STRUCTURE_KINDS, structureKind, writeSchedulePdf, type PdfOptions } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/pdf.js";
-import type { ExportModel } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/model.js";
+import { DEFAULT_SERIES_SETTINGS, MILESTONE_TYPES, type ActivityLocationDto } from "@sitekeephq/sitekeep-ee-planning/shared/linear.js";
+import { OPERATIONS } from "@sitekeephq/sitekeep-ee-planning/shared/operations.js";
+import { computeCpm } from "@sitekeephq/sitekeep-ee-planning/shared/cpm.js";
+import { type ActivityDto } from "@sitekeephq/sitekeep-ee-planning/shared/schedule.js";
+import { programmeAssumptions, weekdayRanges } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/assumptions.js";
+import { STRUCTURE_KINDS, structureKind, writeSchedulePdf, type PdfOptions } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/pdf.js";
+import type { ExportModel } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/model.js";
 
 /** Hover fields of the first page: widget annotations with their field name, /TU text and /F flags. */
 function hoverFields(doc: PDFDocument) {

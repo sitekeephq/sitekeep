@@ -4,7 +4,7 @@
  * be installed (Community, or a licence without that module).
  */
 import type { ComponentType, ReactNode } from "react";
-import type { SelectedItem, ViewerEngine } from "@7dimensions-project/bim-viewer";
+import type { SelectedItem, ViewerEngine } from "@sitekeephq/bim-viewer";
 import type { AiTaskButtonProps } from "../shared/ai/AiTaskButton";
 import type { AiTaskButtonMode } from "../shared/ai/ai-tasks";
 import type { CashflowDto, CompanyDto, ReportDraft, ReportSharing, CostLineDto, ElementCostsDto, FormTemplateDto, LocationDto, MemberDto, TakeoffDto, WorkDetailDto, WorkFieldValues } from "@sitekeep/shared";

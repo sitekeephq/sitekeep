@@ -7,10 +7,10 @@ Feature documents: [Quantity take-off](../features/QUANTITIES.md), [Quantity App
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-cost](https://github.com/7Dimensions-Project/sitekeep-cost) (private); local clone `~/Desktop/7dimensions/sitekeep-cost` |
-| Package | `@7dimensions-project/sitekeep-ee-cost` (GitHub Packages) |
-| Version in this repository | `0.6.1` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.11.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-cost](https://github.com/sitekeephq/sitekeep-cost) (private); local clone `~/Desktop/7dimensions/sitekeep-cost` |
+| Package | `@sitekeephq/sitekeep-ee-cost` (GitHub Packages) |
+| Version in this repository | `0.7.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `cost` (`SITEKEEP_MODULES`) |
 
 Extraction: #24 (SDK boundary), #26 (own package, migration journal, Community build), then
@@ -40,7 +40,7 @@ As before, the 5D routes depend on the Schedule module switch (`schedule`).
 The published code is minified and contains no source or source maps. `./internal/*` is only for this repository's
 Cost tests (`dist/server/*`) and is not an API.
 
-Strings are in the package (`locales/server`, `locales/web`: `contracts`, `quantities` and the 5D `sim` keys). Of the shared types, only those Cost uses are in the package (`shared/`: contracts and progress payments, take-off inventory, quantity approval, Suggest Items, 2D take-off calculations (`takeoff`), opening deductions (`openings`), 5D cost rules and summary (`sim`); `./shared/*`). Contract, progress payment and cost quantity labels are in the package too (Turkish `*_LABELS_TR`, English `locales/shared/en/labels.json`). What stays in the core is what the core also uses: 2D take-off DTOs and line/area calculation, `OpeningSolid`, rule matching, cost row and cash flow DTOs (`cost` capability, report datasets); the module accesses them through `@7dimensions-project/sitekeep-sdk/shared`.
+Strings are in the package (`locales/server`, `locales/web`: `contracts`, `quantities` and the 5D `sim` keys). Of the shared types, only those Cost uses are in the package (`shared/`: contracts and progress payments, take-off inventory, quantity approval, Suggest Items, 2D take-off calculations (`takeoff`), opening deductions (`openings`), 5D cost rules and summary (`sim`); `./shared/*`). Contract, progress payment and cost quantity labels are in the package too (Turkish `*_LABELS_TR`, English `locales/shared/en/labels.json`). What stays in the core is what the core also uses: 2D take-off DTOs and line/area calculation, `OpeningSolid`, rule matching, cost row and cash flow DTOs (`cost` capability, report datasets); the module accesses them through `@sitekeephq/sitekeep-sdk/shared`.
 
 ## Migrations
 

@@ -1,6 +1,6 @@
 {
-  "name": "@7dimensions-project/bim-viewer",
-  "version": "0.4.6",
+  "name": "@sitekeephq/bim-viewer",
+  "version": "0.5.0",
   "description": "Shared BIM viewer engine and React integration for 7Dimensions products",
   "repository": {
     "type": "git",
@@ -91,7 +91,7 @@
   "engines": {
     "node": ">=22"
   },
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "publishConfig": {
     "access": "restricted",
     "registry": "https://npm.pkg.github.com"

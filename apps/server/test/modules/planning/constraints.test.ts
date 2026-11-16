@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { decodeText } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/import.js";
-import { parseMspdi } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/mspdi.js";
-import { parseXer } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/xer.js";
+import { decodeText } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/import.js";
+import { parseMspdi } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/mspdi.js";
+import { parseXer } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/xer.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fx = (n: string) => readFileSync(path.join(here, "../../fixtures", n));

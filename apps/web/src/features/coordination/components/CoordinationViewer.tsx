@@ -7,7 +7,7 @@ import {
   type ViewRule,
 } from "@sitekeep/shared";
 import { api } from "../../../shared/api/api";
-import { type ViewerEngine } from "@7dimensions-project/bim-viewer";
+import { type ViewerEngine } from "@sitekeephq/bim-viewer";
 import { Dialog } from "../../../shared/ui/Dialog";
 
 /** Model set header with its saved views (left panel). */

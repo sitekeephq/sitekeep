@@ -7,7 +7,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const KNOWN_MODULES = ["field", "coordinate", "planning", "cost", "ai", "manage", "connect", "platform"]; // app/modules.ts
 const packageInstalled = (id: string) => {
   for (let dir = here; ; dir = path.dirname(dir)) {
-    if (existsSync(path.join(dir, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`, "package.json"))) return true;
+    if (existsSync(path.join(dir, "node_modules/@sitekeephq", `sitekeep-ee-${id}`, "package.json"))) return true;
     if (path.dirname(dir) === dir) return false;
   }
 };
@@ -16,7 +16,7 @@ const notInstalled = KNOWN_MODULES.filter((id) => !installed.includes(id));
 
 export default defineConfig({
   // Tests run against the shared sources, so `npm test` works without building packages/shared first.
-  // Modules are installed packages (node_modules/@7dimensions-project/sitekeep-ee-*), run as published.
+  // Modules are installed packages (node_modules/@sitekeephq/sitekeep-ee-*), run as published.
   resolve: { alias: { "@sitekeep/shared": path.resolve(here, "../../packages/shared/src/index.ts") } },
   // Server texts in Turkish: the expectations were written against the Turkish messages
   // (docs/architecture/i18n.md §8). test/i18n covers English.

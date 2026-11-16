@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
 import { PDFDocument } from "pdf-lib";
-import { modelGroupKey } from "@7dimensions-project/sitekeep-ee-cost/shared/approvals.js";
+import { modelGroupKey } from "@sitekeephq/sitekeep-ee-cost/shared/approvals.js";
 import { buildApp } from "../../../../src/app/build-app.js";
 import { hashPassword } from "../../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../../src/db/index.js";
@@ -15,7 +15,7 @@ import {
   auditLog,
   users,
 } from "../../../../src/db/schema.js";
-import { pozMappings } from "@7dimensions-project/sitekeep-ee-cost/internal/schema/index.js";
+import { pozMappings } from "@sitekeephq/sitekeep-ee-cost/internal/schema/index.js";
 import { JobQueue } from "../../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../../src/core/platform/storage.js";
 import { compactFold } from "../../../../src/model/model-index.js";

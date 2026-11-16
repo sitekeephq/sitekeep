@@ -15,9 +15,9 @@ If a change does not fit any row below, open an issue and ask before writing cod
 | What | Where | Licence |
 |---|---|---|
 | **SiteKeep Community**: the core | This repository (`apps/`, `packages/`) | AGPL-3.0 |
-| 3D viewer engine | `@7dimensions-project/bim-viewer` ([structure](architecture/structure.md#221-external-private-package-7dimensions-projectbim-viewer)) | AGPL-3.0 |
+| 3D viewer engine | `@sitekeephq/bim-viewer` ([structure](architecture/structure.md#221-external-private-package-sitekeephqbim-viewer)) | AGPL-3.0 |
 | Module SDK | `packages/sdk` | MIT |
-| **SiteKeep Enterprise** modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect, Platform | One closed repository per module (`sitekeep-<id>`), installed as `@7dimensions-project/sitekeep-ee-<id>` | Commercial |
+| **SiteKeep Enterprise** modules: Cost, Field, Coordinate, Planning, AI, Manage, Connect, Platform | One closed repository per module (`sitekeep-<id>`), installed as `@sitekeephq/sitekeep-ee-<id>` | Commercial |
 
 Community must always build, run and pass its tests **without any module** installed. Enterprise is
 Community plus one or more modules, unlocked by a licence.

@@ -18,7 +18,7 @@ export { KNOWN_MODULES, moduleIds } from "./module-ids.js";
 import { loadedModuleIds, moduleIds } from "./module-ids.js";
 
 async function load(id: string): Promise<ServerModule> {
-  const pkg = `@7dimensions-project/sitekeep-ee-${id}/server`;
+  const pkg = `@sitekeephq/sitekeep-ee-${id}/server`;
   // One at a time, so what the module registers while loading is attributed to it (module-owner.ts).
   setLoadingModule(id);
   try {

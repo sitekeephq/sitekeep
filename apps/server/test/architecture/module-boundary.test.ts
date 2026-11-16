@@ -1,6 +1,6 @@
 /**
  * Module boundary (docs/modules/README.md). Modules live in their own repositories
- * (7Dimensions-Project/sitekeep-<id>, which checks its side) and come in as published packages;
+ * (sitekeephq/sitekeep-<id>, which checks its side) and come in as published packages;
  * the core loads them by package name (app/modules.ts) and never imports their code.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { KNOWN_MODULES } from "../../src/app/modules.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
-const MODULE_PREFIX = "@7dimensions-project/sitekeep-ee-";
+const MODULE_PREFIX = "@sitekeephq/sitekeep-ee-";
 
 function walk(dir: string): string[] {
   if (!existsSync(dir)) return [];

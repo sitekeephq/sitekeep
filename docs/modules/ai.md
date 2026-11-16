@@ -7,10 +7,10 @@ SiteKeep editions and modules §2, §3.2.
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-ai](https://github.com/7Dimensions-Project/sitekeep-ai) (private); local clone `~/Desktop/7dimensions/sitekeep-ai` |
-| Package | `@7dimensions-project/sitekeep-ee-ai` (GitHub Packages) |
-| Version in this repository | `0.4.0` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.12.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private); local clone `~/Desktop/7dimensions/sitekeep-ai` |
+| Package | `@sitekeephq/sitekeep-ee-ai` (GitHub Packages) |
+| Version in this repository | `0.5.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `ai` (`SITEKEEP_MODULES`) |
 
 The history before the move is in this repository (`apps/server/src/ai`, `apps/server/src/integrations/mcp`,

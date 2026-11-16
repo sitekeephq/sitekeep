@@ -3,11 +3,11 @@ import type { AddressInfo } from "node:net";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { AI_PROVIDER_PRESETS, aiPresetTexts, findAiPreset, presetProblems } from "@sitekeep/shared";
 import { AiError, type AiProvider } from "../../../src/ai/provider.js";
-import { createProvider, retryDelayMs } from "@7dimensions-project/sitekeep-ee-ai/internal/provider.js";
-import { listAnthropicModels } from "@7dimensions-project/sitekeep-ee-ai/internal/personal.js";
-import { personalProviderError } from "@7dimensions-project/sitekeep-ee-ai/internal/personal.js";
+import { createProvider, retryDelayMs } from "@sitekeephq/sitekeep-ee-ai/internal/provider.js";
+import { listAnthropicModels } from "@sitekeephq/sitekeep-ee-ai/internal/personal.js";
+import { personalProviderError } from "@sitekeephq/sitekeep-ee-ai/internal/personal.js";
 import { render } from "../../../src/i18n/index.js";
-import { Refs, runAsk, type AskTool } from "@7dimensions-project/sitekeep-ee-ai/internal/assistant.js";
+import { Refs, runAsk, type AskTool } from "@sitekeephq/sitekeep-ee-ai/internal/assistant.js";
 
 /** One stub HTTP server; each test sets the handler (imitating a vendor's response shape). */
 let server: Server;

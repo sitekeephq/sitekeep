@@ -10,15 +10,15 @@ import type { FastifyInstance } from "fastify";
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, rgb } from "pdf-lib";
 import { ZipFile } from "yazl";
-import { intakeNoTextNote } from "@7dimensions-project/sitekeep-ee-manage/shared/record-intake.js";
+import { intakeNoTextNote } from "@sitekeephq/sitekeep-ee-manage/shared/record-intake.js";
 import { buildApp } from "../../../src/app/build-app.js";
 import { hashPassword } from "../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { users } from "../../../src/db/schema.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
-import { mergeAiAnswer, parseIntake, referencesIn } from "@7dimensions-project/sitekeep-ee-manage/internal/intake.js";
-import { decodeHeader, parseEml } from "@7dimensions-project/sitekeep-ee-manage/internal/intake-text.js";
+import { mergeAiAnswer, parseIntake, referencesIn } from "@sitekeephq/sitekeep-ee-manage/internal/intake.js";
+import { decodeHeader, parseEml } from "@sitekeephq/sitekeep-ee-manage/internal/intake-text.js";
 import { readUpload, signUpload } from "../../../src/works/intake-upload.js";
 
 const PW = "Sifre-1234567";

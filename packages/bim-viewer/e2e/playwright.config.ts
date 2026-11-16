@@ -35,7 +35,7 @@ export default defineConfig({
       testMatch: /mobile-.*\.spec\.ts/,
       testIgnore: /mobile-safari\.spec\.ts/,
     },
-    // Same rule as the 7D CDE harness: Playwright's WebKit is unreliable on macOS 14 ARM, so the
+    // Same rule as the SiteKeep harness: Playwright's WebKit is unreliable on macOS 14 ARM, so the
     // Safari project runs in CI (Ubuntu) and locally only with E2E_SAFARI=1.
     ...(process.env.CI || process.env.E2E_SAFARI === "1"
       ? [

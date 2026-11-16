@@ -1,6 +1,6 @@
 /** Değişiklik Talebi helpers (Coordinate's shared file): settings, ownership, codes and value text. */
 import { describe, expect, it } from "vitest";
-import { paramChangeCode, paramChangeDefaultOwnership, paramChangeLostMessage, paramValueText, resolveParamChangeSettings } from "@7dimensions-project/sitekeep-ee-coordinate/shared/param-change.js";
+import { paramChangeCode, paramChangeDefaultOwnership, paramChangeLostMessage, paramValueText, resolveParamChangeSettings } from "@sitekeephq/sitekeep-ee-coordinate/shared/param-change.js";
 
 describe("Değişiklik Talebi helpers", () => {
   it("defaults: approval on, no approver role", () => {

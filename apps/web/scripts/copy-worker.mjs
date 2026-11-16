@@ -1,7 +1,7 @@
 // The shared BIM viewer copies its version-matched Fragments worker. This host script only owns
 // the pdf.js data files (CMaps, standard fonts, wasm decoders, ICC profiles).
 // The pdf.js worker itself is bundled by Vite (`pdf.worker.min.mjs?url`).
-import "@7dimensions-project/bim-viewer/copy-assets";
+import "@sitekeephq/bim-viewer/copy-assets";
 import { cpSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";

@@ -1,12 +1,12 @@
 /** 4D engine on a synthetic element index: rules, suggestions, 4D state. 5D: test/modules/cost/fived.test.ts. */
 import { describe, expect, it } from "vitest";
 import { ruleMatchLabel, type ActivityDto } from "@sitekeep/shared";
-import { plannedStatusAt, progressAt, simStatusAt } from "@7dimensions-project/sitekeep-ee-planning/shared/sim.js";
+import { plannedStatusAt, progressAt, simStatusAt } from "@sitekeephq/sitekeep-ee-planning/shared/sim.js";
 import type { IndexFile } from "../../../src/jobs/version-index.js";
 import { ModelIndex } from "../../../src/model/model-index.js";
-import { fourDState } from "@7dimensions-project/sitekeep-ee-planning/internal/fourd.js";
+import { fourDState } from "@sitekeephq/sitekeep-ee-planning/internal/fourd.js";
 import { evaluateRules, normalizeMatch, previewRules } from "../../../src/model/rule-match.js";
-import { classesForName, storeyByName, suggestLinkRules } from "@7dimensions-project/sitekeep-ee-planning/internal/suggest.js";
+import { classesForName, storeyByName, suggestLinkRules } from "@sitekeephq/sitekeep-ee-planning/internal/suggest.js";
 
 type Props = Record<string, string | number | boolean>;
 interface El {

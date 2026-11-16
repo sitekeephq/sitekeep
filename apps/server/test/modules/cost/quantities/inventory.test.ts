@@ -4,11 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { parseQuantityGroupBy } from "@7dimensions-project/sitekeep-ee-cost/shared/quantities.js";
+import { parseQuantityGroupBy } from "@sitekeephq/sitekeep-ee-cost/shared/quantities.js";
 import { runIfcWorker } from "../../../../src/jobs/queue.js";
 import type { IndexFile } from "../../../../src/jobs/version-index.js";
 import { ModelIndex } from "../../../../src/model/model-index.js";
-import { elementDto, inventory, inventoryElements, quantityDiff } from "@7dimensions-project/sitekeep-ee-cost/internal/quantities/inventory.js";
+import { elementDto, inventory, inventoryElements, quantityDiff } from "@sitekeephq/sitekeep-ee-cost/internal/quantities/inventory.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 let dir: string;

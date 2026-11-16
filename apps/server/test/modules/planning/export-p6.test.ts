@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { ActivityDto, DependencyDto } from "@7dimensions-project/sitekeep-ee-planning/shared/schedule.js";
-import type { ActivityLocationDto } from "@7dimensions-project/sitekeep-ee-planning/shared/linear.js";
-import { decodeText } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/import.js";
-import { parseXer, readXerTables } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/xer.js";
+import type { ActivityDto, DependencyDto } from "@sitekeephq/sitekeep-ee-planning/shared/schedule.js";
+import type { ActivityLocationDto } from "@sitekeephq/sitekeep-ee-planning/shared/linear.js";
+import { decodeText } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/import.js";
+import { parseXer, readXerTables } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/xer.js";
 import { children, childText, findFirst, parseXml } from "../../../src/core/formats/xml.js";
-import type { ExportModel } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/model.js";
-import { writeXer } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/xer.js";
-import { writeP6Xml } from "@7dimensions-project/sitekeep-ee-planning/internal/schedule/export/p6xml.js";
+import type { ExportModel } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/model.js";
+import { writeXer } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/xer.js";
+import { writeP6Xml } from "@sitekeephq/sitekeep-ee-planning/internal/schedule/export/p6xml.js";
 
 const TR = "Köprü İmalatı ğüşıöç";
 

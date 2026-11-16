@@ -19,7 +19,7 @@ export function modulePackageInstalled(id: string): boolean {
   if (hit !== undefined) return hit;
   let found = false;
   for (let dir = HERE; ; dir = path.dirname(dir)) {
-    if (existsSync(path.join(dir, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`, "package.json"))) {
+    if (existsSync(path.join(dir, "node_modules/@sitekeephq", `sitekeep-ee-${id}`, "package.json"))) {
       found = true;
       break;
     }

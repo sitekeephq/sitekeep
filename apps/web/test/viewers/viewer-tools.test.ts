@@ -35,7 +35,7 @@ import {
   toViewpointExtras,
   yawPitchOf,
   type ToolMenuState,
-} from "@7dimensions-project/bim-viewer/tools";
+} from "@sitekeephq/bim-viewer/tools";
 
 describe("measurement units (Turkish number format)", () => {
   it("uses a decimal comma, dot grouping and 2 decimals", () => {
@@ -325,13 +325,13 @@ describe("viewer tools in the phone menu", () => {
 
 describe("storey unit detection (real metro model: elevations in cm)", () => {
   it("reads centimetre elevations as cm, not mm, when the storeys span the model height", async () => {
-    const { fitStoreyScale } = await import("@7dimensions-project/bim-viewer/tools");
+    const { fitStoreyScale } = await import("@sitekeephq/bim-viewer/tools");
     // -1.40 … +48.14 m stored as -140 … 4814 (cm); the model is about 50 m tall.
     const fit = fitStoreyScale([-140, 0, 103, 893, 1616, 2279, 3150, 3790, 4354, 4814], { offsetY: 0, minY: -3, maxY: 50 });
     expect(fit.scale).toBe(0.01);
   });
   it("still picks millimetres for mm models and metres for metre models", async () => {
-    const { fitStoreyScale } = await import("@7dimensions-project/bim-viewer/tools");
+    const { fitStoreyScale } = await import("@sitekeephq/bim-viewer/tools");
     expect(fitStoreyScale([0, 3500, 7000, 10500], { offsetY: 0, minY: -0.5, maxY: 14 }).scale).toBe(0.001);
     expect(fitStoreyScale([0, 3.5, 7, 10.5], { offsetY: 0, minY: -0.5, maxY: 14 }).scale).toBe(1);
   });

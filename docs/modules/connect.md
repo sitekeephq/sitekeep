@@ -10,10 +10,10 @@ Feature documents: [Forma Sync](../features/FORMA_SYNC.md).
 
 | | |
 |---|---|
-| Repository | [7Dimensions-Project/sitekeep-connect](https://github.com/7Dimensions-Project/sitekeep-connect) (private); local clone `~/Desktop/7dimensions/sitekeep-connect` |
-| Package | `@7dimensions-project/sitekeep-ee-connect` (GitHub Packages) |
-| Version in this repository | `0.3.2` (`apps/server/package.json`, `apps/web/package.json`) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.10.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private); local clone `~/Desktop/7dimensions/sitekeep-connect` |
+| Package | `@sitekeephq/sitekeep-ee-connect` (GitHub Packages) |
+| Version in this repository | `0.4.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `connect` (`SITEKEEP_MODULES`) |
 
 The history before the move is in this repository. On the server: `apps/server/src/integrations/autodesk`,

@@ -7,8 +7,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { runIfcWorker } from "../../../../src/jobs/queue.js";
 import { OPENINGS_FORMAT, type IndexFile } from "../../../../src/jobs/version-index.js";
 import { ModelIndex } from "../../../../src/model/model-index.js";
-import { elementDto, elementQuantities, inventory, inventoryElements, quantityDiff } from "@7dimensions-project/sitekeep-ee-cost/internal/quantities/inventory.js";
-import { pozGroups } from "@7dimensions-project/sitekeep-ee-cost/internal/fived/poz.js";
+import { elementDto, elementQuantities, inventory, inventoryElements, quantityDiff } from "@sitekeephq/sitekeep-ee-cost/internal/quantities/inventory.js";
+import { pozGroups } from "@sitekeephq/sitekeep-ee-cost/internal/fived/poz.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 let dir: string;

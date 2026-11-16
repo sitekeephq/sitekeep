@@ -1,5 +1,5 @@
 /**
- * Enterprise modules in the e2e run. SiteKeep Community has no `@7dimensions-project/sitekeep-ee-*`
+ * Enterprise modules in the e2e run. SiteKeep Community has no `@sitekeephq/sitekeep-ee-*`
  * package installed, so the module's pages, menus and admin tabs are not there. Specs about a module
  * skip themselves with `needsModules(...)`; lists that mix core and module entries filter the module
  * ones with `moduleInstalled(...)`.
@@ -15,13 +15,13 @@ const cache = new Map<ModuleId, boolean>();
 
 /**
  * The module's package is installed: at the repository root or, when npm could not hoist it, under the
- * server workspace (node_modules/@7dimensions-project/sitekeep-ee-<id>), which is where the server loads it from.
+ * server workspace (node_modules/@sitekeephq/sitekeep-ee-<id>), which is where the server loads it from.
  */
 export function moduleInstalled(id: ModuleId): boolean {
   let hit = cache.get(id);
   if (hit === undefined) {
     hit = ["", "apps/server"].some((dir) =>
-      existsSync(path.join(root, dir, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`, "package.json")),
+      existsSync(path.join(root, dir, "node_modules/@sitekeephq", `sitekeep-ee-${id}`, "package.json")),
     );
     cache.set(id, hit);
   }

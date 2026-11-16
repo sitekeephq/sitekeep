@@ -36,7 +36,7 @@ describe("tools/third-party-notices.mjs: licence check", () => {
       { name: "nolicence", version: "1.0.0", licence: "" },
       { name: "copyleft", version: "2.0.0", licence: "GPL-3.0-only" },
       { name: "@cursor/sdk", version: "1.0.38", licence: "SEE LICENSE IN LICENSE.md" },
-      { name: "@7dimensions-project/bim-viewer", version: "0.4.6", licence: "AGPL-3.0-only" },
+      { name: "@sitekeephq/bim-viewer", version: "0.4.6", licence: "AGPL-3.0-only" },
       { name: "jszip", version: "3.10.1", licence: "MIT" },
     ];
     expect(licenceProblems(items, ["x (needed by apps/web)"])).toEqual([
@@ -57,7 +57,7 @@ describe("tools/third-party-notices.mjs: what ships", () => {
   const lock = {
     packages: {
       "": { name: "root", devDependencies: { vite: "1" } },
-      "apps/web": { name: "@sitekeep/web", version: "0.1.0", dependencies: { a: "1", "@sitekeep/shared": "0.1.0" }, optionalDependencies: { "@7dimensions-project/sitekeep-ee-ai": "1" } },
+      "apps/web": { name: "@sitekeep/web", version: "0.1.0", dependencies: { a: "1", "@sitekeep/shared": "0.1.0" }, optionalDependencies: { "@sitekeephq/sitekeep-ee-ai": "1" } },
       "packages/shared": { name: "@sitekeep/shared", version: "0.1.0", dependencies: { c: "1" } },
       "node_modules/@sitekeep/shared": { resolved: "packages/shared", link: true },
       "node_modules/a": { version: "1.0.0", license: "MIT", dependencies: { b: "2" }, peerDependencies: { p: "1", q: "1" }, peerDependenciesMeta: { q: { optional: true } } },
@@ -67,7 +67,7 @@ describe("tools/third-party-notices.mjs: what ships", () => {
       "node_modules/p": { version: "1.0.0", license: "MIT" },
       "node_modules/q": { version: "1.0.0", license: "MIT", dev: true },
       "node_modules/vite": { version: "1.0.0", license: "MIT", dev: true },
-      "node_modules/@7dimensions-project/sitekeep-ee-ai": { version: "1.0.0", license: "UNLICENSED", optional: true, dependencies: { "@cursor/sdk": "1", c: "1" } },
+      "node_modules/@sitekeephq/sitekeep-ee-ai": { version: "1.0.0", license: "UNLICENSED", optional: true, dependencies: { "@cursor/sdk": "1", c: "1" } },
       "node_modules/@cursor/sdk": { version: "1.0.38", optional: true },
     },
   };
@@ -77,16 +77,16 @@ describe("tools/third-party-notices.mjs: what ships", () => {
   });
 
   it("names what only the Enterprise modules need", () => {
-    expect(enterpriseOnlyPaths(lock)).toEqual(["node_modules/@7dimensions-project/sitekeep-ee-ai", "node_modules/@cursor/sdk"]);
+    expect(enterpriseOnlyPaths(lock)).toEqual(["node_modules/@cursor/sdk", "node_modules/@sitekeephq/sitekeep-ee-ai"]);
   });
 
   it("lists what an Enterprise module adds: its own dependencies, without its peers and what the core ships", () => {
     const moduleLock = {
       packages: {
         "": {
-          name: "@7dimensions-project/sitekeep-ee-ai",
+          name: "@sitekeephq/sitekeep-ee-ai",
           dependencies: { "@cursor/sdk": "^1", c: "1" },
-          peerDependencies: { "@7dimensions-project/sitekeep-sdk": "1", zod: "4" },
+          peerDependencies: { "@sitekeephq/sitekeep-sdk": "1", zod: "4" },
           devDependencies: { vite: "1" },
         },
         "node_modules/@cursor/sdk": { version: "1.3.1", dependencies: { x: "1" }, optionalDependencies: { "@cursor/sdk-linux-x64": "1.3.1" }, peerDependencies: { zod: "4" } },
@@ -95,7 +95,7 @@ describe("tools/third-party-notices.mjs: what ships", () => {
         "node_modules/x/node_modules/c": { version: "2.0.0", license: "MIT" },
         "node_modules/c": { version: "1.0.0", license: "MIT" },
         "node_modules/zod": { version: "4.0.0", license: "MIT", dev: true },
-        "node_modules/@7dimensions-project/sitekeep-sdk": { version: "1.0.0", dev: true },
+        "node_modules/@sitekeephq/sitekeep-sdk": { version: "1.0.0", dev: true },
         "node_modules/vite": { version: "1.0.0", dev: true },
       },
     };

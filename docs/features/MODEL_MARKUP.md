@@ -107,7 +107,7 @@ file events): `model_markup.created`, `.updated`, `.closed`, `.reopened`, `.dele
 | Types, view units, carry-over helpers | `packages/shared/src/coordination/model-markup.ts` |
 | Tables | `apps/server/src/db/schema-model-markup.ts`, `apps/server/drizzle/0045_model_markups.sql` |
 | API | `apps/server/src/coordination/routes/model-markups.ts` |
-| Viewer | `apps/web/src/features/coordination/model-markup/` (`useModelMarkups` state, `MarkupLayer` pins and drawing on the canvas, `MarkupPanel` list and detail, `snapshot.ts` burns the drawing into the snapshot); wired into `pages/Viewer.tsx`. The viewer package (`@7dimensions-project/bim-viewer`) is unchanged: pins are HTML dots projected with the engine's camera |
+| Viewer | `apps/web/src/features/coordination/model-markup/` (`useModelMarkups` state, `MarkupLayer` pins and drawing on the canvas, `MarkupPanel` list and detail, `snapshot.ts` burns the drawing into the snapshot); wired into `pages/Viewer.tsx`. The viewer package (`@sitekeephq/bim-viewer`) is unchanged: pins are HTML dots projected with the engine's camera |
 
 ## Tests
 

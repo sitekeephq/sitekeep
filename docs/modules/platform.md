@@ -6,10 +6,10 @@ SiteKeep editions and modules.
 
 | | |
 |---|---|
-| Repository | `7Dimensions-Project/sitekeep-platform` (private; to be created); local clone `~/Desktop/7dimensions/sitekeep-platform` |
-| Package | `@7dimensions-project/sitekeep-ee-platform` (GitHub Packages) |
-| Version in this repository | `0.1.0` (`apps/server/package.json`, `apps/web/package.json`, once published) |
-| SDK used | `@7dimensions-project/sitekeep-sdk` `>=0.14.0 <1.0.0` |
+| Repository | [sitekeephq/sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private); local clone `~/Desktop/7dimensions/sitekeep-platform` |
+| Package | `@sitekeephq/sitekeep-ee-platform` (GitHub Packages) |
+| Version in this repository | `0.2.0` (`apps/server/package.json`, `apps/web/package.json`) |
+| SDK used | `@sitekeephq/sitekeep-sdk` `>=0.16.0 <1.0.0` |
 | ID | `platform` (`SITEKEEP_MODULES`, licence `modules`) |
 
 ## What moved and what stayed

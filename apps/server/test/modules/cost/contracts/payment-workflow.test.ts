@@ -8,7 +8,7 @@ import { buildApp } from "../../../../src/app/build-app.js";
 import { hashPassword } from "../../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../../src/db/index.js";
 import { notifications, projectMembers, projects, users, workflowInstances } from "../../../../src/db/schema.js";
-import { runPaymentDueReminders } from "@7dimensions-project/sitekeep-ee-cost/internal/contracts/workflow.js";
+import { runPaymentDueReminders } from "@sitekeephq/sitekeep-ee-cost/internal/contracts/workflow.js";
 import { JobQueue } from "../../../../src/jobs/queue.js";
 import { LocalStorage } from "../../../../src/core/platform/storage.js";
 

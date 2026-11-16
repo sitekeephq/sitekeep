@@ -2,12 +2,12 @@
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 import { type ActivityDto } from "@sitekeep/shared";
-import { normalizeCostUnit } from "@7dimensions-project/sitekeep-ee-cost/shared/sim.js";
-import { cashflowAt } from "@7dimensions-project/sitekeep-ee-planning/shared/sim.js";
+import { normalizeCostUnit } from "@sitekeephq/sitekeep-ee-cost/shared/sim.js";
+import { cashflowAt } from "@sitekeephq/sitekeep-ee-planning/shared/sim.js";
 import type { IndexFile } from "../../../src/jobs/version-index.js";
 import { ModelIndex } from "../../../src/model/model-index.js";
-import { computeCostLines, costCashflow, summarizeCosts, type CostItemRow, type CostRuleRow } from "@7dimensions-project/sitekeep-ee-cost/internal/fived/cost.js";
-import { parseCostRows, parsePrice, readCostTable, suggestCostMapping } from "@7dimensions-project/sitekeep-ee-cost/internal/fived/cost-import.js";
+import { computeCostLines, costCashflow, summarizeCosts, type CostItemRow, type CostRuleRow } from "@sitekeephq/sitekeep-ee-cost/internal/fived/cost.js";
+import { parseCostRows, parsePrice, readCostTable, suggestCostMapping } from "@sitekeephq/sitekeep-ee-cost/internal/fived/cost-import.js";
 
 type Props = Record<string, string | number | boolean>;
 interface El {

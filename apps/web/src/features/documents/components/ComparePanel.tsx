@@ -5,7 +5,7 @@ import { api, type ModelVersion } from "../../../shared/api/api";
 import { fileDay } from "../docs-phone";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { ModelAskPanel } from "../../coordination/components/ModelAsk";
-import { COMPARE_COLORS, type ViewerEngine } from "@7dimensions-project/bim-viewer";
+import { COMPARE_COLORS, type ViewerEngine } from "@sitekeephq/bim-viewer";
 
 type Kind = "added" | "changed" | "removed";
 

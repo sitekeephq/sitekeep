@@ -607,7 +607,7 @@ describe("office integration (WOPI)", () => {
     });
     expect(viewer.statusCode).toBe(403);
     // Forge an edit token for Veli directly: the per-call check still says no.
-    const { issueWopiToken } = await import("@7dimensions-project/sitekeep-ee-connect/internal/office/wopi.js");
+    const { issueWopiToken } = await import("@sitekeephq/sitekeep-ee-connect/internal/office/wopi.js");
     const { token } = await issueWopiToken(handle.db, {
       userId: ids["veli@7d.test"]!,
       projectId: pid,

@@ -4,7 +4,7 @@
  * The Viewer page owns one controller and hands it to MarkupLayer (canvas) and MarkupPanel (side).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ViewerEngine } from "@7dimensions-project/bim-viewer";
+import type { ViewerEngine } from "@sitekeephq/bim-viewer";
 import {
   MODEL_MARKUP_COLORS,
   type MarkupShape,

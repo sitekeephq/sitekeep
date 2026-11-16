@@ -12,7 +12,7 @@ import { buildApp } from "../../../src/app/build-app.js";
 import { hashPassword } from "../../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../../src/db/index.js";
 import { users } from "../../../src/db/schema.js";
-import { activityLinks } from "@7dimensions-project/sitekeep-ee-planning/internal/schema-tables.js";
+import { activityLinks } from "@sitekeephq/sitekeep-ee-planning/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { saveVersionIndex, type IndexFile } from "../../../src/jobs/version-index.js";
 import { LocalStorage } from "../../../src/core/platform/storage.js";
@@ -22,7 +22,7 @@ import { moduleIds } from "../../../src/app/modules.js";
 const hasCost = moduleIds().includes("cost");
 /** The "Maliyet (5D)" template is the Platform module's (report builder). */
 const hasPlatform = moduleIds().includes("platform");
-const PLATFORM_TEMPLATES = "@7dimensions-project/sitekeep-ee-platform/internal/templates-modules.js";
+const PLATFORM_TEMPLATES = "@sitekeephq/sitekeep-ee-platform/internal/templates-modules.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const IFC_V1 = readFileSync(path.join(here, "../../fixtures/model-query.ifc"));

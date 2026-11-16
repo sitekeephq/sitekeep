@@ -169,8 +169,8 @@ describe("every outbound connection has an entry in the Privacy Centre", () => {
     const found = new Set<string>();
     for (const m of loadedModules) {
       let dir = here;
-      while (!existsSync(path.join(dir, "node_modules/@7dimensions-project", `sitekeep-ee-${m.id}`, "package.json")) && path.dirname(dir) !== dir) dir = path.dirname(dir);
-      const pkg = path.join(dir, "node_modules/@7dimensions-project", `sitekeep-ee-${m.id}`);
+      while (!existsSync(path.join(dir, "node_modules/@sitekeephq", `sitekeep-ee-${m.id}`, "package.json")) && path.dirname(dir) !== dir) dir = path.dirname(dir);
+      const pkg = path.join(dir, "node_modules/@sitekeephq", `sitekeep-ee-${m.id}`);
       const dist = path.join(pkg, "dist/server");
       if (!existsSync(dist)) continue;
       for (const f of walk(dist, /\.js$/)) {

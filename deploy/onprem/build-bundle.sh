@@ -54,7 +54,7 @@ leaks="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 
 [ -z "$leaks" ] || { echo "source files found in the image:"; echo "$leaks"; exit 1; }
 # SiteKeep Community carries no closed module code.
 if [ "$EDITION" = community ]; then
-  ee="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 'ls -d /app/node_modules/@7dimensions-project/sitekeep-ee-* 2>/dev/null | head -3')"
+  ee="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 'ls -d /app/node_modules/@sitekeephq/sitekeep-ee-* 2>/dev/null | head -3')"
   [ -z "$ee" ] || { echo "Enterprise modules found in the Community image:"; echo "$ee"; exit 1; }
   # Closed packages only the Enterprise modules need (tools/third-party-notices.mjs --ee-only).
   closed="$(docker run --rm --platform "$PLATFORM" --entrypoint sh "$APP_IMAGE" -c 'ls -d /app/node_modules/@cursor/sdk 2>/dev/null')" || true

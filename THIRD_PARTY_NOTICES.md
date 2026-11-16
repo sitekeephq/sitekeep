@@ -15,7 +15,6 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 
 | Package | Version | Licence | Source |
 |---|---|---|---|
-| @7dimensions-project/bim-viewer | 0.4.6 | AGPL-3.0-only | https://github.com/sitekeephq/sitekeep/tree/main/packages/bim-viewer |
 | @aiden0z/pptx-renderer | 1.3.0 | Apache-2.0 | https://github.com/aiden0z/pptx-renderer |
 | @babel/runtime | 7.29.10 | MIT | https://github.com/babel/babel/tree/HEAD/packages/babel-runtime |
 | @dimforge/rapier3d-compat | 0.12.0 | Apache-2.0 | https://github.com/dimforge/rapier.js |
@@ -57,6 +56,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | @pdf-lib/standard-fonts | 1.0.0 | MIT | https://github.com/Hopding/standard-fonts |
 | @pdf-lib/upng | 1.0.1 | MIT | https://github.com/Hopding/upng |
 | @pinojs/redact | 0.4.0 | MIT | https://github.com/pinojs/redact |
+| @sitekeephq/bim-viewer | 0.5.0 | AGPL-3.0-only | https://github.com/sitekeephq/sitekeep/tree/main/packages/bim-viewer |
 | @tanstack/query-core | 5.104.3 | MIT | https://github.com/TanStack/query/tree/HEAD/packages/query-core |
 | @tanstack/react-query | 5.104.3 | MIT | https://github.com/TanStack/query/tree/HEAD/packages/react-query |
 | @tesseract.js-data/eng | 1.0.0 | MIT | https://github.com/naptha/tessdata |
@@ -295,7 +295,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 
 Notes:
 
-- **@7dimensions-project/bim-viewer**: SiteKeep 3D viewer, part of SiteKeep (AGPL-3.0-only, the same licence as SiteKeep; text in LICENSE).
+- **@sitekeephq/bim-viewer**: SiteKeep 3D viewer, part of SiteKeep (AGPL-3.0-only, the same licence as SiteKeep; text in LICENSE).
 - **jszip**: Dual-licensed (MIT OR GPL-3.0-or-later); SiteKeep uses it under the MIT licence.
 - **nodemailer**: MIT No Attribution (MIT-0) does not require keeping the copyright notice or the licence text; the package is listed for completeness.
 
