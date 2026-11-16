@@ -16,6 +16,10 @@
       "userAgent": "Tarayıcı Bilgisi",
       "details": "Ayrıntılar",
       "hash": "Özet (Hash)"
+    },
+    "personalRemoved": {
+      "retention": "silindi (saklama süresi)",
+      "erased": "silindi (kişi talebi)"
     }
   }
 }

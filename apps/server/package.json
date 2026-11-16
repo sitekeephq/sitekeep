@@ -14,6 +14,7 @@
     "scenarios": "tsx scripts/run-scenarios.ts",
     "db:generate": "drizzle-kit generate",
     "audit:verify": "tsx src/scripts/audit-verify.ts",
+    "audit:reseal": "tsx src/scripts/audit-reseal.ts",
     "import:autodesk": "tsx src/scripts/import-autodesk.ts",
     "seed:showcase": "tsx src/scripts/seed-project-showcase.ts",
     "seed:load": "tsx --env-file=.env.development src/scripts/seed-ui-load.ts",

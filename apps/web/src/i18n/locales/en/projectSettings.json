@@ -745,7 +745,7 @@
     }
   },
   "auditLog": {
-    "description": "Every change, view and download in this project, newest first. Entries cannot be changed or deleted; each one is chained to the one before it (hash), so tampering is detected. IP address and browser are stored with each entry.",
+    "description": "Every change, view and download in this project, newest first. Entries cannot be changed or deleted; each one is chained to the one before it (hash), so tampering is detected. The IP address and browser of each entry are kept apart from the chain and deleted after the retention period set in the Privacy Centre.",
     "filters": {
       "from": "From",
       "to": "To",
@@ -784,8 +784,14 @@
       "reasons": {
         "missing_hash": "entry without hash",
         "prev_mismatch": "an entry is missing or out of order",
-        "hash_mismatch": "the entry was changed"
+        "hash_mismatch": "the entry was changed",
+        "personal_mismatch": "the IP address, browser or e-mail of the entry was changed",
+        "reseal_archive_mismatch": "the archive of a re-seal was changed"
       }
+    },
+    "personalRemoved": {
+      "retention": "deleted (retention)",
+      "erased": "deleted (erased)"
     }
   }
 }

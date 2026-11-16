@@ -12,9 +12,10 @@ import DxfParser from "dxf-viewer/src/parser/DxfParser.js";
 import { DxfScene } from "dxf-viewer/src/DxfScene.js";
 import opentype from "opentype.js";
 import { DxfPairRepair, dxfInfo, repairDxfFile, repairDxfText } from "../../src/previews/preview-worker.js";
-import { buildScenes, decodeScene, encodeScene, SCENE_FONTS, sceneOrigin, shuffleBytes, unshuffleBytes, type SerializedScene } from "../../src/previews/scene-worker.js";
+import { buildScenes, decodeScene, encodeScene, SCENE_FONTS, SCENE_VERSION, sceneOrigin, shuffleBytes, unshuffleBytes, type SerializedScene } from "../../src/previews/scene-worker.js";
 import { cadCheck } from "../../src/previews/service.js";
-import { decodeScene as decodeInBrowser, planCad, PHONE_DXF_LIMIT } from "../../../web/src/viewers/cad/scene-loader.js";
+import { dxfLayerStates, layerHiddenByDefault } from "@sitekeep/shared";
+import { decodeScene as decodeInBrowser, planCad, PHONE_DXF_LIMIT, SCENE_FORMAT } from "../../../web/src/viewers/cad/scene-loader.js";
 import { initI18n, setLanguage } from "../../../web/src/i18n/index.js";
 
 // planCad's notices are web interface texts (docs/architecture/i18n.md); checked in Turkish.
@@ -189,6 +190,55 @@ describe("prebuilt 2D scene", () => {
     expect(model.vertices.byteLength).toBeLessThan(scene.vertices.byteLength);
   });
 
+  it("builds frozen layers too and lists every layer with its state (frozen, off, locked)", async () => {
+    // FROZEN: flag 1; KAPALI: negative colour (off); KILITLI: flag 4; YENI_VP: flag 2 only (frozen in new viewports: shown).
+    const layer = (name: string, flags: number, color: number) => ["  0", "LAYER", "  2", name, " 70", String(flags), " 62", String(color), "  6", "CONTINUOUS"];
+    const line = (layerName: string, y: number) => ["  0", "LINE", "  8", layerName, " 10", "0", " 20", String(y), " 30", "0", " 11", "10", " 21", String(y), " 31", "0"];
+    const text = [
+      "  0", "SECTION", "  2", "HEADER", "  9", "$ACADVER", "  1", "AC1027", "  0", "ENDSEC",
+      "  0", "SECTION", "  2", "TABLES",
+      "  0", "TABLE", "  2", "LTYPE", " 70", "1", "  0", "LTYPE", "  2", "LAYER", " 70", "0", "  0", "ENDTAB",
+      "  0", "TABLE", "  2", "LAYER", " 70", "5",
+      ...layer("0", 0, 7), ...layer("DUVAR", 0, 1), ...layer("FROZEN", 1, 3), ...layer("KAPALI", 0, -5), ...layer("KILITLI", 4, 2), ...layer("YENI_VP", 2, 4),
+      "  0", "ENDTAB", "  0", "ENDSEC",
+      "  0", "SECTION", "  2", "ENTITIES",
+      ...line("DUVAR", 0), ...line("FROZEN", 5), ...line("KAPALI", 10), ...line("KILITLI", 15), ...line("YENI_VP", 20),
+      "  0", "ENDSEC", "  0", "EOF",
+    ].join("\r\n");
+
+    const states = dxfLayerStates(text);
+    expect(Object.fromEntries(states)).toEqual({
+      FROZEN: { frozen: true, off: false, locked: false },
+      KAPALI: { frozen: false, off: true, locked: false },
+      KILITLI: { frozen: false, off: false, locked: true },
+    });
+    // dxf-viewer alone drops the frozen layer and its line.
+    const plain = new DxfParser().parseSync(text);
+    expect(plain.tables.layer.layers.FROZEN.frozen).toBe(true);
+
+    const src = path.join(dir, "layers.dxf");
+    writeFileSync(src, text, "utf8");
+    const out = path.join(dir, "layers.scene.gz");
+    const r = await buildScenes({ task: "scene", inputPath: src, encoding: "utf-8", outputPath: out });
+    const { scene } = decodeInBrowser(new Uint8Array(gunzipSync(readFileSync(out))));
+    expect(r.layers).toBe(scene.layers.length);
+    const byName = Object.fromEntries(scene.layers.map((l) => [l.name, l]));
+    expect(Object.keys(byName)).toEqual(expect.arrayContaining(["DUVAR", "FROZEN", "KAPALI", "KILITLI", "YENI_VP"]));
+    expect(byName.FROZEN).toMatchObject({ frozen: true, off: false, locked: false });
+    expect(byName.KAPALI).toMatchObject({ off: true });
+    expect(byName.KILITLI).toMatchObject({ locked: true });
+    expect(byName.DUVAR).toEqual({ name: "DUVAR", displayName: "DUVAR", color: expect.any(Number) });
+    // Colours are kept, the off layer's included (ACI 3 green, ACI 5 blue).
+    expect(byName.FROZEN!.color).toBe(0x00ff00);
+    expect(byName.KAPALI!.color).toBe(0x0000ff);
+    // The frozen layer's line is in the scene (the viewer hides it when the drawing opens).
+    expect(scene.batches.some((b) => (b as { key: { layerName: string } }).key.layerName === "FROZEN")).toBe(true);
+    expect(layerHiddenByDefault(byName.FROZEN)).toBe(true);
+    expect(layerHiddenByDefault(byName.KAPALI)).toBe(true);
+    expect(layerHiddenByDefault(byName.KILITLI)).toBe(false);
+    expect(layerHiddenByDefault(byName.DUVAR)).toBe(false);
+  });
+
   it("puts the origin in the robust body, not at a stray entity (float32 precision in UTM drawings)", async () => {
     const ents: string[] = ["  0", "LINE", "  8", "0", " 10", "0", " 20", "0", " 30", "0", " 11", "1", " 21", "1", " 31", "0"];
     for (let i = 0; i < 400; i++) {
@@ -216,8 +266,11 @@ describe("prebuilt 2D scene", () => {
   it("plans the loading path: scene, DXF, cards", () => {
     const meta = (m: object) => ({ error: null, hint: null, updatedAt: "", ...m });
     const dxf = (m: object = {}) => meta({ kind: "dxf", status: "ready", meta: { dxfBytes: 1_000_000, cad: undefined, ...m } });
-    const scene = (status: string) => meta({ kind: "scene", status, meta: status === "ready" ? { scene: { format: 1 } } : {} });
+    const scene = (status: string) => meta({ kind: "scene", status, meta: status === "ready" ? { scene: { format: SCENE_FORMAT } } : {} });
     const info = (...previews: object[]) => ({ size: 1, previews }) as never;
+    expect(SCENE_FORMAT).toBe(SCENE_VERSION);
+    // A scene of an older format is not loaded (the server builds it again).
+    expect(planCad(info(dxf(), meta({ kind: "scene", status: "ready", meta: { scene: { format: 1 } } })), { phone: false })).toMatchObject({ show: "viewer", source: "dxf" });
     expect(planCad(info(dxf(), scene("ready")), { phone: true })).toMatchObject({ show: "viewer", source: "scene" });
     expect(planCad(info(dxf(), scene("processing")), { phone: true })).toMatchObject({ show: "viewer", source: "dxf" });
     const big = { dxfBytes: PHONE_DXF_LIMIT + 1 };

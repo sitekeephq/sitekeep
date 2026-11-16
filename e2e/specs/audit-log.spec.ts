@@ -1,6 +1,7 @@
 /**
  * ISO19650-2 5.1.7(d) audit (docs/features/AUDIT_LOG.md): the project's Denetim Kaydı tab
- * (filter, CSV download, chain check) and a file's Denetim Geçmişi in the file drawer. Core only:
+ * (filter, CSV download, chain check), a file's Denetim Geçmişi in the file drawer, and the retention
+ * of the log's personal part in Gizlilik Merkezi (P1-5, AUDIT_LOG.md#personal-data). Core only:
  * passes with and without Enterprise modules.
  */
 import { readFile } from "node:fs/promises";
@@ -45,4 +46,40 @@ test("ISO19650-2 5.1.7(d) audit: file history, project log with filter, CSV down
   const chain = page.getByTestId("audit-chain");
   await chain.getByRole("button", { name: "Zinciri Denetle", exact: true }).click();
   await expect(chain.getByText(/^Sağlam: \d+ kayıt denetlendi$/)).toBeVisible();
+});
+
+test("ISO19650-2 5.1.7(d) audit: retention of the personal part is set in the Privacy Centre and the chain still verifies", async ({ page }) => {
+  // The e2e user's own requests write their IP address outside the chain (P1-5).
+  const own = await page.request.get(`/api/v1/admin/audit?limit=20`);
+  expect(own.ok()).toBe(true);
+  const entries = ((await own.json()) as { entries: { ip?: string | null; hash: string | null }[] }).entries;
+  expect(entries.some((e) => !!e.ip && !!e.hash)).toBe(true);
+
+  await page.goto("/administration");
+  const loaded = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/v1/admin/privacy" && r.request().method() === "GET");
+  await page.getByRole("button", { name: "Gizlilik Merkezi", exact: true }).click();
+  expect((await loaded).ok()).toBe(true);
+  const months = page.getByLabel("Denetim Kaydı Kişisel Veri Saklama Süresi (ay)", { exact: true });
+  const before = await months.inputValue();
+  await expect(page.getByText(/bu süre dolunca silinir \(1–120 ay\)/)).toBeVisible();
+
+  try {
+    await months.fill("18");
+    const card = page.locator(".card").filter({ has: months });
+    const saved = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/v1/admin/privacy/settings" && r.request().method() === "PUT");
+    await card.getByRole("button", { name: "Kaydet", exact: true }).click();
+    const res = await saved;
+    expect(res.ok(), await res.text()).toBe(true);
+    expect(((await res.json()) as { settings: { auditPersonalRetentionMonths: number } }).settings.auditPersonalRetentionMonths).toBe(18);
+    await expect(card.getByText("Kaydedildi.", { exact: true })).toBeVisible();
+
+    await page.reload();
+    await page.getByRole("button", { name: "Gizlilik Merkezi", exact: true }).click();
+    await expect(page.getByLabel("Denetim Kaydı Kişisel Veri Saklama Süresi (ay)", { exact: true })).toHaveValue("18");
+  } finally {
+    const reset = await page.request.put(`/api/v1/admin/privacy/settings`, { data: { auditPersonalRetentionMonths: Number(before) || 12 } });
+    expect(reset.ok()).toBe(true);
+  }
+  const verify = await page.request.get(`/api/v1/admin/audit/verify`);
+  expect(((await verify.json()) as { ok: boolean }).ok).toBe(true);
 });

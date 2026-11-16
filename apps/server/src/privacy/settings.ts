@@ -13,10 +13,17 @@ import { eq } from "drizzle-orm";
 import type { Db } from "../db/index.js";
 import { systemSettings } from "../db/schema.js";
 import { normalizeLanList, setLanAllowlist } from "../ai/hosts.js";
+import { AUDIT_PERSONAL_RETENTION } from "@sitekeep/shared";
+import { connectionDefaultEnabled } from "./connections.js";
 
 export interface PrivacySettings {
   /** Outbound log rows are kept this many days (daily cleanup). */
   logRetentionDays: number;
+  /**
+   * Personal part of the audit log (IP address, user agent, e-mail; audit_personal) is kept this
+   * many months, then deleted by the daily job (audit/personal.ts). The chained rows stay.
+   */
+  auditPersonalRetentionMonths: number;
   /** "İç ağ" list: hosts treated as inside the network (see ai/hosts.ts). */
   lanHosts: string[];
   /** Redact personal data also before prompts go to a local (LAN) model ("Yerel modelde de maskele"). */
@@ -25,6 +32,8 @@ export interface PrivacySettings {
   redactNames: boolean;
   /** Connection ids switched off in "Dış Bağlantılar" ("ai:<providerId>", "smtp", "office:editor"…). */
   disabledConnections: string[];
+  /** Connections that are off until turned on (a module's defaultEnabled: false) and were turned on. */
+  enabledConnections: string[];
 }
 
 export interface KillSwitchState {
@@ -37,10 +46,12 @@ export interface KillSwitchState {
 
 export const PRIVACY_DEFAULTS: PrivacySettings = {
   logRetentionDays: 90,
+  auditPersonalRetentionMonths: AUDIT_PERSONAL_RETENTION.default,
   lanHosts: [],
   redactLocal: false,
   redactNames: true,
   disabledConnections: [],
+  enabledConnections: [],
 };
 
 const KILL_DEFAULT: KillSwitchState = { on: false, at: null, by: null };
@@ -63,7 +74,9 @@ export function killSwitchOn(): boolean {
 }
 
 export function connectionDisabled(id: string | null | undefined): boolean {
-  return !!id && state.settings.disabledConnections.includes(id);
+  if (!id) return false;
+  if (state.settings.disabledConnections.includes(id)) return true;
+  return !connectionDefaultEnabled(id) && !state.settings.enabledConnections.includes(id);
 }
 
 async function read<T>(db: Db, key: string): Promise<T | undefined> {
@@ -82,12 +95,17 @@ async function write(db: Db, key: string, value: unknown, userId: string | null)
 function clean(s: Partial<PrivacySettings> | undefined): PrivacySettings {
   const v = { ...PRIVACY_DEFAULTS, ...(s ?? {}) };
   const days = Math.round(Number(v.logRetentionDays));
+  const months = Math.round(Number(v.auditPersonalRetentionMonths));
   return {
     logRetentionDays: Number.isFinite(days) ? Math.min(Math.max(days, 1), 3650) : PRIVACY_DEFAULTS.logRetentionDays,
+    auditPersonalRetentionMonths: Number.isFinite(months)
+      ? Math.min(Math.max(months, AUDIT_PERSONAL_RETENTION.min), AUDIT_PERSONAL_RETENTION.max)
+      : PRIVACY_DEFAULTS.auditPersonalRetentionMonths,
     lanHosts: normalizeLanList(Array.isArray(v.lanHosts) ? v.lanHosts.map(String) : []),
     redactLocal: !!v.redactLocal,
     redactNames: v.redactNames !== false,
     disabledConnections: Array.isArray(v.disabledConnections) ? [...new Set(v.disabledConnections.map(String))] : [],
+    enabledConnections: Array.isArray(v.enabledConnections) ? [...new Set(v.enabledConnections.map(String))] : [],
   };
 }
 
@@ -136,8 +154,26 @@ export async function setKillSwitch(db: Db, on: boolean, userId: string | null):
 
 export async function setConnectionEnabled(db: Db, id: string, enabled: boolean, userId: string | null): Promise<PrivacySettings> {
   const current = clean(await read<Partial<PrivacySettings>>(db, "privacy.settings"));
-  const set = new Set(current.disabledConnections);
-  if (enabled) set.delete(id);
-  else set.add(id);
-  return savePrivacySettings(db, { disabledConnections: [...set] }, userId);
+  const off = new Set(current.disabledConnections);
+  const on = new Set(current.enabledConnections);
+  if (enabled) {
+    off.delete(id);
+    on.add(id);
+  } else {
+    off.add(id);
+    on.delete(id);
+  }
+  return savePrivacySettings(db, { disabledConnections: [...off], enabledConnections: [...on] }, userId);
+}
+
+/** Audit rows older than this lose their personal part (calendar months before `now`, UTC). */
+export function auditPersonalCutoff(now = new Date(), months = state.settings.auditPersonalRetentionMonths): Date {
+  const d = new Date(now.getTime());
+  const day = d.getUTCDate();
+  d.setUTCDate(1);
+  d.setUTCMonth(d.getUTCMonth() - months);
+  // 31 March minus one month is 28/29 February, not 3 March.
+  const last = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+  d.setUTCDate(Math.min(day, last));
+  return d;
 }

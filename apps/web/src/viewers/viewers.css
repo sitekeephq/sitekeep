@@ -62,6 +62,10 @@
 .cad-layers { overflow: auto; border-left: 1px solid var(--border); background: var(--surface); padding: 8px; font-size: 13px; }
 .cad-layer { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; margin: 0; color: var(--text); font-size: 13px; }
 .cad-layer input { width: auto; margin: 0; }
+.cad-layer-name { min-width: 0; overflow-wrap: anywhere; }
+.cad-layer-hidden .cad-layer-name { color: var(--muted); }
+.cad-layer-state { flex-shrink: 0; font-size: 11px; line-height: 1.4; padding: 0 5px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted); }
+.cad-layers-frozen { width: 100%; margin-bottom: 6px; }
 .cad-swatch { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--border); flex-shrink: 0; }
 .cad-overlay { position: absolute; inset: 0; pointer-events: none; }
 .cad-status { position: absolute; left: 10px; bottom: 10px; background: var(--surface); color: var(--text); border-radius: 6px; padding: 4px 10px; box-shadow: var(--shadow); font-size: 12px; z-index: 2; }

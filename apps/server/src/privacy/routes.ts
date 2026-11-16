@@ -2,17 +2,18 @@
  * Gizlilik Merkezi (Yönetim → Gizlilik Merkezi), system administrators only:
  *   GET  /admin/privacy                     summary (statement, AI mode, data location, settings)
  *   GET  /admin/privacy/status              { killSwitch } for the admin banner
- *   PUT  /admin/privacy/settings            retention, "iç ağ" list, redaction switches
+ *   PUT  /admin/privacy/settings            retention (outbound log, audit personal data), "iç ağ" list, redaction switches
  *   PUT  /admin/privacy/kill-switch         { on } "Tüm Dış Bağlantıları Kapat"
- *   GET  /admin/privacy/connections         every configured external connection
+ *   GET  /admin/privacy/connections         every external connection: the core's (AI providers, SMTP, office,
+ *                                           Google sign-in) and the ones modules declared (privacy/connections.ts)
  *   PUT  /admin/privacy/connections/:id     { enabled }
  *   GET  /admin/privacy/outbound            outbound log (purpose, host, from, to, blocked, limit, offset)
  *   GET  /admin/privacy/outbound.csv        the same rows as CSV (at most 10 000)
  */
-import { and, asc, count, desc, eq, gt, gte, isNotNull, isNull, like, lte, max, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, isNull, like, lte, max, or, sql, type SQL } from "drizzle-orm";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { privacyStatement, type OutboundLogRowDto, type PrivacyConnectionDto, type PrivacySummaryDto } from "@sitekeep/shared";
+import { AUDIT_PERSONAL_RETENTION, privacyStatement, type OutboundLogRowDto, type PrivacyConnectionDto, type PrivacySummaryDto } from "@sitekeep/shared";
 import type { ResolvedDeps } from "../app/deps.js";
 import { audit } from "../core/platform/audit.js";
 import { isExternalUrl, lanEntryProblem } from "../ai/hosts.js";
@@ -31,6 +32,8 @@ import { badRequest, forbidden } from "../core/platform/http.js";
 import { officeConverterLabel, officeEditorLabel } from "@sitekeep/shared";
 import { LocalStorage } from "../core/platform/storage.js";
 import { hostOf } from "./outbound.js";
+import { AI_PROVIDER_CONNECTION, knownConnectionId, privacyConnections } from "./connections.js";
+import { GOOGLE_HOSTS } from "../auth/google-connection.js";
 import { DEFAULT_LANGUAGE, msg, render, requestLanguage, tFor, tReq } from "../i18n/index.js";
 import { connectionDisabled, killSwitchOn, privacyState, savePrivacySettings, setConnectionEnabled, setKillSwitch } from "./settings.js";
 
@@ -79,6 +82,7 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       data: { database, storage },
       settings: {
         logRetentionDays: state.settings.logRetentionDays,
+        auditPersonalRetentionMonths: state.settings.auditPersonalRetentionMonths,
         lanHosts: state.settings.lanHosts,
         redactLocal: state.settings.redactLocal,
         redactNames: state.settings.redactNames,
@@ -101,6 +105,7 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     const body = z
       .object({
         logRetentionDays: z.number().int().min(1).max(3650).optional(),
+        auditPersonalRetentionMonths: z.number().int().min(AUDIT_PERSONAL_RETENTION.min).max(AUDIT_PERSONAL_RETENTION.max).optional(),
         lanHosts: z.array(z.string().trim().max(255)).max(200).optional(),
         redactLocal: z.boolean().optional(),
         redactNames: z.boolean().optional(),
@@ -137,6 +142,13 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       .where(and(isNotNull(outboundLog.connection), eq(outboundLog.blocked, false)))
       .groupBy(outboundLog.connection);
     const last = new Map(lastRows.map((r) => [r.connection!, r.at ? new Date(r.at).toISOString() : null]));
+    const declared = privacyConnections();
+    const hostRows = declared.length
+      ? await db
+          .selectDistinct({ connection: outboundLog.connection, host: outboundLog.host })
+          .from(outboundLog)
+          .where(inArray(outboundLog.connection, declared.map((c) => c.id)))
+      : [];
     const loc = (url: string | null | undefined): PrivacyConnectionDto["location"] => (url && isExternalUrl(url) ? "external" : "local");
     const out: PrivacyConnectionDto[] = [];
 
@@ -209,6 +221,35 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       notes: conv?.converter?.id === "local" ? [t("privacy:connections.localLibreOffice")] : conv?.converter ? [] : [conv?.reason ? render(lang, conv.reason) : t("privacy:connections.notConfigured")],
     });
 
+    out.push({
+      id: "google",
+      kind: "auth",
+      name: t("privacy:connections.google"),
+      host: GOOGLE_HOSTS.join(", "),
+      location: "external",
+      enabled: !connectionDisabled("google"),
+      toggleable: true,
+      lastUsedAt: last.get("google") ?? null,
+      notes: deps.googleAuth ? [t("privacy:connections.googleSends")] : [t("privacy:connections.googleNotConfigured")],
+    });
+
+    // Connections the installed modules declared (SDK registerPrivacyConnection), e.g. Autodesk.
+    for (const c of declared) {
+      const seen = hostRows.filter((r) => r.connection === c.id).map((r) => r.host.toLowerCase());
+      const hosts = [...new Set([...c.hosts, ...seen])];
+      out.push({
+        id: c.id,
+        kind: "module",
+        name: render(lang, c.name),
+        host: hosts.join(", "),
+        location: hosts.some((h) => isExternalUrl(`https://${h.replace(/^\*\./, "x.")}`)) ? "external" : "local",
+        enabled: !connectionDisabled(c.id),
+        toggleable: true,
+        lastUsedAt: last.get(c.id) ?? null,
+        notes: c.description ? [render(lang, c.description)] : [],
+      });
+    }
+
     const [tokenCount] = await db
       .select({ n: count() })
       .from(tokens)
@@ -276,8 +317,11 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     } else if (id === "oauth") {
       throw badRequest(msg("privacy:errors.oauthManagedElsewhere"));
     } else {
-      const known = ["ai:env", "smtp", "office:editor", "office:converter", ...(await getProviders(db)).map((p) => `ai:${p.id}`)];
-      if (!known.includes(id) && !connectionDisabled(id)) throw badRequest(msg("privacy:errors.unknownConnection"));
+      // A core connection, a configured AI provider or one a module declared (privacy/connections.ts);
+      // an id switched off earlier can always be turned back on.
+      const known =
+        id === "ai:env" || (AI_PROVIDER_CONNECTION.test(id) ? (await getProviders(db)).some((p) => `ai:${p.id}` === id) : knownConnectionId(id));
+      if (!known && !connectionDisabled(id)) throw badRequest(msg("privacy:errors.unknownConnection"));
       await setConnectionEnabled(db, id, enabled, uid);
       if (id.startsWith("office:")) deps.office.resetDiscovery();
     }

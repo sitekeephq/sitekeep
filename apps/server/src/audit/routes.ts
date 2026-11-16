@@ -5,7 +5,8 @@
  *   GET /projects/:pid/files/:id/history  people who may view the file; its rows and its versions'
  *   GET /admin/audit, /admin/audit.csv system administrators; all projects and system rows
  *   GET /admin/audit/verify            system administrators; walks the hash chain
- * IP address and user agent (D-9) are shown to administrators only.
+ * IP address and user agent (D-9) are shown to administrators only, from audit_personal while it is
+ * kept (P1-5); afterwards the row says they were deleted.
  */
 import { Readable } from "node:stream";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
@@ -53,8 +54,8 @@ async function sendCsv(
           e.targetType ?? "",
           e.targetId ?? "",
           e.targetName ?? "",
-          e.ip ?? "",
-          e.userAgent ?? "",
+          e.ip ?? (e.personalRemoved ? t(`audit:csv.personalRemoved.${e.personalRemoved}`) : ""),
+          e.userAgent ?? (e.personalRemoved ? t(`audit:csv.personalRemoved.${e.personalRemoved}`) : ""),
           e.details ? JSON.stringify(e.details) : "",
           e.hash ?? "",
         ]);

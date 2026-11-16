@@ -4,7 +4,7 @@
  * are lazy so the circular import between the two files is safe.
  */
 import { sql } from "drizzle-orm";
-import { boolean, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type {
   CdeCodeScheme,
   CdeRevisionRules,
@@ -13,8 +13,8 @@ import type {
   CdeTransitionMode,
   CdeWipPolicy,
 } from "@sitekeep/shared";
-import { files, folders, namingStandards, projects } from "./schema.js";
-import { workflowTemplates } from "./schema-workflow.js";
+import { fileVersions, files, folders, namingStandards, projects } from "./schema.js";
+import { reviews, workflowTemplates } from "./schema-workflow.js";
 
 /** One row per project; a project without a row uses DEFAULT_CDE_SETTINGS. */
 export const projectCdeSettings = pgTable("project_cde_settings", {
@@ -70,4 +70,28 @@ export const documentCodes = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.projectId, t.codeNorm] })],
+);
+
+/**
+ * ISO-12: which version replaced which (ISO 19650-1 §12.5). A publication that archives the
+ * current one records the pair: `version_id` is the new published version, `superseded_version_id`
+ * the archive copy (and a publication in another place that it made superseded). Both sides read
+ * the same row: the archived file shows "Superseded by", the new one "Supersedes".
+ */
+export const cdeSupersessions = pgTable(
+  "cde_supersessions",
+  {
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    versionId: uuid("version_id")
+      .notNull()
+      .references(() => fileVersions.id, { onDelete: "cascade" }),
+    supersededVersionId: uuid("superseded_version_id")
+      .notNull()
+      .references(() => fileVersions.id, { onDelete: "cascade" }),
+    reviewId: uuid("review_id").references(() => reviews.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.versionId, t.supersededVersionId] }), index("cde_supersessions_superseded").on(t.supersededVersionId)],
 );

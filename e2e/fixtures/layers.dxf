@@ -1,0 +1,146 @@
+  0
+SECTION
+  2
+HEADER
+  9
+$ACADVER
+  1
+AC1015
+  0
+ENDSEC
+  0
+SECTION
+  2
+TABLES
+  0
+TABLE
+  2
+LAYER
+ 70
+5
+  0
+LAYER
+  2
+0
+ 70
+0
+ 62
+7
+  6
+CONTINUOUS
+  0
+LAYER
+  2
+DUVAR
+ 70
+0
+ 62
+1
+  6
+CONTINUOUS
+  0
+LAYER
+  2
+DONMUS
+ 70
+1
+ 62
+3
+  6
+CONTINUOUS
+  0
+LAYER
+  2
+KAPALI
+ 70
+0
+ 62
+-5
+  6
+CONTINUOUS
+  0
+LAYER
+  2
+KILITLI
+ 70
+4
+ 62
+2
+  6
+CONTINUOUS
+  0
+ENDTAB
+  0
+ENDSEC
+  0
+SECTION
+  2
+ENTITIES
+  0
+LINE
+  8
+DUVAR
+ 10
+0
+ 20
+0
+ 30
+0
+ 11
+20
+ 21
+0
+ 31
+0
+  0
+LINE
+  8
+DONMUS
+ 10
+0
+ 20
+5
+ 30
+0
+ 11
+20
+ 21
+5
+ 31
+0
+  0
+LINE
+  8
+KAPALI
+ 10
+0
+ 20
+10
+ 30
+0
+ 11
+20
+ 21
+10
+ 31
+0
+  0
+LINE
+  8
+KILITLI
+ 10
+0
+ 20
+15
+ 30
+0
+ 11
+20
+ 21
+15
+ 31
+0
+  0
+ENDSEC
+  0
+EOF

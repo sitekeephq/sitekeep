@@ -16,7 +16,7 @@ import { codeProfile } from "@sitekeep/shared";
 import { loadCodeSettings } from "../cde/codes.js";
 import { loadTransitionRules } from "../cde/transitions.js";
 import { containerRevisions, copyCodesFor, reviewSuitability } from "../cde/review-transition.js";
-import { archiveCurrentPublications } from "../cde/archive.js";
+import { archiveCurrentPublications, recordArchive, type ArchivedCopy } from "../cde/archive.js";
 
 /**
  * Copies approved versions into the review's target folder as new files / versions. With a
@@ -113,6 +113,8 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
       }
     }
 
+    // Archive copies made for this file, recorded (and linked, ISO-12) once the new version exists.
+    let archivedCopies: ArchivedCopy[] = [];
     try {
       const src = row.file_versions;
       // CDE guards: the copy is the same document (container) arriving in the target state.
@@ -132,6 +134,7 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
           actorId,
         });
         tree = archived.tree;
+        archivedCopies = archived.archived;
         standards.setTree(tree);
       }
       const guard = { projectId: review.projectId, access: null, tree, source: "review_copy", lang: DEFAULT_LANGUAGE } as const;
@@ -236,6 +239,17 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
           .returning();
         return { file: file!, version: version!, created: true };
       });
+      // ISO-12: the archive copies are linked to the version that replaced them.
+      const pending = archivedCopies;
+      archivedCopies = [];
+      const supersedes = await recordArchive(db, { projectId: review.projectId, tree, review, actorId }, pending, {
+        fileId: out.file.id,
+        versionId: out.version.id,
+        name: out.file.name,
+        version: out.version.version,
+        revisionCode: out.version.revisionCode ?? null,
+        folderId: targetId,
+      });
       if (out.created)
         await recordTransition(db, {
           projectId: review.projectId,
@@ -289,9 +303,13 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
           system: true,
           unchanged: !out.created,
           ...(unresolved.length ? { unresolved } : {}),
+          ...(supersedes.length ? { supersedes } : {}),
         },
       });
     } catch (err) {
+      // Copies archived before the failure are still recorded (unlinked: nothing replaced them).
+      if (archivedCopies.length)
+        await recordArchive(db, { projectId: review.projectId, tree, review, actorId }, archivedCopies, null).catch(() => undefined);
       await fail(
         err instanceof Error && "status" in err
           ? "msg" in err && isMsg(err.msg)

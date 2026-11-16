@@ -104,10 +104,16 @@ restart the server.
 
 ## Sign-in errors
 
+Google sign-in is the `google` connection of **Administration → Privacy Centre → External
+Connections**. Switched off there (or with all external connections off) the Google button is hidden
+on the sign-in and invitation pages and every step of the flow is refused
+([privacy](PRIVACY.md#external-connections-list)).
+
 | `authError` | Shown to the user |
 |---|---|
 | `account_not_allowed` | This Google account has no access to SiteKeep. |
 | `google_cancelled` | Signing in with Google was cancelled. |
+| `google_disabled` | Signing in with Google is turned off on this server (Administration → Privacy Centre). |
 | other (`email_not_verified`, `invalid_state`, `google_failed`) | Signing in with Google could not be completed. Please try again. |
 
 ---

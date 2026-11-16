@@ -135,6 +135,30 @@ export interface FileVersionDto {
   suitabilityCode?: string | null;
   /** ISO 19650 revision code of this version ("P01.02", "C01"); null or missing: not set. */
   revisionCode?: string | null;
+  /**
+   * ISO-12 (ISO 19650-1 §12.5): the published versions that replaced this one (an archive copy, or
+   * a publication made superseded); missing when none. Single file reads only (GET …/files/:id).
+   */
+  supersededBy?: SupersessionLinkDto[];
+  /** ISO-12: the archived versions this publication replaced; missing when none. */
+  supersedes?: SupersessionLinkDto[];
+}
+
+/**
+ * The other side of a supersession (ISO-12). `fileId`, `folderId` and `versionId` are null when the
+ * caller cannot see that file (folder permissions, the task-team WIP rule, the trash): the name is
+ * then shown without a link.
+ */
+export interface SupersessionLinkDto {
+  fileId: string | null;
+  folderId: string | null;
+  versionId: string | null;
+  name: string;
+  version: number;
+  revisionCode: string | null;
+  suitabilityCode: string | null;
+  /** When the supersession was recorded (the publication). */
+  at: string;
 }
 
 export interface FileDto {
@@ -372,6 +396,11 @@ export interface AuditEntryDto {
   /** Client of the request (D-9): shown to project and system administrators only. */
   ip?: string | null;
   userAgent?: string | null;
+  /**
+   * The row had personal values (IP address, user agent, e-mail) that are gone: deleted after the
+   * retention period, or erased for the person (docs/features/AUDIT_LOG.md#personal-data).
+   */
+  personalRemoved?: "retention" | "erased";
   /** Hash chain (docs/features/AUDIT_LOG.md); null on rows written before the chain started. */
   hash?: string | null;
   /** Name of the file or folder the row is about, when it still exists. */
@@ -395,8 +424,20 @@ export interface AuditVerifyDto {
   legacyRows: number;
   /** The newest chained row: record its hash elsewhere to anchor the chain. */
   head: { id: number; hash: string; at: string } | null;
-  /** The first row that breaks the chain. */
-  broken: { id: number; reason: "missing_hash" | "prev_mismatch" | "hash_mismatch" } | null;
+  /**
+   * Personal records (audit_personal) checked against their row's personal_hash; null when the
+   * check ran without the installation's key (CLI without the secret key).
+   */
+  personalChecked: number | null;
+  /**
+   * The first row that breaks the chain. `personal_mismatch`: the row's personal record does not
+   * match its personal_hash; `reseal_archive_mismatch`: an `audit.resealed` row's archive of old
+   * hashes was changed.
+   */
+  broken: {
+    id: number;
+    reason: "missing_hash" | "prev_mismatch" | "hash_mismatch" | "personal_mismatch" | "reseal_archive_mismatch";
+  } | null;
 }
 
 export interface ApiError {

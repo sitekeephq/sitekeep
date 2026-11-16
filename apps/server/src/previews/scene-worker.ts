@@ -8,7 +8,9 @@
  *   json                  UTF-8: { v, header, scene, buffers }
  *                         - header: $INSUNITS, $MEASUREMENT, $EXTMIN/$EXTMAX, $ACADVER
  *                         - scene: the serialised DxfScene without its typed arrays (batches,
- *                           layers with colours, origin, bounds, hasMissingChars, pointShapeHasDot)
+ *                           layers with colours and states, origin, bounds, hasMissingChars,
+ *                           pointShapeHasDot). Frozen layers are built too (format 2): the
+ *                           viewer lists them and hides frozen and off layers itself
  *                         - buffers: { vertices | indices | transforms: [byteOffset, byteLength] }
  *   padding               to 8 bytes
  *   vertices, indices, transforms   the scene's ArrayBuffers, each 8-byte aligned and byte-shuffled
@@ -23,10 +25,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { gzipSync } from "node:zlib";
 import { parentPort, workerData } from "node:worker_threads";
-import { robustBounds } from "@sitekeep/shared";
+import { dxfLayerStates, robustBounds, unfreezeLayers, withLayerStates, type CadLayerState } from "@sitekeep/shared";
 
 export const SCENE_MAGIC = "7DSCENE1";
-export const SCENE_VERSION = 1;
+/** 2: frozen layers built and listed, layer states (frozen, off, locked) in `scene.layers`. */
+export const SCENE_VERSION = 2;
 
 /** Fonts in the order CadViewer hands them to dxf-viewer (glyphs are looked up in turn). */
 export const SCENE_FONTS = [
@@ -48,7 +51,7 @@ export interface SerializedScene {
   indices: ArrayBuffer;
   transforms: ArrayBuffer;
   batches: unknown[];
-  layers: { name: string; displayName: string; color: number }[];
+  layers: ({ name: string; displayName: string; color: number } & Partial<CadLayerState>)[];
   origin: { x: number; y: number } | null;
   bounds: { minX: number; maxX: number; minY: number; maxY: number } | null;
   hasMissingChars: boolean;
@@ -240,8 +243,11 @@ export async function buildScenes(input: SceneBuildInput, progress: Progress = (
   const t0 = performance.now();
   progress("parse");
   let text: string | null = new TextDecoder(input.encoding).decode(readFileSync(input.inputPath));
-  const dxf = new DxfParser().parseSync(text);
+  const dxf = new DxfParser().parseSync(text) as ReturnType<InstanceType<typeof DxfParser>["parseSync"]> & Parameters<typeof unfreezeLayers>[0];
+  const layerStates = dxfLayerStates(text);
   text = null;
+  // Frozen layers are built as well; the viewer hides them (and off layers) when it opens.
+  unfreezeLayers(dxf);
   const t1 = performance.now();
   progress("build");
   const header = headerOf(dxf);
@@ -252,6 +258,7 @@ export async function buildScenes(input: SceneBuildInput, progress: Progress = (
     const origin = sceneOrigin(dxf.entities ?? [], !suppressPaperSpace);
     if (origin) s.origin = origin;
     await s.Build(dxf, fonts);
+    s.scene.layers = withLayerStates(s.scene.layers, layerStates);
     return s.scene;
   };
   const silence = console.log;

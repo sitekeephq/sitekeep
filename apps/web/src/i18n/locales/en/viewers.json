@@ -251,10 +251,17 @@
       "placeholder": "Search layers",
       "actions": {
         "allOn": "Turn All On",
-        "allOff": "Turn All Off"
+        "allOff": "Turn All Off",
+        "showFrozen": "Show Frozen and Off Layers ({{count}})"
       },
       "empty": "No layers.",
-      "noMatch": "No matching layers."
+      "noMatch": "No matching layers.",
+      "frozenHint": "Layers frozen or turned off in the drawing are hidden when it opens, as in AutoCAD.",
+      "state": {
+        "frozen": "Frozen",
+        "off": "Off",
+        "locked": "Locked"
+      }
     },
     "tools": {
       "length": "Length",

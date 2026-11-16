@@ -58,6 +58,7 @@ if Field is missing, they are skipped.
 | Administration → Forma Sync | `connect.ui.AdminFormaSyncSection`; the tab appears only when installed |
 | Project pages `edit/:fileId`, `forma-esitleme` | `WebModule.projectRoutes`; `LEGACY_URLS.module` |
 | Field forms | `field.externalForms` |
+| Privacy Centre → External Connections: `autodesk` | `registerPrivacyConnection` (SDK 0.15.0); older releases are declared by the core (`privacy/legacy-connections.ts`) |
 
 ## Tests
 

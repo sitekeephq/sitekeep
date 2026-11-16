@@ -19,6 +19,16 @@ describe("ISO19650-2 5.1.7(d) audit labels", () => {
     expect(auditSummary({ action: "member.added", details: null })).toBe("");
   });
 
+  it("summarises supersession links: superseded by and supersedes (ISO-12)", () => {
+    const pub = { fileId: "p", versionId: "pv", name: "A.pdf", version: 2, revisionCode: "C02", folderId: "f" };
+    expect(auditSummary({ action: "cde.superseded", details: { name: "A.pdf", version: 1, supersededBy: pub } })).toBe("A.pdf · version: 1 · yerini alan: A.pdf V2 · C02");
+    expect(
+      auditSummary({ action: "review.file_copied", targetName: "A.pdf", details: { name: "A.pdf", version: 2, supersedes: [{ ...pub, version: 1, revisionCode: "C01" }] } }),
+    ).toBe("A.pdf · version: 2 · yerini aldığı: A.pdf V1 · C01");
+    // Without links: the usual summary.
+    expect(auditSummary({ action: "cde.superseded", details: { name: "A.pdf", version: 1 } })).toBe("name: A.pdf · version: 1");
+  });
+
   it("builds the query without empty filters", () => {
     expect(auditQuery({ action: "file.*", userId: "", from: "2026-11-01" }, { cursor: 42, limit: 50 })).toBe("action=file.*&from=2026-11-01&cursor=42&limit=50");
   });

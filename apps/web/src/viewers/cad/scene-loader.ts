@@ -17,7 +17,7 @@ import { viewersApi } from "../../shared/api/api-viewers";
 export const PHONE_DXF_LIMIT = 60 * 1024 * 1024;
 /** Scene container: magic and format version (scene-worker.ts writes the same). */
 export const SCENE_MAGIC = "7DSCENE1";
-export const SCENE_FORMAT = 1;
+export const SCENE_FORMAT = 2;
 
 const MSG_SIGNATURE = "DxfWorkerMsg";
 

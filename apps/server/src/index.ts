@@ -17,6 +17,7 @@ import { startDueReminders } from "./workflow/reminders.js";
 import { LocalStorage } from "./core/platform/storage.js";
 import { mailerFromEnv } from "./works/letter.js";
 import { startOutboundCleanup } from "./privacy/outbound.js";
+import { startAuditPersonalRetention } from "./audit/personal.js";
 import { FALLBACK_LANGUAGE, render } from "./i18n/index.js";
 import { editionName } from "./app/module-ids.js";
 import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
@@ -123,6 +124,8 @@ app.log.info(`${editionName()} ready on :${port} (database: ${kind}, data: ${dat
 const stopReminders = startDueReminders(db, { log: (m, e) => console.error(m, e) });
 // Gizlilik Merkezi: outbound log rows older than the retention setting (default 90 days), daily.
 const stopOutboundCleanup = startOutboundCleanup(db, { log: (m, e) => console.error(m, e) });
+// Audit log: the personal part (IP, user agent, e-mail) of rows older than its retention (default 12 months), daily.
+const stopAuditRetention = startAuditPersonalRetention(db, { log: (m, e) => console.error(m, e) });
 // Modules' background work (Connect: Autodesk sync scheduler and interrupted file imports).
 const stopModules: (() => void)[] = [];
 for (const m of activeModules()) if (m.start) stopModules.push(await m.start({ db, jobs, log: (msg, e) => console.error(msg, e) }));
@@ -131,6 +134,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, async () => {
     stopReminders();
     stopOutboundCleanup();
+    stopAuditRetention();
     for (const stop of stopModules) stop();
     jobs.stop();
     await app.close();

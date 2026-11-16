@@ -6,8 +6,13 @@ import { SHARED_DEFAULT_LANGUAGE, sharedText } from "./i18n.js";
 
 export type PrivacyAiMode = "off" | "local_only" | "allow_external";
 
+/** Months the personal part of the audit log (IP, user agent, e-mail) is kept (Privacy Centre). */
+export const AUDIT_PERSONAL_RETENTION = { default: 12, min: 1, max: 120 } as const;
+
 export interface PrivacySettingsDto {
   logRetentionDays: number;
+  /** Personal part of the audit log (IP address, user agent, e-mail) is deleted after this many months. */
+  auditPersonalRetentionMonths: number;
   /** "İç ağ" list: exact host, "*.firma.com.tr" or an IPv4 range "10.20.0.0/16". */
   lanHosts: string[];
   /** "Yerel Modelde de Maskele". */
@@ -35,14 +40,15 @@ export interface PrivacySummaryDto {
   settings: PrivacySettingsDto;
 }
 
-export type PrivacyConnectionKind = "ai" | "smtp" | "office" | "mcp" | "ai_queue" | "oauth";
+/** "auth": sign-in with Google; "module": a connection a module declared (registerPrivacyConnection). */
+export type PrivacyConnectionKind = "ai" | "smtp" | "office" | "auth" | "module" | "mcp" | "ai_queue" | "oauth";
 
 export interface PrivacyConnectionDto {
-  /** "ai:<providerId>", "ai:env", "smtp", "office:editor", "office:converter", "mcp", "ai_queue", "oauth". */
+  /** "ai:<providerId>", "ai:env", "smtp", "office:editor", "office:converter", "google", a module's ("autodesk"), "mcp", "ai_queue", "oauth". */
   id: string;
   kind: PrivacyConnectionKind;
   name: string;
-  /** host[:port]; null when not configured or inbound only. */
+  /** host[:port] (several comma-separated); null when not configured or inbound only. */
   host: string | null;
   /** "local" = inside the network (private range or "iç ağ" list), "external" = outside, "inbound" = clients connect to the CDE. */
   location: "local" | "external" | "inbound";

@@ -13,7 +13,7 @@ import { oauthClients, tokens, users } from "../db/schema.js";
 import { HttpError, errorHandler } from "../core/platform/http.js";
 import { msg, render, requestLanguage } from "../i18n/index.js";
 import { logMethodHook } from "../core/platform/error-ring.js";
-import { clientInfo, withAuditClient } from "../core/platform/audit.js";
+import { clientInfo, setAuditPersonalKey, withAuditClient } from "../core/platform/audit.js";
 import { devToolsEnabled } from "../dev/flag.js";
 import { devRoutes } from "../dev/routes.js";
 import { authRoutes } from "../auth/routes.js";
@@ -86,6 +86,8 @@ function moduleGuard(id: string) {
 
 export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
   const secretKey = input.secretKey ?? randomBytes(32);
+  // Keyed hashes of personal values in the audit log (P1-5) use a key derived from the secret.
+  setAuditPersonalKey(secretKey);
   const converters = input.converters ?? new Converters();
   const office =
     input.office ?? new OfficeIntegration({ db: input.db, secretKey, converters, env: input.officeEnv ?? process.env });

@@ -62,6 +62,7 @@ export function FileHistoryPanel({ projectId, file }: Pick<FileCdeSlotProps, "pr
                       {e.ip}
                     </div>
                   )}
+                  {!e.ip && e.personalRemoved && <div className="muted small">{t(`audit.history.personalRemoved.${e.personalRemoved}`)}</div>}
                 </td>
                 <td data-label={t("audit.history.what")}>
                   <div>{auditActionLabel(e.action)}</div>

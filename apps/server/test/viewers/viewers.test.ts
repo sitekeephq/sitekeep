@@ -4,7 +4,7 @@ import path from "node:path";
 import { gunzipSync } from "node:zlib";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { ZipFile } from "yazl";
 import * as XLSX from "xlsx";
@@ -18,7 +18,7 @@ import { LocalStorage } from "../../src/core/platform/storage.js";
 import { Converters, ConverterTimeoutError, findSoffice, type ProcessRunner } from "../../src/previews/converters.js";
 import { officeText, pptxText } from "../../src/previews/office-text.js";
 import { cleanDxfText, decodeText, dxfInfo, parseSheet } from "../../src/previews/preview-worker.js";
-import { decodeScene } from "../../src/previews/scene-worker.js";
+import { decodeScene, SCENE_VERSION } from "../../src/previews/scene-worker.js";
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -446,7 +446,7 @@ describe("viewer API", () => {
     expect(out.body).toContain("Aks A-1 kolon");
 
     // The prebuilt 2D scene follows the DXF: gzip container, ETag revalidation.
-    expect(preview(s, "scene")).toMatchObject({ status: "ready", meta: { scene: { format: 1, model: null } } });
+    expect(preview(s, "scene")).toMatchObject({ status: "ready", meta: { scene: { format: SCENE_VERSION, model: null } } });
     expect(preview(s, "scene")!.meta.sceneModelKey).toBeUndefined();
     const sc = await call("GET", `/projects/${pid}/versions/${dwg}/preview/scene`);
     expect(sc.statusCode).toBe(200);
@@ -460,6 +460,16 @@ describe("viewer API", () => {
     expect(header.acadver).toBe("AC1032");
     const again = await call("GET", `/projects/${pid}/versions/${dwg}/preview/scene`, { "if-none-match": String(sc.headers.etag) });
     expect(again.statusCode).toBe(304);
+
+    // A scene of an older format (before frozen layers were built) is built again when the drawing is opened.
+    const [row] = await handle.db.select().from(versionPreviews).where(and(eq(versionPreviews.versionId, dwg), eq(versionPreviews.kind, "scene")));
+    await handle.db
+      .update(versionPreviews)
+      .set({ meta: { ...row!.meta, scene: { ...row!.meta.scene!, format: 1 } } })
+      .where(and(eq(versionPreviews.versionId, dwg), eq(versionPreviews.kind, "scene")));
+    expect(preview(await status(dwg), "scene")!.status).toBe("pending");
+    await jobs.drain();
+    expect(preview(await status(dwg), "scene")).toMatchObject({ status: "ready", meta: { scene: { format: SCENE_VERSION } } });
 
     const dxfVid = await upload("Kesit.dxf", Buffer.from(dxf([{ type: "TEXT", value: "Döşeme kotu +3.50" }], "  9\n$ACADVER\n  1\nAC1027\n")));
     await jobs.drain();

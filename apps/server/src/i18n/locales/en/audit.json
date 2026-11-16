@@ -16,6 +16,10 @@
       "userAgent": "User Agent",
       "details": "Details",
       "hash": "Hash"
+    },
+    "personalRemoved": {
+      "retention": "deleted (retention)",
+      "erased": "deleted (erased)"
     }
   }
 }

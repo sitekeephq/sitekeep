@@ -11,8 +11,14 @@
 import path from "node:path";
 import { openDb } from "../db/index.js";
 import { verifyAuditChain } from "../audit/query.js";
+import { existsSync } from "node:fs";
+import { loadSecretKey } from "../core/platform/secrets.js";
+import { setAuditPersonalKey } from "../core/platform/audit.js";
 
-const dbUrl = process.env.DATABASE_URL || path.join(path.resolve(process.env.DATA_DIR ?? "./data"), "db");
+const dataDir = path.resolve(process.env.DATA_DIR ?? "./data");
+const dbUrl = process.env.DATABASE_URL || path.join(dataDir, "db");
+// With the secret key at hand, personal records are checked against their hashes too (never creates a key).
+if (process.env.CDE_SECRET_KEY || existsSync(path.join(dataDir, "secret.key"))) setAuditPersonalKey(loadSecretKey(dataDir));
 let code = 1;
 try {
   const handle = await openDb(dbUrl);

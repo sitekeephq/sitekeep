@@ -125,7 +125,11 @@ IFC viewer limitations:
   Rows and columns are virtualised: 50 000+ rows scroll smoothly. Formulas are not calculated; the last value stored in the file is shown.
   Reading is done on the server with SheetJS; LibreOffice is not needed.
 - **DWG/DXF:** pan/zoom, **Fit** (the main body of the drawing; distant stray objects excluded) and **Show All**,
-  layer list (search, on/off, **Turn All On / Turn All Off**; `?layer=NAME` opens with only that layer on, used by the
+  layer list (search, on/off, **Turn All On / Turn All Off**; every layer with its state and colour: **frozen** and **off**
+  layers are hidden when the drawing opens, as in AutoCAD, and **Show Frozen and Off Layers** or their own tick shows them;
+  **locked** layers are shown and marked. dxf-viewer on its own drops frozen layers and draws off layers, so both the server's
+  scene and the browser's DXF worker build every layer and carry the states read from the LAYER table, `@sitekeep/shared`
+  `cad-layers.ts`; Fit covers the shown layers; `?layer=NAME` opens with only that layer on, used by the
   [version comparison](DOCUMENT_COMPARISON.md#drawings-and-models-dwg-dxf-ifc)), "Model Space Only", dark/light background, measurement tools
   and **Info** (below: "DWG/DXF measurement and inspection"). Noto Sans is embedded for Turkish characters. A separately loaded
   lazy chunk; parsing happens in a web worker. For old DXF files the code page (`$DWGCODEPAGE`, e.g. ANSI_1254) is read on the server.
@@ -210,7 +214,8 @@ does in the browser **once** itself and stores the result:
    Tools such as measurement and snapping read the same scene.
 
 **Scene file** (`7DSCENE1`): 8-byte magic word, 4-byte JSON length, JSON (format version; drawing header:
-`$INSUNITS`, `$MEASUREMENT`, `$EXTMIN/$EXTMAX`, `$ACADVER`; scene: batches, coloured layers, origin, bounds;
+`$INSUNITS`, `$MEASUREMENT`, `$EXTMIN/$EXTMAX`, `$ACADVER`; scene: batches, coloured layers with their states
+(`frozen`, `off`, `locked`; format 2 builds frozen layers too, and scenes of an older format are built again when opened), origin, bounds;
 buffer locations), then the 8-byte-aligned `vertices` (Float32), `indices` (Uint16), `transforms` (Float32) buffers.
 The buffers are written **byte-shuffled** (first all first bytes, then all second bytes…); this way gzip compresses floating-point
 data roughly twice as well. The browser decompresses gzip natively (`Content-Encoding: gzip`) and reverses the shuffle.

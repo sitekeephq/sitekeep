@@ -8,7 +8,11 @@
       "what": "Ne",
       "system": "Sistem",
       "loading": "Yükleniyor…",
-      "more": "Daha Fazla"
+      "more": "Daha Fazla",
+      "personalRemoved": {
+        "retention": "silindi (saklama süresi)",
+        "erased": "silindi (kişi talebi)"
+      }
     },
     "viewKinds": {
       "preview": "görüntüleyici",
@@ -242,5 +246,12 @@
     "save": "Geçişleri Kaydet",
     "saved": "Kaydedildi.",
     "anyWorkflow": "Herhangi bir inceleme"
+  },
+  "supersession": {
+    "supersededBy": "Yerini alan",
+    "supersedes": "Yerini aldığı",
+    "noAccess": "Bu dosyayı açma yetkiniz yok.",
+    "summaryBy": "yerini alan: {{target}}",
+    "summarySupersedes": "yerini aldığı: {{target}}"
   }
 }

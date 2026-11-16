@@ -8,7 +8,11 @@
       "what": "What",
       "system": "System",
       "loading": "Loading…",
-      "more": "Load More"
+      "more": "Load More",
+      "personalRemoved": {
+        "retention": "deleted (retention)",
+        "erased": "deleted (erased)"
+      }
     },
     "viewKinds": {
       "preview": "viewer",
@@ -242,5 +246,12 @@
     "save": "Save Transitions",
     "saved": "Saved.",
     "anyWorkflow": "Any review"
+  },
+  "supersession": {
+    "supersededBy": "Superseded by",
+    "supersedes": "Supersedes",
+    "noAccess": "You cannot open this file.",
+    "summaryBy": "superseded by {{target}}",
+    "summarySupersedes": "supersedes {{target}}"
   }
 }

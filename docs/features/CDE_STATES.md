@@ -28,6 +28,7 @@ mapping, the steps to switch the rules on and the conformance test pack (`npm ru
 | **Document code** | `files.document_code`, register `document_codes (project_id, code_norm) → container_id` | Unique per project: one code belongs to one container. Only names that follow the project's naming standard get a code; the same code with another extension is a rendition of the same document |
 | **Suitability and revision codes** | `file_versions.suitability_code`, `revision_code`, `codes_set_by`, `codes_set_at` | Per version. Profiles: `iso_uk_na` (S0, S1–S4, A1…, B1…, CR; P01.01 → P01 → C01), `legacy_r` (R00), `custom`, `letter_rev` (A, B, C …) |
 | **Status flag** | `files.cde_status`: `returned`, `superseded`, `withdrawn` | Beside the state: a rejected WIP original is *returned*, its Shared copy *withdrawn*; a publication replaced by a newer one is *superseded*. Nothing is moved physically |
+| **Supersession** (ISO-12) | `cde_supersessions (version_id, superseded_version_id, project_id, review_id, created_at)`, migration 0050 | Which version replaced which: the new published version and the archive copy it replaced (and a publication in another place it made superseded). Read both ways: the archived file is *superseded by*, the new one *supersedes* ([below](#supersession-iso-12)) |
 | **Task team** | `project_roles.kind = 'task_team'` (+ `company_id`, `code`, `is_lead`); `folders.owner_team_id` | A kind of project role, one per company; a person may belong to several teams. A WIP folder can be owned by one team ([task teams](TASK_TEAMS.md)) |
 | **Audit trail** | `audit_log` (+ `prev_hash`, `hash`, `ip`, `user_agent`; indexes by project/action, target, user) | Append-only and hash-chained (migration 0043); `file.viewed`, `file.moved`, `cde.transition`; IP and user agent ([privacy](PRIVACY.md#audit-log-ip-address-and-user-agent)). See [audit log](AUDIT_LOG.md) |
 
@@ -224,7 +225,7 @@ before ISO-1 (the folder review gate of the folder settings still applies).
 | Move (`PATCH /files/:id`, `checkMove`) | The transition (from state → to state) must be `direct`: `review` → 403 naming the workflow, `auto` → 403 (done by the system), `forbidden` or no row → 403. A move inside one state is no transition. Leaving the CDE (into a folder without a state) is allowed from WIP only. `requireReason` asks for `reason` |
 | Review start (`prepareReview`, preview and start) | For each file, the transition (source state → target state) must be `review` (or `direct`) and, when the table names a workflow template, the review must use it; otherwise the start is refused and the preview lists the problem. The suitability chosen for the copies must fit the target state |
 | Approved review copy (`copyApprovedFiles`) | The copy keeps the document's container; its version gets the suitability chosen at the start (stored in the start action, `targetSuitability`; else the source's when it fits, else the state's first: S1, A1) and the next revision (`nextRevision` over the container's revisions: P01.03 → P01, → C01 …). Audit `cde.transition` (mode `review`). A new approved version clears a `withdrawn` / `superseded` flag on the target file |
-| Archive on publication (D-10, `cde/archive.ts`) | Before a new version is published, each current publication of the same container (a file in a Published folder without a status flag) is copied into the archive folder (`archive_folder_id`) at the same path it has below its Published folder (`ensureFolderPath`): same storage key, no byte copy, same codes. The archive copy is flagged `superseded` (a later superseded publication of the same document becomes a new version of it); a publication in another place than the new one is flagged `superseded` too. Audit `cde.superseded` and `cde.transition` (published → archived, mode `auto`) |
+| Archive on publication (D-10, `cde/archive.ts`) | Before a new version is published, each current publication of the same container (a file in a Published folder without a status flag) is copied into the archive folder (`archive_folder_id`) at the same path it has below its Published folder (`ensureFolderPath`): same storage key, no byte copy, same codes. The archive copy is flagged `superseded` (a later superseded publication of the same document becomes a new version of it); a publication in another place than the new one is flagged `superseded` too. Audit `cde.superseded` (with `supersededBy`) and `cde.transition` (published → archived, mode `auto`), written once the new version exists; the copy is linked to it ([supersession](#supersession-iso-12)) |
 | Rejection (D-2, `cde/rejection.ts`, `afterEvaluate`) | A file sent back (`rejected`, `revise_resubmit`; stopped in a stop stage or decided so at the end): its WIP original (the file itself when it is in WIP, else the container's files in WIP) is flagged `returned`, the current version's suitability goes back to S0 (ISO profiles), and the members of the task team owning its WIP folder are notified (`cde.returned`; the uploader when no team owns it). A Shared copy refused for publication is flagged `withdrawn`. Audit `cde.returned`, `cde.withdrawn`, `cde.transition` (shared → wip, mode `auto`). Nothing is moved. A new version of the WIP file clears `returned` |
 | Project administrators | No silent bypass: the routes above refuse them like anyone. `POST /api/v1/projects/:pid/files/:id/transition { toFolderId, reason }` moves a file whatever the table says (naming standard and document code still apply); project administrators only, reason required; audit `cde.override` (`what: "transition"`), `file.moved`, `cde.transition` with the reason |
 
@@ -238,6 +239,34 @@ folder) and in the file drawer open the review dialog with the workflow and the 
 transition table; the dialog shows the transition, the suitability of the copies (enforced projects)
 and the proposed revision per file. Badges **Returned**, **Superseded**, **Withdrawn** beside the codes
 in the list and in the file drawer; the administrator override in the file drawer (folder and reason).
+
+### Supersession (ISO-12)
+
+ISO 19650-1 §12.5 asks that superseded information is marked as such and linked to what replaced it.
+When a publication archives the current one (above), `recordArchive` (`apps/server/src/cde/archive.ts`)
+stores a row in `cde_supersessions` for each archive copy (and for a publication in another place that it
+flagged superseded): `version_id` is the new published version, `superseded_version_id` the archived one.
+An archive copy that collects several publications of the same document as versions has one link per
+version.
+
+- **API.** `GET /api/v1/projects/:pid/files/:id` returns, per version (`latest` and `versions[]`),
+  `supersededBy` and `supersedes`: lists of `SupersessionLinkDto` (`fileId`, `folderId`, `versionId`,
+  `name`, `version`, `revisionCode`, `suitabilityCode`, `at`), left out when empty
+  (`apps/server/src/cde/supersessions.ts`). A file the caller cannot see (no view on its folder, the
+  task-team WIP rule, in the trash) comes without `fileId`, `folderId` and `versionId`: the name only.
+- **Audit.** `cde.superseded` on the archive copy carries `supersededBy` (`fileId`, `versionId`, `name`,
+  `version`, `revisionCode`, `folderId`); `review.file_copied` of the new publication carries `supersedes`
+  (a list of the same). Both show in the file's **Audit History** ("superseded by …", "supersedes …").
+  When the new version cannot be stored after the archive copy was made, `cde.superseded` is written
+  without `supersededBy` and nothing is linked.
+- **Web.** The file drawer shows **Superseded by** / **Supersedes** under the codes for the current
+  version, and in the version history for older versions of an archive copy; each entry opens the other
+  file in its folder, or is plain text when the user cannot see it
+  (`apps/web/src/features/documents/components/cde/SupersessionLinks.tsx`).
+- **Existing data.** Migration 0050 backfills the archive copies made before it from the audit log: the
+  `cde.superseded` event names the archive copy and the review, and the review's approved copy in the same
+  container is the version that replaced it. Copies whose review copy is gone stay unlinked (the
+  **Superseded** flag remains).
 
 ## Where the rules run
 
@@ -265,6 +294,7 @@ migration 0042): `DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.
 |---|---|
 | Data model, settings, template block, seams (this page) | done; no behaviour change |
 | Transitions enforced, archive on publication, returned / withdrawn on rejection ([transitions](#transitions)) | done |
+| Superseded by / supersedes links (ISO-12, [supersession](#supersession-iso-12)) | done |
 | Suitability and revision codes per version ([codes](#codes)) | done |
 | Unique document codes ([details](DOCUMENT_CODES.md)) | done |
 | Task teams and WIP visibility ([task teams](TASK_TEAMS.md)) | done |

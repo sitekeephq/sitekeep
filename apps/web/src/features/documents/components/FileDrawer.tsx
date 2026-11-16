@@ -12,7 +12,7 @@ import { AttributeInput } from "../../../shared/ui/AttributeInput";
 import { FileTransferDialog } from "./FileTransferDialog";
 import { WhoCanSeeDialog } from "./WhoCanSeeDialog";
 import { webCapability } from "../../../sdk";
-import { FileCdeChips, FileCdePanel } from "./cde/FileCdeSlots";
+import { FileCdeChips, FileCdePanel, VersionCdeNote } from "./cde/FileCdeSlots";
 
 // Parameter change bits come from the Coordinate module; without it the hook returns nothing. Read when
 // used: modules are turned on at start (app/modules.ts), after this file loads; fixed for the session.
@@ -333,6 +333,7 @@ export function FileDrawer({
                         {formatDate(v.uploadedAt)} · {formatSize(v.size)}
                       </div>
                       {v.comment && <div className="small">{v.comment}</div>}
+                      <VersionCdeNote projectId={projectId} file={file} version={v} />
                       {paramFile && <paramFile.VersionBadge status={paramStatus} versionId={v.id} />}
                       {approvals
                         ?.filter((x) => x.versionId === v.id)

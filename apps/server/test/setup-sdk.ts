@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { registerTurkishLabels } from "@sitekeep/shared";
 import { moduleIds } from "../src/app/module-ids.js";
 import { registerLocaleFolder } from "../src/i18n/index.js";
+import { registerLegacyConnections } from "../src/privacy/legacy-connections.js";
 
 // The installed modules' texts and label tables, as loading the modules does (app/modules.ts and each
 // module's entry): tests that import a module's internals directly render its messages and labels too.
@@ -24,3 +25,6 @@ for (const id of moduleIds()) {
     }
   }
 }
+// …and the outbound connections the core declares for module releases that predate
+// registerPrivacyConnection (app/modules.ts): the SDK's outboundFetch refuses undeclared ones.
+registerLegacyConnections(moduleIds());

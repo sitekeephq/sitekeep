@@ -27,6 +27,7 @@ import type { ResolvedDeps } from "../app/deps.js";
 import { versionPreviews, versionTexts } from "../db/schema.js";
 import { HttpError, badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
 import { officePdfAvailable, previewsOf, queuePreview, registerPreviewJobs, sceneWanted } from "../previews/service.js";
+import { SCENE_VERSION } from "../previews/scene-worker.js";
 import { loadVersion, requireView } from "../modules/documents/files.js";
 import { clientInfo, recordView } from "../cde/events.js";
 import { msg, requestLanguage } from "../i18n/index.js";
@@ -92,6 +93,9 @@ export async function previewRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     // Drawings converted before the prebuilt 2D scene existed get it now.
     const dxf = rows.find((r) => r.kind === "dxf");
     if (dxf?.status === "ready" && sceneWanted(dxf.meta) && !rows.some((r) => r.kind === "scene")) missing.push("scene");
+    // Scenes of an older format are built again (format 2 added frozen layers and layer states).
+    const scene = rows.find((r) => r.kind === "scene");
+    if (dxf?.status === "ready" && scene?.status === "ready" && scene.meta.scene && scene.meta.scene.format !== SCENE_VERSION && !missing.includes("scene")) missing.push("scene");
     if (missing.length) {
       for (const k of missing) await queuePreview(db, jobs, version.id, k);
       rows = await previewsOf(db, version.id);

@@ -20,6 +20,15 @@ import { clientInfo, recordTransition, recordView } from "../../cde/events.js";
 import { cdeStateOf } from "../../cde/state.js";
 import { warningDtos } from "../../cde/codes.js";
 import { cleanFileName, toFileDto, toVersionDto } from "./mapper.js";
+import { supersessionsOf, type VersionSupersessions } from "../../cde/supersessions.js";
+
+/** Only the non-empty sides go into the version DTO. */
+function withLinks(s: VersionSupersessions | undefined) {
+  return {
+    ...(s?.supersededBy.length ? { supersededBy: s.supersededBy } : {}),
+    ...(s?.supersedes.length ? { supersedes: s.supersedes } : {}),
+  };
+}
 import { ensureGeometryUpgrade } from "../../model/service.js";
 
 export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
@@ -155,7 +164,10 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       .orderBy(desc(fileVersions.version));
     const names = await userNames(db, versions.map((v) => v.uploadedBy));
     const current = versions.find((v) => v.version === file.currentVersion)!;
-    return { ...toFileDto(file, current, names), versions: versions.map((v) => toVersionDto(v, names)) };
+    // ISO-12: what replaced each version and what it replaced, linked where the caller may look.
+    const links = await supersessionsOf(db, a.project.id, versions.map((v) => v.id), tree, a);
+    const dto = (v: (typeof versions)[number]) => ({ ...toVersionDto(v, names), ...withLinks(links.get(v.id)) });
+    return { ...toFileDto(file, current, names), latest: dto(current), versions: versions.map(dto) };
   });
 
   api.patch<{ Params: { pid: string; id: string } }>("/projects/:pid/files/:id", async (req) => {

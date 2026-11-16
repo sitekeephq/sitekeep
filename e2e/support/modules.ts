@@ -13,11 +13,16 @@ export type ModuleId = "cost" | "field" | "coordinate" | "planning" | "ai" | "ma
 const root = path.resolve(__dirname, "../..");
 const cache = new Map<ModuleId, boolean>();
 
-/** The module's package is installed at the repository root (node_modules/@7dimensions-project/sitekeep-ee-<id>). */
+/**
+ * The module's package is installed: at the repository root or, when npm could not hoist it, under the
+ * server workspace (node_modules/@7dimensions-project/sitekeep-ee-<id>), which is where the server loads it from.
+ */
 export function moduleInstalled(id: ModuleId): boolean {
   let hit = cache.get(id);
   if (hit === undefined) {
-    hit = existsSync(path.join(root, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`, "package.json"));
+    hit = ["", "apps/server"].some((dir) =>
+      existsSync(path.join(root, dir, "node_modules/@7dimensions-project", `sitekeep-ee-${id}`, "package.json")),
+    );
     cache.set(id, hit);
   }
   return hit;

@@ -421,10 +421,12 @@
       "always": "In every prompt to AI outside the network, e-mail addresses, phone numbers, Turkish ID numbers and IBANs are always replaced with placeholders. The originals are put back when the answer is shown to you; the mapping is kept in memory only for that call.",
       "fields": {
         "retention": "Log Retention Period (days)",
-        "lanHosts": "Internal Network Servers"
+        "lanHosts": "Internal Network Servers",
+        "auditRetention": "Audit Log Personal Data Retention (months)"
       },
       "lanPlaceholder": "ai.company.com\n*.company.local\n100.64.0.0/10",
-      "lanHelp": "Servers that are on your network even though their names look public (one name per line, \"*.domain\" or an IPv4 range). Private IP ranges and single-label names are already local. The entries in this list count as local: they keep working while all external connections are off, and AI prompts to them are not masked."
+      "lanHelp": "Servers that are on your network even though their names look public (one name per line, \"*.domain\" or an IPv4 range). Private IP ranges and single-label names are already local. The entries in this list count as local: they keep working while all external connections are off, and AI prompts to them are not masked.",
+      "auditRetentionHelp": "IP addresses, browser details and e-mail addresses in the audit log are deleted once this period has passed ({{min}}–{{max}} months). The entries themselves stay, and the chain check still passes."
     },
     "location": {
       "local": "Local Network",

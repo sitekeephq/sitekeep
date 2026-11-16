@@ -1,8 +1,9 @@
 /**
  * ISO19650-2 5.1.7(c) / -1 12.2-12.5 state transition (docs/features/CDE_STATES.md "Transitions"): a WIP
  * document goes to Shared through review; a direct upload into Published is refused when the project
- * enforces the rules. Core only: passes with and without modules. Uses its own project, so switching
- * enforcement on does not touch the other specs.
+ * enforces the rules. ISO19650-1 12.5 supersession (ISO-12): an archived copy and the publication that
+ * replaced it link to each other in the file drawer. Core only: passes with and without modules. Uses
+ * its own project, so switching enforcement on does not touch the other specs.
  */
 import type { APIRequestContext, APIResponse } from "@playwright/test";
 import { test, expect } from "../support/fixtures";
@@ -87,4 +88,77 @@ test("ISO19650-2 5.1.7(c) / -1 12.2-12.5 state transition: a WIP file goes to Sh
   expect(((await refused.json()) as { message: string }).message).toMatch(/Yayınlanan durumuna doğrudan dosya yazılamaz/);
   await page.goto(`/projects/${project.id}/files/${published}`);
   await expect(page.locator(".docs-toolbar .badge.warn")).toBeVisible();
+});
+
+test("ISO19650-1 12.5 supersession: the archived copy links to the publication that replaced it, and back", async ({ page }) => {
+  test.setTimeout(90_000);
+  const { project, wip, shared, published } = await enforcedProject(page.request);
+  const pid = project.id;
+  const contents = await json<{ folders: { id: string; state: string | null }[] }>(
+    await page.request.get(`/api/v1/projects/${pid}/folders/${project.rootFolderId}/contents`),
+    "root contents",
+  );
+  const archived = contents.folders.find((f) => f.state === "archived")!.id;
+  await json(await page.request.put(`/api/v1/projects/${pid}/cde/settings`, { data: { enforceTransitions: true, archiveFolderId: archived } }), "archive folder");
+  const templates = await json<{ id: string; name: string }[]>(await page.request.get(`/api/v1/projects/${pid}/workflow-templates`), "workflows");
+  const templateId = templates.find((t) => t.name === "E2E team check")!.id;
+  const name = `SUP-${Date.now().toString(36)}.txt`;
+  const fileIn = async (folderId: string) => {
+    const c = await json<{ files: { id: string; name: string }[] }>(await page.request.get(`/api/v1/projects/${pid}/folders/${folderId}/contents`), "contents");
+    return c.files.find((f) => f.name === name)!.id;
+  };
+  const latestVersion = async (fileId: string) =>
+    (await json<{ latest: { id: string } }>(await page.request.get(`/api/v1/projects/${pid}/files/${fileId}`), "file")).latest.id;
+  const approve = async (versionId: string, targetFolderId: string, targetSuitability: string) => {
+    const r = await json<{ id: string; files: { id: string }[] }>(
+      await page.request.post(`/api/v1/projects/${pid}/reviews`, {
+        data: { templateId, versionIds: [versionId], targetFolderId, name: `R ${Math.random()}`, targetSuitability },
+      }),
+      "review",
+    );
+    await json(
+      await page.request.post(`/api/v1/projects/${pid}/reviews/${r.id}/submit`, {
+        data: { files: r.files.map((f) => ({ reviewFileId: f.id, outcome: "approved" })) },
+      }),
+      "approval",
+    );
+  };
+  // Two revisions published (C01, then C02): the second archives the first.
+  for (const [i, suitability] of [
+    [1, "A1"],
+    [2, "A2"],
+  ] as const) {
+    await json(
+      await page.request.post(`/api/v1/projects/${pid}/folders/${wip}/files`, {
+        multipart: { file: { name, mimeType: "text/plain", buffer: Buffer.from(`revision ${i}`) } },
+      }),
+      "WIP upload",
+    );
+    await approve(await latestVersion(await fileIn(wip)), shared, "S2");
+    await approve(await latestVersion(await fileIn(shared)), published, suitability);
+  }
+  const pubId = await fileIn(published);
+  const arcId = await fileIn(archived);
+
+  // The publication: "Yerini aldığı" links to the archive copy.
+  await page.goto(`/projects/${pid}/files/${published}?file=${pubId}`);
+  const drawer = page.locator("aside.drawer");
+  const supersedes = drawer.getByTestId("supersession-supersedes");
+  await expect(supersedes).toContainText("Yerini aldığı:");
+  await expect(supersedes.getByRole("link", { name: `${name} V1 · C01` })).toBeVisible();
+  await supersedes.getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`/files/${archived}\\?file=${arcId}`));
+
+  // The archive copy: superseded, and "Yerini alan" links back to the publication.
+  await expect(drawer.getByTestId("cde-status")).toHaveText("Yenisi Yayınlandı");
+  const by = drawer.getByTestId("supersession-supersededBy");
+  await expect(by).toContainText("Yerini alan:");
+  await expect(by.getByRole("link", { name: `${name} V2 · C02` })).toBeVisible();
+  // The file's audit history names the publication as well.
+  const history = drawer.locator("details.file-audit-history");
+  await history.getByText("Denetim Geçmişi", { exact: true }).click();
+  await expect(history.getByText(`yerini alan: ${name} V2 · C02`)).toBeVisible();
+  await by.getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`/files/${published}\\?file=${pubId}`));
+  await expect(drawer.getByTestId("supersession-supersedes")).toBeVisible();
 });

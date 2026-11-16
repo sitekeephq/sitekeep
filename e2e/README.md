@@ -32,6 +32,9 @@ coverage for critical browser journeys:
 - version comparison (FP-1, Community): two IFC versions on the comparison page (changed elements by class and storey,
   filters, search, the link into the 3D viewer's colours, the Excel link) and two DXF versions per layer (text change,
   added layer, the layer link into the CAD viewer);
+- CAD layer panel (Community): `fixtures/layers.dxf` with a frozen, an off and a locked layer, on the server-built 2D
+  scene and on the DXF parsed in the browser: every layer listed with its state and colour, frozen and off layers
+  hidden when the drawing opens, the "Donmuş ve Kapalı Katmanları Göster" toggle and a single layer turned on;
 - 2D take-off (2B Metraj): a fixture PDF (`fixtures/takeoff-plan.pdf`, 600 × 400 pt with a 10 m line) opened from
   the PDF viewer, page calibration, an area priced by a unit price, a deducted opening, a length and a count,
   editing and deleting (confirm dialog), the Excel download, **Metraja Ekle** in the CAD viewer for `tiny.dxf`
@@ -81,8 +84,8 @@ live, shared, customer, or production data.
 ## Enterprise modules and SiteKeep Community
 
 The suite runs both with the Enterprise module packages installed and in SiteKeep Community, where no
-`@7dimensions-project/sitekeep-ee-*` package is in `node_modules` (delete them, rebuild `@sitekeep/web`, run
-the suite). `e2e/support/modules.ts` reads which packages are installed: `moduleInstalled(id)` checks one
+`@7dimensions-project/sitekeep-ee-*` package is installed (delete them from `node_modules`, `apps/server/node_modules`
+and `apps/web/node_modules`, rebuild `@sitekeep/web`, run the suite). `e2e/support/modules.ts` reads which packages are installed: `moduleInstalled(id)` checks one
 module, `needsModules(...ids)` skips the file (at top level) or the test (inside it) with the reason
 "needs SiteKeep Enterprise module(s): …", and `withInstalled(list)` drops the entries of a route, tab or
 dialog list whose `module` is not installed. A spec about one module calls `needsModules` at the top; a

@@ -4,16 +4,16 @@
  * and revision, archive on publication (D-10), returned / withdrawn on rejection (D-2), the
  * administrator override and the module paths (assertDirectWriteAllowed, folderGate).
  */
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
-import { auditLog, fileVersions, files, folders, memberRoles, notifications, projectRoles, users } from "../../src/db/schema.js";
+import { auditLog, cdeSupersessions, fileVersions, files, folders, memberRoles, notifications, projectRoles, users } from "../../src/db/schema.js";
 import { JobQueue } from "../../src/jobs/queue.js";
 import { LocalStorage } from "../../src/core/platform/storage.js";
 import { FolderTree } from "../../src/core/security/access.js";
@@ -295,6 +295,77 @@ describe("ISO19650-2 5.1.7(c) / -1 12.2-12.5 state transition: review start, app
     const [mirror] = await handle.db.select().from(folders).where(and(eq(folders.parentId, F.archived), eq(folders.name, "Mimari")));
     expect(mirror).toBeTruthy();
     expect((await fileIn(mirror!.id, "DOC-2.pdf"))?.cdeStatus).toBe("superseded");
+  });
+});
+
+describe("ISO19650-1 12.5 supersession: superseded by and supersedes links (ISO-12)", () => {
+  type Link = { fileId: string | null; folderId: string | null; versionId: string | null; name: string; version: number; revisionCode: string | null };
+
+  it("links the archive copy and the publication that replaced it, both ways: file DTO, audit details, file history", async () => {
+    const pub = (await fileIn(F.published, "DOC-1.pdf"))!;
+    const archived = (await fileIn(F.archived, "DOC-1.pdf"))!;
+    const pubV2 = await latest(pub.id);
+    const arcV1 = await latest(archived.id);
+
+    const a = (await admin.get(`${P()}/files/${archived.id}`)).body;
+    expect(a.latest.supersededBy).toEqual([
+      expect.objectContaining({ fileId: pub.id, folderId: F.published, versionId: pubV2.version.id, name: "DOC-1.pdf", version: 2, revisionCode: "C02", suitabilityCode: "A2" }),
+    ]);
+    expect(a.latest.supersedes).toBeUndefined();
+    const p = (await admin.get(`${P()}/files/${pub.id}`)).body;
+    expect(p.latest.supersedes).toEqual([expect.objectContaining({ fileId: archived.id, folderId: F.archived, versionId: arcV1.version.id, version: 1, revisionCode: "C01" })]);
+    expect(p.versions.find((v: { version: number }) => v.version === 1).supersedes).toBeUndefined();
+
+    const superseded = await handle.db.select().from(auditLog).where(and(eq(auditLog.action, "cde.superseded"), eq(auditLog.targetId, archived.id)));
+    expect(superseded[0]!.details).toMatchObject({ supersededBy: { fileId: pub.id, versionId: pubV2.version.id, version: 2, revisionCode: "C02" } });
+    const copied = await handle.db.select().from(auditLog).where(and(eq(auditLog.action, "review.file_copied"), eq(auditLog.targetId, pub.id)));
+    expect(copied.find((c) => (c.details as { version: number }).version === 2)!.details).toMatchObject({
+      supersedes: [{ fileId: archived.id, versionId: arcV1.version.id, version: 1, revisionCode: "C01" }],
+    });
+    const history = (await admin.get(`${P()}/files/${archived.id}/history`)).body.entries as { action: string; details: Record<string, unknown> }[];
+    expect(history.find((e) => e.action === "cde.superseded")!.details.supersededBy).toMatchObject({ fileId: pub.id, versionId: pubV2.version.id });
+  });
+
+  it("links every version of the archive copy to its own replacement", async () => {
+    const wip = (await fileIn(F.wip, "DOC-1.pdf"))!;
+    const shared = (await fileIn(F.shared, "DOC-1.pdf"))!;
+    await eda.upload(`${P()}/folders/${F.wip}/files`, "DOC-1.pdf");
+    await review(teamCheck, [(await latest(wip.id)).version.id], F.shared, "approved", { targetSuitability: "S2" });
+    await review(publication, [(await latest(shared.id)).version.id], F.published, "approved", { targetSuitability: "A3" });
+    const pub = (await fileIn(F.published, "DOC-1.pdf"))!;
+    const archived = (await fileIn(F.archived, "DOC-1.pdf"))!;
+    const a = (await admin.get(`${P()}/files/${archived.id}`)).body;
+    const by = (n: number) => (a.versions.find((v: { version: number }) => v.version === n).supersededBy as Link[]).map((l) => [l.fileId, l.version, l.revisionCode]);
+    expect(by(1)).toEqual([[pub.id, 2, "C02"]]);
+    expect(by(2)).toEqual([[pub.id, 3, "C03"]]);
+    const p = (await admin.get(`${P()}/files/${pub.id}`)).body;
+    expect((p.latest.supersedes as Link[]).map((l) => [l.fileId, l.version, l.revisionCode])).toEqual([[archived.id, 2, "C02"]]);
+  });
+
+  it("names a file the caller cannot see without linking it", async () => {
+    const pub = (await fileIn(F.published, "DOC-1.pdf"))!;
+    const archived = (await fileIn(F.archived, "DOC-1.pdf"))!;
+    // Eda edits WIP, Shared and Published but has no access to the archive.
+    expect((await eda.get(`${P()}/files/${archived.id}`)).status).toBe(404);
+    const p = (await eda.get(`${P()}/files/${pub.id}`)).body;
+    expect(p.latest.supersedes).toEqual([{ fileId: null, folderId: null, versionId: null, name: "DOC-1.pdf", version: 2, revisionCode: "C02", suitabilityCode: "A2", at: expect.any(String) }]);
+    // The administrator sees the link.
+    expect((await admin.get(`${P()}/files/${pub.id}`)).body.latest.supersedes[0].fileId).toBe(archived.id);
+  });
+
+  it("backfills the archive copies made before migration 0050 from the audit log", async () => {
+    const before = await handle.db.select().from(cdeSupersessions).where(eq(cdeSupersessions.projectId, pid));
+    expect(before.length).toBeGreaterThanOrEqual(3);
+    await handle.db.delete(cdeSupersessions).where(eq(cdeSupersessions.projectId, pid));
+    const migration = readFileSync(path.join(import.meta.dirname, "../../drizzle/0050_cde_supersessions.sql"), "utf8");
+    const backfill = migration.slice(migration.indexOf("INSERT INTO"));
+    await handle.db.execute(sql.raw(backfill));
+    const after = await handle.db.select().from(cdeSupersessions).where(eq(cdeSupersessions.projectId, pid));
+    const pairs = (rows: (typeof before)[number][]) => rows.map((r) => `${r.versionId}>${r.supersededVersionId}`).sort();
+    expect(pairs(after)).toEqual(pairs(before));
+    // Idempotent.
+    await handle.db.execute(sql.raw(backfill));
+    expect(await handle.db.select().from(cdeSupersessions).where(eq(cdeSupersessions.projectId, pid))).toHaveLength(after.length);
   });
 });
 

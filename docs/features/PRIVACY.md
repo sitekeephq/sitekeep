@@ -14,15 +14,16 @@ SiteKeep is a privacy-first CDE. This document describes what leaves the server,
 
 In the default installation, the server makes no connections outside the network. The following run only if an administrator configures them.
 
-| Connection | When | What is sent | Purpose in the log |
+| Connection (id) | When | What is sent | Purpose in the log |
 |---|---|---|---|
-| AI provider (Ollama, vLLM, DeepSeek, Claude…) | When an AI feature is used | Prompt: the question, summaries of related records. Personal data is masked in prompts that leave the network. | `yapay_zeka:<sağlayıcı>` |
-| Report model (`AI_BASE_URL`) | When the report builder is used | Dataset schema and the request | `yapay_zeka:rapor` |
-| Email server (SMTP) | When an official letter is sent with "Send"; when a person without an account is [invited](INVITATIONS.md) (or the invitation is sent again) | Letter text and PDF attachment, recipients; for an invitation: the invited address, the inviter's and the project's name and the single-use link | `eposta` (invitations: detail `kind: invitation`) |
-| Office editor (ONLYOFFICE / Collabora) | Editor settings and opening a file | Server: only the discovery request. The editor fetches the file from the CDE itself over WOPI. | `ofis:onlyoffice`, `ofis:collabora` |
-| Office → PDF converter (ONLYOFFICE, Collabora, Gotenberg) | Office file preview | The file to convert | `ofis:<dönüştürücü>` |
-| Sign in with Google | When a user chooses Google sign-in | OAuth code; the verified email information is then received | `giris:google` — [Sign in with Google](GOOGLE_SIGN_IN.md) |
-| Autodesk APS / ACC | When a project administrator sets up the connection and when sync runs | OAuth code and read-only project API requests; ACC records are brought into the CDE | `entegrasyon:autodesk` |
+| AI provider (Ollama, vLLM, DeepSeek, Claude…) (`ai:<providerId>`) | When an AI feature is used | Prompt: the question, summaries of related records. Personal data is masked in prompts that leave the network. | `yapay_zeka:<sağlayıcı>` |
+| Report model (`AI_BASE_URL`) (`ai:env`) | When the report builder is used | Dataset schema and the request | `yapay_zeka:rapor` |
+| Personal Claude API / Cursor (`ai:personal:anthropic`, `ai:personal:cursor`; AI module) | When a user runs an AI feature with their own key | As for an AI provider | `yapay_zeka:anthropic`, `yapay_zeka:cursor` |
+| Email server (SMTP) (`smtp`) | When an official letter is sent with "Send"; when a person without an account is [invited](INVITATIONS.md) (or the invitation is sent again) | Letter text and PDF attachment, recipients; for an invitation: the invited address, the inviter's and the project's name and the single-use link | `eposta` (invitations: detail `kind: invitation`) |
+| Office editor (ONLYOFFICE / Collabora) (`office:editor`) | Editor settings and opening a file | Server: only the discovery request. The editor fetches the file from the CDE itself over WOPI. | `ofis:onlyoffice`, `ofis:collabora` |
+| Office → PDF converter (ONLYOFFICE, Collabora, Gotenberg) (`office:converter`) | Office file preview | The file to convert | `ofis:<dönüştürücü>` |
+| Sign in with Google (`google`) | When a user chooses Google sign-in | OAuth code to `oauth2.googleapis.com`; the verified email information is then read from `openidconnect.googleapis.com` | `giris:google` — [Sign in with Google](GOOGLE_SIGN_IN.md) |
+| Autodesk APS / ACC (`autodesk`; Connect module) | When a project administrator sets up the connection and when sync runs | OAuth code and read-only project API requests to `developer.api.autodesk.com`; file content is downloaded from the short-lived signed addresses Autodesk gives. ACC records are brought into the CDE | `entegrasyon:autodesk` |
 
 Switching **Email server (SMTP)** off in External Connections (or the kill switch, for a server outside
 the network) stops invitation e-mails too: the invitation is still created and the inviter gets the
@@ -52,20 +53,37 @@ Content, prompts, responses and file names are not recorded. Records are kept fo
 
 ## Audit log: IP address and user agent
 
-The [audit log](AUDIT_LOG.md) stores, with every row written during a request, the client's **IP
+The [audit log](AUDIT_LOG.md) stores, for every row written during a request, the client's **IP
 address** and the browser's **user agent** (at most 500 characters), next to the person, the time and
 what they did. This includes viewing a document (once per person, version and 15 minutes),
 downloading, moving, deleting, restoring and permission changes (decision D-9 of the ISO 19650 work).
+E-mail addresses an event names (a failed sign-in, an invitation) are personal data of the same kind.
+
+These values are kept **apart from the hash chain**, in `audit_personal`, so they can be deleted
+without breaking it ([personal data](AUDIT_LOG.md#personal-data)). The chained row keeps only a keyed
+hash (HMAC with a key derived from the installation's secret key): a failed sign-in for an unknown
+address records the hash of the address, not the address, and the account when the address belongs
+to one.
 
 - **Purpose:** an ISO 19650 audit trail that shows who acted, when and from where; evidence in
   disputes and security investigations.
 - **Who sees it:** project administrators (their project's log, CSV) and system administrators (the
   whole log). Other members see a file's history without IP address and user agent.
 - **Behind a reverse proxy** set `CDE_TRUST_PROXY` so the address of the client, not of the proxy, is stored.
-- **Retention: never deleted.** The log is append-only and hash-chained; the database refuses updates
-  and deletes, so the rows (and their IP addresses) are kept for the life of the installation, also
-  after a person or project is removed. An organisation that needs a retention period must cover it in
-  its own records of processing (KVKK / GDPR) and inform users, e.g. in its privacy notice.
+- **Retention: 12 months by default.** Privacy Centre → Settings → **Audit Log Personal Data
+  Retention (months)** (1 to 120). A daily job deletes the IP address, user agent and e-mail of rows
+  older than that and records the count in the log (`audit.personal_expired`). The rows themselves
+  (who, what, when) are kept for the life of the installation: the log is append-only and
+  hash-chained, and the chain check still passes after the deletion. Screens and CSV then show
+  "deleted (retention)".
+- **Erasure:** one person's personal audit data (rows they wrote, rows naming their e-mail address)
+  can be deleted on its own (`eraseAuditPersonal`, `audit.personal_erased`); their rows stay under
+  their user id. The "anonymise user" request (roadmap) uses it.
+- **Rows from before this split** (migration 0049): rows from before the hash chain had theirs moved
+  by the migration. Rows chained between migrations 0043 and 0049 still hold their IP address and
+  user agent inside the chained content, because changing them would break the chain; they are not
+  covered by retention or erasure until an administrator runs the audited **re-seal**
+  (`npm run audit:reseal`, [re-seal](AUDIT_LOG.md#re-seal)). The migration records how many there are.
 - Background work (jobs, automatic steps) writes rows without IP address and user agent.
 
 ## Data minimisation in AI
@@ -100,6 +118,27 @@ The local network is defined as:
 
 Each connection can also be turned off individually from the **External Connections** list.
 
+## External Connections list
+
+**Administration → Privacy Centre → External Connections** lists every outbound connection of the
+table above that this installation has: the core's, and those of the installed modules (Autodesk only
+when the Connect module is installed). Each row shows the servers it connects to, whether they are
+inside or outside the network, the time of the last logged call and an on/off switch. A switched-off
+connection refuses its calls before connecting and logs them as "Blocked"; turning a switch on or
+off is written to the audit log (`privacy.connection_updated`, with the connection id).
+
+- **Sign in with Google** is listed even when it is not configured. Switched off (or with all external
+  connections off) the sign-in and invitation pages show no Google button and the server refuses
+  every step of the Google flow (`/login?authError=google_disabled`).
+- **Modules** declare their connections with `registerPrivacyConnection({ id, name, description, hosts,
+  defaultEnabled })` from the SDK ([modules](../modules/README.md#outbound-connections)). The SDK's
+  `outboundFetch` / `outboundCall` refuse a module call whose `connection` is not declared, so a
+  module cannot reach a server the list does not show. A connection with `defaultEnabled: false`
+  stays off until an administrator turns it on. Module releases built before SDK 0.15.0 are declared
+  by the core on their behalf (`apps/server/src/privacy/legacy-connections.ts`).
+- A test (`apps/server/test/auth/privacy-connections.test.ts`) fails when an `outboundFetch` /
+  `outboundCall` in the core or in an installed module names a connection that has no row in the list.
+
 ## Storage and deletion of Autodesk data
 
 User names, emails, companies, issues, forms, reviews, RFIs and submittal records brought in from ACC are stored in the project
@@ -126,8 +165,11 @@ KVKK is the Turkish Personal Data Protection Law.
   - every call is logged.
 - The organisation should assess the provider's data processing agreement and the legal basis for the transfer.
 - The outbound connection log can be used as evidence for the transfer inventory and for audits.
-- The audit log keeps IP addresses and user agents without a retention period
-  ([above](#audit-log-ip-address-and-user-agent)); the organisation records this in its processing inventory.
+- The audit log keeps IP addresses, user agents and e-mail addresses for the retention period set in
+  the Privacy Centre (default 12 months; KVKK m.4(2)(d), GDPR Art. 5(1)(e)) and the event rows for the
+  life of the installation ([above](#audit-log-ip-address-and-user-agent)); the organisation records
+  both in its processing inventory. The keyed hashes that stay in the chain are pseudonymised data,
+  not anonymous data, while the installation's secret key exists.
 - Masking is a security layer, not full anonymisation. Indirect identifiers in free text (e.g. address, job title) are not masked.
 
 ## Security headers
@@ -141,7 +183,8 @@ OAuth paths (`/oauth2/*`, consent page) do not get COOP, for clients that use po
 ## Roadmap (phase 2)
 
 - On-disk encryption for stored files.
-- KVKK user data export and anonymisation (data subject requests).
+- KVKK user data export and anonymisation (data subject requests); the audit log part is ready
+  (`eraseAuditPersonal`, [personal data](AUDIT_LOG.md#personal-data)).
 - Retention policies: duration and automatic deletion by project, folder and record type.
 - Full project export (in OpenCDE BCF and Documents API format): the customer can move their data to another CDE at any time.
 - Two-factor authentication (2FA) and enterprise single sign-on (SSO).

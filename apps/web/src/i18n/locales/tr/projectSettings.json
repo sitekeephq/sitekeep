@@ -745,7 +745,7 @@
     }
   },
   "auditLog": {
-    "description": "Bu projedeki her değişiklik, görüntüleme ve indirme, en yenisi üstte. Kayıtlar değiştirilemez ve silinemez; her kayıt bir öncekine bağlıdır (hash), böylece kurcalama fark edilir. Her kayıtla IP adresi ve tarayıcı bilgisi saklanır.",
+    "description": "Bu projedeki her değişiklik, görüntüleme ve indirme, en yenisi üstte. Kayıtlar değiştirilemez ve silinemez; her kayıt bir öncekine bağlıdır (hash), böylece kurcalama fark edilir. Her kaydın IP adresi ve tarayıcı bilgisi zincirden ayrı tutulur, Gizlilik Merkezi'nde belirlenen saklama süresi dolunca silinir.",
     "filters": {
       "from": "Başlangıç",
       "to": "Bitiş",
@@ -784,8 +784,14 @@
       "reasons": {
         "missing_hash": "hash'i olmayan kayıt",
         "prev_mismatch": "bir kayıt eksik ya da sırası bozuk",
-        "hash_mismatch": "kayıt değiştirilmiş"
+        "hash_mismatch": "kayıt değiştirilmiş",
+        "personal_mismatch": "kaydın IP adresi, tarayıcı bilgisi ya da e-postası değiştirilmiş",
+        "reseal_archive_mismatch": "bir yeniden mühürlemenin arşivi değiştirilmiş"
       }
+    },
+    "personalRemoved": {
+      "retention": "silindi (saklama süresi)",
+      "erased": "silindi (kişi talebi)"
     }
   }
 }

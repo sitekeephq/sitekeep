@@ -48,9 +48,10 @@ const child = spawn(process.execPath, [serverEntry], {
     AI_ENABLED: "0",
     CDE_DEV_TOOLS: "0",
     CDE_OFFICE_CONVERTER: "none",
-    GOOGLE_CLIENT_ID: "",
-    GOOGLE_CLIENT_SECRET: "",
-    GOOGLE_CALLBACK_URL: "",
+    // Dummy Google credentials: the sign-in page offers Google (privacy-connections.spec.ts); no test calls Google.
+    GOOGLE_CLIENT_ID: "e2e-google-client",
+    GOOGLE_CLIENT_SECRET: "e2e-google-secret",
+    GOOGLE_CALLBACK_URL: `http://127.0.0.1:${port}/api/v1/auth/google/callback`,
     AUTODESK_CLIENT_ID: "",
     AUTODESK_CALLBACK_URL: "",
     CDE_SMTP_URL: "",

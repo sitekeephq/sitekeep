@@ -251,10 +251,17 @@
       "placeholder": "Katman ara",
       "actions": {
         "allOn": "Tümünü Aç",
-        "allOff": "Tümünü Kapat"
+        "allOff": "Tümünü Kapat",
+        "showFrozen": "Donmuş ve Kapalı Katmanları Göster ({{count}})"
       },
       "empty": "Katman yok.",
-      "noMatch": "Eşleşen katman yok."
+      "noMatch": "Eşleşen katman yok.",
+      "frozenHint": "Çizimde dondurulmuş ya da kapatılmış katmanlar, AutoCAD'de olduğu gibi açılışta gizlenir.",
+      "state": {
+        "frozen": "Donmuş",
+        "off": "Kapalı",
+        "locked": "Kilitli"
+      }
     },
     "tools": {
       "length": "Uzunluk",

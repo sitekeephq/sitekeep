@@ -15,6 +15,7 @@ import { projectMembers, projects, tokens, users } from "../db/schema.js";
 import { HttpError, badRequest, forbidden, notFound } from "../core/platform/http.js";
 import { outboundFetch } from "../privacy/outbound.js";
 import { resolveGoogleUser } from "./google-settings.js";
+import { GOOGLE_CONNECTION, GOOGLE_PURPOSE, GOOGLE_TOKEN_URL, GOOGLE_USERINFO_URL, googleSignInRefusal } from "./google-connection.js";
 import { createSession } from "./session.js";
 import { INVITATION_COOKIE } from "./invitation-routes.js";
 import { acceptInvitation, findOpenInvitation } from "./invitations.js";
@@ -22,15 +23,23 @@ import { msg, render, requestLanguage, type Msg } from "../i18n/index.js";
 
 const GOOGLE_STATE_COOKIE = "cde_google_state";
 
+/** The account an e-mail address belongs to, for a failed login (audit row user, P1-5). */
+async function knownUserId(db: Db, email: string): Promise<string | null> {
+  const [u] = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
+  return u?.id ?? null;
+}
+
 export async function authRoutes(api: FastifyInstance, { db, secureCookies, googleAuth }: AppDeps) {
   const apiGoogleAuth = googleAuth;
+  // Google is offered while it is configured and its connection is on (Privacy Centre, google-connection.ts).
   api.get("/auth/methods", { config: { public: true } }, async () => ({
     password: true,
-    google: !!apiGoogleAuth,
+    google: !!apiGoogleAuth && !(await googleSignInRefusal(db)),
   }));
 
   api.get("/auth/google", { config: { public: true } }, async (_req, reply) => {
     if (!apiGoogleAuth) throw notFound(msg("auth:entities.googleSignIn"));
+    if (await googleSignInRefusal(db)) return reply.redirect("/login?authError=google_disabled");
     const state = randomBytes(32).toString("base64url");
     reply.setCookie(GOOGLE_STATE_COOKIE, state, {
       path: "/api/v1/auth/google",
@@ -60,12 +69,13 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
     const invitationToken = req.cookies[INVITATION_COOKIE];
     if (invitationToken) reply.clearCookie(INVITATION_COOKIE, { path: "/api/v1/auth/google" });
     if (query.error) return reply.redirect("/login?authError=google_cancelled");
+    if (await googleSignInRefusal(db)) return reply.redirect("/login?authError=google_disabled");
     if (!query.code || !query.state || !expectedState || query.state !== expectedState) {
       return reply.redirect("/login?authError=invalid_state");
     }
 
     try {
-      const tokenResponse = await outboundFetch("giris:google", "https://oauth2.googleapis.com/token", {
+      const tokenResponse = await outboundFetch(GOOGLE_PURPOSE, GOOGLE_TOKEN_URL, {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
@@ -75,12 +85,12 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
           redirect_uri: apiGoogleAuth.callbackUrl,
           grant_type: "authorization_code",
         }),
-      }, { connection: "google" });
+      }, { connection: GOOGLE_CONNECTION });
       if (!tokenResponse.ok) throw new Error(`token exchange failed (${tokenResponse.status})`);
       const token = z.object({ access_token: z.string() }).parse(await tokenResponse.json());
-      const profileResponse = await outboundFetch("giris:google", "https://openidconnect.googleapis.com/v1/userinfo", {
+      const profileResponse = await outboundFetch(GOOGLE_PURPOSE, GOOGLE_USERINFO_URL, {
         headers: { authorization: `Bearer ${token.access_token}` },
-      }, { connection: "google" });
+      }, { connection: GOOGLE_CONNECTION });
       if (!profileResponse.ok) throw new Error(`profile request failed (${profileResponse.status})`);
       const profile = z
         .object({ email: z.string().email(), email_verified: z.boolean(), name: z.string().optional() })
@@ -92,7 +102,7 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
         const found = await findOpenInvitation(db, invitationToken);
         if (!found.ok) return reply.redirect(`/login?authError=${found.problem}`);
         if (found.user.email !== email) {
-          await audit(db, { action: "auth.login_failed", details: { email, provider: "google", invitation: "email_mismatch" } });
+          await audit(db, { userId: await knownUserId(db, email), action: "auth.login_failed", details: { email, provider: "google", invitation: "email_mismatch" } });
           return reply.redirect("/login?authError=invitation_email_mismatch");
         }
         const user = await acceptInvitation(db, invitationToken, { name: profile.name, provider: "google" });
@@ -102,7 +112,7 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
       }
       const resolved = await resolveGoogleUser(db, email, profile.name ?? "");
       if (!resolved) {
-        await audit(db, { action: "auth.login_failed", details: { email, provider: "google" } });
+        await audit(db, { userId: await knownUserId(db, email), action: "auth.login_failed", details: { email, provider: "google" } });
         return reply.redirect("/login?authError=account_not_allowed");
       }
       await createSession(db, resolved.user.id, reply, !!secureCookies);
@@ -122,7 +132,8 @@ export async function authRoutes(api: FastifyInstance, { db, secureCookies, goog
     const body = z.object({ email: z.string().trim().email().toLowerCase(), password: z.string() }).parse(req.body);
     const [user] = await db.select().from(users).where(eq(users.email, body.email));
     if (!user || user.disabled || !(await verifyPassword(body.password, user.passwordHash))) {
-      await audit(db, { action: "auth.login_failed", details: { email: body.email } });
+      // The address goes to the personal part of the log (details keep its hash); a known account by id.
+      await audit(db, { userId: user?.id ?? null, action: "auth.login_failed", details: { email: body.email } });
       throw new HttpError(401, "invalid_credentials", msg("auth:errors.invalidCredentials"));
     }
     let signedIn = user;

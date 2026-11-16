@@ -421,10 +421,12 @@
       "always": "Ağ dışındaki yapay zekâya giden her istemde e-posta, telefon, TC kimlik no ve IBAN her zaman yer tutucuyla değiştirilir. Cevap size gösterilirken asılları geri konur; eşleme yalnız o çağrı boyunca bellekte tutulur.",
       "fields": {
         "retention": "Kayıt Saklama Süresi (gün)",
-        "lanHosts": "İç Ağ Sunucuları"
+        "lanHosts": "İç Ağ Sunucuları",
+        "auditRetention": "Denetim Kaydı Kişisel Veri Saklama Süresi (ay)"
       },
       "lanPlaceholder": "ai.firma.com.tr\n*.firma.local\n100.64.0.0/10",
-      "lanHelp": "Adı genel görünse de sizin ağınızda olan sunucular (her satıra bir ad, \"*.alan\" ya da IPv4 aralığı). Özel IP aralıkları ve tek parçalı adlar zaten yereldir. Bu listedekiler yerel sayılır: tüm dış bağlantılar kapalıyken de çalışır, yapay zekâ istemleri maskelenmez."
+      "lanHelp": "Adı genel görünse de sizin ağınızda olan sunucular (her satıra bir ad, \"*.alan\" ya da IPv4 aralığı). Özel IP aralıkları ve tek parçalı adlar zaten yereldir. Bu listedekiler yerel sayılır: tüm dış bağlantılar kapalıyken de çalışır, yapay zekâ istemleri maskelenmez.",
+      "auditRetentionHelp": "Denetim kaydındaki IP adresleri, tarayıcı bilgileri ve e-posta adresleri bu süre dolunca silinir ({{min}}–{{max}} ay). Kayıtların kendisi kalır, zincir denetimi yine geçer."
     },
     "location": {
       "local": "Yerel Ağ",

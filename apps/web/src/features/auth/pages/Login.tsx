@@ -26,11 +26,13 @@ export function LoginPage() {
           ? t("login.errors.accountNotAllowed")
           : code === "google_cancelled"
             ? t("login.errors.googleCancelled")
-            : code === "invitation_email_mismatch"
-              ? t("login.errors.invitationEmailMismatch")
-              : code.startsWith("invitation_")
-                ? t("login.errors.invitationClosed")
-                : t("login.errors.googleFailed"),
+            : code === "google_disabled"
+              ? t("login.errors.googleDisabled")
+              : code === "invitation_email_mismatch"
+                ? t("login.errors.invitationEmailMismatch")
+                : code.startsWith("invitation_")
+                  ? t("login.errors.invitationClosed")
+                  : t("login.errors.googleFailed"),
       );
       window.history.replaceState({}, "", "/login");
     }

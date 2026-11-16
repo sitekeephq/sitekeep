@@ -3,11 +3,14 @@
  * hash-chain check. The log itself is written by core/platform/audit.ts and kept append-only and
  * chained by the database (migration 0043_audit_chain).
  */
+import { createHash } from "node:crypto";
 import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, like, lt, min, or, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import type { AuditEntryDto, AuditVerifyDto, Principal } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
-import { auditLog, fileVersions, files, folders, projects } from "../db/schema.js";
+import { auditLog, auditPersonal, auditResealHashes, fileVersions, files, folders, projects } from "../db/schema.js";
+import { auditPersonalHash, auditPersonalKey } from "../core/platform/audit.js";
+import { auditPersonalCutoff } from "../privacy/settings.js";
 import { hiddenByWipRule, userNames, type FolderTree } from "../core/security/access.js";
 import { badRequest } from "../core/platform/http.js";
 import { msg } from "../i18n/index.js";
@@ -144,9 +147,26 @@ export async function toAuditDtos(
   const pids = [...new Set(rows.map((r) => r.projectId).filter((x): x is string => !!x))];
   if (opts.projectCodes && pids.length)
     for (const p of await db.select({ id: projects.id, code: projects.code }).from(projects).where(inArray(projects.id, pids))) codes.set(p.id, p.code);
+  // Personal part (P1-5): from audit_personal; rows chained before 0049 and not re-sealed still
+  // hold theirs in the row itself.
+  const personal = new Map<number, { ip: string | null; userAgent: string | null; email: string | null }>();
+  if (opts.client && rows.length)
+    for (const p of await db
+      .select({ auditId: auditPersonal.auditId, ip: auditPersonal.ip, userAgent: auditPersonal.userAgent, email: auditPersonal.email })
+      .from(auditPersonal)
+      .where(inArray(auditPersonal.auditId, rows.map((r) => r.id))))
+      personal.set(p.auditId, p);
+  const cutoff = auditPersonalCutoff();
+  const clientOf = (r: AuditRow): Pick<AuditEntryDto, "ip" | "userAgent" | "personalRemoved"> => {
+    const p = personal.get(r.id);
+    if (p) return { ip: p.ip, userAgent: p.userAgent };
+    if (r.personalHash) return { ip: null, userAgent: null, personalRemoved: r.at < cutoff ? "retention" : "erased" };
+    return { ip: r.ip, userAgent: r.userAgent };
+  };
   return rows.map((r) => {
     const withheld = hidden(r);
     const targetName = targetNames.get(`${r.targetType}:${r.targetId}`);
+    const email = personal.get(r.id)?.email;
     return {
       id: r.id,
       projectId: r.projectId,
@@ -155,10 +175,11 @@ export async function toAuditDtos(
       action: r.action,
       targetType: r.targetType,
       targetId: r.targetId,
-      details: withheld ? { withheld: "task_team_wip" } : r.details,
+      // An administrator reading the log sees the e-mail address while it is kept.
+      details: withheld ? { withheld: "task_team_wip" } : email ? { ...(r.details ?? {}), email } : r.details,
       at: r.at.toISOString(),
       hash: r.hash,
-      ...(opts.client && { ip: r.ip, userAgent: r.userAgent }),
+      ...(opts.client && clientOf(r)),
       ...(r.targetId && targetName !== undefined && !withheld && { targetName }),
       ...(r.projectId && codes.has(r.projectId) && { projectCode: codes.get(r.projectId) }),
     };
@@ -208,8 +229,14 @@ export async function fileHistoryWhere(db: Db, projectId: string, fileId: string
  * Walks the chain from its first row (the genesis row of 0043) in id order: every chained row must
  * have a hash, point to the previous row's hash and hash to what the database recomputes from its
  * fields. Reports the first row that does not.
+ *
+ * P1-5: a row's personal record (audit_personal) must belong to a row with personal_hash and, when
+ * the installation's key is at hand, hash to it; a deleted personal record is fine (retention,
+ * erasure). The archive of every re-seal (audit.resealed rows) must still give the digest the row
+ * recorded.
  */
-export async function verifyAuditChain(db: Db, batchSize = 2000): Promise<AuditVerifyDto> {
+export async function verifyAuditChain(db: Db, batchSize = 2000, opts: { personalKey?: Buffer | null } = {}): Promise<AuditVerifyDto> {
+  const key = opts.personalKey === undefined ? auditPersonalKey() : opts.personalKey;
   const [start] = await db.select({ first: min(auditLog.id) }).from(auditLog).where(isNotNull(auditLog.hash));
   const first = start?.first ?? null;
   const [legacy] = await db
@@ -217,12 +244,22 @@ export async function verifyAuditChain(db: Db, batchSize = 2000): Promise<AuditV
     .from(auditLog)
     .where(first === null ? undefined : lt(auditLog.id, first));
   const legacyRows = Number(legacy?.n ?? 0);
-  if (first === null) return { ok: true, checked: 0, legacyRows, head: null, broken: null };
+  let personalChecked: number | null = key ? 0 : null;
+  if (first === null) return { ok: true, checked: 0, legacyRows, head: null, personalChecked, broken: null };
 
   let expectedPrev: string | null = null;
   let checked = 0;
   let head: AuditVerifyDto["head"] = null;
   let after = first - 1;
+  const reseals: { id: number; details: Record<string, unknown> | null }[] = [];
+  const broken = (id: number, reason: NonNullable<AuditVerifyDto["broken"]>["reason"]): AuditVerifyDto => ({
+    ok: false,
+    checked,
+    legacyRows,
+    head,
+    personalChecked,
+    broken: { id, reason },
+  });
   for (;;) {
     const rows = await db
       .select({
@@ -230,18 +267,33 @@ export async function verifyAuditChain(db: Db, batchSize = 2000): Promise<AuditV
         prevHash: auditLog.prevHash,
         hash: auditLog.hash,
         at: auditLog.at,
+        action: auditLog.action,
+        details: auditLog.details,
+        personalHash: auditLog.personalHash,
         // Recomputed by the same function as the insert trigger, from the row as stored now.
         computed: sql<string>`audit_log_hash(${auditLog.prevHash}, "audit_log")`,
+        pAuditId: auditPersonal.auditId,
+        pIp: auditPersonal.ip,
+        pUserAgent: auditPersonal.userAgent,
+        pEmail: auditPersonal.email,
       })
       .from(auditLog)
+      .leftJoin(auditPersonal, eq(auditPersonal.auditId, auditLog.id))
       .where(gt(auditLog.id, after))
       .orderBy(asc(auditLog.id))
       .limit(batchSize);
     for (const r of rows) {
-      const broken = (reason: NonNullable<AuditVerifyDto["broken"]>["reason"]): AuditVerifyDto => ({ ok: false, checked, legacyRows, head, broken: { id: r.id, reason } });
-      if (!r.hash) return broken("missing_hash");
-      if (r.prevHash !== expectedPrev) return broken("prev_mismatch");
-      if (r.computed !== r.hash) return broken("hash_mismatch");
+      if (!r.hash) return broken(r.id, "missing_hash");
+      if (r.prevHash !== expectedPrev) return broken(r.id, "prev_mismatch");
+      if (r.computed !== r.hash) return broken(r.id, "hash_mismatch");
+      if (r.pAuditId !== null) {
+        if (!r.personalHash) return broken(r.id, "personal_mismatch");
+        if (key) {
+          if (auditPersonalHash({ ip: r.pIp, userAgent: r.pUserAgent, email: r.pEmail }, key) !== r.personalHash) return broken(r.id, "personal_mismatch");
+          personalChecked = (personalChecked ?? 0) + 1;
+        }
+      }
+      if (r.action === "audit.resealed") reseals.push({ id: r.id, details: r.details });
       expectedPrev = r.hash;
       checked++;
       head = { id: r.id, hash: r.hash, at: r.at.toISOString() };
@@ -249,5 +301,30 @@ export async function verifyAuditChain(db: Db, batchSize = 2000): Promise<AuditV
     }
     if (rows.length < batchSize) break;
   }
-  return { ok: true, checked, legacyRows, head, broken: null };
+  for (const s of reseals) {
+    const resealId = Number(s.details?.resealId);
+    if (!Number.isSafeInteger(resealId) || (await resealArchiveDigest(db, resealId)) !== s.details?.archiveDigest) return broken(s.id, "reseal_archive_mismatch");
+  }
+  return { ok: true, checked, legacyRows, head, personalChecked, broken: null };
+}
+
+/** One line per archived row, in id order: "id:old_prev_hash:old_hash\n". */
+export const resealArchiveLine = (r: { rowId: number; oldPrevHash: string | null; oldHash: string }) => `${r.rowId}:${r.oldPrevHash ?? ""}:${r.oldHash}\n`;
+
+/** sha256 of a re-seal's archive of old hashes, as stored. */
+export async function resealArchiveDigest(db: Db, resealId: number, batchSize = 5000): Promise<string> {
+  const digest = createHash("sha256");
+  let after = -1;
+  for (;;) {
+    const rows = await db
+      .select({ rowId: auditResealHashes.rowId, oldPrevHash: auditResealHashes.oldPrevHash, oldHash: auditResealHashes.oldHash })
+      .from(auditResealHashes)
+      .where(and(eq(auditResealHashes.resealId, resealId), gt(auditResealHashes.rowId, after)))
+      .orderBy(asc(auditResealHashes.rowId))
+      .limit(batchSize);
+    for (const r of rows) digest.update(resealArchiveLine(r));
+    if (rows.length < batchSize) break;
+    after = rows[rows.length - 1]!.rowId;
+  }
+  return digest.digest("hex");
 }

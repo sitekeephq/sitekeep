@@ -146,7 +146,11 @@ export { adminSettingsDto } from "../admin/settings.js";
 export { AnswerProvider, CANDIDATE_INVALID, CaptureProvider, MeteredProvider, PROMPT_CAPTURED, overrideProvider, withProvider } from "../ai/override.js";
 export { bridgedCall, bridgedRaw, type RawCall } from "../core/platform/inprocess.js";
 export { decryptSecret, encryptSecret } from "../core/platform/secrets.js";
-export { OutboundBlockedError, outboundCall, outboundFetch } from "../privacy/outbound.js";
+export { OutboundBlockedError } from "../privacy/outbound.js";
+// Privacy Centre: a module declares each outbound connection it makes (listed with its own on/off
+// switch); the SDK's outboundFetch / outboundCall refuse a connection id that is not declared.
+export { registerPrivacyConnection, type PrivacyConnectionDef } from "../privacy/connections.js";
+export { UndeclaredConnectionError, moduleOutboundCall as outboundCall, moduleOutboundFetch as outboundFetch } from "./privacy.js";
 export { connectionDisabled, killSwitchOn, privacyState } from "../privacy/settings.js";
 export { projectPeople } from "../privacy/people.js";
 export { Redactor, type RedactPerson } from "../privacy/redact.js";

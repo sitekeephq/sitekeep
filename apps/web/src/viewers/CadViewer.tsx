@@ -7,10 +7,13 @@
  * extents), layers, model space only or all, dark/light background. Measuring, snapping, units
  * and "Bilgi" live in ./cad/ (CadMeasure.tsx). Text uses bundled Noto Sans (latin + latin-ext:
  * Turkish letters), so nothing is fetched from the internet. `?layer=NAME` opens with only that
- * layer on (the version comparison links a layer's changes here).
+ * layer on (the version comparison links a layer's changes here). Every layer is listed with its
+ * state: frozen and off layers are built but hidden when the drawing opens (as in AutoCAD) and
+ * can be turned on; locked layers are marked (dxf.worker.ts, @sitekeep/shared cad-layers.ts).
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DxfViewer, type LayerInfo } from "dxf-viewer";
+import { layerHiddenByDefault, type CadLayerState } from "@sitekeep/shared";
 import { useTranslation } from "react-i18next";
 import * as THREE from "three";
 import notoLatin from "@fontsource/noto-sans/files/noto-sans-latin-400-normal.woff?url";
@@ -37,6 +40,23 @@ type Bg = keyof typeof BACKGROUNDS;
 const PHASES = ["font", "fetch", "parse", "prepare"] as const;
 const isPhase = (p: string): p is (typeof PHASES)[number] => (PHASES as readonly string[]).includes(p);
 
+type PanelLayer = LayerInfo & Partial<CadLayerState> & { visible: boolean };
+
+/**
+ * Wraps a dxf-viewer worker factory to read the layer states from the scene the worker sends
+ * (DxfViewer.GetLayers() reports only name, display name and colour).
+ */
+function withLayerStateCapture(factory: () => Worker, onStates: (states: Map<string, Partial<CadLayerState>>) => void): () => Worker {
+  return () => {
+    const w = factory();
+    w.addEventListener("message", (e: MessageEvent<{ type?: string; data?: { scene?: { layers?: ({ name: string } & Partial<CadLayerState>)[] } } }>) => {
+      const layers = e.data?.type === "LOAD" ? e.data.data?.scene?.layers : undefined;
+      if (layers) onStates(new Map(layers.map((l) => [l.name, { frozen: !!l.frozen, off: !!l.off, locked: !!l.locked }])));
+    });
+    return w;
+  };
+}
+
 function prefersDark(): boolean {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
 }
@@ -47,7 +67,7 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
   const viewer = useRef<DxfViewer | null>(null);
   const [bg, setBg] = useState<Bg>(() => (prefersDark() ? "dark" : "light"));
   const [modelOnly, setModelOnly] = useState(false);
-  const [layers, setLayers] = useState<(LayerInfo & { visible: boolean })[]>([]);
+  const [layers, setLayers] = useState<PanelLayer[]>([]);
   const [progress, setProgress] = useState<string | null>(() => t("cad.messages.loading"));
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
@@ -55,7 +75,7 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
   const [layerFilter, setLayerFilter] = useState("");
   const [showLayers, setShowLayers] = useState(() => window.innerWidth > 760);
   const phone = usePhoneWidth();
-  const robust = useRef<{ v: DxfViewer; b: RobustBounds | null } | null>(null);
+  const robust = useRef<{ v: DxfViewer; hidden: string; b: RobustBounds | null } | null>(null);
 
   const preview = info.previews.find((p) => p.kind === "dxf");
   // The prebuilt scene, or the DXF (the original, or the one converted from a DWG).
@@ -93,10 +113,12 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
     };
     v.Subscribe("viewChanged", onView);
     v.Subscribe("message", onMessage);
+    let states = new Map<string, Partial<CadLayerState>>();
+    const factory = source === "scene" ? sceneWorkerFactory() : () => new Worker(new URL("./dxf.worker.ts", import.meta.url), { type: "module" });
     v.Load({
       url,
       fonts: [notoLatin, notoLatinExt],
-      workerFactory: source === "scene" ? sceneWorkerFactory() : () => new Worker(new URL("./dxf.worker.ts", import.meta.url), { type: "module" }),
+      workerFactory: withLayerStateCapture(factory, (s) => (states = s)),
       progressCbk: (phase, done, total) => {
         if (disposed) return;
         const name = isPhase(phase) ? t(`cad.phases.${phase}`) : phase;
@@ -106,15 +128,20 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
       () => {
         if (disposed) return;
         setProgress(null);
-        // `?layer=NAME` (version comparison): only that layer is shown at first.
+        // `?layer=NAME` (version comparison): only that layer is shown at first. Otherwise frozen
+        // and off layers start hidden, as in AutoCAD.
         const only = new URLSearchParams(window.location.search).get("layer");
-        const all = [...v.GetLayers(true)];
+        const all = [...v.GetLayers(true)].map((l) => ({ ...l, ...states.get(l.name) }));
         const isolate = only !== null && all.some((l) => l.name === only);
-        if (isolate) {
-          for (const l of all) if (l.name !== only) v.ShowLayer(l.name, false);
-          v.Render();
-        }
-        setLayers(all.map((l) => ({ ...l, visible: !isolate || l.name === only })).sort((a, b) => a.displayName.localeCompare(b.displayName, dataLocale())));
+        const shown = (l: (typeof all)[number]) => (isolate ? l.name === only : !layerHiddenByDefault(l));
+        let hidden = 0;
+        for (const l of all)
+          if (!shown(l)) {
+            v.ShowLayer(l.name, false);
+            hidden++;
+          }
+        if (hidden) v.Render();
+        setLayers(all.map((l) => ({ ...l, visible: shown(l) })).sort((a, b) => a.displayName.localeCompare(b.displayName, dataLocale())));
       },
       (e: unknown) => {
         if (disposed) return;
@@ -153,9 +180,20 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
 
   const loaded = progress === null && !error && !!viewer.current;
 
-  /** Extents of the main body of the drawing (scene coordinates), once per loaded scene. */
+  const hiddenLayers = useMemo(
+    () =>
+      layers
+        .filter((l) => !l.visible)
+        .map((l) => l.name)
+        .join("\n"),
+    [layers],
+  );
+  /** Extents of the main body of the shown layers (scene coordinates), once per scene and set of hidden layers. */
   const mainBounds = (v: DxfViewer): RobustBounds | null => {
-    if (robust.current?.v !== v) robust.current = { v, b: robustBounds(scenePoints(v.GetScene().children as unknown as SceneObjectLike[])) };
+    if (robust.current?.v !== v || robust.current.hidden !== hiddenLayers) {
+      const shown = (v.GetScene().children as unknown as SceneObjectLike[]).filter((o) => o.visible !== false);
+      robust.current = { v, hidden: hiddenLayers, b: robustBounds(scenePoints(shown)) };
+    }
     return robust.current.b;
   };
   /** Tümünü Göster: the full extents, stray entities included. */
@@ -173,23 +211,16 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
     if (!v || !b) return fitAll();
     v.FitView(b.minX, b.maxX, b.minY, b.maxY);
   };
-  // The first view after loading is the smart fit too (the viewer itself fits the full extents).
+  // The first view after loading is the smart fit too (the viewer itself fits the full extents,
+  // frozen and off layers included).
   const loadedViewer = loaded ? viewer.current : null;
   useEffect(() => {
     if (!loadedViewer) return;
     const b = mainBounds(loadedViewer);
-    if (b && b.outliers > 0) loadedViewer.FitView(b.minX, b.maxX, b.minY, b.maxY);
+    if (b && (b.outliers > 0 || hiddenLayers)) loadedViewer.FitView(b.minX, b.maxX, b.minY, b.maxY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadedViewer]);
 
-  const hiddenLayers = useMemo(
-    () =>
-      layers
-        .filter((l) => !l.visible)
-        .map((l) => l.name)
-        .join("\n"),
-    [layers],
-  );
   // Units: the server's drawing check already read $INSUNITS / $MEASUREMENT (meta.cad); older
   // previews without it stream the DXF header (never the scene URL).
   const cad = preview?.meta.cad;
@@ -217,13 +248,17 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
     setLayers((ls) => ls.map((l) => (l.name === name ? { ...l, visible } : l)));
   };
   const visibleLayers = layers.filter((l) => !layerFilter || l.displayName.toLocaleLowerCase(dataLocale()).includes(layerFilter.toLocaleLowerCase(dataLocale())));
-  /** Tümünü Aç / Tümünü Kapat: the layers in the list (the search result when searching). */
-  const setAll = (visible: boolean) => {
-    const names = new Set(visibleLayers.map((l) => l.name));
+  const setMany = (list: PanelLayer[], visible: boolean) => {
+    const names = new Set(list.map((l) => l.name));
     for (const name of names) viewer.current?.ShowLayer(name, visible);
     viewer.current?.Render();
     setLayers((ls) => ls.map((l) => (names.has(l.name) ? { ...l, visible } : l)));
   };
+  /** Tümünü Aç / Tümünü Kapat: the layers in the list (the search result when searching). */
+  const setAll = (visible: boolean) => setMany(visibleLayers, visible);
+  /** Frozen and off layers (hidden when the drawing opens): shown or hidden together. */
+  const stateHidden = layers.filter(layerHiddenByDefault);
+  const stateHiddenOn = stateHidden.length > 0 && stateHidden.every((l) => l.visible);
 
   const toggleBg = () => setBg((b) => (b === "dark" ? "light" : "dark"));
   const onMore = (k: CadMoreKey) => {
@@ -306,11 +341,24 @@ export default function CadViewer({ projectId, info, source = "dxf", notice = nu
                 {t("cad.layers.actions.allOff")}
               </button>
             </div>
+            {stateHidden.length > 0 && (
+              <button
+                className={`small cad-layers-frozen${stateHiddenOn ? " on" : ""}`}
+                aria-pressed={stateHiddenOn}
+                onClick={() => setMany(stateHidden, !stateHiddenOn)}
+                title={t("cad.layers.frozenHint")}
+              >
+                {t("cad.layers.actions.showFrozen", { count: stateHidden.length })}
+              </button>
+            )}
             {visibleLayers.map((l) => (
-              <label key={l.name} className="cad-layer">
+              <label key={l.name} className={`cad-layer${layerHiddenByDefault(l) ? " cad-layer-hidden" : ""}`}>
                 <input type="checkbox" checked={l.visible} onChange={(e) => setLayer(l.name, e.target.checked)} />
                 <span className="cad-swatch" style={{ background: `#${l.color.toString(16).padStart(6, "0")}` }} />
-                <span>{l.displayName}</span>
+                <span className="cad-layer-name">{l.displayName}</span>
+                {l.frozen && <span className="cad-layer-state">{t("cad.layers.state.frozen")}</span>}
+                {l.off && <span className="cad-layer-state">{t("cad.layers.state.off")}</span>}
+                {l.locked && <span className="cad-layer-state">{t("cad.layers.state.locked")}</span>}
               </label>
             ))}
             {!layers.length && !progress && <p className="muted small">{t("cad.layers.empty")}</p>}

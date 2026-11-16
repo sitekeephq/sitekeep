@@ -19,7 +19,7 @@ import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
 import * as schema from "../../src/db/schema.js";
-import { auditLog, folders, users } from "../../src/db/schema.js";
+import { auditLog, auditPersonal, folders, users } from "../../src/db/schema.js";
 import type { Db } from "../../src/db/index.js";
 import { JobQueue } from "../../src/jobs/queue.js";
 import { LocalStorage } from "../../src/core/platform/storage.js";
@@ -94,8 +94,16 @@ function api(cookie: string, ip = "203.0.113.7") {
 type Api = ReturnType<typeof api>;
 
 const q = (text: string) => handle.db.execute(sql.raw(text));
-const rowsOf = (pid: string, action: string) =>
-  handle.db.select().from(auditLog).where(and(eq(auditLog.projectId, pid), eq(auditLog.action, action))).orderBy(asc(auditLog.id));
+/** Rows of an action with their client from audit_personal (0049); `inRow` is what the chained row itself holds. */
+const rowsOf = async (pid: string, action: string) =>
+  (
+    await handle.db
+      .select({ row: auditLog, p: auditPersonal })
+      .from(auditLog)
+      .leftJoin(auditPersonal, eq(auditPersonal.auditId, auditLog.id))
+      .where(and(eq(auditLog.projectId, pid), eq(auditLog.action, action)))
+      .orderBy(asc(auditLog.id))
+  ).map(({ row, p }) => ({ ...row, ip: p?.ip ?? null, userAgent: p?.userAgent ?? null, inRow: { ip: row.ip, userAgent: row.userAgent } }));
 
 describe("ISO19650-2 5.1.7(d) audit: hash chain (migration 0043)", () => {
   it("starts the chain with a genesis row and chains every new row", async () => {
@@ -124,10 +132,13 @@ describe("ISO19650-2 5.1.7(d) audit: hash chain (migration 0043)", () => {
   });
 
   it("refuses UPDATE, DELETE and TRUNCATE", async () => {
-    for (const statement of [`update audit_log set action = 'x'`, `delete from audit_log`, `truncate audit_log`]) {
+    for (const statement of [`update audit_log set action = 'x'`, `delete from audit_log`, `truncate audit_log cascade`]) {
       const err = (await q(statement).catch((e: unknown) => e)) as { cause?: Error } | undefined;
       expect(String(err?.cause?.message), statement).toMatch(/audit_log is append-only/);
     }
+    // Without cascade, audit_personal's foreign key refuses it first (0049).
+    const plain = (await q(`truncate audit_log`).catch((e: unknown) => e)) as { cause?: Error } | undefined;
+    expect(String(plain?.cause?.message)).toMatch(/foreign key/);
     expect((await verifyAuditChain(handle.db)).ok).toBe(true);
   });
 
@@ -137,13 +148,16 @@ describe("ISO19650-2 5.1.7(d) audit: hash chain (migration 0043)", () => {
     try {
       const db = own.db;
       for (const n of [1, 2, 3, 4]) await audit(db, { action: `t.${n}`, details: { n } });
-      const ids = (await db.select({ id: auditLog.id }).from(auditLog).orderBy(asc(auditLog.id))).map((r) => r.id);
+      // The genesis row and t.1–t.4 (the 0049 row in between left out).
+      const ids = (await db.select({ id: auditLog.id, action: auditLog.action }).from(auditLog).orderBy(asc(auditLog.id)))
+        .filter((r) => r.action !== "audit.personal_split")
+        .map((r) => r.id);
       expect((await verifyAuditChain(db)).ok).toBe(true);
       const run = (s: string) => db.execute(sql.raw(s));
 
       await run(`alter table audit_log disable trigger audit_log_immutable`);
       await run(`update audit_log set details = '{"n": 99}' where id = ${ids[2]}`);
-      expect(await verifyAuditChain(db)).toMatchObject({ ok: false, checked: 2, broken: { id: ids[2], reason: "hash_mismatch" } });
+      expect(await verifyAuditChain(db)).toMatchObject({ ok: false, checked: 3, broken: { id: ids[2], reason: "hash_mismatch" } });
       await run(`update audit_log set details = '{"n": 2}' where id = ${ids[2]}`);
       expect((await verifyAuditChain(db)).ok).toBe(true);
 
@@ -184,9 +198,10 @@ describe("ISO19650-2 5.1.7(d) audit: hash chain (migration 0043)", () => {
         ["old.one", true],
         ["old.two", true],
         ["audit.chain_started", false],
+        ["audit.personal_split", false],
       ]);
       await audit(db, { action: "new.one" });
-      expect(await verifyAuditChain(db)).toMatchObject({ ok: true, checked: 2, legacyRows: 2 });
+      expect(await verifyAuditChain(db)).toMatchObject({ ok: true, checked: 3, legacyRows: 2 });
       // The report refresh keeps its insert stamp; the update / delete stamps are gone.
       const triggers = await client.query<{ tgname: string }>(
         `select tgname from pg_trigger where tgrelid = 'audit_log'::regclass and not tgisinternal order by tgname`,
@@ -229,6 +244,9 @@ describe("ISO19650-2 5.1.7(d) audit: events with the client of the request (D-9)
     const [row] = await rowsOf(pid, "file.uploaded");
     expect(row).toMatchObject({ ip: "203.0.113.7", userAgent: UA, targetId: fileId });
     expect(row!.hash).toMatch(/^[0-9a-f]{64}$/);
+    // The chained row keeps only the keyed hash of the client (P1-5).
+    expect(row!.inRow).toEqual({ ip: null, userAgent: null });
+    expect(row!.personalHash).toMatch(/^[0-9a-f]{64}$/);
   });
 
   it("records a view once per user, version and 15 minutes", async () => {

@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  AUDIT_PERSONAL_RETENTION,
   privacyStatement,
   type OutboundLogPageDto,
   type OutboundLogRowDto,
@@ -132,6 +133,7 @@ export function AdminPrivacySection() {
 function PrivacySummary({ data, onSaved }: { data: PrivacySummaryDto; onSaved(d: PrivacySummaryDto): void }) {
   const { t, i18n } = useTranslation(["admin", "common"]);
   const [days, setDays] = useState(String(data.settings.logRetentionDays));
+  const [auditMonths, setAuditMonths] = useState(String(data.settings.auditPersonalRetentionMonths));
   const [lan, setLan] = useState(data.settings.lanHosts.join("\n"));
   const [redactLocal, setRedactLocal] = useState(data.settings.redactLocal);
   const [redactNames, setRedactNames] = useState(data.settings.redactNames);
@@ -142,6 +144,7 @@ function PrivacySummary({ data, onSaved }: { data: PrivacySummaryDto; onSaved(d:
     try {
       const d = await privacyApi.saveSettings({
         logRetentionDays: Number(days),
+        auditPersonalRetentionMonths: Number(auditMonths),
         lanHosts: lan
           .split(/[\n,]+/)
           .map((x) => x.trim())
@@ -224,6 +227,22 @@ function PrivacySummary({ data, onSaved }: { data: PrivacySummaryDto; onSaved(d:
         <div style={{ maxWidth: 220 }}>
           <label htmlFor="privacy-days">{t("privacy.settings.fields.retention")}</label>
           <input id="privacy-days" type="number" min={1} max={3650} value={days} onChange={(e) => setDays(e.target.value)} />
+        </div>
+        <div>
+          <div style={{ maxWidth: 220 }}>
+            <label htmlFor="privacy-audit-months">{t("privacy.settings.fields.auditRetention")}</label>
+            <input
+              id="privacy-audit-months"
+              type="number"
+              min={AUDIT_PERSONAL_RETENTION.min}
+              max={AUDIT_PERSONAL_RETENTION.max}
+              value={auditMonths}
+              onChange={(e) => setAuditMonths(e.target.value)}
+            />
+          </div>
+          <p className="muted small" style={{ margin: "4px 0 0" }}>
+            {t("privacy.settings.auditRetentionHelp", { min: AUDIT_PERSONAL_RETENTION.min, max: AUDIT_PERSONAL_RETENTION.max })}
+          </p>
         </div>
         <div>
           <label htmlFor="privacy-lan">{t("privacy.settings.fields.lanHosts")}</label>

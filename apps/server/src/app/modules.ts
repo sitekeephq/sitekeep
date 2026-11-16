@@ -12,6 +12,7 @@ import path from "node:path";
 import type { ServerModule } from "../sdk/module.js";
 import { registerLocaleFolder } from "../i18n/index.js";
 import { setLoadingModule } from "./module-owner.js";
+import { registerLegacyConnections } from "../privacy/legacy-connections.js";
 
 export { KNOWN_MODULES, moduleIds } from "./module-ids.js";
 import { loadedModuleIds, moduleIds } from "./module-ids.js";
@@ -31,6 +32,8 @@ async function load(id: string): Promise<ServerModule> {
 
 const loaded: ServerModule[] = [];
 for (const id of loadedModuleIds()) loaded.push(await load(id));
+// Outbound connections of module releases that predate registerPrivacyConnection (privacy/legacy-connections.ts).
+registerLegacyConnections(loaded.map((m) => m.id));
 
 /** Every loaded module (migrations, texts, developer tables). */
 export const loadedModules: readonly ServerModule[] = loaded;

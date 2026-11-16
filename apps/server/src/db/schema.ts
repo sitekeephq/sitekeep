@@ -384,9 +384,14 @@ export const auditLog = pgTable(
     /** Hash chain (ISO-4): hash of the previous row and of this row (filled by the audit work). */
     prevHash: text("prev_hash"),
     hash: text("hash"),
-    /** Client of the request (D-9; documented in docs/features/PRIVACY.md). */
+    /**
+     * Client of the request (D-9) on chained rows written before migration 0049 only: newer rows
+     * keep it in audit_personal and carry personal_hash instead (docs/features/AUDIT_LOG.md#personal-data).
+     */
     ip: text("ip"),
     userAgent: text("user_agent"),
+    /** Keyed hash (HMAC-SHA256) of the row's audit_personal values; part of the chained content. */
+    personalHash: text("personal_hash"),
   },
   (t) => [
     index("audit_project_idx").on(t.projectId, t.at),
@@ -394,6 +399,65 @@ export const auditLog = pgTable(
     index("audit_target_idx").on(t.targetType, t.targetId),
     index("audit_user_idx").on(t.userId, t.at),
   ],
+);
+
+/**
+ * Personal part of an audit row (P1-5, migration 0049): the client's IP address and user agent and
+ * an e-mail address the event names. Not chained, so it can be deleted (retention, erasure of one
+ * person) while the chained row keeps only personal_hash. Rows are written with their audit row and
+ * deleted, never changed.
+ */
+export const auditPersonal = pgTable(
+  "audit_personal",
+  {
+    auditId: bigint("audit_id", { mode: "number" })
+      .primaryKey()
+      .references(() => auditLog.id),
+    /** Time of the audit row (the retention clock). */
+    at: timestamp("at", { withTimezone: true }).notNull(),
+    /** The audit row's person, or the known account the event names (erasure by person). */
+    userId: uuid("user_id"),
+    ip: text("ip"),
+    userAgent: text("user_agent"),
+    /** Lower-case e-mail address moved out of details (details keep emailHash). */
+    email: text("email"),
+  },
+  (t) => [index("audit_personal_at_idx").on(t.at), index("audit_personal_user_idx").on(t.userId), index("audit_personal_email_idx").on(t.email)],
+);
+
+/**
+ * Re-seals of the audit chain (docs/features/AUDIT_LOG.md#re-seal): one row per maintenance
+ * operation that moved personal values out of chained rows and recomputed the chain from there.
+ */
+export const auditReseals = pgTable("audit_reseal", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  userId: uuid("user_id"),
+  /** First row rewritten: every chained row from here to the old head got a new hash. */
+  fromId: bigint("from_id", { mode: "number" }).notNull(),
+  /** Head of the chain before the re-seal. */
+  oldHeadId: bigint("old_head_id", { mode: "number" }).notNull(),
+  oldHeadHash: text("old_head_hash").notNull(),
+  /** Hash of the same row after the rewrite (the audit.resealed row chains to it). */
+  newHeadHash: text("new_head_hash").notNull(),
+  rowsRewritten: integer("rows_rewritten").notNull(),
+  personalMoved: integer("personal_moved").notNull(),
+  /** sha256 over "id:old_prev_hash:old_hash\n" of every archived row, in id order. */
+  archiveDigest: text("archive_digest").notNull(),
+});
+
+/** The hashes re-sealed rows had before the re-seal: an old head hash recorded elsewhere stays findable. */
+export const auditResealHashes = pgTable(
+  "audit_reseal_hash",
+  {
+    resealId: bigint("reseal_id", { mode: "number" })
+      .notNull()
+      .references(() => auditReseals.id),
+    rowId: bigint("row_id", { mode: "number" }).notNull(),
+    oldPrevHash: text("old_prev_hash"),
+    oldHash: text("old_hash").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.resealId, t.rowId] }), index("audit_reseal_hash_old_idx").on(t.oldHash)],
 );
 
 export * from "./schema-workflow.js";

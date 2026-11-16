@@ -4,11 +4,16 @@
  * project's archive folder (same storage key, no byte copy), at the same path below the archive as
  * it had below its Published folder (ensureFolderPath), and flagged `superseded`. Only for projects
  * that enforce the transitions; the system does it (transition published → archived, mode `auto`).
+ *
+ * ISO-12: the copy and the version that replaced it are linked (`cde_supersessions`, read both
+ * ways, cde/supersessions.ts). `archiveCurrentPublications` makes the copies before the new version
+ * exists; `recordArchive` then links them to it and writes the audit events (`cde.superseded` with
+ * `supersededBy`, the transition).
  */
 import { and, eq, isNull } from "drizzle-orm";
 import { splitExtension } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
-import { fileVersions, files } from "../db/schema.js";
+import { cdeSupersessions, fileVersions, files } from "../db/schema.js";
 import type { FolderTree } from "../core/security/access.js";
 import { audit } from "../core/platform/audit.js";
 import { ensureFolderPath } from "../workflow/chain-service.js";
@@ -30,10 +35,33 @@ export interface ArchiveInput {
   actorId: string | null;
 }
 
-/** Archives the container's current publications; returns the (possibly reloaded) tree and the archive copies. */
-export async function archiveCurrentPublications(db: Db, input: ArchiveInput): Promise<{ tree: FolderTree; archived: string[] }> {
+/** A version taking part in a supersession, as the audit details name it. */
+export interface SupersessionRef {
+  fileId: string;
+  versionId: string;
+  name: string;
+  version: number;
+  revisionCode: string | null;
+  folderId: string;
+}
+
+/** An archive copy made by `archiveCurrentPublications`, recorded by `recordArchive`. */
+export interface ArchivedCopy extends SupersessionRef {
+  /** The publication it copies (its current version). */
+  sourceFileId: string;
+  sourceVersionId: string;
+  sourceFolderId: string;
+  /** The publication itself was flagged superseded (it was in another place than the new one). */
+  sourceFlagged: boolean;
+}
+
+/**
+ * Archives the container's current publications; returns the (possibly reloaded) tree and the
+ * archive copies. The caller records them with `recordArchive` once the new version exists.
+ */
+export async function archiveCurrentPublications(db: Db, input: ArchiveInput): Promise<{ tree: FolderTree; archived: ArchivedCopy[] }> {
   let tree = input.tree;
-  const archived: string[] = [];
+  const archived: ArchivedCopy[] = [];
   if (!tree.byId.has(input.archiveFolderId)) return { tree, archived };
   const candidates = await db
     .select()
@@ -56,6 +84,8 @@ export async function archiveCurrentPublications(db: Db, input: ArchiveInput): P
     const folderId = ensured.folderId;
 
     const comment = `Superseded by review ${input.review.code ?? `#${input.review.number}`}`; // i18n-ok: version comment stored as data
+    // A publication in another place than the new one is no longer current either.
+    const elsewhere = pub.folderId !== input.targetFolderId || pub.name !== input.targetName;
     const copy = await db.transaction(async (tx) => {
       const [same] = await tx
         .select()
@@ -86,7 +116,7 @@ export async function archiveCurrentPublications(db: Db, input: ArchiveInput): P
           .set({ currentVersion: v!.version, cdeStatus: "superseded" })
           .where(eq(files.id, same.id))
           .returning();
-        return { file: f!, version: v! };
+        return { file: f!, version: v!, flagged: false };
       }
       // Another document holds the name: the archive copy gets the revision in its name.
       const { base, extension } = splitExtension(pub.name);
@@ -105,41 +135,79 @@ export async function archiveCurrentPublications(db: Db, input: ArchiveInput): P
         })
         .returning();
       const [v] = await tx.insert(fileVersions).values({ fileId: f!.id, version: 1, ...versionValues }).returning();
-      // A publication in another place than the new one is no longer current either.
-      if (pub.folderId !== input.targetFolderId || pub.name !== input.targetName)
-        await tx.update(files).set({ cdeStatus: "superseded" }).where(eq(files.id, pub.id));
-      return { file: f!, version: v! };
+      if (elsewhere) await tx.update(files).set({ cdeStatus: "superseded" }).where(eq(files.id, pub.id));
+      return { file: f!, version: v!, flagged: elsewhere };
     });
-    archived.push(copy.file.id);
+    archived.push({
+      fileId: copy.file.id,
+      versionId: copy.version.id,
+      name: copy.file.name,
+      version: copy.version.version,
+      revisionCode: current.revisionCode,
+      folderId,
+      sourceFileId: pub.id,
+      sourceVersionId: current.id,
+      sourceFolderId: pub.folderId,
+      sourceFlagged: copy.flagged,
+    });
+  }
+  return { tree, archived };
+}
+
+/**
+ * Records the archive copies once the new publication exists (ISO-12): links each copy, and a
+ * publication flagged superseded in another place, to the version that replaced it; writes
+ * `cde.superseded` (with `supersededBy`) and the published → archived transition. `replacement`
+ * is null when the new version could not be stored: the copies are then recorded unlinked.
+ * Returns what the new version supersedes, for its own audit event.
+ */
+export async function recordArchive(
+  db: Db,
+  input: Pick<ArchiveInput, "projectId" | "tree" | "review" | "actorId">,
+  archived: ArchivedCopy[],
+  replacement: SupersessionRef | null,
+): Promise<SupersessionRef[]> {
+  const supersedes: SupersessionRef[] = [];
+  for (const copy of archived) {
+    const { sourceFileId, sourceVersionId, sourceFolderId, sourceFlagged, ...ref } = copy;
+    if (replacement) {
+      const superseded = [copy.versionId, ...(sourceFlagged ? [sourceVersionId] : [])];
+      await db
+        .insert(cdeSupersessions)
+        .values(superseded.map((id) => ({ projectId: input.projectId, versionId: replacement.versionId, supersededVersionId: id, reviewId: input.review.id })))
+        .onConflictDoNothing();
+      supersedes.push(ref);
+    }
     await audit(db, {
       projectId: input.projectId,
       userId: input.actorId,
       action: "cde.superseded",
       targetType: "file",
-      targetId: copy.file.id,
+      targetId: copy.fileId,
       details: {
-        name: copy.file.name,
-        version: copy.version.version,
-        sourceFileId: pub.id,
-        sourceVersionId: current.id,
-        revisionCode: current.revisionCode,
-        folderId,
+        name: copy.name,
+        version: copy.version,
+        sourceFileId,
+        sourceVersionId,
+        revisionCode: copy.revisionCode,
+        folderId: copy.folderId,
         reviewId: input.review.id,
+        ...(replacement ? { supersededBy: replacement } : {}),
         system: true,
       },
     });
     await recordTransition(db, {
       projectId: input.projectId,
       userId: input.actorId,
-      fileId: copy.file.id,
-      versionId: copy.version.id,
-      fromFolderId: pub.folderId,
-      toFolderId: folderId,
+      fileId: copy.fileId,
+      versionId: copy.versionId,
+      fromFolderId: sourceFolderId,
+      toFolderId: copy.folderId,
       fromState: "published",
-      toState: cdeStateOf(tree, folderId),
+      toState: cdeStateOf(input.tree, copy.folderId),
       mode: "auto",
       reviewId: input.review.id,
     });
   }
-  return { tree, archived };
+  return supersedes;
 }

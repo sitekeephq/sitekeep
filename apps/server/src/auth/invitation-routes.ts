@@ -18,6 +18,8 @@ import { FailureLimiter } from "../oauth/rate-limit.js";
 import { publicBaseUrl } from "../oauth/config.js";
 import { fromAcceptLanguage, msg } from "../i18n/index.js";
 import { toUserDto } from "./dto.js";
+import { googleSignInRefusal } from "./google-connection.js";
+import { OutboundBlockedError } from "../privacy/outbound.js";
 import { createSession } from "./session.js";
 import {
   accountFor,
@@ -231,7 +233,7 @@ export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps)
         invitedBy: inviter?.name ?? null,
         expiresAt: found.invitation.expiresAt.toISOString(),
         language: found.invitation.language,
-        google: !!deps.googleAuth,
+        google: !!deps.googleAuth && !(await googleSignInRefusal(db)),
       };
     }),
   );
@@ -258,6 +260,8 @@ export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps)
   api.post("/invitations/google", { config: { public: true } }, async (req, reply) =>
     withToken(req, async () => {
       if (!deps.googleAuth) throw notFound(msg("auth:entities.googleSignIn"));
+      const refused = await googleSignInRefusal(db);
+      if (refused) throw new OutboundBlockedError(refused);
       const { token } = tokenBody.parse(req.body);
       const found = await findOpenInvitation(db, token);
       if (!found.ok) throw invitationError(found.problem);

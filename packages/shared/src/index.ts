@@ -60,3 +60,4 @@ export * from "./platform/i18n.js";
 export * from "./platform/source.js";
 export * from "./documents/sheets.js";
 export * from "./coordination/model-markup.js";
+export * from "./viewers/cad-layers.js";

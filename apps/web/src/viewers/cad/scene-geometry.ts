@@ -26,6 +26,8 @@ export interface SceneObjectLike {
   };
   /** dxf-viewer's layer of the object. */
   _dxfViewerLayer?: { name: string } | null;
+  /** three.js visibility (false on hidden layers). */
+  visible?: boolean;
 }
 
 function get(a: AttrLike, i: number, c: number): number {

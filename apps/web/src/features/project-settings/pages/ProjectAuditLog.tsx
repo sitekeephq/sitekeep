@@ -143,7 +143,7 @@ export function AuditLog() {
                     )}
                   </td>
                   <td className="muted small mono" data-label={t("auditLog.columns.client")} title={e.userAgent ?? undefined}>
-                    {e.ip ?? "—"}
+                    {e.ip ?? (e.personalRemoved ? t(`auditLog.personalRemoved.${e.personalRemoved}`) : "—")}
                   </td>
                 </tr>
               ))}

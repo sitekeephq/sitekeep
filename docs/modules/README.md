@@ -170,6 +170,31 @@ Release: `packages/sdk/package.json` version → PR → merge → `git tag -a sd
 (`.github/workflows/sdk-release.yml`; `prepack` generates the type declarations). The module repository takes the new SDK
 into `devDependencies` and updates the `peerDependencies` range if needed.
 
+### Outbound connections
+
+A module that connects to another server declares the connection when it loads, at the top level of its
+server entry (so it is attributed to the module), and passes its id on every call:
+
+```ts
+import { msg, outboundFetch, registerPrivacyConnection } from "@7dimensions-project/sitekeep-sdk/server";
+
+registerPrivacyConnection({
+  id: "autodesk",                                   // the `connection` of its calls
+  name: msg("integrations:privacy.autodesk"),       // a text key of the module (or plain text)
+  description: msg("integrations:privacy.autodeskSends"),
+  hosts: ["developer.api.autodesk.com"],            // shown in the list; hosts the log sees are added
+  defaultEnabled: true,                             // false: off until an administrator turns it on
+});
+
+await outboundFetch("entegrasyon:autodesk", url, init, { connection: "autodesk" });
+```
+
+The Privacy Centre lists it (while the module is on) with its servers, last use and an on/off switch
+([privacy](../features/PRIVACY.md#external-connections-list)). The SDK's `outboundFetch` / `outboundCall`
+throw `UndeclaredConnectionError` before connecting when the `connection` is missing or not declared;
+the core's connections (`ai:<providerId>`, `ai:env`, `smtp`, `office:*`, `google`) need no declaration.
+Since SDK 0.15.0.
+
 ### Third-party notices of a module
 
 The core's `THIRD_PARTY_NOTICES.md` covers what SiteKeep Community ships and leaves the Enterprise modules out. A module that has
