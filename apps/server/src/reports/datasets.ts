@@ -26,6 +26,7 @@ import type { FieldSource } from "./engine.js";
 import type { StampScope } from "./stamp.js";
 import { loadingModule } from "../app/module-owner.js";
 import { moduleIds } from "../app/module-ids.js";
+import { isModelFile } from "../files/model-formats.js";
 
 /**
  * Texts of a dataset are shown in the report builder (in the reader's language) and written into
@@ -548,7 +549,7 @@ reportDatasets.register("models", {
       .innerJoin(fileVersions, eq(fileVersions.fileId, files.id))
       .where(and(eq(files.projectId, ctx.access.project.id), isNull(files.deletedAt)));
     const shown = rows.filter(
-      (r) => splitExtension(r.files.name).extension.toLowerCase() === "ifc" && visible(r.files),
+      (r) => isModelFile(r.files.name) && visible(r.files),
     );
     await people.ensure(shown.map((r) => r.file_versions.uploadedBy));
     const folders = new Map<string, FolderInfo>();

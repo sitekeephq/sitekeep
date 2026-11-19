@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Navigate, useSearchParams } from "react-router-dom";
 import {
   PROJECT_MODULES,
+  keepNamingFieldSettings,
   resolveModules,
+  valuesFor,
   type NamingField,
   type NamingStandard,
   type NamingStandardDto,
@@ -23,10 +25,12 @@ import { AttributeSettings } from "./ProjectSettingsDocs";
 import { webCapability } from "../../../sdk/capabilities";
 import { RoleChip, RolesSettings } from "./ProjectSettingsRoles";
 import { MemberInvitations } from "./MemberInvitations";
+import { ProjectCompaniesSection } from "./ProjectCompaniesSection";
 import { LocationsPage } from "./Locations";
 import { CdeSettings } from "./ProjectSettingsCde";
 import { AuditLog } from "./ProjectAuditLog";
 import { CloseoutArchive } from "./CloseoutArchive";
+import { ProjectExport } from "./ProjectExport";
 import { hubApi } from "../../../shared/api/api-hub";
 import { SETTINGS_ADVANCED_LABEL, SETTINGS_TABS, type SettingsTabKey } from "../../../app/navigation/nav";
 import { AdminStatusSection } from "../../admin/pages/AdminStatus";
@@ -109,6 +113,7 @@ export function ProjectSettingsPage() {
       {tab === "cde" && <CdeSettings />}
       {tab === "aktivite" && <AuditLog />}
       {tab === "kapanis" && <CloseoutArchive />}
+      {tab === "disa-aktarma" && <ProjectExport />}
       {tab === "sistem-durumu" && user?.isAdmin && <AdminStatusSection />}
     </div>
   );
@@ -173,7 +178,7 @@ function Members() {
   const project = useProject();
   const { data: members, error, reload } = useLoad(() => api.members(project.id), [project.id]);
   const { data: users } = useLoad(() => api.users(), []);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies, reload: reloadCompanies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const { data: roles, reload: reloadRoles } = useLoad(() => api.roles(project.id), [project.id]);
   const [email, setEmail] = useState("");
   const [roleId, setRoleId] = useState("");
@@ -188,6 +193,7 @@ function Members() {
     try {
       await fn();
       reload();
+      reloadCompanies();
     } catch (e) {
       setMsg((e as Error).message);
     }
@@ -323,6 +329,7 @@ function Members() {
           reloadRoles();
         }}
       />
+      <ProjectCompaniesSection companies={companies ?? []} onChanged={reloadCompanies} />
     </div>
   );
 }
@@ -377,11 +384,22 @@ function Naming() {
 }
 
 function example(s: NamingStandard): string {
+  const chosen: Record<string, string> = {};
   return s.fields
     .filter((f) => f.inName !== false)
-    .map((f) => (f.type === "list" ? (f.values[0]?.code ?? "?") : f.type === "number" ? "1".padStart(f.digits, "0") : i18n.t("projectSettings:naming.exampleText")))
+    .map((f) => {
+      const value =
+        f.type === "list"
+          ? (valuesFor(f, f.dependsOn ? chosen[f.dependsOn] : undefined)[0]?.code ?? "?")
+          : f.type === "number"
+            ? "1".padStart(f.digits, "0")
+            : (f.suggestions?.[0]?.code ?? i18n.t("projectSettings:naming.exampleText"));
+      chosen[f.name] = value;
+      return value;
+    })
     .join(s.delimiter);
 }
+
 
 /**
  * One field per line: "Ad | list | KOD=Açıklama, KOD2" · "Ad | number | 4" (or "2-3" digits) · "Ad | text".
@@ -456,9 +474,10 @@ function NamingEditor({ initial, onClose, onSaved }: { initial: NamingStandardDt
     const def: NamingStandard = {
       ...(initial?.definition.allowSuffix ? { allowSuffix: true } : {}),
       ...(initial?.definition.allowDelimiterInCodes ? { allowDelimiterInCodes: true } : {}),
+      ...(initial?.definition.maxLength !== undefined ? { maxLength: initial.definition.maxLength } : {}),
       name,
       delimiter,
-      fields: fromText(fields),
+      fields: keepNamingFieldSettings(fromText(fields), initial?.definition.fields),
     };
     try {
       if (initial) await api.updateNamingStandard(project.id, initial.id, def);

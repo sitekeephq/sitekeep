@@ -16,6 +16,7 @@ import {
 } from "@sitekeep/shared";
 import { DEFAULT_LANGUAGE, tFor, type MsgKey } from "../i18n/index.js";
 import { extractJson } from "../ai/json.js";
+import { sourceLanguageRule } from "../ai/language.js";
 import { pdfErrorText } from "./extract.js";
 import type { WorkerOutput } from "./pdf-worker.js";
 import type { ChatProvider } from "./suggest.js";
@@ -294,7 +295,9 @@ export async function refineRegisterWithAi(
         {
           role: "system",
           content:
-            "Şartname cümlelerini teknik onay tiplerine ayırıyorsun: MOS malzeme onayı/teknik föy, NUM numune, UCZ atölye çizimi, YB yöntem beyanı, IP iş programı, ISG iş güvenliği, TR teknik rapor/hesap, PMR periyodik muayene, KS test/sertifika/kalite, IKOF imalat kontrol formu, BAS bilgi amaçlı, MKF saha malzeme kabulü. Yalnız JSON döndür: {\"<id>\": {\"tip\": \"<kod>\"|null, \"ozet\": \"<en çok 12 kelime>\"}}.", // i18n-ok: prompt for the language model
+            "Şartname cümlelerini teknik onay tiplerine ayırıyorsun: MOS malzeme onayı/teknik föy, NUM numune, UCZ atölye çizimi, YB yöntem beyanı, IP iş programı, ISG iş güvenliği, TR teknik rapor/hesap, PMR periyodik muayene, KS test/sertifika/kalite, IKOF imalat kontrol formu, BAS bilgi amaçlı, MKF saha malzeme kabulü. Yalnız JSON döndür: {\"<id>\": {\"tip\": \"<kod>\"|null, \"ozet\": \"<en çok 12 kelime>\"}}. " + // i18n-ok: prompt for the language model
+            // Extraction: the short descriptions keep the specification's language.
+            sourceLanguageRule(opts.lang, "each item's specification sentence (metin)"),
         },
         { role: "user", content: JSON.stringify(payload) },
       ],

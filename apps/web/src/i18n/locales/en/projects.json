@@ -233,7 +233,9 @@
       "endDate": "End Date",
       "location": "Location",
       "locationPlaceholder": "City, district or site address",
-      "client": "Client"
+      "client": "Client",
+      "csbProjectCode": "ÇŞB Project Code (EK-1)",
+      "csbProjectCodeHint": "Six characters given by the authority (e.g. 270001). It fills the Proje Kodu field of the ÇŞB 2026 naming; leave it empty if it is not known yet."
     },
     "parties": {
       "team": "Task Team",
@@ -336,7 +338,19 @@
       "digits_other": "{{count}} digits",
       "freeText": "Free text",
       "sample": "Sample Name",
-      "sampleOk": "The sample follows the standard."
+      "sampleOk": "The sample follows the standard.",
+      "textLength_one": "{{count}} character",
+      "textLength_other": "{{count}} characters",
+      "charset": {
+        "alphanumeric": "A–Z, 0–9",
+        "alphabetic": "A–Z",
+        "numeric": "0–9"
+      },
+      "suggested": "Suggested: {{codes}}",
+      "dependsOn": "Depends on {{field}}",
+      "notInCode": "not part of the document code",
+      "fromCsbCode": "from the ÇŞB project code",
+      "maxLength": "At most {{count}} characters without the extension."
     },
     "codes": {
       "suitability": "Suitability Codes",
@@ -412,5 +426,28 @@
       "emailRequired": "Fill in or remove the empty e-mail rows.",
       "standard": "Naming standard {{name}} is not in the template."
     }
+  },
+  "restore": {
+    "action": "Restore Project",
+    "title": "Restore a Project from an Export",
+    "hint": "Upload a SiteKeep project export (ZIP). It is restored as a new project: files with all versions and codes, folders with states and permissions, members (matched by e-mail; people without an account here are listed, not created), roles, task teams and issues. Every checksum is verified first: a changed or damaged package is refused.",
+    "file": "Export package (ZIP)",
+    "code": "Project code of the new project",
+    "name": "Project name (empty: the name in the package)",
+    "start": "Upload and Restore",
+    "uploading": "Uploading…",
+    "verifying": "Checking checksums: {{done}} / {{total}}",
+    "importing": "Restoring: {{done}} / {{total}} versions",
+    "queued": "Queued",
+    "failed": "Restore failed: {{error}}",
+    "done": "The project {{code}} was restored: {{files}} files, {{versions}} versions, {{topics}} issues, {{members}} members.",
+    "unknownUsers": "People without an account in this installation (not created; add them and give them their roles):",
+    "unknownCompanies": "Companies without a match here:",
+    "skippedGrants_one": "{{count}} folder permission left out (its person, company or role has no match).",
+    "skippedGrants_other": "{{count}} folder permissions left out (their person, company or role has no match).",
+    "missingVersions": "Versions in the package without their bytes: {{count}}.",
+    "warnings": "Notes:",
+    "open": "Open Project",
+    "close": "Close"
   }
 }

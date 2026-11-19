@@ -23,7 +23,7 @@ import { eq, lt } from "drizzle-orm";
 import type { Db } from "../db/index.js";
 import { outboundLog } from "../db/schema.js";
 import { HttpError } from "../core/platform/http.js";
-import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
 import { isLanHost } from "../ai/hosts.js";
 import { connectionDisabled, privacyState, refreshPrivacyState } from "./settings.js";
 
@@ -48,8 +48,8 @@ export interface OutboundMeta {
 export class OutboundBlockedError extends HttpError {
   constructor(message: Msg | string) {
     super(403, "outbound_blocked", message);
-    // Callers that pass the text on (AI provider errors) get the default language, not the log's English.
-    this.message = render(DEFAULT_LANGUAGE, message);
+    // Callers that pass the text on (AI provider errors) get the requester's language (the default outside a request).
+    this.message = render(currentLanguage(), message);
   }
 }
 

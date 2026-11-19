@@ -15,7 +15,9 @@
     "templateRequired": "templateId or template is required.",
     "invalidFolderName": "Invalid folder name: \"{{name}}\".",
     "roleNotInTemplate": "Role \"{{key}}\" is not in the Template.",
-    "companyNotFound": "One of the selected companies was not found."
+    "companyNotFound": "One of the selected companies was not found.",
+    "companyNotInProject": "The company is not on this Project. A project administrator adds companies to the Project.",
+    "companyInUse": "The company is still used in this Project (members, roles, permissions or records)."
   },
   "warnings": {
     "rolesWithoutCompany": "Roles without a company: {{roles}}. Folder permissions and workflow steps of these roles are skipped; they can be added manually later.",
@@ -38,5 +40,14 @@
     "numberingRefused": "Number pattern not applied: {{problem}}",
     "transmittalAttributes": "The columns of the transmittal cover sheet are fixed; the template's attribute list was not applied.",
     "issueFields": "Issue custom fields are kept with the project settings; issues do not have custom fields yet."
+  },
+  "seed": {
+    "rootFolder": "Project Files",
+    "isoFolders": {
+      "wip": "01-WIP",
+      "shared": "02-SHARED",
+      "published": "03-PUBLISHED",
+      "archived": "04-ARCHIVED"
+    }
   }
 }

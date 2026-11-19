@@ -302,14 +302,15 @@ describe("project templates", () => {
   });
 
   it("creates ISO 19650 construction projects in Turkish and English with all workflows", async () => {
-    for (const [code, id, shared] of [
-      ["ISOTR", "iso19650-yapim-tr", "20-PAYLAŞILAN (Shared)"],
-      ["ISOEN", "iso19650-yapim-en", "20-SHARED"],
+    // The Turkish template also brings the ÇŞB 2026 (EK-2) naming profile.
+    for (const [code, id, shared, naming] of [
+      ["ISOTR", "iso19650-yapim-tr", "20-PAYLAŞILAN (Shared)", 3],
+      ["ISOEN", "iso19650-yapim-en", "20-SHARED", 2],
     ] as const) {
       const r = await admin.post("/projects/from-template", { code, name: id, templateId: id, slotCompanies });
       expect(r.status, JSON.stringify(r.body)).toBe(200);
       expect(r.body.counts.workflows).toBe(8);
-      expect(r.body.counts.namingStandards).toBe(2);
+      expect(r.body.counts.namingStandards).toBe(naming);
       expect(await child(admin, r.body.id, r.body.rootFolderId, shared)).toBeTruthy();
     }
   });

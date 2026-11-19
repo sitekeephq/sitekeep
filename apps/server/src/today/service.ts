@@ -21,7 +21,7 @@ import { AnswerProvider, overrideProvider } from "../ai/override.js";
 import { resolveProvider, resolveProviderSetup, type AiProvider } from "../ai/provider.js";
 import { externalClientAllowed, getAiTaskQueueSettings } from "../ai/settings.js";
 import { todayIso } from "../works/service.js";
-import { TODAY_SUMMARY_SYSTEM, autoSummary, compactInput, inputStamp, parseAiSummary, type CompactInput, type TodayData } from "./text.js";
+import { autoSummary, compactInput, inputStamp, parseAiSummary, type CompactInput, type TodayData, todaySummarySystem } from "./text.js";
 
 export interface SummaryDeps {
   db: Db;
@@ -67,6 +67,11 @@ async function save(db: Db, userId: string, projectId: string, set: Partial<Omit
     .onConflictDoUpdate({ target: [todaySummaries.userId, todaySummaries.projectId], set });
 }
 
+/** The summary is written in the reader's language: a language switch makes it due again. */
+function summaryStamp(input: CompactInput, lang: string | undefined): string {
+  return inputStamp(`${lang ?? DEFAULT_LANGUAGE}\n${input.text}`);
+}
+
 const lastFailed = (row: Row | undefined) => !!row?.error && (!row.generatedAt || (row.errorAt ?? new Date(0)) > row.generatedAt);
 
 /**
@@ -80,11 +85,14 @@ export function summaryDue(row: Row | undefined, stamp: string, now: Date, manua
   return !row?.attemptedAt || now.getTime() - row.attemptedAt.getTime() >= TODAY_SUMMARY_MIN_INTERVAL_MS;
 }
 
-/** Asks the model; invented numbers are dropped (strict for a connected client: it gets the errors back). */
-export async function writeSummary(provider: AiProvider, input: CompactInput, strict = false) {
+/**
+ * Asks the model; invented numbers are dropped (strict for a connected client: it gets the errors
+ * back). The bullets are written in `lang`, the reader's interface language.
+ */
+export async function writeSummary(provider: AiProvider, input: CompactInput, strict = false, lang: string = DEFAULT_LANGUAGE) {
   const res = await provider.chat(
     [
-      { role: "system", content: TODAY_SUMMARY_SYSTEM },
+      { role: "system", content: todaySummarySystem(lang) },
       { role: "user", content: input.text },
     ],
     { maxTokens: 400, timeoutMs: 240_000 },
@@ -106,7 +114,7 @@ export async function writeSummary(provider: AiProvider, input: CompactInput, st
   return { bullets: parsed.bullets, model: res.model || provider.model, dropped: parsed.dropped };
 }
 
-function start(deps: SummaryDeps, a: ProjectAccess, input: CompactInput, stamp: string, key: string): void {
+function start(deps: SummaryDeps, a: ProjectAccess, input: CompactInput, stamp: string, key: string, lang: string): void {
   const { db } = deps;
   const uid = a.user.id;
   const pid = a.project.id;
@@ -114,7 +122,7 @@ function start(deps: SummaryDeps, a: ProjectAccess, input: CompactInput, stamp: 
     await save(db, uid, pid, { attemptedAt: new Date() });
     try {
       const provider = await resolveProvider(db, deps.secretKey, pid);
-      const r = await writeSummary(provider, input);
+      const r = await writeSummary(provider, input, false, lang);
       await save(db, uid, pid, { stamp, bullets: r.bullets, model: r.model, source: "provider", generatedAt: new Date(), error: null, errorAt: null });
     } catch (e) {
       // Stored with the summary: in the installation language.
@@ -168,13 +176,13 @@ export async function todaySummary(
 ): Promise<TodaySummaryDto> {
   const today = todayIso(now);
   const input = compactInput(data, today);
-  const stamp = inputStamp(input.text);
+  const stamp = summaryStamp(input, o.lang);
   const auto = autoSummary(data, today, o.lang);
   const pid = a.project.id;
   const key = `${a.user.id}:${pid}`;
   const mode = await summaryMode(deps, pid);
   const row = await loadRow(deps.db, a.user.id, pid);
-  if (o.kick && mode === "provider" && !inflight.has(key) && summaryDue(row, stamp, now, false)) start(deps, a, input, stamp, key);
+  if (o.kick && mode === "provider" && !inflight.has(key) && summaryDue(row, stamp, now, false)) start(deps, a, input, stamp, key, o.lang ?? DEFAULT_LANGUAGE);
   const queueTask = mode === "queue" ? await openQueueTask(deps.db, a.user.id, pid) : null;
   return toDto(row, { auto, mode, stamp, today, key, queueTask });
 }
@@ -195,7 +203,7 @@ export async function refreshTodaySummary(
   const pid = a.project.id;
   const key = `${a.user.id}:${pid}`;
   const input = compactInput(data, todayIso(now));
-  const stamp = inputStamp(input.text);
+  const stamp = summaryStamp(input, o.lang);
   const row = await loadRow(db, a.user.id, pid);
   const due = o.force || summaryDue(row, stamp, now, true);
   if (o.wait) {
@@ -203,7 +211,7 @@ export async function refreshTodaySummary(
       // resolveProvider applies the AI policy (also to a connected client's answer).
       const provider = await resolveProvider(db, deps.secretKey, pid);
       const override = overrideProvider();
-      const r = await writeSummary(provider, input, override instanceof AnswerProvider);
+      const r = await writeSummary(provider, input, override instanceof AnswerProvider, o.lang);
       const at = new Date();
       await save(db, a.user.id, pid, {
         stamp,
@@ -222,6 +230,6 @@ export async function refreshTodaySummary(
   if (mode === "off") throw new HttpError(403, "ai_off", msg("today:errors.aiOff"));
   if (mode !== "provider")
     throw new HttpError(409, "ai_no_provider", msg("today:errors.noProvider"));
-  if (due && !inflight.has(key)) start(deps, a, input, stamp, key);
+  if (due && !inflight.has(key)) start(deps, a, input, stamp, key, o.lang ?? DEFAULT_LANGUAGE);
   return todaySummary(deps, a, data, now, { kick: false, lang: o.lang });
 }

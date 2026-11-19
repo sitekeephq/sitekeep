@@ -331,6 +331,9 @@ describe("record from file (Bırak, kaydet)", () => {
       await admin.post("/users", { email: `${key}@b.test`, name: key, password: PW, companyId: ids[company] });
       expect((await admin.post(`${P()}/members`, { email: `${key}@b.test` })).status).toBe(200);
     }
+    // Prota has no member here: letters may address it once it is on the project (docs/features/COMPANIES.md).
+    // DİS stays off the project.
+    expect((await admin.post(`${P()}/companies`, { companyId: ids.PRT })).status).toBe(200);
     await admin.post("/users", { email: "eve@b.test", name: "Eve", password: PW, companyId: ids.DIS });
     semih = api({ cookie: await login("semih@b.test") });
     aytug = api({ cookie: await login("aytug@b.test") });

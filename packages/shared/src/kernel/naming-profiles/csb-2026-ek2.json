@@ -1,0 +1,1208 @@
+{
+  "$comment": "ÇŞB 2026 file naming profile (EK-1, EK-2). Transcribed from the annexes of the regulation 'Mimarlık ve Mühendislik Projelerinin Dijital Olarak Hazırlanması Hakkında Yönetmelik' (Resmî Gazete 5 August 2026, no. 33331; in force 1 September 2027). Names and codes as printed; deviations are listed in 'notes'. Used by packages/shared/src/kernel/naming-csb2026.ts and apps/server/templates/src/iso19650-yapim.mjs; docs/features/NAMING_CSB_2026.md.",
+  "source": {
+    "gazette": "Resmî Gazete",
+    "date": "2026-08-05",
+    "number": "33331",
+    "inForce": "2027-09-01",
+    "annexes": [
+      "EK-1",
+      "EK-2"
+    ]
+  },
+  "template": "Proje Kodu_Bina Kodu_Disiplin_Alt Disiplin/Öge_Dosya Türü_Dosya Tipi_Kat/Konum_Sıra No_Revizyon No",
+  "delimiter": "_",
+  "maxLength": 35,
+  "disciplines": [
+    {
+      "code": "MM",
+      "name": "Mimari"
+    },
+    {
+      "code": "IM",
+      "name": "İç Mimari"
+    },
+    {
+      "code": "ST",
+      "name": "Statik"
+    },
+    {
+      "code": "EE",
+      "name": "Elektrik"
+    },
+    {
+      "code": "MK",
+      "name": "Mekanik"
+    },
+    {
+      "code": "HR",
+      "name": "Harita"
+    },
+    {
+      "code": "AL",
+      "name": "Altyapı"
+    },
+    {
+      "code": "PY",
+      "name": "Peyzaj"
+    },
+    {
+      "code": "ZE",
+      "name": "Zemin"
+    },
+    {
+      "code": "YN",
+      "name": "Yangın"
+    },
+    {
+      "code": "GS",
+      "name": "Güneş Enerji Sistemi"
+    },
+    {
+      "code": "AK",
+      "name": "Akustik"
+    }
+  ],
+  "subdisciplines": [
+    {
+      "table": "2.3",
+      "discipline": "MM",
+      "kind": "Öge",
+      "values": [
+        {
+          "code": "AKSS",
+          "name": "Aks"
+        },
+        {
+          "code": "AKSR",
+          "name": "Aksesuar"
+        },
+        {
+          "code": "ASAN",
+          "name": "Asansör"
+        },
+        {
+          "code": "ASTV",
+          "name": "Asma Tavan"
+        },
+        {
+          "code": "BACA",
+          "name": "Baca"
+        },
+        {
+          "code": "BITK",
+          "name": "Bitki"
+        },
+        {
+          "code": "BORD",
+          "name": "Bordür"
+        },
+        {
+          "code": "CAMM",
+          "name": "Cam"
+        },
+        {
+          "code": "CEPH",
+          "name": "Cephe"
+        },
+        {
+          "code": "CATI",
+          "name": "Çatı"
+        },
+        {
+          "code": "CKAP",
+          "name": "Çatı Kaplama"
+        },
+        {
+          "code": "CKTA",
+          "name": "Çatı Kaplama Tahtası"
+        },
+        {
+          "code": "CTAS",
+          "name": "Çatı Taşıyıcı"
+        },
+        {
+          "code": "CVRE",
+          "name": "Çevre"
+        },
+        {
+          "code": "CORT",
+          "name": "Çörten"
+        },
+        {
+          "code": "DENZ",
+          "name": "Denizlik"
+        },
+        {
+          "code": "DOGR",
+          "name": "Doğrama"
+        },
+        {
+          "code": "DOSM",
+          "name": "Döşeme"
+        },
+        {
+          "code": "DUVA",
+          "name": "Duvar"
+        },
+        {
+          "code": "DUVK",
+          "name": "Duvar Kaplama"
+        },
+        {
+          "code": "EMSL",
+          "name": "Emsal"
+        },
+        {
+          "code": "GIYC",
+          "name": "Giydirme Cephe"
+        },
+        {
+          "code": "GNKR",
+          "name": "Güneş Kırıcı"
+        },
+        {
+          "code": "HARP",
+          "name": "Harpuşta"
+        },
+        {
+          "code": "HATL",
+          "name": "Hatıl"
+        },
+        {
+          "code": "ISYA",
+          "name": "Isı Yalıtımı"
+        },
+        {
+          "code": "ISLH",
+          "name": "Islak Hacim",
+          "printed": "İSLH"
+        },
+        {
+          "code": "KALD",
+          "name": "Kaldırım"
+        },
+        {
+          "code": "KAPI",
+          "name": "Kapı"
+        },
+        {
+          "code": "KARP",
+          "name": "Kartonpiyer"
+        },
+        {
+          "code": "KOLN",
+          "name": "Kolon"
+        },
+        {
+          "code": "KORK",
+          "name": "Korkuluk"
+        },
+        {
+          "code": "LENT",
+          "name": "Lento"
+        },
+        {
+          "code": "MERD",
+          "name": "Merdiven"
+        },
+        {
+          "code": "OLUK",
+          "name": "Oluk"
+        },
+        {
+          "code": "PENC",
+          "name": "Pencere"
+        },
+        {
+          "code": "RAMP",
+          "name": "Rampa"
+        },
+        {
+          "code": "SAPP",
+          "name": "Şap"
+        },
+        {
+          "code": "SESY",
+          "name": "Ses Yalıtımı"
+        },
+        {
+          "code": "SIVA",
+          "name": "Sıva"
+        },
+        {
+          "code": "SUYA",
+          "name": "Su Yalıtımı"
+        },
+        {
+          "code": "SUPR",
+          "name": "Süpürgelik"
+        },
+        {
+          "code": "TASI",
+          "name": "Taşıyıcı"
+        },
+        {
+          "code": "TAVN",
+          "name": "Tavan"
+        },
+        {
+          "code": "TEML",
+          "name": "Temel"
+        },
+        {
+          "code": "TEFR",
+          "name": "Tefriş"
+        },
+        {
+          "code": "TSVY",
+          "name": "Tesviye Betonu"
+        },
+        {
+          "code": "TRET",
+          "name": "Tretuvar"
+        },
+        {
+          "code": "YIBO",
+          "name": "Yağmur İniş Borusu"
+        },
+        {
+          "code": "YOLL",
+          "name": "Yol"
+        },
+        {
+          "code": "ZMNK",
+          "name": "Zemin Kaplama"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Öge kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer (Diğer ögeler için)"
+        }
+      ]
+    },
+    {
+      "table": "2.4",
+      "discipline": "IM",
+      "kind": "Öge",
+      "values": [
+        {
+          "code": "PANL",
+          "name": "Ahşap Panel"
+        },
+        {
+          "code": "AKSR",
+          "name": "Aksesuar"
+        },
+        {
+          "code": "ASAN",
+          "name": "Asansör"
+        },
+        {
+          "code": "AKUS",
+          "name": "Akustik Panel"
+        },
+        {
+          "code": "ASTV",
+          "name": "Asma Tavan"
+        },
+        {
+          "code": "AYDN",
+          "name": "Aydınlatma Elemanı"
+        },
+        {
+          "code": "BACA",
+          "name": "Baca"
+        },
+        {
+          "code": "BNYO",
+          "name": "Banyo Elemanı"
+        },
+        {
+          "code": "BITK",
+          "name": "Bitki"
+        },
+        {
+          "code": "BORD",
+          "name": "Bordür"
+        },
+        {
+          "code": "BOLP",
+          "name": "Bölücü Panel"
+        },
+        {
+          "code": "CAMM",
+          "name": "Cam"
+        },
+        {
+          "code": "CMBL",
+          "name": "Cam İç Bölme"
+        },
+        {
+          "code": "CEPH",
+          "name": "Cephe"
+        },
+        {
+          "code": "CATI",
+          "name": "Çatı"
+        },
+        {
+          "code": "CKAP",
+          "name": "Çatı Kaplama"
+        },
+        {
+          "code": "CKTA",
+          "name": "Çatı Kaplama Tahtası"
+        },
+        {
+          "code": "CTAS",
+          "name": "Çatı Taşıyıcı"
+        },
+        {
+          "code": "CVRE",
+          "name": "Çevre"
+        },
+        {
+          "code": "CORT",
+          "name": "Çörten"
+        },
+        {
+          "code": "DENZ",
+          "name": "Denizlik"
+        },
+        {
+          "code": "DOGR",
+          "name": "Doğrama"
+        },
+        {
+          "code": "DOSM",
+          "name": "Döşeme"
+        },
+        {
+          "code": "DUVA",
+          "name": "Duvar"
+        },
+        {
+          "code": "DUVK",
+          "name": "Duvar Kaplama"
+        },
+        {
+          "code": "EMSL",
+          "name": "Emsal"
+        },
+        {
+          "code": "GIYC",
+          "name": "Giydirme Cephe"
+        },
+        {
+          "code": "GNKR",
+          "name": "Güneş Kırıcı"
+        },
+        {
+          "code": "HARP",
+          "name": "Harpuşta"
+        },
+        {
+          "code": "HATL",
+          "name": "Hatıl"
+        },
+        {
+          "code": "ISYA",
+          "name": "Isı Yalıtımı"
+        },
+        {
+          "code": "ISLH",
+          "name": "Islak Hacim"
+        },
+        {
+          "code": "KALD",
+          "name": "Kaldırım"
+        },
+        {
+          "code": "KPKN",
+          "name": "Kapı Kanat"
+        },
+        {
+          "code": "KPKS",
+          "name": "Kapı Kasa"
+        },
+        {
+          "code": "KARP",
+          "name": "Kartonpiyer"
+        },
+        {
+          "code": "KLIM",
+          "name": "Klima İç Ünite"
+        },
+        {
+          "code": "KORK",
+          "name": "Korkuluk"
+        },
+        {
+          "code": "LENT",
+          "name": "Lento"
+        },
+        {
+          "code": "MNFZ",
+          "name": "Menfez"
+        },
+        {
+          "code": "MERD",
+          "name": "Merdiven"
+        },
+        {
+          "code": "MTFK",
+          "name": "Mutfak Elemanı"
+        },
+        {
+          "code": "OLUK",
+          "name": "Oluk"
+        },
+        {
+          "code": "PNKT",
+          "name": "Pencere Kanat"
+        },
+        {
+          "code": "PNKS",
+          "name": "Pencere Kasa"
+        },
+        {
+          "code": "PRDE",
+          "name": "Perde"
+        },
+        {
+          "code": "PRIZ",
+          "name": "Priz/Anahtar"
+        },
+        {
+          "code": "RAMP",
+          "name": "Rampa"
+        },
+        {
+          "code": "SAPP",
+          "name": "Şap"
+        },
+        {
+          "code": "SMOB",
+          "name": "Sabit Mobilya"
+        },
+        {
+          "code": "SESY",
+          "name": "Ses Yalıtımı"
+        },
+        {
+          "code": "SIVA",
+          "name": "Sıva"
+        },
+        {
+          "code": "SUYA",
+          "name": "Su Yalıtımı"
+        },
+        {
+          "code": "SUPR",
+          "name": "Süpürgelik"
+        },
+        {
+          "code": "TASI",
+          "name": "Taşıyıcı"
+        },
+        {
+          "code": "TAVN",
+          "name": "Tavan"
+        },
+        {
+          "code": "TEML",
+          "name": "Temel"
+        },
+        {
+          "code": "TEFR",
+          "name": "Tefriş"
+        },
+        {
+          "code": "TSVY",
+          "name": "Tesviye Betonu"
+        },
+        {
+          "code": "TZGH",
+          "name": "Tezgah"
+        },
+        {
+          "code": "TRET",
+          "name": "Tretuvar"
+        },
+        {
+          "code": "YIBO",
+          "name": "Yağmur İniş Borusu"
+        },
+        {
+          "code": "YOLL",
+          "name": "Yol"
+        },
+        {
+          "code": "ZMNK",
+          "name": "Zemin Kaplama"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Öge kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer (Diğer ögeler için)"
+        }
+      ]
+    },
+    {
+      "table": "2.5",
+      "discipline": "ST",
+      "kind": "Alt Disiplin",
+      "values": [
+        {
+          "code": "BETO",
+          "name": "Betonarme"
+        },
+        {
+          "code": "CELK",
+          "name": "Çelik"
+        },
+        {
+          "code": "YIGM",
+          "name": "Yığma"
+        },
+        {
+          "code": "AHSP",
+          "name": "Ahşap"
+        },
+        {
+          "code": "KMPT",
+          "name": "Kompozit"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Alt disiplin kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    },
+    {
+      "table": "2.6",
+      "discipline": "MK",
+      "kind": "Alt Disiplin",
+      "values": [
+        {
+          "code": "SHTT",
+          "name": "Sıhhi Tesisat"
+        },
+        {
+          "code": "ISTT",
+          "name": "Isıtma Tesisat"
+        },
+        {
+          "code": "HVLT",
+          "name": "Havalandırma Tesisat"
+        },
+        {
+          "code": "SGTT",
+          "name": "Soğutma Tesisatı"
+        },
+        {
+          "code": "TMST",
+          "name": "Temiz Su Tesisatı"
+        },
+        {
+          "code": "PIST",
+          "name": "Pissu Tesisatı"
+        },
+        {
+          "code": "YAGT",
+          "name": "Yağmur Tesisatı"
+        },
+        {
+          "code": "BSHT",
+          "name": "Basınçlı Hava Tesisatı"
+        },
+        {
+          "code": "OTMT",
+          "name": "Otomatik Kontrol Tesisatı"
+        },
+        {
+          "code": "MDGZ",
+          "name": "Medikal Gaz"
+        },
+        {
+          "code": "MUTT",
+          "name": "Mutfak Tesisatı"
+        },
+        {
+          "code": "CMTT",
+          "name": "Çamaşırhane Tesisatı"
+        },
+        {
+          "code": "DGTT",
+          "name": "Doğalgaz Tesisatı"
+        },
+        {
+          "code": "BHTT",
+          "name": "Buhar Tesisatı"
+        },
+        {
+          "code": "ORTT",
+          "name": "Müşterek Tesisat"
+        },
+        {
+          "code": "BSTT",
+          "name": "Bahçe Sulama Tesisatı"
+        },
+        {
+          "code": "HVZT",
+          "name": "Havuz Tesisatı"
+        },
+        {
+          "code": "ASTT",
+          "name": "Atık Su Arıtma Tesisatı"
+        },
+        {
+          "code": "DSDK",
+          "name": "Klima Tesisatı"
+        },
+        {
+          "code": "YNGT",
+          "name": "Yangın Tesisatı"
+        },
+        {
+          "code": "ASNR",
+          "name": "Asansör"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Alt disiplin kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    },
+    {
+      "table": "2.7",
+      "discipline": "EE",
+      "kind": "Alt Disiplin",
+      "values": [
+        {
+          "code": "KUVA",
+          "name": "Kuvvetli Akım Tesisatı"
+        },
+        {
+          "code": "ZAYA",
+          "name": "Zayıf Akım Tesisatı"
+        },
+        {
+          "code": "AYDT",
+          "name": "Aydınlatma Tesisatı"
+        },
+        {
+          "code": "GUDT",
+          "name": "Güç Dağıtım Tesisatı -Mekanik Tesisat İçin Güç Dağıtımı Tesisatı-Reaktif Güç Kompanzasyonu"
+        },
+        {
+          "code": "DJGT",
+          "name": "Dizel Jeneratör Grubu Tesisatı"
+        },
+        {
+          "code": "CAYT",
+          "name": "Çevre Aydınlatma Tesisatı"
+        },
+        {
+          "code": "TOST",
+          "name": "Topraklama Sistemleri Tesisatı -Yıldırımdan Korunma Sistemi"
+        },
+        {
+          "code": "OGET",
+          "name": "Orta Gerilim Enerji Temini (Trafo)"
+        },
+        {
+          "code": "TBIA",
+          "name": "Telefon-Bilgi İletişim Ağı-TV Sistemleri Tesisatı"
+        },
+        {
+          "code": "MYAS",
+          "name": "Müzik Yayın, Anons Sistemi-Merkezi Saat Sistemi- Intercom Sistemi"
+        },
+        {
+          "code": "YAVA",
+          "name": "Yangın Algılama ve Alarm Tesisatı-Acil Anons Sistemleri -Acil Durum Aydınlatma ve Yönlendirme Tesisatı"
+        },
+        {
+          "code": "CTVS",
+          "name": "Kapalı Devre TV Sistemleri (CCTV)-Kartlı Geçiş ve Güvenlik Sistemleri"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Alt disiplin kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    },
+    {
+      "table": "2.8",
+      "discipline": "HR",
+      "kind": "Öge",
+      "values": [
+        {
+          "code": "PKBL",
+          "name": "Proje Koordinat Bilgisi"
+        },
+        {
+          "code": "KORD",
+          "name": "Koordinatlar"
+        },
+        {
+          "code": "DOSB",
+          "name": "Dönüşüm Bilgisi"
+        },
+        {
+          "code": "LJNT",
+          "name": "Lejant"
+        },
+        {
+          "code": "PLGN",
+          "name": "Poligon"
+        },
+        {
+          "code": "ADPL",
+          "name": "Ada Parsel"
+        },
+        {
+          "code": "PZKT",
+          "name": "Parsel Zemin Kotu"
+        },
+        {
+          "code": "BZKT",
+          "name": "Bina Zemin Kotu"
+        },
+        {
+          "code": "BLKA",
+          "name": "Blok Adı"
+        },
+        {
+          "code": "KMPL",
+          "name": "Komşu Parseller"
+        },
+        {
+          "code": "CKMS",
+          "name": "Çekme Mesafesi"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Öge kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    },
+    {
+      "table": "2.9",
+      "discipline": "AL",
+      "kind": "Alt Disiplin",
+      "values": [
+        {
+          "code": "YAGS",
+          "name": "Yağmur Suyu"
+        },
+        {
+          "code": "ATIS",
+          "name": "Atık Su"
+        },
+        {
+          "code": "ICMS",
+          "name": "İçme Suyu"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Alt disiplin kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    },
+    {
+      "table": "2.10",
+      "discipline": "PY",
+      "kind": "Alt Disiplin",
+      "values": [
+        {
+          "code": "YAPS",
+          "name": "Yapısal"
+        },
+        {
+          "code": "BITS",
+          "name": "Bitkisel"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Alt Disiplin kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    },
+    {
+      "table": "2.11",
+      "discipline": "ZE",
+      "kind": "Öge",
+      "values": [
+        {
+          "code": "IKS",
+          "name": "İksa"
+        },
+        {
+          "code": "KZK",
+          "name": "Kazık"
+        },
+        {
+          "code": "ZTE",
+          "name": "Zemin ve Temel"
+        },
+        {
+          "code": "XXXX",
+          "name": "Genel (Öge kullanılmaması durumunda)"
+        },
+        {
+          "code": "DIGR",
+          "name": "Diğer"
+        }
+      ]
+    }
+  ],
+  "fileKinds": [
+    {
+      "code": "PL",
+      "name": "Plan"
+    },
+    {
+      "code": "KS",
+      "name": "Kesit",
+      "note": "Tip kesitler de dahil"
+    },
+    {
+      "code": "GR",
+      "name": "Görünüş"
+    },
+    {
+      "code": "DT",
+      "name": "Detay"
+    },
+    {
+      "code": "SM",
+      "name": "Şema"
+    },
+    {
+      "code": "MD",
+      "name": "Model"
+    },
+    {
+      "code": "FR",
+      "name": "Form"
+    },
+    {
+      "code": "LS",
+      "name": "Liste"
+    },
+    {
+      "code": "DK",
+      "name": "Doküman"
+    },
+    {
+      "code": "RP",
+      "name": "Rapor"
+    },
+    {
+      "code": "HS",
+      "name": "Hesap"
+    },
+    {
+      "code": "GN",
+      "name": "Genel"
+    }
+  ],
+  "fileTypes": [
+    {
+      "group": "MİMARİ DOSYA TİPLERİ",
+      "values": [
+        {
+          "code": "MMC",
+          "name": "Mimari Çizim"
+        },
+        {
+          "code": "MAP",
+          "name": "Mimari Açıklama Raporu"
+        },
+        {
+          "code": "ERP",
+          "name": "Erişilebilirlik Çizimi"
+        },
+        {
+          "code": "YKG",
+          "name": "Yangın Kaçış ve Güvenlik Planları"
+        },
+        {
+          "code": "CAT",
+          "name": "Çatı Planı ve Detayları"
+        },
+        {
+          "code": "VAZ",
+          "name": "Vaziyet Planı"
+        },
+        {
+          "code": "MIR",
+          "name": "Mimari Hesap Raporu"
+        }
+      ]
+    },
+    {
+      "group": "STATİK DOSYA TİPLERİ",
+      "values": [
+        {
+          "code": "STC",
+          "name": "Statik Çizim"
+        },
+        {
+          "code": "SHR",
+          "name": "Statik Hesap Raporu"
+        },
+        {
+          "code": "ISC",
+          "name": "İskele Çizimi"
+        },
+        {
+          "code": "IHR",
+          "name": "İskele Hesap Raporu"
+        }
+      ]
+    },
+    {
+      "group": "MEKANİK DOSYA TİPLERİ",
+      "values": [
+        {
+          "code": "MKC",
+          "name": "Mekanik Çizim"
+        },
+        {
+          "code": "ITH",
+          "name": "Isıtma Tesisatı Hesap Raporu"
+        },
+        {
+          "code": "IYP",
+          "name": "Isı Yalıtım Projesi Hesap Raporu"
+        },
+        {
+          "code": "IKR",
+          "name": "Isı Kaybı Isı Kazanç Hesapları Raporu"
+        },
+        {
+          "code": "EKB",
+          "name": "Enerji Kimlik Belgesi Ön Hesap Raporu"
+        },
+        {
+          "code": "ASN",
+          "name": "Asansör Trafik Hesabı"
+        },
+        {
+          "code": "MTS",
+          "name": "Mekanik Özel Teknik Şartname"
+        }
+      ]
+    },
+    {
+      "group": "ELEKTRİK DOSYA TİPLERİ",
+      "values": [
+        {
+          "code": "ELC",
+          "name": "Elektrik Çizim"
+        },
+        {
+          "code": "AGH",
+          "name": "Akim Kontrolü Ve Gerilim Düşümü Hesabi"
+        },
+        {
+          "code": "TGH",
+          "name": "Trafo Güç Hesabı"
+        },
+        {
+          "code": "AHR",
+          "name": "Aydınlatma Hesap Raporu"
+        },
+        {
+          "code": "ETS",
+          "name": "Elektrik Özel Teknik Şartname"
+        }
+      ]
+    },
+    {
+      "group": "HARİTA DOSYA TİPLERİ",
+      "values": [
+        {
+          "code": "YAP",
+          "name": "Yapı Aplikasyon Projesi"
+        }
+      ]
+    },
+    {
+      "group": "DİĞER DOSYA TİPLERİ",
+      "values": [
+        {
+          "code": "DIC",
+          "name": "Diğer Çizim"
+        },
+        {
+          "code": "DGR",
+          "name": "Diğer Raporlar"
+        }
+      ]
+    },
+    {
+      "group": "TÜM DİSİPLİNLERDE OLABİLECEK DOSYALAR",
+      "values": [
+        {
+          "code": "MLZ",
+          "name": "Malzeme Listesi"
+        },
+        {
+          "code": "MHL",
+          "name": "Mahal Listesi"
+        },
+        {
+          "code": "XXX",
+          "name": "Tip yok"
+        },
+        {
+          "code": "MKF",
+          "name": "Model Kontrol Formu"
+        }
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "code": "B03",
+      "name": "3. Bodrum Kat"
+    },
+    {
+      "code": "B02",
+      "name": "2. Bodrum Kat"
+    },
+    {
+      "code": "B01",
+      "name": "1. Bodrum Kat"
+    },
+    {
+      "code": "K00",
+      "name": "Zemin Kat"
+    },
+    {
+      "code": "K01",
+      "name": "Kat 1"
+    },
+    {
+      "code": "K02",
+      "name": "Kat 2"
+    },
+    {
+      "code": "K03",
+      "name": "Kat 3"
+    },
+    {
+      "code": "K04",
+      "name": "Kat 4"
+    },
+    {
+      "code": "NNN",
+      "name": "Kattan Bağımsız"
+    }
+  ],
+  "levelRules": {
+    "length": 3,
+    "charset": "alphanumeric",
+    "notes": [
+      "2.9.2: mezzanines, roof pieces, plant floors and similar floors not in Tablo 2.14 use KXX with an XX chosen by the designer.",
+      "2.9.3: sections, elevations and other 2D views use a location code XXX chosen by the designer."
+    ]
+  },
+  "fields": [
+    {
+      "name": "Proje Kodu",
+      "length": 6,
+      "dataType": "Alfanümerik",
+      "rule": "EK-1: two-digit year + four-digit sequence given by the authority"
+    },
+    {
+      "name": "Bina Kodu",
+      "length": 2,
+      "dataType": "Alfanümerik",
+      "rule": "2.3: '00' when the project has one building"
+    },
+    {
+      "name": "Disiplin",
+      "length": 2,
+      "dataType": "Alfabetik",
+      "rule": "Tablo 2.2"
+    },
+    {
+      "name": "Alt Disiplin / Öge",
+      "length": 4,
+      "dataType": "Alfabetik",
+      "rule": "Tablo 2.3–2.11; DIGR for others (2.6)"
+    },
+    {
+      "name": "Dosya Türü",
+      "length": 2,
+      "dataType": "Alfabetik",
+      "rule": "Tablo 2.12"
+    },
+    {
+      "name": "Dosya Tipi",
+      "length": 3,
+      "dataType": "Alfabetik",
+      "rule": "Tablo 2.13"
+    },
+    {
+      "name": "Kat / Konum",
+      "length": 3,
+      "dataType": "Alfanümerik",
+      "rule": "Tablo 2.14, 2.9.2, 2.9.3"
+    },
+    {
+      "name": "Sıra No",
+      "length": 2,
+      "dataType": "Sayısal",
+      "rule": "2.10: from 01"
+    },
+    {
+      "name": "Revizyon No",
+      "length": 3,
+      "dataType": "Sayısal",
+      "rule": "2.11: 000, then 001 … on each revision the authority requests"
+    }
+  ],
+  "notes": [
+    "Tablo 2.3 prints the code of 'Islak Hacim' as İSLH (dotted capital I); Tablo 2.4 prints ISLH for the same item. ISLH is used in both (marked 'printed').",
+    "Tablo 2.11 (Zemin) codes IKS, KZK, ZTE have three characters although 2.5 asks for four; they are kept as printed (such names are 34 characters).",
+    "Tablo 2.12: the note '(Tip kesitler de dahil)' of KS is kept as 'note'.",
+    "Tablo 2.13 groups are kept; the group is not enforced against the discipline."
+  ]
+}

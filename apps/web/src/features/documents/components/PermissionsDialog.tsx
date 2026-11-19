@@ -27,7 +27,7 @@ export function PermissionsDialog({
   const label = useLabel();
   const { data: grants, error, setData } = useLoad(() => documentsApi.permissions(projectId, folder.id), [projectId, folder.id]);
   const { data: members } = useLoad(() => api.members(projectId), [projectId]);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(projectId), [projectId]);
   const { data: roles } = useLoad(() => api.roles(projectId), [projectId]);
   const [whoOpen, setWhoOpen] = useState(false);
   const withWipReason = useWipReason();

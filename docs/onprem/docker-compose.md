@@ -34,6 +34,19 @@ The installation bundle installs Caddy itself.
 Profiles for editing in the browser and Office → PDF: `docker compose --profile onlyoffice up -d`
 (or `collabora`, `gotenberg`); the matching block in `.env` ([Office Integration](../features/OFFICE_INTEGRATION.md)).
 
+### macOS and Windows (Docker Desktop)
+
+For trying SiteKeep on a workstation. For a server used by a team, install on Linux
+([installation bundle](installation-bundle.md) or the steps above); the installation bundle is Linux only.
+
+| | |
+|---|---|
+| **macOS** | Docker Desktop 4.x. The image is published for `linux/arm64` and `linux/amd64`, so Apple Silicon runs it natively, without emulation. Tested with the Community image on Apple Silicon: start-up, sign-in, project creation, IFC, PDF and DXF upload, IFC conversion for the model viewer, restart with data kept. |
+| **Windows** | Docker Desktop with the **WSL2** backend (Settings → General → "Use the WSL 2 based engine"). Run the commands in PowerShell or a WSL terminal; `cp` becomes `copy .env.example .env` in `cmd`. Keep the folder on the WSL file system (for example `\\wsl$\Ubuntu\home\<user>\sitekeep`) for better file performance; the data itself is in Docker volumes either way. |
+| **Memory** | Give Docker Desktop at least 4 GB (Settings → Resources); 8 GB when you open large IFC models. |
+| **Port** | If 8080 is taken, set `CDE_PORT=18080` (or another port) in `.env` and open `http://localhost:18080`. |
+| **Stopping** | `docker compose stop` keeps the data; `docker compose down -v` deletes it (both volumes). |
+
 ## Enterprise
 
 ```bash
@@ -50,6 +63,36 @@ docker compose up -d
 Without a licence, the Enterprise image runs like Community. In Administration → Licence, copy the installation ID and request a licence,
 then upload the `license.json` you receive on the same screen; the modules are enabled without a restart (refresh the page;
 background jobs start at the next restart).
+
+## Revit models (Enterprise)
+
+With the Connect module, an uploaded Revit `.rvt` opens in the model viewer: the server converts it to IFC with
+[rvt-rs](https://github.com/DrunkOnJava/rvt-rs) `rvt-ifc` (Apache-2.0; no Autodesk software, nothing leaves the
+server) ([model formats](../features/MODEL_FORMATS.md), [Connect](../modules/connect.md#revit-models)).
+
+- **Image:** the Enterprise image contains a pinned `rvt-ifc` (`/usr/local/bin/rvt-ifc`, licence texts in
+  `/usr/share/sitekeep/`). The Community image has no converter: `.rvt` files are stored and versioned as plain files.
+- **Check it:** `docker compose exec app rvt-ifc --version` (installation bundle: `docker exec` into the app
+  container). The file panel shows the version a model was converted with ("Converted automatically from RVT 2024
+  (rvt-rs 0.25.0)").
+- **Settings** (in `.env` for compose, `config/app.env` for the installation bundle; restart after a change):
+
+  | Variable | Default | Meaning |
+  |---|---|---|
+  | `SITEKEEP_RVT_MEMORY_MB` | `2048` | Memory cap of one conversion (address space, MB). A model that needs more fails with a message instead of taking the server's memory. `0` = no cap. |
+  | `SITEKEEP_RVT_IFC_PATH` | empty | Another `rvt-ifc` than the image's (a newer rvt-rs mounted into the container). Empty: `/usr/local/bin/rvt-ifc`, then `PATH`. |
+
+- **Memory:** conversions run one at a time, next to the application and the database. On real project files
+  (Revit 2027, 1–354 MB) most conversions stayed near 1 GB; the heaviest needed the full 2 GB of the default cap.
+  Plan about 2 GB of RAM for the converter on top of the [capacity](capacity.md) figures; raise
+  `SITEKEEP_RVT_MEMORY_MB` (e.g. 3072) only when the server has the room and a large model fails with the memory message.
+- **Time:** typical files convert in seconds to a minute or two (2–79 s on the files above); one conversion may run
+  up to 60 minutes (the model job limit) before it is stopped.
+- **Disk:** the converted IFC is kept next to the viewer model (people with download permission can download it
+  from the file panel), so each converted version uses roughly its IFC size again in `cdedata`.
+- **After an update with a new rvt-rs:** at startup, models converted with the earlier rvt-rs are converted again
+  in the background (current versions first; the old model stays open meanwhile) and failed ones are retried once.
+  Project administrators can also "Convert again" a single version, or all failed models of a project, from the file panel.
 
 ## Updating
 

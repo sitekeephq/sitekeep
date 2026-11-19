@@ -42,6 +42,7 @@ Document events that matter for ISO 19650:
 | `delivery_plan.*` | The delivery plan: milestones, TIDP leads, planned deliverables, import and export ([delivery plan](DELIVERY_PLAN.md#audit)) |
 | `audit.exported` | Someone downloaded the log as CSV (the filters are in `details.query`) |
 | `project.closeout_archive_created`, `project.closeout_archive_downloaded`, `project.closeout_archive_deleted` | A [close-out archive](CLOSEOUT_ARCHIVE.md) was built (with the audit head hash it recorded), downloaded or deleted |
+| `project.exported`, `project.export_downloaded`, `project.export_deleted`, `project.imported` | A [full project export](PROJECT_EXPORT.md) was built, downloaded or deleted; a project was restored from an export (on the new project) |
 | `project.closed`, `project.reopened` | The project was closed (read-only) after its close-out archive, or reopened by a system administrator |
 | `audit.chain_started` | The genesis row written when the chain was switched on (migration 0043) |
 | `audit.personal_split` | Migration 0049 moved the personal data of the rows from before the chain; `details`: `legacyRowsMoved`, `chainedRowsWithPersonalData` (rows still to be [re-sealed](#re-seal)) |

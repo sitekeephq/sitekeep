@@ -65,6 +65,7 @@ import {
 } from "../db/schema.js";
 import { normaliseChainTemplate, withRuleAssignees } from "../workflow/chain-template.js";
 import { checkTemplate as checkWorkflowSteps } from "../workflow/engine.js";
+import { syncProjectCompanies } from "./companies.js";
 import { templateFromRequest } from "./template-built-ins.js";
 import { parseProjectTemplate } from "./template-schemas.js";
 import { applyTemplateCde } from "../cde/settings.js";
@@ -167,6 +168,7 @@ async function prepare(db: Db, template: ProjectTemplate, req: PreviewRequest, p
 
   const tokenCtx = {
     projectCode,
+    csbProjectCode: req.details?.csbProjectCode?.trim() || undefined,
     slotCodes: Object.fromEntries([...slots].map(([key, slot]) => [key, slot.code ?? undefined])),
     slotNames: Object.fromEntries([...slots].map(([key, slot]) => [key, slot.companyName ?? slot.slot.label])),
   };
@@ -445,7 +447,7 @@ export async function createProjectFromTemplate(
 
   type FolderRow = typeof folders.$inferInsert;
   const folderRows: FolderRow[] = [
-    { id: rootId, projectId, parentId: null, name: "Proje Dosyaları", createdBy: user.id, namingStandardId: null },  // i18n-ok: data
+    { id: rootId, projectId, parentId: null, name: tFor(language)("projects:seed.rootFolder"), createdBy: user.id, namingStandardId: null },
   ];
   const grantRows: (typeof folderGrants.$inferInsert)[] = [];
   const bindingRows: (typeof folderAttributeBindings.$inferInsert)[] = [];
@@ -639,6 +641,8 @@ export async function createProjectFromTemplate(
     await applyTemplateDeliveryPlan(txDb, projectId, template.deliveryPlan, start);
     return { row: row!, workflowIds };
   });
+  // Every company the new project refers to goes on it (docs/features/COMPANIES.md), before the parts check them.
+  await syncProjectCompanies(db, projectId);
   // Template format v2 parts: transmittal (core), RFI, submittals, meetings (Manage), forms (Field).
   const parts = await applyTemplateParts(db, template, {
     projectId,
@@ -653,6 +657,7 @@ export async function createProjectFromTemplate(
     roleIds: prepared.roleIds,
     folderIds: realPaths,
   });
+  await syncProjectCompanies(db, projectId);
   for (const e of invitationAudits) await audit(db, e);
   // Invitations after the project exists: e-mailed when SMTP is configured and allowed, else the link.
   for (const issued of issuedInvitations) {

@@ -28,7 +28,9 @@
     "clashGroup": "Çakışma Grubu",
     "clashGroupMeta": "Çakışma Grubu · {{file}} V{{version}}",
     "markupMeta": "V{{version}} · sayfa {{page}} · işaretleme",
-    "versionMeta": "V{{version}} · versiyon"
+    "versionMeta": "V{{version}} · versiyon",
+    "empty": "Bağlı doküman yok.",
+    "remove": "{{name}} bağlantısını kaldır"
   },
   "paramFile": {
     "hint": "Bu modelin eleman bilgilerini değiştirme talepleri (yeni IFC versiyonu)",
@@ -155,7 +157,8 @@
     "actions": {
       "newInModel": "Modelde Yeni Sorun",
       "report": "Rapor",
-      "exportBcfCount": "BCF Olarak Dışa Aktar ({{n}})"
+      "exportBcfCount": "BCF Olarak Dışa Aktar ({{n}})",
+      "new": "+ Yeni Sorun"
     },
     "empty": "Henüz sorun yok. \"+ Yeni\" ile ya da Model → Görüntüleyici'de \"📍 Noktadan Sorun\" ile oluşturun.",
     "columns": {
@@ -167,13 +170,20 @@
       "due": "Termin",
       "updated": "Güncelleme"
     },
-    "selectIssue": "Sorunu Seç"
+    "selectIssue": "Sorunu Seç",
+    "form": {
+      "documents": "Dokümanlar",
+      "addDocument": "Doküman Bağla",
+      "removeDocument": "{{name}} kaldır",
+      "hint": "Bakış açısı veya iğne için sorunu model görüntüleyicide açın."
+    }
   },
   "issue": {
     "viewpoint": "Görünüm",
     "viewpointN": "Görünüm {{n}}",
     "actions": {
-      "openInModel": "🧊 Modelde Görünümü Aç"
+      "openInModel": "🧊 Modelde Görünümü Aç",
+      "delete": "Sorunu Sil"
     },
     "importedFrom": "BCF {{version}} dosyasından içe aktarıldı",
     "importedFromFile": "BCF {{version}} dosyasından içe aktarıldı ({{file}})",
@@ -181,7 +191,9 @@
     "editHint": "Durumu oluşturan kişi, atanan kişi veya proje yöneticisi değiştirebilir.",
     "comments": "Yorumlar",
     "noComments": "Henüz yorum yok.",
-    "commentPlaceholder": "Yorum yazın…"
+    "commentPlaceholder": "Yorum yazın…",
+    "deleteTitle": "Sorunu Sil",
+    "deleteConfirm": "#{{number}} \"{{title}}\" sorunu yorumları ve bağlantılarıyla silinsin mi? Bu geri alınamaz; denetim kaydında iz kalır."
   },
   "paramChanges": {
     "title": "Parametre Değişiklikleri",

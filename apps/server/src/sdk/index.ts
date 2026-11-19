@@ -92,6 +92,9 @@ export { envNumber, isIfc, resolveItems, runWorker, workerFile } from "../coordi
 export { insertIssue } from "../coordination/routes/issues.js";
 export { viewerStateFields } from "../bcf/viewpoint-schema.js";
 export { wasmDir, type JobQueue, type JobRow } from "../jobs/queue.js";
+
+// Model formats a module converts to IFC (ServerModule.modelFormats)
+export type { ModelFormat, ModelSourceInfo } from "../files/model-formats.js";
 export type { ParamWorkerItem, ParamWorkerOutcome } from "../jobs/param-change-worker.js";
 
 // API contracts of Coordinate (parameter changes), shared with the AI features
@@ -155,6 +158,8 @@ export { connectionDisabled, killSwitchOn, privacyState } from "../privacy/setti
 export { projectPeople } from "../privacy/people.js";
 export { Redactor, type RedactPerson } from "../privacy/redact.js";
 export { moduleDisabled, modulesOf } from "../projects/modules.js";
+// Companies on a project (docs/features/COMPANIES.md): pickers and records use only these.
+export { linkProjectCompanies, listProjectCompanies, projectCompanyIds, requireProjectCompanies, visibleCompanyIds } from "../projects/companies.js";
 // Works engine (İşler: work types, works, workflow, links, events): Manage builds its categories on it
 export {
   addDaysIso,

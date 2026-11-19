@@ -153,7 +153,21 @@
     "deleteConfirm": "\"{{name}}\" silinsin mi? Dosya çöp kutusuna taşınır; proje yöneticisi geri yükleyebilir.",
     "ifc": {
       "heading": "IFC Özeti",
-      "summary": "Şema: <b>{{schema}}</b> · Proje: {{project}} · Eleman: <b>{{elements}}</b>"
+      "summary": "Şema: <b>{{schema}}</b> · Proje: {{project}} · Eleman: <b>{{elements}}</b>",
+      "converted": "{{format}}{{version}} dosyasından otomatik dönüştürüldü ({{tool}}).",
+      "approximated_one": "{{count}} eleman yaklaşık şekille",
+      "approximated_other": "{{count}} eleman yaklaşık şekille",
+      "experimental": "bu sürüm için dönüşüm deneysel",
+      "incomplete": "dosyanın bir kısmı çok büyük olduğu için okunamadı, model eksik olabilir",
+      "download": "⬇ IFC İndir",
+      "downloadHint": "Bu sürümün dönüştürüldüğü IFC",
+      "convertAgain": "↻ Yeniden Dönüştür",
+      "convertAgainHint": "Bu sürümü kurulu dönüştürücüyle yeniden dönüştürür; bu sırada mevcut model açık kalır",
+      "convertAgainQueued": "Dönüştürme sıraya alındı.",
+      "retryFailed": "↻ Dönüşmeyen Tüm Modelleri Yeniden Dene",
+      "retryFailedConfirm": "Bu projede dönüştürülemeyen tüm modeller yeniden dönüştürülsün mü?",
+      "retryFailedQueued_one": "{{count}} sürüm sıraya alındı.",
+      "retryFailedQueued_other": "{{count}} sürüm sıraya alındı."
     },
     "otherAttributes": {
       "heading": "Diğer Öznitelikler"
@@ -166,6 +180,7 @@
       "uploader": "Yükleyen",
       "review": "İnceleme #{{number}}",
       "model": "Model",
+      "ifc": "IFC",
       "compareHint": "Bir önceki versiyonla karşılaştır"
     }
   },
@@ -463,7 +478,7 @@
     "readingTitleBlocks": "PDF antetleri okunuyor…",
     "suggestionsFound_one": "Antetten öneri: {{count}} dosya için standarda uygun yeni ad bulundu.",
     "suggestionsFound_other": "Antetten öneri: {{count}} dosya için standarda uygun yeni ad bulundu.",
-    "aiHint": "Yalnız belirsiz alanlar yerel modele sorulur; cevap standarda uymazsa kullanılmaz.",
+    "aiHint": "Yalnız belirsiz alanlar yapay zekâ modeline sorulur; cevap standarda uymazsa kullanılmaz.",
     "status": {
       "aiThinking": "Yapay Zekâ Düşünüyor…"
     },

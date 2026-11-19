@@ -11,7 +11,7 @@
 # --build-arg SITEKEEP_VERSION (release version, e.g. 1.0.0) and SOURCE_COMMIT (git commit): the About page
 #   shows the version and links to its source (AGPL-3.0 §13): tag v<version> for a release, else the repository.
 # Licence texts go to /usr/share/sitekeep: LICENSE, THIRD_PARTY_NOTICES.md (tools/third-party-notices.mjs) and,
-#   with LibreDWG, LIBREDWG-COPYING.
+#   with LibreDWG, LIBREDWG-COPYING; with rvt-rs (not in Community), RVT-RS-LICENSE and RVT-RS-NOTICE.
 FROM node:22-bookworm-slim AS build
 ARG EDITION=
 
@@ -86,6 +86,36 @@ RUN mkdir -p /opt/libredwg/bin \
     fi \
  && mkdir -p /opt/libredwg/legal
 
+# rvt-rs (Apache-2.0) rvt-ifc: Revit .rvt → IFC for SiteKeep Connect (docs/features/MODEL_FORMATS.md). The
+# release's static Linux program, pinned and checked by SHA-256; the server runs it as a separate process.
+# Community images leave it out (no Connect). Skip with --build-arg WITH_RVT_RS=0.
+FROM debian:bookworm-slim AS rvtrs
+ARG EDITION=
+ARG WITH_RVT_RS=1
+ARG TARGETARCH
+ARG RVT_RS_VERSION=0.25.0
+ARG RVT_RS_SHA256_AMD64=bfde9804b20a8006fe071584b793d3965735cf852e4828ce101fc96d9e48a8b7
+ARG RVT_RS_SHA256_ARM64=a05eaead139586b49b87a314e50ad33e07305254581c13caffbce3e019ad6770
+RUN mkdir -p /opt/rvt-rs/bin /opt/rvt-rs/legal \
+ && if [ "$WITH_RVT_RS" = 1 ] && [ "$EDITION" != community ]; then \
+      apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+      && arch="${TARGETARCH:-$(dpkg --print-architecture)}" \
+      && case "$arch" in \
+           amd64) triple=x86_64-unknown-linux-musl; sum="$RVT_RS_SHA256_AMD64" ;; \
+           arm64) triple=aarch64-unknown-linux-musl; sum="$RVT_RS_SHA256_ARM64" ;; \
+           *) echo "rvt-rs: no release for $arch" >&2; exit 1 ;; \
+         esac \
+      && name="rvt-rs-v${RVT_RS_VERSION}-${triple}" \
+      && curl -fsSL "https://github.com/DrunkOnJava/rvt-rs/releases/download/v${RVT_RS_VERSION}/${name}.tar.gz" -o /tmp/rvt-rs.tar.gz \
+      && echo "${sum}  /tmp/rvt-rs.tar.gz" | sha256sum -c - \
+      && tar -xzf /tmp/rvt-rs.tar.gz -C /tmp "${name}/rvt-ifc" "${name}/LICENSE" "${name}/NOTICE" \
+      && install -m 755 "/tmp/${name}/rvt-ifc" /opt/rvt-rs/bin/rvt-ifc \
+      && cp "/tmp/${name}/LICENSE" /opt/rvt-rs/legal/RVT-RS-LICENSE \
+      && cp "/tmp/${name}/NOTICE" /opt/rvt-rs/legal/RVT-RS-NOTICE \
+      && /opt/rvt-rs/bin/rvt-ifc --version \
+      && rm -rf /tmp/rvt-rs.tar.gz "/tmp/${name}" /var/lib/apt/lists/*; \
+    fi
+
 FROM node:22-bookworm-slim
 ARG EDITION=
 ARG BUILD_DATE=
@@ -105,6 +135,8 @@ WORKDIR /app
 # docker-compose.yml profiles and docs/features/OFFICE_INTEGRATION.md).
 COPY --from=libredwg /opt/libredwg/bin/ /usr/local/bin/
 COPY --from=libredwg /opt/libredwg/legal/ /usr/share/sitekeep/
+COPY --from=rvtrs /opt/rvt-rs/bin/ /usr/local/bin/
+COPY --from=rvtrs /opt/rvt-rs/legal/ /usr/share/sitekeep/
 COPY LICENSE THIRD_PARTY_NOTICES.md /usr/share/sitekeep/
 ENV NODE_ENV=production \
     PORT=8080 \

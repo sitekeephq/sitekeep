@@ -1,5 +1,6 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { requireProjectCompanies } from "../../projects/companies.js";
 import {
   LETTER_STATUS,
   WORK_DUE_SOON_DAYS,
@@ -13,6 +14,7 @@ import { projectAccess, userNames } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
 import { HttpError, badRequest, conflict, notFound } from "../../core/platform/http.js";
 import { msg, requestLanguage } from "../../i18n/index.js";
+import { localizedWorkType } from "@sitekeep/shared";
 import { projectMembers, works } from "../../db/schema.js";
 import { requireWorkModule } from "../../projects/modules.js";
 import { notify } from "../../workflow/service.js";
@@ -21,7 +23,6 @@ import {
   addDaysIso,
   addEvent,
   attachSourceFile,
-  companyNames,
   createWork,
   isClosed,
   projectTypes,
@@ -67,6 +68,8 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
       category?: string;
       parent?: string;
       view?: string;
+      /** "hide": leave cancelled works ("iptal") out; ignored when the status filter asks for them. */
+      cancelled?: string;
     };
   }>("/projects/:pid/works", async (req) => {
     const a = await projectAccess(db, req.params.pid, req.user!);
@@ -84,6 +87,7 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
     const needle = q.q?.trim() ? foldTr(q.q.trim()) : null;
     const limit = Math.min(Math.max(Number(q.limit) || 500, 1), 2000);
     const categories = q.category ? q.category.split(",").filter(Boolean) : [];
+    const hideCancelled = q.cancelled === "hide" && !(q.status ?? "").split(",").includes(LETTER_STATUS.cancelled);
     const participant = await participantWorkIds(db, a, rows.filter((w) => w.workflowInstanceId && !canSeeWork(w, viewer)).map((w) => w.id));
     const out = [];
     for (const w of rows) {
@@ -91,6 +95,7 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
       if (typeFilter.length && !typeFilter.includes(t.key) && !typeFilter.includes(t.id)) continue;
       if (categories.length && !categories.includes(t.category)) continue;
       if (q.parent && w.parentWorkId !== q.parent) continue;
+      if (hideCancelled && w.status === LETTER_STATUS.cancelled) continue;
       if (!canSeeWork(w, viewer) && !participant.has(w.id)) continue;
       const closed = isClosed(t, w.status);
       if (q.open === "1" && closed) continue;
@@ -176,14 +181,15 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
         throw conflict(msg("works:errors.useLetterActions"));
     }
     if (body.status !== undefined) {
-      if (!type.statuses.some((s) => s.key === body.status)) throw badRequest(msg("works:errors.invalidStatus", { status: body.status }));
+      if (!type.statuses.some((s) => s.key === body.status))
+        throw badRequest(msg("works:errors.invalidStatusFor", { status: body.status, type: localizedWorkType(type, requestLanguage(req)).name, allowed: type.statuses.map((s) => s.key).join(", ") }));
       if (body.status === WORK_STATUS.sent && work.status !== WORK_STATUS.sent)
         throw badRequest(msg("works:errors.useSend"));
     }
     if (work.status !== WORK_STATUS.draft && (body.toCompanyIds || body.ccCompanyIds || body.fromCompanyId !== undefined))
       throw conflict(msg("works:errors.recipientsLocked"));
     const companyIds = [...(body.toCompanyIds ?? []), ...(body.ccCompanyIds ?? []), ...(body.fromCompanyId ? [body.fromCompanyId] : [])];
-    if (companyIds.length && (await companyNames(db, companyIds)).size !== new Set(companyIds).size) throw badRequest(msg("works:errors.companyNotFound"));
+    await requireProjectCompanies(db, a, companyIds);
     if (body.assigneeUserId) {
       const [m] = await db.select().from(projectMembers)
         .where(and(eq(projectMembers.projectId, a.project.id), eq(projectMembers.userId, body.assigneeUserId)));

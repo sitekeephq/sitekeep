@@ -172,6 +172,15 @@ export const documentsApi = {
     del(`/projects/${projectId}/files/${fileId}`),
   downloadUrl: (projectId: string, versionId: string) =>
     `/api/v1/projects/${projectId}/versions/${versionId}/download`,
+  /** The IFC a module converted the version to (Revit .rvt); only when `ifcAvailable`. */
+  ifcDownloadUrl: (projectId: string, versionId: string) =>
+    `/api/v1/projects/${projectId}/versions/${versionId}/ifc`,
+  /** Project administrators: convert a version of a converted model (.rvt) again. */
+  convertAgain: (projectId: string, versionId: string) =>
+    post<{ queued: number }>(`/projects/${projectId}/versions/${versionId}/convert-again`),
+  /** Project administrators: convert every failed model version of the project again. */
+  retryFailedConversions: (projectId: string) =>
+    post<{ queued: number }>(`/projects/${projectId}/model-conversions/retry-failed`),
   attributeDefinitions: (projectId: string) =>
     get<AttributeDefinitionDto[]>(`/projects/${projectId}/attribute-definitions`),
   createAttributeDefinition: (projectId: string, definition: AttributeDefinition) =>

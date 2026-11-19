@@ -20,9 +20,11 @@ import { startRetention } from "./privacy/retention.js";
 import { startSecurityAlerts } from "./audit/security-alerts.js";
 import { SignInSecurity } from "./auth/sign-in-security.js";
 import { startCloseoutCleanup } from "./closeout/build.js";
-import { FALLBACK_LANGUAGE, render } from "./i18n/index.js";
+import { startPortabilityCleanup } from "./portability/export.js";
+import { DEFAULT_LANGUAGE, FALLBACK_LANGUAGE, render, tFor } from "./i18n/index.js";
 import { editionName } from "./app/module-ids.js";
 import { backfillDocumentCodesAtStart } from "./cde/document-code.js";
+import { queueModelBackfill, queueModelReconversion } from "./files/model-backfill.js";
 
 /**
  * Configuration (environment):
@@ -139,9 +141,21 @@ const stopRetention = startRetention(db, storage, { log: (m, e) => console.error
 const stopSecurityAlerts = startSecurityAlerts({ db, mailer, log: (m, e) => console.error(m, e) });
 // Close-out archives past their download period (CDE_CLOSEOUT_RETENTION_DAYS): the ZIP is deleted, hourly.
 const stopCloseoutCleanup = startCloseoutCleanup(db, storage, { log: (m, e) => console.error(m, e) });
+// Full project exports past their download period (same retention): the ZIP is deleted, hourly.
+const stopPortabilityCleanup = startPortabilityCleanup(db, storage, { log: (m, e) => console.error(m, e) });
 // Modules' background work (Connect: Autodesk sync scheduler and interrupted file imports).
 const stopModules: (() => void)[] = [];
 for (const m of activeModules()) if (m.start) stopModules.push(await m.start({ db, jobs, log: (msg, e) => console.error(msg, e) }));
+// Model files stored before a module converted their format (.rvt before Connect 0.5.0): converted once, in the queue.
+// Then models from another converter version (a new rvt-rs) and failed ones: converted again once per converter version.
+try {
+  const queued = await queueModelBackfill(db, jobs);
+  if (queued) app.log.info(`model formats: ${queued} stored version(s) queued for conversion`);
+  const again = await queueModelReconversion(db, jobs);
+  if (again) app.log.info(`model formats: ${again} version(s) queued to convert again (new converter or failed before)`);
+} catch (err) {
+  app.log.error({ err }, "model formats: queueing stored versions failed");
+}
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, async () => {
@@ -149,6 +163,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
     stopRetention();
     stopSecurityAlerts();
     stopCloseoutCleanup();
+    stopPortabilityCleanup();
     for (const stop of stopModules) stop();
     jobs.stop();
     await app.close();
@@ -171,7 +186,9 @@ async function bootstrapAdmin() {
     console.error(`ADMIN_PASSWORD: ${render(FALLBACK_LANGUAGE, problem)}`);
     process.exit(1);
   }
-  await db.insert(users).values({ email, name: "Yönetici", passwordHash: await hashPassword(password), isAdmin: true }); // i18n-ok: stored display name
+  // The display name is data: written once in the installation's language (CDE_DEFAULT_LANGUAGE).
+  const name = tFor(DEFAULT_LANGUAGE)("auth:seed.adminName");
+  await db.insert(users).values({ email, name, passwordHash: await hashPassword(password), isAdmin: true });
   const [u] = await db.select().from(users).where(eq(users.email, email));
   console.log(`Created administrator ${u?.email}`);
 }

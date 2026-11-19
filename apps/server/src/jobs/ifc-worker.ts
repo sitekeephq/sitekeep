@@ -271,6 +271,8 @@ async function buildIndex(path: string) {
     // Shape fingerprint per element (FP-1 version comparison): the representation tree, references
     // replaced by the fingerprints of what they point at (express ids left out), memoised per entity.
     const geom: Record<string, string> = {};
+    /** Elements whose quantity sets have neither a volume nor an area: measured from their mesh below. */
+    const meshFor = new Map<number, string>();
     const shapeMemo = new Map<number, string>();
     const shapeOf = (id: number, depth = 0): string => {
       const hit = shapeMemo.get(id);
@@ -374,6 +376,7 @@ async function buildIndex(path: string) {
           else continue;
           if (fromType.has(k)) typeKv.push(keyId(k));
         }
+        if (shapeId !== null && lacksQuantities(props)) meshFor.set(eid, guid);
         const tGuid = typeId === undefined ? null : typeGuid(typeId);
         const tName = typeId === undefined ? null : typeName(typeId);
         const matId = materialOfObject.get(eid) ?? (typeId === undefined ? undefined : materialOfObject.get(typeId));
@@ -399,6 +402,12 @@ async function buildIndex(path: string) {
     } catch (err) {
       console.warn(`ifc-worker: units/openings skipped: ${(err as Error).message}`);
     }
+    let meshQ: ReturnType<typeof meshQuantities> | undefined;
+    try {
+      meshQ = meshQuantities(api, modelId, meshFor);
+    } catch (err) {
+      console.warn(`ifc-worker: mesh quantities skipped: ${(err as Error).message}`);
+    }
     api.CloseModel(modelId);
     writeFileSync(
       path,
@@ -413,6 +422,7 @@ async function buildIndex(path: string) {
         geom,
         ...(units && { units }),
         ...(openings && { openingsV: OPENINGS_FORMAT, openings }),
+        ...(meshQ && { meshQV: MESH_QUANTITIES_FORMAT, meshQ }),
       }),
     );
     return { elementCount };
@@ -425,6 +435,136 @@ async function buildIndex(path: string) {
 const OPENINGS_FORMAT = 1;
 /** Same as GEOMETRY_FORMAT in version-index.ts. */
 const GEOMETRY_FORMAT = 1;
+/** Same as MESH_QUANTITIES_FORMAT in version-index.ts. */
+const MESH_QUANTITIES_FORMAT = 1;
+
+/** Base quantity sets and Revit's Dimensions set, as the quantity inventory reads them. */
+const QTO_SET = /^qto_|basequantities/i;
+const DIMENSION_SET = /^(dimensions|boyutlar|ölçüler|olculer)$/i; // i18n-ok: IFC property set names (data)
+
+/**
+ * True when the element's quantity sets give neither a volume nor an area (the inventory would show
+ * "—"). Elements with one of them (a column with its volume and length) are left as exported.
+ */
+function lacksQuantities(props: Map<string, unknown>): boolean {
+  let volume = false;
+  let area = false;
+  for (const [k, v] of props) {
+    if (typeof v !== "number" && typeof v !== "string") continue;
+    const dot = k.lastIndexOf(".");
+    const set = k.slice(0, Math.max(0, dot));
+    const name = k.slice(dot + 1).toLowerCase();
+    if (QTO_SET.test(set)) {
+      if (name === "netvolume" || name === "grossvolume" || name === "volume") volume = true;
+      if (name.endsWith("area")) area = true;
+    } else if (DIMENSION_SET.test(set)) {
+      if (name === "volume") volume = true;
+      if (name === "area") area = true;
+    }
+    if (volume || area) return false;
+  }
+  return true;
+}
+
+/** Triangles measured for quantities at most (larger models leave the rest without computed values). */
+const MESH_QUANTITY_MAX_TRIANGLES = 20_000_000;
+
+/**
+ * Volume (m³) and area (m²) of elements from their triangle meshes (web-ifc output is in metres,
+ * openings already cut out), for elements whose quantity sets have neither:
+ * - volume: signed tetrahedron sum (divergence theorem) per geometry, absolute; exact for closed meshes;
+ * - area: the faces projected on the element's main direction (the dominant eigenvector of the area-weighted
+ *   normal tensor), one side: a wall's side face, a slab's plan area; reveals of openings do not count.
+ * Each geometry is measured with the linear part of its placement only (no translation), which keeps
+ * float precision on georeferenced models and changes neither volume nor area.
+ */
+function meshQuantities(api: WebIFC.IfcAPI, modelId: number, elements: Map<number, string>): Record<string, [number | null, number | null]> {
+  const out: Record<string, [number | null, number | null]> = {};
+  const ids = [...elements.keys()].sort((a, b) => a - b);
+  if (!ids.length) return out;
+  type Acc = { volume: number; closed: boolean; areas: number[] };
+  const acc = new Map<number, Acc>();
+  let triangles = 0;
+  api.StreamMeshes(
+    modelId,
+    ids,
+    (mesh) => {
+      if (triangles > MESH_QUANTITY_MAX_TRIANGLES) return;
+      let a = acc.get(mesh.expressID);
+      if (!a) acc.set(mesh.expressID, (a = { volume: 0, closed: true, areas: [] }));
+      const n = mesh.geometries.size();
+      for (let i = 0; i < n; i++) {
+        const pg = mesh.geometries.get(i);
+        const geometry = api.GetGeometry(modelId, pg.geometryExpressID);
+        const v = api.GetVertexArray(geometry.GetVertexData(), geometry.GetVertexDataSize());
+        const index = api.GetIndexArray(geometry.GetIndexData(), geometry.GetIndexDataSize());
+        const t = pg.flatTransformation;
+        const p = (k: number): [number, number, number] => {
+          const x = v[k * 6]!, y = v[k * 6 + 1]!, z = v[k * 6 + 2]!;
+          return [t[0]! * x + t[4]! * y + t[8]! * z, t[1]! * x + t[5]! * y + t[9]! * z, t[2]! * x + t[6]! * y + t[10]! * z];
+        };
+        let vol = 0;
+        // A closed surface's area vectors sum to zero (T-junctions from boolean cuts do not matter).
+        let sx = 0, sy = 0, sz = 0, total = 0;
+        for (let k = 0; k + 2 < index.length; k += 3) {
+          const [ax, ay, az] = p(index[k]!);
+          const [bx, by, bz] = p(index[k + 1]!);
+          const [cx, cy, cz] = p(index[k + 2]!);
+          vol += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+          const ux = bx - ax, uy = by - ay, uz = bz - az, wx = cx - ax, wy = cy - ay, wz = cz - az;
+          const nx = (uy * wz - uz * wy) / 2, ny = (uz * wx - ux * wz) / 2, nz = (ux * wy - uy * wx) / 2;
+          a.areas.push(nx, ny, nz);
+          sx += nx; sy += ny; sz += nz;
+          total += Math.hypot(nx, ny, nz);
+        }
+        if (Math.hypot(sx, sy, sz) > total * 1e-3) a.closed = false;
+        a.volume += Math.abs(vol);
+        triangles += Math.floor(index.length / 3);
+        geometry.delete();
+      }
+    },
+    true,
+  );
+  for (const [eid, a] of acc) {
+    const guid = elements.get(eid);
+    if (!guid || !a.areas.length) continue;
+    const area = projectedArea(a.areas);
+    out[guid] = [a.closed && a.volume > 0 ? round4(a.volume) : null, area > 0 ? round4(area) : null];
+  }
+  return out;
+}
+
+const round4 = (n: number) => Math.round(n * 10_000) / 10_000;
+
+/**
+ * One-side area of a mesh along its main direction: d = dominant eigenvector of Σ |a| n nᵀ (area
+ * vectors a = |a| n), area = Σ |a · d| / 2.
+ */
+function projectedArea(areas: number[]): number {
+  let xx = 0, xy = 0, xz = 0, yy = 0, yz = 0, zz = 0; // Σ a aᵀ / |a|
+  for (let k = 0; k + 2 < areas.length; k += 3) {
+    const x = areas[k]!, y = areas[k + 1]!, z = areas[k + 2]!;
+    const len = Math.hypot(x, y, z);
+    if (!len) continue;
+    xx += (x * x) / len; xy += (x * y) / len; xz += (x * z) / len;
+    yy += (y * y) / len; yz += (y * z) / len; zz += (z * z) / len;
+  }
+  const m = [xx, xy, xz, yy, yz, zz];
+  // Power iteration from the column with the largest diagonal (the matrix is positive semi-definite).
+  const col = m[0]! >= m[3]! && m[0]! >= m[5]! ? 0 : m[3]! >= m[5]! ? 1 : 2;
+  let d = col === 0 ? [m[0]!, m[1]!, m[2]!] : col === 1 ? [m[1]!, m[3]!, m[4]!] : [m[2]!, m[4]!, m[5]!];
+  for (let it = 0; it < 50; it++) {
+    const nx = m[0]! * d[0]! + m[1]! * d[1]! + m[2]! * d[2]!;
+    const ny = m[1]! * d[0]! + m[3]! * d[1]! + m[4]! * d[2]!;
+    const nz = m[2]! * d[0]! + m[4]! * d[1]! + m[5]! * d[2]!;
+    const len = Math.hypot(nx, ny, nz);
+    if (!len) return 0;
+    d = [nx / len, ny / len, nz / len];
+  }
+  let sum = 0;
+  for (let k = 0; k + 2 < areas.length; k += 3) sum += Math.abs(areas[k]! * d[0]! + areas[k + 1]! * d[1]! + areas[k + 2]! * d[2]!);
+  return sum / 2;
+}
 
 const SI_PREFIX: Record<string, number> = { EXA: 1e18, PETA: 1e15, TERA: 1e12, GIGA: 1e9, MEGA: 1e6, KILO: 1e3, HECTO: 1e2, DECA: 10, DECI: 0.1, CENTI: 0.01, MILLI: 1e-3, MICRO: 1e-6, NANO: 1e-9 };
 

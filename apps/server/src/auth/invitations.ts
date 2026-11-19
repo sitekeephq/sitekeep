@@ -21,6 +21,7 @@ import {
 } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { companies, invitations, memberRoles, projectMembers, projects, users } from "../db/schema.js";
+import { linkProjectCompanies } from "../projects/companies.js";
 import { getSetting, putSetting } from "../ai/settings.js";
 import { audit, type AuditEvent } from "../core/platform/audit.js";
 import { HttpError } from "../core/platform/http.js";
@@ -126,6 +127,7 @@ export async function addProjectMember(
       .insert(memberRoles)
       .values(input.roleIds.map((roleId) => ({ projectId: project.id, userId: input.userId, roleId })))
       .onConflictDoNothing();
+  await linkProjectCompanies(db, project.id, [input.companyId]);
   await joinCompanyTeam(db, project.id, input.userId, input.companyId);
   if (input.isProjectAdmin) {
     const roleIds = await ensureDefaultProjectRoles(db, project.id, project.rootFolderId);

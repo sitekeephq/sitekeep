@@ -14,6 +14,7 @@ export {
   memberRoles,
   modelSets,
   issueLinks,
+  projectCompanies,
   projectMembers,
   projectRoles,
   projectAiSettings,

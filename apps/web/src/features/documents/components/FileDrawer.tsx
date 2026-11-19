@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { LocationLinkField } from "../../../shared/ui/LocationSelect";
 import { Link } from "react-router-dom";
-import { can, docCompareKind, validateAttributes, viewerFor, viewerPath, type EffectiveAttributeDto, type PermissionLevel } from "@sitekeep/shared";
+import { can, docCompareKind, validateAttributes, viewerFor, viewerPath, type EffectiveAttributeDto, type IfcSummary, type PermissionLevel } from "@sitekeep/shared";
 import { formatDate, formatNumber, formatSize } from "../../../shared/api/api";
 import { documentsApi } from "../api";
-import { useLoad } from "../../../app/context/project";
+import { useLoad, useProject } from "../../../app/context/project";
 import { AntetPanel } from "./AntetPanel";
 import { ApprovalBadge } from "./ApprovalBadge";
 import { AttributeInput } from "../../../shared/ui/AttributeInput";
@@ -54,7 +54,13 @@ export function FileDrawer({
   const canEdit = can(level, "edit");
   const viewer = viewerFor(file?.name ?? "", i18n.language);
   const paramFile = paramFileCapability();
-  const paramStatus = useParamFileStatus(projectId, fileId, viewer.kind === "ifc");
+  // Parameter changes write the IFC file itself: not for models converted from another format (.rvt).
+  const isIfcFile = viewer.kind === "ifc" && /\.ifc$/i.test(file?.name ?? "");
+  // A model a module converts to IFC (Revit .rvt): its IFC can be downloaded, administrators can convert it again.
+  const isConvertedModel = viewer.kind === "ifc" && !isIfcFile;
+  const isProjectAdmin = !!useProject().isProjectAdmin;
+  const [note, setNote] = useState<string | null>(null);
+  const paramStatus = useParamFileStatus(projectId, fileId, isIfcFile);
   const canDownload = can(level, "download");
   // Browser editing (WOPI, Connect module): "Düzenle" and "X düzenliyor"; reloads when the editor saved.
   // The installed modules never change while the app runs, so the hook order is stable.
@@ -82,6 +88,7 @@ export function FileDrawer({
 
   async function act(fn: () => Promise<unknown>) {
     setMsg(null);
+    setNote(null);
     try {
       await fn();
       reload();
@@ -100,6 +107,7 @@ export function FileDrawer({
       </div>
       {error && <p className="error">{error}</p>}
       {msg && <p className="error">{msg}</p>}
+      {note && <p className="muted small">{note}</p>}
       {file && (
         <div className="stack" style={{ marginTop: 12 }}>
           <FileCdeChips projectId={projectId} file={file} level={level} onChanged={cdeChanged} />
@@ -138,7 +146,40 @@ export function FileDrawer({
                 {t("drawer.actions.compareVersion")}
               </Link>
             )}
-            {viewer.kind === "ifc" && paramFile && <paramFile.FileButton projectId={projectId} fileId={file.id} status={paramStatus} />}
+            {isConvertedModel && canDownload && file.latest.ifcAvailable && (
+              <a className="btn" href={documentsApi.ifcDownloadUrl(projectId, file.latest.id)} title={t("drawer.ifc.downloadHint")} data-testid="ifc-download">
+                {t("drawer.ifc.download")}
+              </a>
+            )}
+            {isConvertedModel && isProjectAdmin && (file.latest.derivativeStatus === "ready" || file.latest.derivativeStatus === "failed") && (
+              <button
+                title={t("drawer.ifc.convertAgainHint")}
+                onClick={() =>
+                  void act(async () => {
+                    await documentsApi.convertAgain(projectId, file.latest.id);
+                    setNote(t("drawer.ifc.convertAgainQueued"));
+                  })
+                }
+              >
+                {t("drawer.ifc.convertAgain")}
+              </button>
+            )}
+            {isConvertedModel && isProjectAdmin && file.latest.derivativeStatus === "failed" && (
+              <button
+                onClick={() =>
+                  void confirm({ title: t("drawer.ifc.retryFailed"), message: t("drawer.ifc.retryFailedConfirm") }).then((ok) => {
+                    if (!ok) return;
+                    void act(async () => {
+                      const r = await documentsApi.retryFailedConversions(projectId);
+                      setNote(t("drawer.ifc.retryFailedQueued", { count: r.queued }));
+                    });
+                  })
+                }
+              >
+                {t("drawer.ifc.retryFailed")}
+              </button>
+            )}
+            {isIfcFile && paramFile && <paramFile.FileButton projectId={projectId} fileId={file.id} status={paramStatus} />}
             {can(level, "view") && (
               <button title={t("drawer.accessHint")} onClick={() => setWhoOpen(true)}>
                 {t("drawer.actions.access")}
@@ -198,6 +239,7 @@ export function FileDrawer({
                   components={{ b: <strong /> }}
                 />
               </div>
+              {file.latest.ifcSummary.source && <ModelSourceNote source={file.latest.ifcSummary.source} />}
               <div className="row wrap small" style={{ marginTop: 6 }}>
                 {Object.entries(file.latest.ifcSummary.byClass)
                   .sort((a, b) => b[1] - a[1])
@@ -364,6 +406,13 @@ export function FileDrawer({
                           </Link>
                         </div>
                       )}
+                      {isConvertedModel && canDownload && v.ifcAvailable && (
+                        <div>
+                          <a className="small" href={documentsApi.ifcDownloadUrl(projectId, v.id)} title={t("drawer.ifc.downloadHint")}>
+                            {t("drawer.history.ifc")}
+                          </a>
+                        </div>
+                      )}
                       {docCompareKind(file.extension) && v.version > 1 && (
                         <div>
                           <Link className="small" to={`/projects/${projectId}/compare?to=${v.id}`} title={t("drawer.history.compareHint")}>
@@ -400,5 +449,23 @@ export function FileDrawer({
         />
       )}
     </aside>
+  );
+}
+
+/** "Converted from Revit 2024 (rvt-rs 0.25.0)": a model a module converted to IFC (docs/features/MODEL_FORMATS.md). */
+function ModelSourceNote({ source }: { source: NonNullable<IfcSummary["source"]> }) {
+  const { t } = useTranslation("documents");
+  const approximate = (source.approximated ?? 0) > 0;
+  return (
+    <div className="small muted" style={{ marginTop: 4 }} data-testid="model-source">
+      {t("drawer.ifc.converted", {
+        format: source.format.toUpperCase(),
+        version: source.sourceVersion ? ` ${source.sourceVersion}` : "",
+        tool: source.tool,
+      })}
+      {approximate && <> · {t("drawer.ifc.approximated", { count: source.approximated })}</>}
+      {source.support === "experimental" && <> · {t("drawer.ifc.experimental")}</>}
+      {source.support === "incomplete" && <> · {t("drawer.ifc.incomplete")}</>}
+    </div>
   );
 }

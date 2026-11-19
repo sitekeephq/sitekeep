@@ -12,19 +12,46 @@
  * - number fields may have a variable length (`minDigits`/`maxDigits`, e.g. 2–3 digits);
  * - fields with `inName: false` are "metadata" fields (Revizyon, Pafta adı): they belong to the
  *   standard as attributes but are not part of the name.
+ *
+ * Extras for regulated profiles (ÇŞB 2026 EK-2, docs/features/NAMING_CSB_2026.md):
+ * - `maxLength` on the standard limits the whole name (without extension);
+ * - a list field may depend on an earlier list field (`dependsOn`): a value with `parents` is
+ *   allowed only after one of those parent codes (Disiplin → Alt Disiplin / Öge);
+ * - a text field may restrict its characters (`charset`) and offer `suggestions` (a pick-list that
+ *   does not limit the value, e.g. Kat / Konum);
+ * - fields with `inCode: false` are part of the name but not of the document code (Revizyon No).
  */
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "../platform/i18n.js";
 
 export interface NamingValue {
   code: string;
   description?: string;
+  /**
+   * Codes of the parent field (`dependsOn` of the field) after which this value is allowed.
+   * Absent: allowed after any parent code.
+   */
+  parents?: string[];
 }
 
 interface FieldBase {
   name: string;
   /** false = metadata field: kept with the standard (e.g. as an attribute) but not part of the name. */
   inName?: boolean;
+  /**
+   * false = part of the name but not of the document code (docs/features/DOCUMENT_CODES.md), e.g. a
+   * revision number written into the name: the file keeps its container across revisions.
+   */
+  inCode?: boolean;
 }
+
+/** Characters a text field allows: upper-case Latin letters (A–Z) and/or digits. */
+export const NAMING_CHARSETS = ["alphanumeric", "alphabetic", "numeric"] as const;
+export type NamingCharset = (typeof NAMING_CHARSETS)[number];
+const CHARSET_PATTERN: Record<NamingCharset, RegExp> = {
+  alphanumeric: /^[A-Z0-9]+$/,
+  alphabetic: /^[A-Z]+$/,
+  numeric: /^[0-9]+$/,
+};
 
 export type NumberField = FieldBase & {
   type: "number";
@@ -34,10 +61,28 @@ export type NumberField = FieldBase & {
   maxDigits?: number;
 };
 
-export type NamingField =
-  | (FieldBase & { type: "list"; values: NamingValue[] })
-  | (FieldBase & { type: "text"; minLength?: number; maxLength?: number })
-  | NumberField;
+export type ListField = FieldBase & {
+  type: "list";
+  values: NamingValue[];
+  /** Name of an earlier list field of the name whose code selects the allowed values (`parents`). */
+  dependsOn?: string;
+};
+
+export type TextField = FieldBase & {
+  type: "text";
+  minLength?: number;
+  maxLength?: number;
+  charset?: NamingCharset;
+  /** Codes offered in pick-lists; any value that passes the length and charset is accepted. */
+  suggestions?: NamingValue[];
+  /**
+   * Templates only: a fixed value with tokens (e.g. "{EK1}"). When the tokens resolve at project
+   * creation, the field becomes a one-value list; otherwise it stays a text field.
+   */
+  fixed?: string;
+};
+
+export type NamingField = ListField | TextField | NumberField;
 
 export interface NamingStandard {
   name: string;
@@ -50,6 +95,8 @@ export interface NamingStandard {
   allowSuffix?: boolean;
   /** Allows list codes that contain the delimiter (e.g. "SKP1-A" with "-"). Off by default. */
   allowDelimiterInCodes?: boolean;
+  /** Longest allowed name, in characters, without the extension (ÇŞB EK-2: 35). */
+  maxLength?: number;
 }
 
 export interface FieldResult {
@@ -149,17 +196,24 @@ function match(standard: NamingStandard, base: string): string[] | null {
   const d = standard.delimiter;
   const n = fields.length;
   if (!n || !d) return null;
+  if (standard.maxLength !== undefined && base.length > standard.maxLength) return null;
+  const parents = parentIndexes(fields);
+  // Indexes of fields some later field depends on: their values are part of the memo key.
+  const keyed = [...new Set(parents.filter((p): p is number => p !== null))].sort((a, b) => a - b);
   const failed = new Set<string>();
+  const chosen: string[] = [];
 
   const step = (i: number, pos: number): string[] | null => {
-    const key = `${i}:${pos}`;
+    const key = `${i}:${pos}:${keyed.filter((k) => k < i).map((k) => chosen[k]).join("\u0000")}`;
     if (failed.has(key)) return null;
     const field = fields[i]!;
+    const parent = parents[i] !== null ? (chosen[parents[i]!] ?? null) : undefined;
     for (const raw of candidates(field, base, pos, d)) {
       const end = pos + raw.length;
       if (i < n - 1) {
         if (base[end] !== d) continue;
-        if (!checkField(field, raw).ok) continue;
+        if (!checkField(field, raw, undefined, parent).ok) continue;
+        chosen[i] = raw;
         const rest = step(i + 1, end + d.length);
         if (rest) return [raw, ...rest];
         continue;
@@ -175,7 +229,7 @@ function match(standard: NamingStandard, base: string): string[] | null {
         const space = value.indexOf(" ");
         if (space > 0) value = value.slice(0, space);
       }
-      if (checkField(field, value).ok) return [value];
+      if (checkField(field, value, undefined, parent).ok) return [value];
     }
     failed.add(key);
     return null;
@@ -225,16 +279,27 @@ function diagnose(standard: NamingStandard, base: string, lang: string): NamingR
   const partCount = values.filter((v) => v !== null).length + extra;
 
   const errors: string[] = [];
+  if (standard.maxLength !== undefined && base.length > standard.maxLength) {
+    errors.push(sharedText(lang, "naming.tooLong", { count: standard.maxLength, length: base.length }));
+  }
   if (partCount < n || (partCount > n && !standard.allowSuffix)) {
     errors.push(sharedText(lang, "naming.partCount", { expected: n, count: partCount, delimiter: d }));
   }
+  const parents = parentIndexes(fields);
+  const trimmed: (string | null)[] = [];
+  const valid: boolean[] = [];
   const results: FieldResult[] = fields.map((field, i) => {
     let value = values[i] ?? null;
     if (value !== null && i === n - 1 && standard.allowSuffix) {
       const space = value.indexOf(" ");
       if (space > 0) value = value.slice(0, space);
     }
-    const r = checkField(field, value, lang);
+    trimmed[i] = value;
+    // A dependent value is checked against its parent only when the parent itself is valid.
+    const p = parents[i];
+    const parent = p !== null && p !== undefined ? (valid[p] ? trimmed[p]! : null) : undefined;
+    const r = checkField(field, value, lang, parent, p !== null && p !== undefined ? fields[p]!.name : undefined);
+    valid[i] = r.ok;
     if (!r.ok && r.message) errors.push(sharedText(lang, "naming.fieldProblem", { field: field.name, problem: r.message }));
     return r;
   });
@@ -242,13 +307,47 @@ function diagnose(standard: NamingStandard, base: string, lang: string): NamingR
   return { ok: false, baseName: base, fields: results, errors };
 }
 
-function checkField(field: NamingField, value: string | null, lang: string = SHARED_DEFAULT_LANGUAGE): FieldResult {
+/** Per name field: the index of the field it depends on (`dependsOn`), or null. */
+function parentIndexes(fields: readonly NamingField[]): (number | null)[] {
+  return fields.map((f, i) => {
+    if (f.type !== "list" || !f.dependsOn) return null;
+    const p = fields.findIndex((x) => x.name === f.dependsOn);
+    return p >= 0 && p < i ? p : null;
+  });
+}
+
+/**
+ * Whether a list value is allowed after the parent code. `parent`: undefined = the field has no
+ * parent; null = the parent's value is unknown or invalid (any value of the list is accepted then).
+ */
+function allowedAfter(v: NamingValue, parent: string | null | undefined): boolean {
+  return parent === undefined || parent === null || !v.parents || v.parents.includes(parent);
+}
+
+/** List values allowed after a parent code (all values when the field has no parent). */
+export function valuesFor(field: ListField, parent: string | null | undefined): NamingValue[] {
+  return field.values.filter((v) => allowedAfter(v, field.dependsOn ? parent : undefined));
+}
+
+function checkField(
+  field: NamingField,
+  value: string | null,
+  lang: string = SHARED_DEFAULT_LANGUAGE,
+  parent?: string | null,
+  parentField?: string,
+): FieldResult {
   const base = { field: field.name, value };
   if (value === null || value === "") return { ...base, ok: false, message: sharedText(lang, "naming.field.missing") };
   switch (field.type) {
     case "list": {
-      const ok = field.values.some((v) => v.code === value);
-      return ok ? { ...base, ok } : { ...base, ok, message: sharedText(lang, "naming.field.notAllowed", { value }) };
+      const matches = field.values.filter((v) => v.code === value);
+      if (!matches.length) return { ...base, ok: false, message: sharedText(lang, "naming.field.notAllowed", { value }) };
+      if (matches.some((v) => allowedAfter(v, parent))) return { ...base, ok: true };
+      return {
+        ...base,
+        ok: false,
+        message: sharedText(lang, "naming.field.notForParent", { value, field: parentField ?? field.dependsOn ?? "", parent: parent ?? "" }),
+      };
     }
     case "number": {
       const { min, max } = digitRange(field);
@@ -261,6 +360,8 @@ function checkField(field: NamingField, value: string | null, lang: string = SHA
         return { ...base, ok: false, message: sharedText(lang, "naming.field.minLength", { count: field.minLength }) };
       if (field.maxLength !== undefined && value.length > field.maxLength)
         return { ...base, ok: false, message: sharedText(lang, "naming.field.maxLength", { count: field.maxLength }) };
+      if (field.charset && CHARSET_PATTERN[field.charset] && !CHARSET_PATTERN[field.charset].test(value))
+        return { ...base, ok: false, message: sharedText(lang, `naming.field.charset.${field.charset}`) };
       return { ...base, ok: true };
     }
   }
@@ -274,7 +375,10 @@ export function checkStandard(standard: NamingStandard, lang: string = SHARED_DE
   if (!d || d.length !== 1) errors.push(sharedText(lang, "naming.standard.delimiter"));
   if (!standard.fields?.length) errors.push(sharedText(lang, "naming.standard.noFields"));
   else if (!standard.fields.some((f) => f.inName !== false)) errors.push(sharedText(lang, "naming.standard.noNameField"));
+  if (standard.maxLength !== undefined && !(Number.isInteger(standard.maxLength) && standard.maxLength >= 1))
+    errors.push(sharedText(lang, "naming.standard.maxLength"));
   const names = new Set<string>();
+  const inName = (standard.fields ?? []).filter((f) => f.inName !== false);
   for (const f of standard.fields ?? []) {
     if (!f.name?.trim()) errors.push(sharedText(lang, "naming.standard.fieldNameEmpty"));
     if (names.has(f.name)) errors.push(sharedText(lang, "naming.standard.duplicateField", { field: f.name }));
@@ -287,7 +391,22 @@ export function checkStandard(standard: NamingStandard, lang: string = SHARED_DE
         else if (v.code.startsWith(d) || v.code.endsWith(d))
           errors.push(sharedText(lang, "naming.standard.codeDelimiterEdge", { field: f.name, code: v.code }));
       }
+      if (f.dependsOn) {
+        const at = inName.indexOf(f);
+        const p = inName.findIndex((x) => x.name === f.dependsOn);
+        const parent = inName[p];
+        if (at < 0 || p < 0 || p >= at || parent?.type !== "list")
+          errors.push(sharedText(lang, "naming.standard.dependsOn", { field: f.name, parent: f.dependsOn }));
+        else {
+          const known = new Set(parent.values.map((v) => v.code));
+          const unknown = [...new Set((f.values ?? []).flatMap((v) => v.parents ?? []).filter((c) => !known.has(c)))];
+          if (unknown.length)
+            errors.push(sharedText(lang, "naming.standard.parentCodes", { field: f.name, parent: parent.name, codes: unknown.join(", ") }));
+        }
+      }
     }
+    if (f.type === "text" && f.charset !== undefined && !NAMING_CHARSETS.includes(f.charset))
+      errors.push(sharedText(lang, "naming.standard.charset", { field: f.name }));
     if (f.type === "number") {
       if (!(f.digits >= 1 && f.digits <= 12)) errors.push(sharedText(lang, "naming.standard.digits", { field: f.name }));
       else {
@@ -298,4 +417,31 @@ export function checkStandard(standard: NamingStandard, lang: string = SHARED_DE
     }
   }
   return errors;
+}
+
+/**
+ * A naming editor that shows only names, types, codes and digits. Settings it cannot show (a list's
+ * `dependsOn` and the values' `parents`, a text field's length, characters and suggestions,
+ * `inCode`) are carried over from the saved field of the same name and type.
+ */
+export function keepNamingFieldSettings(fields: NamingField[], previous: readonly NamingField[] | undefined): NamingField[] {
+  return fields.map((f) => {
+    const old = previous?.find((p) => p.name === f.name && p.type === f.type);
+    if (!old) return f;
+    const inCode = old.inCode === false ? { inCode: false } : {};
+    if (f.type === "list" && old.type === "list") {
+      const parents = new Map(old.values.filter((v) => v.parents).map((v) => [v.code, v.parents!]));
+      return {
+        ...f,
+        ...inCode,
+        ...(old.dependsOn ? { dependsOn: old.dependsOn } : {}),
+        values: f.values.map((v) => (parents.has(v.code) ? { ...v, parents: parents.get(v.code)! } : v)),
+      };
+    }
+    if (f.type === "text" && old.type === "text") {
+      const { name: _name, type: _type, inName: _inName, ...rest } = old;
+      return { ...rest, ...f, ...inCode };
+    }
+    return { ...f, ...inCode };
+  });
 }

@@ -8,6 +8,7 @@ import type {
   WorkFieldValues,
   WorkTypeDto,
 } from "@sitekeep/shared";
+import { fieldValueLabel } from "@sitekeep/shared";
 import { api } from "../../../shared/api/api";
 import { worksApi, type LinkInput } from "../../../shared/api/api-works";
 import { useLoad, useProject } from "../../../app/context/project";
@@ -219,7 +220,7 @@ export function FieldInputs({
             ) : d.type === "list" ? (
               <select disabled={disabled} value={String(v ?? "")} onChange={(e) => set(d.key, e.target.value || null)}>
                 <option value="">—</option>
-                {d.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+                {d.options?.map((o) => <option key={o} value={o}>{fieldValueLabel(d, o)}</option>)}
               </select>
             ) : (
               <input

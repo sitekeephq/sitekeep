@@ -49,6 +49,22 @@ The source is IFC's base quantity sets: `Qto_*` (IFC4) and `BaseQuantities` (IFC
 - Length, area and volume written as numbers are converted to metres using the model's unit (`IfcUnitAssignment`: mm, cm, ft …).
   Values with the unit written in the text ("3,5 m") are read as they are.
 - Spaces (IfcSpace) and opening elements (IfcOpeningElement) are not counted.
+
+### From Geometry, Without Base Quantities
+
+An element whose base quantity sets (and Revit's `Dimensions`) give **neither a volume nor an area** — typically a model
+exported without "Export base quantities" — gets both measured from its triangle mesh when the element index is built:
+
+- **Net volume:** the volume enclosed by the mesh (openings are already cut out of it). An open mesh gets no volume.
+- **Net area:** the faces projected on the element's main direction, one side: a wall's side face, a slab's plan area.
+  The reveals of openings do not count, so the value is net; openings measured from the geometry then give the gross area.
+- The source is shown as **From Geometry (Mesh)**; the group table marks groups with such elements ("N from geometry"),
+  and the note below the totals counts them. The Excel export has the same source text.
+- Elements with a volume or an area in their sets stay exactly as exported (a column with only its volume and length gets
+  no area). Length and weight are never computed.
+- Values are in m³ and m² (the mesh is in metres whatever the model's unit). A difference uses them only when both
+  indexes have them, so a re-indexed version shows no false change.
+- An index written before this is rebuilt once on first opening, together with the openings (409, the page refreshes).
 - The difference is found by GlobalId. Differences smaller than 0.0005 do not count as a change.
 - An element that moved to another group (its storey, type or material changed) counts as changed.
 
@@ -109,8 +125,11 @@ Door, window and shaft openings are measured from the model's geometry; whether 
 
 ## Limits
 
-- **No measurement from geometry.** An element without quantities is counted only by number, and a "Without Quantities" warning appears.
-  Export from Revit with "Export base quantities" turned on.
+- **Geometry gives volume and area only, and only to elements without either in their sets.** Length and weight stay empty;
+  an element without body geometry is counted only by number, with the "Without Quantities" warning. Exporting from Revit with
+  "Export base quantities" turned on still gives the most precise values (side areas, footprints, gross values).
+- The geometric area is one side along the element's main direction; for columns, beams and irregular objects it is an
+  approximation. Very large models measure at most 20 million triangles; elements past that keep no computed value.
 - **Opening geometry is read only from extrusions.** Openings drawn as B-rep, CSG or sweeps count as "not measurable"
   and are not deducted. For an inclined opening (not perpendicular to the wall), the face area is calculated from the profile and the slope is not corrected.
 - Openings are deducted for one face of the wall (`GrossSideArea` is one face). A niche that does not fully pierce the wall also counts as an opening.

@@ -579,6 +579,8 @@ describe("works: Turkish built-in names in older projects", () => {
     rootId = p.body.rootFolderId;
     await admin.post("/users", { email: "lg@lg.test", name: "Lale", password: PW, companyId: lga });
     expect((await admin.post(`${P()}/members`, { email: "lg@lg.test" })).status).toBe(200);
+    // LGB has no member here: records may address it once it is on the project (docs/features/COMPANIES.md).
+    expect((await admin.post(`${P()}/companies`, { companyId: lgb })).status).toBe(200);
     lg = api(await login("lg@lg.test"));
 
     // A fresh project gets the Turkish names and the EYL prefix for actions.

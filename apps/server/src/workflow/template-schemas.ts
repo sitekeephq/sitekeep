@@ -8,7 +8,7 @@ import {
   type WorkflowStep,
 } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
-import { companies, projectMembers, projectRoles } from "../db/schema.js";
+import { projectCompanies, projectMembers, projectRoles } from "../db/schema.js";
 import { isUuid } from "../core/security/access.js";
 import { badRequest } from "../core/platform/http.js";
 import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
@@ -57,7 +57,7 @@ export async function parseTemplateBody(db: Db, projectId: string, raw: unknown,
   };
 }
 
-/** Assignees must be project members, existing companies, built-in roles or project roles. */
+/** Assignees must be project members, companies on the project, built-in roles or project roles. */
 export async function checkSteps(
   db: Db,
   projectId: string,
@@ -84,7 +84,11 @@ export async function checkSteps(
       if (userIds.some((x) => !ok.has(x))) problems.push(tr("workflow:errors.assigneeNotMember"));
     }
     if (companyIds.length) {
-      const rows = await db.select({ id: companies.id }).from(companies).where(inArray(companies.id, companyIds));
+      // Only companies on the project (docs/features/COMPANIES.md).
+      const rows = await db
+        .select({ id: projectCompanies.companyId })
+        .from(projectCompanies)
+        .where(and(eq(projectCompanies.projectId, projectId), inArray(projectCompanies.companyId, companyIds)));
       const ok = new Set(rows.map((r) => r.id));
       if (companyIds.some((x) => !ok.has(x))) problems.push(tr("workflow:errors.assigneeCompanyMissing"));
     }

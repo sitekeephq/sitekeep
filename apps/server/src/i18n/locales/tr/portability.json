@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "export": "Proje dışa aktarımı",
+    "import": "Proje geri yüklemesi"
+  },
+  "errors": {
+    "busy": "Bu projenin bir dışa aktarımı hazırlanıyor. Bitmesini bekleyin.",
+    "notReady": "Dışa aktarım indirmeye hazır değil.",
+    "expired": "Bu dışa aktarımın indirme süresi doldu ve dosyası silindi. Yeni bir dışa aktarım oluşturun.",
+    "fullExportAdminOnly": "Bu dışa aktarımı bir sistem yöneticisi yaptı ve projenin tamamını içeriyor: yalnızca bir sistem yöneticisi indirebilir veya silebilir.",
+    "importAdminOnly": "Projeyi yalnızca bir sistem yöneticisi geri yükleyebilir: geri yükleme yeni bir proje oluşturur.",
+    "noFile": "Geri yüklenecek dışa aktarım paketini (ZIP) seçin.",
+    "fileTooLarge": "Paket bu kurulumun yükleme sınırından büyük.",
+    "codeRequired": "Geri yüklenen proje için bir proje kodu girin."
+  },
+  "import": {
+    "notZip": "Dosya okunabilir bir ZIP paketi değil: {{detail}}",
+    "tooManyEntries": "Pakette {{max}} öğeden fazlası var.",
+    "unsafePath": "Pakette güvenli olmayan bir öğe adı var: {{name}}",
+    "duplicateEntry": "Pakette {{name}} öğesi iki kez var.",
+    "missingEntry": "Paket eksik: {{name}} yok.",
+    "unlistedEntry": "Pakette sağlama listesinde adı geçmeyen {{name}} var.",
+    "partTooLarge": "{{name}} bölümü okunamayacak kadar büyük.",
+    "badJson": "{{name}} bölümü geçerli bir JSON değil.",
+    "badSums": "Paketin sağlama listesi (SHA256SUMS) geçerli değil veya manifest.json ile uyuşmuyor.",
+    "checksumMismatch": "Sağlama değeri uyuşmuyor: {{name}} dışa aktarımdan sonra değiştirilmiş veya bozulmuş. Hiçbir şey geri yüklenmedi.",
+    "wrongSchema": "Bu, bilinen bir sürümde SiteKeep proje dışa aktarımı değil ({{schema}}; beklenen {{expected}}).",
+    "uploadGone": "Yüklenen paket artık yok. Yeniden yükleyin.",
+    "fileWithoutFolder": "{{name}}: klasörü pakette yok; dosya alınmadı.",
+    "hashDiffers": "{{path}}: baytlar kaynakta yüklemede kaydedilen SHA-256 ile uyuşmuyor (dışa aktarım bunu zaten bildirdi); olduğu gibi geri yüklendi.",
+    "transitionsOff": "Kaynak proje ISO 19650 durum geçişlerini zorunlu tutuyordu. Geçiş tablosu pakette yok: Proje Ayarları → CDE'de yeniden kurun, sonra zorunluluğu tekrar açın."
+  },
+  "notifications": {
+    "exportReady": "Proje dışa aktarımı hazır",
+    "exportReadyBody": "{{files}} dosya ({{versions}} versiyon) ve {{issues}} sorun. Proje Ayarları → Dışa Aktarma'dan indirin.",
+    "exportFailed": "Proje dışa aktarımı başarısız oldu",
+    "importReady": "Proje geri yüklendi",
+    "importReadyBody": "{{code}} projesi geri yüklendi. Burada hesabı olmayan kişi sayısı: {{unknown}}.",
+    "importFailed": "Proje geri yüklemesi başarısız oldu"
+  },
+  "readme": {
+    "title": "SiteKeep tam proje dışa aktarımı",
+    "project": "Proje: {{code}} {{name}}",
+    "created": "Oluşturulma: {{at}}, {{user}}",
+    "scopeFull": "Kapsam: projenin tamamı (bir sistem yöneticisi dışa aktardı).",
+    "scopeVisible": "Kapsam: dışa aktaran kişinin görebildikleri (klasör izinleri ve görev ekibi WIP kuralı).",
+    "counts": "{{files}} dosya, {{versions}} versiyon, {{bytes}} bayt, {{issues}} sorun.",
+    "purpose": "Paket, projenin bilgisini açık biçimlerde (JSON, CSV, BCF 3.0) içerir; başka bir SiteKeep kurulumuna geri yüklenebilir veya başka bir CDE tarafından okunabilir. Biçim: {{schema}}, SiteKeep'in docs/features/PROJECT_EXPORT.md belgesinde açıklanır.",
+    "contents": "İçerik:",
+    "manifest": "şema sürümü, proje, sayılar, bölümlerin listesi ve her öğenin sağlama değeri",
+    "sums": "her öğenin SHA-256 değeri (sha256sum -c SHA256SUMS)",
+    "projectJson": "proje, CDE ayarları, isimlendirme standartları",
+    "folders": "CDE durumları ve klasör izinleriyle klasör ağacı",
+    "filesJson": "her dosya ve tüm versiyonları: doküman kodu, kodlar, durum, SHA-256, onaylar",
+    "files": "her versiyonun baytları klasör yapısında (eski versiyonlar \"ad (V2).uzantı\")",
+    "members": "üyeler, firmalar, roller ve görev ekipleri",
+    "reviews": "incelemeler, iş akışı adımları ve her inceleyenin kararı",
+    "transmittals": "iletimler (transmittal), dosyaları, olayları ve alındıları",
+    "supersessions": "versiyonlar arasındaki ISO 19650 yerine geçme bağlantıları",
+    "issues": "BCF 3.0 biçiminde sorunlar",
+    "audit": "projenin denetim kaydı (IP adresleri ve tarayıcı bilgisi olmadan)",
+    "check": "Paketi doğrulayın: sha256sum -c SHA256SUMS (macOS: shasum -a 256 -c SHA256SUMS)."
+  }
+}

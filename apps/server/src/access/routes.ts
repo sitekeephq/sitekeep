@@ -10,6 +10,8 @@ import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import {
+  shownRole,
+  shownRoleName,
   DEFAULT_PROJECT_ROLES,
   PROJECT_ROLE_KINDS,
   rolePackage,
@@ -39,7 +41,8 @@ import {
   workflowTemplates,
 } from "../db/schema.js";
 import { badRequest, conflict, notFound } from "../core/platform/http.js";
-import { DEFAULT_LANGUAGE, msg, requestLanguage } from "../i18n/index.js";
+import { requireProjectCompanies } from "../projects/companies.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, requestLanguage } from "../i18n/index.js";
 import { ensureDefaultProjectRoles, ensureProjectAdminsHoldAdminRole } from "../core/security/default-roles.js";
 import { explainFolderAccess, folderPath, planRolePackage } from "../core/security/roles.js";
 
@@ -79,7 +82,7 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
     const a = await projectAccess(db, req.params.pid, req.user!);
     requireProjectAdmin(a);
     const body = createRoleBody.parse(req.body);
-    await requireCompany(db, body.companyId);
+    await requireProjectCompanies(db, a, [body.companyId]);
     const [row] = await db
       .insert(projectRoles)
       .values({
@@ -109,7 +112,7 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
     requireProjectAdmin(a);
     const role = await loadRole(db, a, req.params.rid);
     const body = roleBody.partial().parse(req.body);
-    await requireCompany(db, body.companyId);
+    await requireProjectCompanies(db, a, [body.companyId]);
     await db
       .update(projectRoles)
       .set({ ...body, ...(body.code !== undefined ? { code: body.code || null } : {}) })
@@ -316,7 +319,9 @@ export async function roleRoutes(api: FastifyInstance, { db }: AppDeps) {
 
 // ---- Helpers --------------------------------------------------------------------------------
 
-function toRoleDto(r: typeof projectRoles.$inferSelect): Omit<ProjectRoleDto, "memberIds"> {
+function toRoleDto(row: typeof projectRoles.$inferSelect): Omit<ProjectRoleDto, "memberIds"> {
+  // The default roles (Görüntüleyici / Düzenleyici / Yönetici) in the reader's language while unchanged.
+  const r = shownRole(row, currentLanguage());
   return {
     id: r.id,
     projectId: r.projectId,
@@ -328,12 +333,6 @@ function toRoleDto(r: typeof projectRoles.$inferSelect): Omit<ProjectRoleDto, "m
     code: r.code ?? null,
     isLead: r.isLead,
   };
-}
-
-async function requireCompany(db: Db, companyId: string | null | undefined) {
-  if (!companyId) return;
-  const [c] = await db.select({ id: companies.id }).from(companies).where(eq(companies.id, companyId));
-  if (!c) throw notFound(msg("access:entities.company"));
 }
 
 export async function listRoles(db: Db, projectId: string): Promise<ProjectRoleDto[]> {
@@ -399,6 +398,7 @@ async function rolePackagePlan(
   body: z.infer<typeof packageBody>,
   apply: boolean,
 ): Promise<RolePackagePlanDto> {
+  await requireProjectCompanies(db, a, [body.companyId], { dryRun: !apply });
   const [company] = await db.select().from(companies).where(eq(companies.id, body.companyId));
   if (!company) throw notFound(msg("access:entities.company"));
   const tree = await FolderTree.load(db, a.project.id);
@@ -447,7 +447,7 @@ async function whoCanSee(
     .select({ id: projectRoles.id, name: projectRoles.name })
     .from(projectRoles)
     .where(eq(projectRoles.projectId, a.project.id));
-  const roleNames = new Map(roles.map((r) => [r.id, r.name]));
+  const roleNames = new Map(roles.map((r) => [r.id, shownRoleName(r.name, lang)]));
   const companyIds = [
     ...new Set([
       ...members.map((m) => m.companyId).filter((x): x is string => !!x),

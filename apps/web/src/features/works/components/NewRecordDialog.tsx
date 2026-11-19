@@ -89,7 +89,7 @@ export function NewRecordDialog({
   const manage = webCapability("manage.ui");
   const modules = project.modules ?? resolveModules(null);
   const { data: types } = useLoad(() => worksApi.creatableTypes(project.id), [project.id]);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const [text, setText] = useState("");
   const [stage, setStage] = useState<Stage>(initialFile ? { kind: "file", file: initialFile } : { kind: "choose" });
   const [busy, setBusy] = useState(false);

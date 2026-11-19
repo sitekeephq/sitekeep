@@ -51,6 +51,7 @@ function location(code: string, kmStart: number, kmEnd: number): ActivityLocatio
     kmEnd,
     locationId: null,
     category: "bridge",
+    display: null,
     source: "manual",
     rule: null,
     detail: null,

@@ -10,7 +10,11 @@
         "closeout_archive_downloaded": "Kapanış arşivi indirildi",
         "closeout_archive_deleted": "Kapanış arşivi silindi",
         "closed": "Proje kapatıldı (salt okunur)",
-        "reopened": "Proje yeniden açıldı"
+        "reopened": "Proje yeniden açıldı",
+        "exported": "Proje dışa aktarıldı",
+        "export_downloaded": "Proje dışa aktarımı indirildi",
+        "export_deleted": "Proje dışa aktarımı silindi",
+        "imported": "Proje bir dışa aktarımdan geri yüklendi"
       },
       "member": {
         "added": "Üye eklendi",
@@ -43,6 +47,8 @@
         "deleted": "Dosya silindi",
         "downloaded": "Dosya indirildi",
         "zip_downloaded": "Toplu indirme (zip)",
+        "model_reconverted": "Model yeniden dönüştürmeye alındı",
+        "model_retry_failed": "Dönüşmeyen modeller yeniden denendi",
         "restored": "Dosya geri yüklendi",
         "purged": "Dosya kalıcı silindi",
         "attributes_updated": "Dosya öznitelikleri değişti",
@@ -368,7 +374,7 @@
         "chooseUser": "Kullanıcı Seçin…"
       },
       "roleLabel": "Rol",
-      "hint": "Hesabı olan kişiyi buradan seçin; hesabı olmayan kişileri aşağıdan e-postayla davet edin."
+      "hint": "Projelerinizdeki kişilerden birini seçin; diğer herkesi aşağıdan e-postayla ekleyin (hesabı olan kişi davetsiz, hemen eklenir)."
     },
     "pending": "Davetli",
     "pendingHint": "Daveti henüz kabul etmedi; giriş yapamaz.",
@@ -656,9 +662,10 @@
     "applied": "{{preset}} uygulandı. Yeni numaralar bu desenle verilir.",
     "heading": "Bilgi Talebi ve Teknik Onay Numaraları",
     "presets": {
-      "standart": "Standart"
+      "standart": "Standart",
+      "proje": "Proje kodu önde"
     },
-    "hint": "Standart: <code>{{standard}}</code> · ZAVM: <code>{{zavm}}</code>. Sayaç disipline göre ayrı yürür; {Konu} sayaca girmez."
+    "hint": "Standart: <code>{{standard}}</code> · Proje kodu önde: <code>{{project}}</code> · ZAVM: <code>{{zavm}}</code>. Sayaç disipline göre ayrı yürür; {Konu} sayaca girmez. {Gönderen}, kaydı açanın bu projedeki firmasıdır; projede firması olmayan için yerine proje kodu, alıcısız kayıtta {Alıcı} yerine X yazılır."
   },
   "locations": {
     "remove": {
@@ -936,6 +943,62 @@
       "action": "Dosyayı Sil",
       "title": "Arşiv dosyası silinsin mi?",
       "confirm": "ZIP, indirme süresinin sonunu beklemeden şimdi silinir. Arşivin kaydı listede ve denetim kaydında kalır."
+    }
+  },
+  "companies": {
+    "heading": "Bu Projedeki Firmalar",
+    "hint": "Projenin listelerinde (üye firması, görev ekipleri, izinler, sorun ve kayıt alıcıları) yalnızca bu firmalar görünür. Başka projelerin firmaları burada gösterilmez.",
+    "columns": {
+      "name": "Firma",
+      "code": "Kod"
+    },
+    "empty": "Bu projede henüz firma yok.",
+    "add": {
+      "label": "Projeye eklenecek firma",
+      "choose": "Firma Seçin…"
+    },
+    "remove": {
+      "title": "Firmayı Kaldır",
+      "confirm": "{{name}} bu projeden kaldırılsın mı? Firma listesinde kalır.",
+      "action": "Kaldır"
+    }
+  },
+  "export": {
+    "heading": "Tam Proje Dışa Aktarma",
+    "description": "Projenin verisini açık biçimlerde SiteKeep'ten alın: klasör ağacı, her dosyanın tüm versiyonları ve öznitelikleri, doküman kodu, uygunluk ve revizyon kodları, CDE durumu ve SHA-256 değeri, BCF 3.0 biçiminde sorunlar, onay adımlarıyla incelemeler, iletimler, denetim kaydı (CSV ve JSON), üyeler, roller, görev ekipleri ve klasör izinleri, bir manifest ve sağlama listesi tek bir ZIP'te. Başka bir SiteKeep kurulumuna geri yüklenebilir. Dışa aktarım arka planda hazırlanır, hazır olunca bildirim gelir; {{days}} gün indirilebilir, sonra dosyası silinir.",
+    "scope": {
+      "full": "Kapsam: projenin tamamı (sistem yöneticisisiniz).",
+      "visible": "Kapsam: bu projede görebildikleriniz (klasör izinleri ve görev ekibi WIP kuralı geçerli). Sistem yöneticisinin dışa aktarımı her şeyi içerir.",
+      "fullShort": "Projenin tamamı",
+      "visibleShort": "Dışa aktaranın görebildikleri"
+    },
+    "estimate": "Dosyalar: {{files}} ({{versions}} versiyon, {{size}}).",
+    "limit": "Sınır: {{size}}.",
+    "create": "Dışa Aktarım Oluştur",
+    "columns": {
+      "created": "Oluşturulma",
+      "contents": "İçerik",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    "counts": "{{files}} dosya, {{versions}} versiyon, {{topics}} sorun, {{size}}",
+    "countsPending": "{{versions}} versiyon, {{size}}",
+    "download": "İndir",
+    "expires": "{{date}} tarihine kadar indirilebilir",
+    "remove": {
+      "title": "Dışa Aktarım Dosyasını Sil",
+      "confirm": "Bu dışa aktarımın ZIP dosyası şimdi silinsin mi? Satır listede kalır.",
+      "action": "Dosyayı Sil"
+    },
+    "status": {
+      "queued": "Sırada",
+      "running": "Hazırlanıyor: {{done}} / {{total}} versiyon",
+      "progress": "Dışa aktarım ilerlemesi",
+      "failed": "Başarısız",
+      "expired": "Süresi doldu",
+      "done": "Hazır",
+      "problems_one": "Hazır, {{count}} dosya eksik veya değişmiş",
+      "problems_other": "Hazır, {{count}} dosya eksik veya değişmiş"
     }
   }
 }

@@ -4,7 +4,7 @@
  * never redirected to.
  */
 
-import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
+import { currentLanguage, tFor } from "../i18n/index.js";
 
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]"]);
 
@@ -26,7 +26,7 @@ export function isLoopbackUri(u: URL): boolean {
  * clients) and private-use schemes in reverse domain form such as com.example.app:/callback
  * (RFC 8252 §7.1). No fragments, no user info.
  */
-export function redirectUriProblem(uri: string, lang: string = DEFAULT_LANGUAGE): string | null {
+export function redirectUriProblem(uri: string, lang: string = currentLanguage()): string | null {
   const t = tFor(lang);
   if (uri.length > 2000) return t("oauth:errors.redirectTooLong");
   const u = parse(uri);

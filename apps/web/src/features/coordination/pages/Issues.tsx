@@ -16,6 +16,8 @@ import { BcfExportDialog, BcfImportDialog } from "../components/BcfDialogs";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 import { reportBuilderUrl } from "../../documents/components/ReportShortcut";
 import { useLabel } from "../../../i18n";
+import { NewIssueDialog } from "../components/NewIssueDialog";
+import { useAsk } from "../../../shared/ui/Ask";
 
 const PRIORITIES: IssuePriority[] = ["low", "normal", "high", "critical"];
 const STATUSES: IssueStatus[] = ["open", "in_progress", "in_review", "closed"];
@@ -52,6 +54,7 @@ export function IssuesPage() {
   // BCF: selected rows (export), dialogs.
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [bcf, setBcf] = useState<"export" | "import" | null>(null);
+  const [creating, setCreating] = useState(false);
   const visible = new Set((issues ?? []).map((i) => i.id));
   const pickedIds = [...picked].filter((id) => visible.has(id));
   const issuesOn = project.modules?.issues !== false;
@@ -77,13 +80,16 @@ export function IssuesPage() {
               </option>
             ))}
           </select>
+          {issuesOn && (
+            <button className="primary" onClick={() => setCreating(true)}>
+              {t("issues.actions.new")}
+            </button>
+          )}
           {phone ? (
             <>
-              <Link className="btn" to={`/projects/${project.id}/viewer`}>
-                {t("issues.actions.newInModel")}
-              </Link>
               <MoreMenu
                 items={[
+                  { key: "model", label: t("issues.actions.newInModel") },
                   { key: "report", label: t("issues.actions.report") },
                   ...(issuesOn ? [{ key: "import", label: t("bcfImport.title") }] : []),
                   {
@@ -93,7 +99,8 @@ export function IssuesPage() {
                   },
                 ]}
                 onSelect={(key) => {
-                  if (key === "report") navigate(reportBuilderUrl(project.id, "issues"));
+                  if (key === "model") navigate(`/projects/${project.id}/viewer`);
+                  else if (key === "report") navigate(reportBuilderUrl(project.id, "issues"));
                   else if (key === "import") setBcf("import");
                   else if (key === "export") setBcf("export");
                 }}
@@ -193,7 +200,28 @@ export function IssuesPage() {
           </div>
         )}
       </div>
-      {iid && <IssueDetail key={iid} issueId={iid} onChanged={reload} names={names} />}
+      {iid && (
+        <IssueDetail
+          key={iid}
+          issueId={iid}
+          onChanged={reload}
+          onDeleted={() => {
+            reload();
+            navigate(`/projects/${project.id}/issues${suffix}`);
+          }}
+          names={names}
+        />
+      )}
+      {creating && (
+        <NewIssueDialog
+          onClose={() => setCreating(false)}
+          onCreated={(issue) => {
+            setCreating(false);
+            reload();
+            navigate(`/projects/${project.id}/issues/${issue.id}${suffix}`);
+          }}
+        />
+      )}
       {bcf === "export" && (
         <BcfExportDialog
           ids={pickedIds.length ? pickedIds : undefined}
@@ -207,7 +235,7 @@ export function IssuesPage() {
   );
 }
 
-function IssueDetail({ issueId, onChanged, names }: { issueId: string; onChanged(): void; names: Map<string, string> }) {
+function IssueDetail({ issueId, onChanged, onDeleted, names }: { issueId: string; onChanged(): void; onDeleted(): void; names: Map<string, string> }) {
   const { t } = useTranslation(["coordination", "common"]);
   const label = useLabel();
   const project = useProject();
@@ -218,6 +246,7 @@ function IssueDetail({ issueId, onChanged, names }: { issueId: string; onChanged
   const [comment, setComment] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const { confirm } = useAsk();
   const panelRef = useRevealOnNarrow<HTMLElement>(issue?.id);
   // Further viewpoints (BCF topics may carry several); loaded only when there are any.
   const extra = issue?.extraViewpointCount ?? 0;
@@ -232,6 +261,27 @@ function IssueDetail({ issueId, onChanged, names }: { issueId: string; onChanged
   const viewerHref = (vp: { fileVersionIds: string[] }, guid?: string) =>
     `/projects/${project.id}/viewer?v=${vp.fileVersionIds.join(",")}&issue=${issue.id}${guid ? `&vp=${guid}` : ""}`;
   const viewerLink = issue.viewpoint ? viewerHref(issue.viewpoint) : null;
+
+  // Deleting: project administrators and the creator (the server checks too).
+  const canDelete = project.isProjectAdmin || issue.createdBy === user?.id;
+
+  async function remove() {
+    if (!issue) return;
+    const ok = await confirm({
+      title: t("issue.deleteTitle"),
+      message: t("issue.deleteConfirm", { number: issue.number, title: issue.title }),
+      confirmLabel: t("common:actions.delete"),
+      danger: true,
+    });
+    if (!ok) return;
+    setMsg(null);
+    try {
+      await api.deleteIssue(project.id, issue.id);
+      onDeleted();
+    } catch (e) {
+      setMsg((e as Error).message);
+    }
+  }
 
   async function update(patch: Partial<IssueDto>) {
     setMsg(null);
@@ -288,11 +338,16 @@ function IssueDetail({ issueId, onChanged, names }: { issueId: string; onChanged
           {issue.importedFrom.assignedTo ? ` · ${t("issue.assignedInFile", { name: issue.importedFrom.assignedTo })}` : ""}
         </p>
       )}
-      <button style={{ marginTop: 8 }} onClick={() => setExporting(true)}>
-        {t("bcfExport.title")}
-      </button>
+      <div className="row wrap" style={{ gap: 8, marginTop: 8 }}>
+        <button onClick={() => setExporting(true)}>{t("bcfExport.title")}</button>
+        {canDelete && (
+          <button className="danger" onClick={() => void remove()}>
+            {t("issue.actions.delete")}
+          </button>
+        )}
+      </div>
       {exporting && <BcfExportDialog ids={[issue.id]} count={1} onClose={() => setExporting(false)} />}
-      <IssueLinks projectId={project.id} issueId={issue.id} />
+      <IssueLinks projectId={project.id} issueId={issue.id} canEdit={canEdit} />
       <LocationLinkField projectId={project.id} kind="issue" targetId={issue.id} disabled={!canEdit} />
 
       <div className="row" style={{ marginTop: 12 }}>

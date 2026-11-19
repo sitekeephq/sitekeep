@@ -11,7 +11,7 @@ import { hashToken } from "../core/security/auth.js";
 import type { Db } from "../db/index.js";
 import { oauthClients, tokens, users } from "../db/schema.js";
 import { HttpError, errorHandler } from "../core/platform/http.js";
-import { msg, render, requestLanguage } from "../i18n/index.js";
+import { msg, render, requestLanguage, withRequestLanguage } from "../i18n/index.js";
 import { logMethodHook } from "../core/platform/error-ring.js";
 import { clientInfo, setAuditPersonalKey, withAuditClient } from "../core/platform/audit.js";
 import { devToolsEnabled } from "../dev/flag.js";
@@ -43,6 +43,7 @@ import { idsRoutes } from "../coordination/routes/ids.js";
 import { enforceTokenScope } from "../core/security/token-scope.js";
 import { enforceProjectOpen } from "../closeout/closed.js";
 import { closeoutRoutes } from "../closeout/routes.js";
+import { portabilityRoutes } from "../portability/routes.js";
 import { reportRoutes } from "../reports/routes.js";
 import { docIntelRoutes } from "../docintel/routes.js";
 import { sheetRoutes } from "../sheets/routes.js";
@@ -136,6 +137,8 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
   app.setErrorHandler(errorHandler);
   // Audit rows written while a request runs carry its client: IP and user agent (D-9, AUDIT_LOG.md).
   app.addHook("onRequest", (req, _reply, done) => withAuditClient(clientInfo(req), done));
+  // Code without a `lang` argument answers in the request's language (i18n currentLanguage()).
+  app.addHook("onRequest", (req, _reply, done) => withRequestLanguage(() => requestLanguage(req), done));
   await app.register(cookie);
   await app.register(multipart, {
     limits: { fileSize: deps.maxUploadBytes ?? 20 * 1024 * 1024 * 1024, files: 50 },
@@ -229,6 +232,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       await cdeCodesRoutes(api, deps);
       await deliveryPlanRoutes(api, deps);
       await closeoutRoutes(api, deps);
+      await portabilityRoutes(api, deps);
       // Developer tools: registered only on a development server (CDE_DEV_TOOLS=1, not production).
       if (deps.devTools) await devRoutes(api, deps);
     },

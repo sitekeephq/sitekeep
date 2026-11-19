@@ -271,6 +271,8 @@ OAuth paths (`/oauth2/*`, consent page) do not get COOP, for clients that use po
   ([encryption at rest](../onprem/docker-compose.md#encryption-at-rest)).
 - Retention policies by project, folder and record type (the installation-wide periods exist:
   [retention](DATA_SUBJECT_RIGHTS.md#retention)).
-- Full project export (in OpenCDE BCF and Documents API format): the customer can move their data to another CDE at any time.
 - Enterprise single sign-on (SSO). Two-factor authentication is done: [sign-in security](SIGN_IN_SECURITY.md).
+- Full project export is done: one ZIP in open formats (files with every version, BCF 3.0 issues, JSON and
+  CSV records, checksums) that another SiteKeep installation restores and another CDE can read
+  ([full project export and restore](PROJECT_EXPORT.md)).
 - Masking of task queue prompts as well.

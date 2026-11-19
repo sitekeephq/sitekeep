@@ -1,4 +1,4 @@
-import { isApprovedOutcome, pathSegments, renderPattern, splitExtension, validateName } from "@sitekeep/shared";
+import { isApprovedOutcome, pathSegments, renderPattern, validateName } from "@sitekeep/shared";
 import { queueSheetsFor } from "../sheets/service.js";
 import { and, eq, isNull } from "drizzle-orm";
 import { audit } from "../core/platform/audit.js";
@@ -13,6 +13,7 @@ import { checkCodes, checkDocumentCode, checkUpload } from "../cde/guards.js";
 import { recordTransition } from "../cde/events.js";
 import { cdeStateOf } from "../cde/state.js";
 import { codeProfile } from "@sitekeep/shared";
+import { isModelFile } from "../files/model-formats.js";
 import { loadCodeSettings } from "../cde/codes.js";
 import { loadTransitionRules } from "../cde/transitions.js";
 import { containerRevisions, copyCodesFor, reviewSuitability } from "../cde/review-transition.js";
@@ -144,11 +145,11 @@ export async function copyApprovedFiles(ctx: ReviewCtx, review: ReviewRow, actor
         profile && toState && fromState !== toState
           ? copyCodesFor(profile, toState, fromState, chosenSuitability, src, (await containerRevisions(db, [row.files.containerId])).get(row.files.containerId) ?? [])
           : { suitabilityCode: src.suitabilityCode, revisionCode: src.revisionCode };
-      const isIfc = splitExtension(name).extension.toLowerCase() === "ifc";
+      const isModel = isModelFile(name);
       const derivative =
         src.derivativeStatus === "ready"
-          ? { derivativeStatus: "ready" as const, derivativeKey: src.derivativeKey, ifcSummary: src.ifcSummary }
-          : { derivativeStatus: isIfc ? ("pending" as const) : ("none" as const) };
+          ? { derivativeStatus: "ready" as const, derivativeKey: src.derivativeKey, ifcSummary: src.ifcSummary, ifcKey: src.ifcKey, converter: src.converter }
+          : { derivativeStatus: isModel ? ("pending" as const) : ("none" as const) };
       const comment = `İnceleme ${review.code ?? `#${review.number}`} ile onaylandı (kaynak V${src.version})`; // i18n-ok: version comment stored as data
       const out = await db.transaction(async (tx) => {
         const txDb = tx as unknown as Db;

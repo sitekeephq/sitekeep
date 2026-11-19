@@ -20,7 +20,7 @@ export function TaskTeamsSection({ settings, onSettings }: { settings: CdeSettin
   const { confirm } = useAsk();
   const { data: roles, reload, error: rolesError } = useLoad(() => api.roles(project.id), [project.id]);
   const { data: members } = useLoad(() => api.members(project.id), [project.id]);
-  const { data: companies } = useLoad(() => api.companies().catch(() => []), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id).catch(() => []), [project.id]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [draft, setDraft] = useState({ name: "", code: "", companyId: "" });

@@ -21,7 +21,7 @@
  */
 import { SHARED_DEFAULT_LANGUAGE, sharedIntlLocale, sharedText } from "./i18n.js";
 import type { AttributeDefinition } from "../kernel/attributes.js";
-import type { NamingStandard } from "../kernel/naming.js";
+import type { NamingField, NamingStandard, NamingValue } from "../kernel/naming.js";
 import type { PermissionLevel } from "../kernel/permissions.js";
 import type { FolderState } from "../core/types.js";
 import type { ProjectModule } from "../core/modules.js";
@@ -182,8 +182,9 @@ export interface ProjectTemplate extends TemplateParts {
   folders: (string | TemplateFolder)[];
   /**
    * Naming standards. List values and descriptions may use tokens: `{PROJE}` (project code),
-   * `{slot:key}` (the slot's company code) and `{firma:key}` (the mapped company's name).
-   * Values whose tokens cannot be resolved are dropped.
+   * `{EK1}` (the ÇŞB EK-1 project code of the project details), `{slot:key}` (the slot's company
+   * code) and `{firma:key}` (the mapped company's name). Values whose tokens cannot be resolved are
+   * dropped. A text field's `fixed` value turns it into a one-value list when its tokens resolve.
    */
   namingStandards?: NamingStandard[];
   attributes?: AttributeDefinition[];
@@ -676,18 +677,21 @@ export function previewTree(folders: readonly ExpandedFolder[]): PreviewFolderDt
 
 export interface TokenContext {
   projectCode: string;
+  /** ÇŞB EK-1 project code (project details `csbProjectCode`), when known. */
+  csbProjectCode?: string;
   /** slot key → company code */
   slotCodes: Record<string, string | undefined>;
   /** slot key → company name */
   slotNames: Record<string, string | undefined>;
 }
 
-/** Replaces {PROJE}, {slot:key} and {firma:key}; null when a token has no value. */
+/** Replaces {PROJE}, {EK1}, {slot:key} and {firma:key}; null when a token has no value. */
 export function resolveTemplateTokens(text: string, ctx: TokenContext): string | null {
   let missing = false;
-  const out = text.replace(/\{(PROJE|slot:([^}]+)|firma:([^}]+))\}/g, (_m, all: string, slot?: string, firma?: string) => {
+  const out = text.replace(/\{(PROJE|EK1|slot:([^}]+)|firma:([^}]+))\}/g, (_m, all: string, slot?: string, firma?: string) => {
     let v: string | undefined;
     if (all === "PROJE") v = ctx.projectCode;
+    else if (all === "EK1") v = ctx.csbProjectCode?.trim();
     else if (slot !== undefined) v = ctx.slotCodes[slot];
     else if (firma !== undefined) v = ctx.slotNames[firma];
     if (!v) {
@@ -699,23 +703,54 @@ export function resolveTemplateTokens(text: string, ctx: TokenContext): string |
   return missing ? null : out;
 }
 
-/** Applies tokens to list values of a naming standard; unresolved values are dropped. */
+/**
+ * Applies tokens to list values (and text suggestions) of a naming standard; unresolved values are
+ * dropped. A text field with a `fixed` value becomes a one-value list when the value resolves, and
+ * stays a text field (without `fixed`) when it does not.
+ */
 export function resolveNamingTokens(standard: NamingStandard, ctx: TokenContext): NamingStandard {
+  const resolveValues = (list: readonly NamingValue[]): NamingValue[] => {
+    const values = list.flatMap((v) => {
+      const code = resolveTemplateTokens(v.code, ctx);
+      if (code === null) return [];
+      const description = v.description === undefined ? undefined : resolveTemplateTokens(v.description, ctx);
+      const out = { ...v, code };
+      if (description === null || description === undefined) delete out.description;
+      else out.description = description;
+      return [out];
+    });
+    const seen = new Set<string>();
+    return values.filter((v) => !seen.has(v.code) && !!seen.add(v.code));
+  };
   return {
     ...standard,
-    fields: standard.fields.map((f) => {
-      if (f.type !== "list") return f;
-      const values = f.values.flatMap((v) => {
-        const code = resolveTemplateTokens(v.code, ctx);
-        if (code === null) return [];
-        const description = v.description === undefined ? undefined : resolveTemplateTokens(v.description, ctx);
-        const out = { ...v, code };
-        if (description === null || description === undefined) delete out.description;
-        else out.description = description;
-        return [out];
-      });
-      const seen = new Set<string>();
-      return { ...f, values: values.filter((v) => !seen.has(v.code) && !!seen.add(v.code)) };
+    fields: standard.fields.map((f): NamingField => {
+      if (f.type === "list") return { ...f, values: resolveValues(f.values) };
+      if (f.type !== "text") return f;
+      const { fixed, ...text } = f;
+      const value = fixed === undefined ? null : resolveTemplateTokens(fixed, ctx);
+      if (value) {
+        return {
+          name: f.name,
+          type: "list",
+          values: [{ code: value }],
+          ...(f.inName !== undefined ? { inName: f.inName } : {}),
+          ...(f.inCode !== undefined ? { inCode: f.inCode } : {}),
+        };
+      }
+      return text.suggestions ? { ...text, suggestions: resolveValues(text.suggestions) } : text;
     }),
   };
+}
+
+/** Whether a naming standard of the list uses a template token ("EK1" → "{EK1}") in a code or fixed value. */
+export function namingUsesToken(standards: readonly NamingStandard[] | undefined, token: string): boolean {
+  const mark = `{${token}}`;
+  return (standards ?? []).some((s) =>
+    s.fields.some((f) =>
+      f.type === "list"
+        ? f.values.some((v) => v.code.includes(mark))
+        : f.type === "text" && (!!f.fixed?.includes(mark) || !!f.suggestions?.some((v) => v.code.includes(mark))),
+    ),
+  );
 }

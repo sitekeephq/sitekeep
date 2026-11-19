@@ -21,10 +21,10 @@ import { extractPdfText } from "../docintel/extract.js";
 import { detectRevision } from "../docintel/revision.js";
 import type { Storage } from "../core/platform/storage.js";
 import { HttpError } from "../core/platform/http.js";
-import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
 
 /** Text of an error in a language (HttpError messages translated, others as they are). */
-export function errorText(err: unknown, lang: string = DEFAULT_LANGUAGE): string {
+export function errorText(err: unknown, lang: string = currentLanguage()): string {
   if (err instanceof HttpError && err.msg) return render(lang, err.msg);
   return err instanceof Error ? err.message : String(err);
 }

@@ -2,16 +2,19 @@
 /**
  * "Değişiklik özeti": the language model gets ONLY a compact description of the differences
  * (text changes, title-block changes, change-region counts per page, checks), never the documents.
- * The answer is a short Turkish bullet list; bullets name their page as [s.N] so the UI can link.
+ * The answer is a short bullet list in the requester's interface language (ai/language.ts);
+ * bullets name their page as [s.N] so the UI can link.
  */
 import type { DocCompareFlag, DocCompareResult, NBox, PageRegions, SummaryBullet, TextChange } from "@sitekeep/shared";
+import { answerLanguageRule } from "../ai/language.js";
 import { stripThinking, type AiProvider } from "../ai/provider.js";
 import { DEFAULT_LANGUAGE, msg, render, tFor } from "../i18n/index.js";
 import { changeText } from "./text-diff.js";
 
 /**
  * Language of the texts given to the model (checks, change descriptions): the prompt is written in
- * Turkish and asks for a Turkish summary, so its inputs stay Turkish whatever the reader's language.
+ * Turkish, so its inputs stay Turkish whatever the reader's language; the summary itself is
+ * written in the reader's language (systemPrompt).
  */
 export const PROMPT_LANGUAGE = "tr";
 
@@ -19,16 +22,21 @@ export const PROMPT_LANGUAGE = "tr";
 const MAX_INPUT = 7000;
 const MAX_BULLETS = 10;
 
-export const SYSTEM_PROMPT =
+const SYSTEM_PROMPT =
   "Sen bir inşaat projesinde doküman kontrol uzmanısın. Bir paftanın/dokümanın iki versiyonu arasındaki farkların " +
-  "özetini alacaksın (tam doküman değil). Türkçe, kısa madde işaretli bir değişiklik özeti yaz: en önemli değişiklikler önce, " +
+  "özetini alacaksın (tam doküman değil). Kısa, madde işaretli bir değişiklik özeti yaz: en önemli değişiklikler önce, " +
   "her madde tek cümle, en fazla 8 madde. Sayfayı biliyorsan maddenin başına [s.N] yaz. Ölçü, kot, malzeme, adet, not ve " +
   "revizyon değişikliklerini somut değerlerle yaz (örn. \"kolon S12 40x60 → 50x60\"). Gerekirse etkisini kısaca ekle " +
   "(örn. \"statik kontrol gerekir\"); her maddeye \"önemli\" yazma. Uyarı yoksa uyarı maddesi yazma. " +
   "Girdide \"Uyarı:\" ile başlayan bir kontrol satırı varsa onu [!] ile başlayan ayrı bir madde olarak yaz; " +
   "\"Uyarı:\" satırı yoksa [!] kullanma ve revizyonun ya da tablonun güncellenmediğini söyleme. " +
-  "Satırların başındaki [s.N] sayfa bilgisini aynen kullan, sayfa uydurma. Antet satırları (antet) ile işaretlidir. " +
+  "Satırların başındaki [s.N] sayfa bilgisini her dilde aynen [s.N] olarak kullan, sayfa uydurma. Antet satırları (antet) ile işaretlidir. " +
   "Verilmeyen bilgiyi uydurma. Yalnızca maddeleri yaz, giriş veya kapanış cümlesi yazma.";
+
+/** The system prompt; the summary is written in `lang` (the requester's interface language). */
+export function systemPrompt(lang: string = DEFAULT_LANGUAGE): string {
+  return `${SYSTEM_PROMPT} ${answerLanguageRule(lang)}`;
+}
 
 export interface PromptInput {
   fileA: string;
@@ -38,6 +46,8 @@ export interface PromptInput {
   result: DocCompareResult;
   regions: PageRegions[] | null;
   flags: DocCompareFlag[];
+  /** Language of the summary: the requester's interface language. */
+  lang?: string;
 }
 
 /** The difference description sent to the model. */
@@ -148,7 +158,7 @@ export async function summarize(
 ): Promise<SummaryBullet[]> {
   const res = await provider.chat(
     [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt(input.lang) },
       { role: "user", content: `Farklar:\n${buildPrompt(input)}\n\nDeğişiklik özetini yaz.` },
     ],
     { maxTokens: 900, timeoutMs: 300_000, onText: opts.onText, signal: opts.signal },

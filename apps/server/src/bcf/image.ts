@@ -6,7 +6,7 @@
  * - JPEG: markers walked up to EOI; APP1–APP13, APP15 (Exif, XMP, ICC…) and comments are dropped.
  */
 import { crc32, inflateSync } from "node:zlib";
-import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
+import { currentLanguage, msg, render, type Msg } from "../i18n/index.js";
 
 export const SNAPSHOT_LIMITS = { bytes: 5 * 1024 * 1024, side: 8000, rawBytes: 96 * 1024 * 1024 };
 
@@ -19,9 +19,9 @@ export interface CleanImage {
 }
 
 export class ImageError extends Error {
-  /** The text for the reader (rendered in the request's language); `message` is the installation's language. */
+  /** The text for the reader (rendered in the request's language); `message` is in the current request's language (the installation's outside a request). */
   constructor(readonly msg: Msg) {
-    super(render(DEFAULT_LANGUAGE, msg));
+    super(render(currentLanguage(), msg));
   }
 }
 

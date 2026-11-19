@@ -72,7 +72,20 @@ export function stepProblems(step: SetupStep, draft: SetupDraft, template: Proje
       else if (!/^[A-Za-z0-9_.]+$/.test(code)) out.push({ key: "codeChars" });
       else if (code.length > 40) out.push({ key: "codeLength" });
       if (!draft.name.trim()) out.push({ key: "nameRequired" });
-      out.push(...texts(checkSetupDetails({ startDate: draft.startDate || undefined, endDate: draft.endDate || undefined, location: draft.location, client: draft.client }, lang)));
+      out.push(
+        ...texts(
+          checkSetupDetails(
+            {
+              startDate: draft.startDate || undefined,
+              endDate: draft.endDate || undefined,
+              location: draft.location,
+              client: draft.client,
+              csbProjectCode: draft.csbProjectCode?.trim().toUpperCase() || undefined,
+            },
+            lang,
+          ),
+        ),
+      );
       return out;
     }
     default:

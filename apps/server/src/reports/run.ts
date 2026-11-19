@@ -1,6 +1,6 @@
 import type { ReportData, ReportQueryErrorKind, ReportQueryRef } from "@sitekeep/shared";
 import { HttpError } from "../core/platform/http.js";
-import { DEFAULT_LANGUAGE, msg, render, tFor } from "../i18n/index.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, render, tFor } from "../i18n/index.js";
 import { reportDatasets, type DatasetRegistry, type ReportContext } from "./datasets.js";
 import { checkSpec, executeSpec } from "./engine.js";
 
@@ -14,7 +14,7 @@ export interface RunResult {
  * The message a dashboard viewer sees on the widget of a saved query that no longer fits its
  * dataset (a field was renamed or removed): short, without the full field list.
  */
-export function invalidQueryMessage(brief: string[], lang: string = DEFAULT_LANGUAGE): string {
+export function invalidQueryMessage(brief: string[], lang: string = currentLanguage()): string {
   return tFor(lang)("reports:messages.invalidSavedQuery", { problems: [...new Set(brief)].join(" ") });
 }
 

@@ -25,6 +25,8 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.resolve(here, "..");
+/** ÇŞB 2026 EK-2 tables (official text); the same file builds csb2026NamingStandard() in @sitekeep/shared. */
+const CSB = JSON.parse(readFileSync(path.resolve(here, "../../../../packages/shared/src/kernel/naming-profiles/csb-2026-ek2.json"), "utf8"));
 
 /** t({tr, en}) → string in the current language. */
 let L = "tr";
@@ -166,6 +168,44 @@ function namingStandards() {
       ],
     },
   ];
+}
+
+/**
+ * ÇŞB 2026 (EK-2) naming, Turkish template only: offered as the document code standard in the set-up
+ * wizard. Mirrors csb2026NamingStandard({ projectCode: "{EK1}" }) (packages/shared/src/kernel/
+ * naming-csb2026.ts); apps/server/test/projects/naming-csb2026.test.ts keeps them equal.
+ */
+function csbStandard() {
+  const any = { XXXX: "Genel", DIGR: "Diğer" };
+  const sub = new Map();
+  for (const table of CSB.subdisciplines) {
+    for (const v of table.values) {
+      const known = sub.get(v.code);
+      if (any[v.code]) {
+        if (!known) sub.set(v.code, { code: v.code, description: any[v.code] });
+      } else if (known) known.parents.push(table.discipline);
+      else sub.set(v.code, { code: v.code, description: v.name, parents: [table.discipline] });
+    }
+  }
+  return {
+    name: "ÇŞB 2026 (EK-2)",
+    delimiter: CSB.delimiter,
+    maxLength: CSB.maxLength,
+    fields: [
+      { name: "Proje Kodu", type: "text", minLength: 6, maxLength: 6, charset: "alphanumeric", fixed: "{EK1}" },
+      { name: "Bina Kodu", type: "text", minLength: 2, maxLength: 2, charset: "alphanumeric", suggestions: [{ code: "00", description: "Tek bina" }] },
+      { name: "Disiplin", type: "list", values: CSB.disciplines.map((d) => ({ code: d.code, description: d.name })) },
+      { name: "Alt Disiplin / Öge", type: "list", dependsOn: "Disiplin", values: [...sub.values()] },
+      { name: "Dosya Türü", type: "list", values: CSB.fileKinds.map((k) => ({ code: k.code, description: k.note ? `${k.name} (${k.note})` : k.name })) },
+      { name: "Dosya Tipi", type: "list", values: CSB.fileTypes.flatMap((g) => g.values.map((v) => ({ code: v.code, description: v.name }))) },
+      {
+        name: "Kat / Konum", type: "text", minLength: CSB.levelRules.length, maxLength: CSB.levelRules.length, charset: "alphanumeric",
+        suggestions: CSB.levels.map((l) => ({ code: l.code, description: l.name })),
+      },
+      { name: "Sıra No", type: "number", digits: 2 },
+      { name: "Revizyon No", type: "number", digits: 3, inCode: false },
+    ],
+  };
 }
 
 // Suitability (S0–S4, A, B, CR) and revision (P01 / C01) are codes of every version (ISO-2,
@@ -461,7 +501,7 @@ function template() {
       [t(N.topic)]: CONSTRUCTION_TOPICS.map((x, i) => `${String(i + 1).padStart(2, "0")}-${t(x)}`),
     },
     folders: folders(),
-    namingStandards: namingStandards(),
+    namingStandards: L === "tr" ? [...namingStandards(), csbStandard()] : namingStandards(),
     attributes: attributes(),
     workflows: workflows(),
     roles: roles(),
@@ -543,6 +583,9 @@ function template() {
       t({ tr: "Firma kodları (Kaynak, Gönderen, Alıcı) proje oluştururken her taraf için sorulur.", en: "Company codes (Originator, Sender, Recipient) are asked for each party when the project is created." }),
       t({ tr: "Disiplin listesi ve kodlama alanları örnektir; kurulum sihirbazında müşterinin kodlamasına göre değiştirilir (ör. Alt Disiplin, Aşama alanı eklenir).", en: "The discipline list and naming fields are examples; the setup wizard adapts them to the client's coding (e.g. adds Sub-discipline or Stage)." }),
       t({ tr: "Paylaşılan ve yayınlanan alanlara dosya yalnız onaylı inceleme ile girer (ISO 19650-2 §5.6.4, §5.7.4); geçiş kuralları açık.", en: "Files enter the shared and published areas only through an approved review (ISO 19650-2 §5.6.4, §5.7.4); the transition rules are enforced." }),
+      ...(L === "tr"
+        ? ["ÇŞB 2026 (EK-2) dosya isimlendirmesi seçenek olarak gelir: kurulum sihirbazında doküman kodu standardı olarak seçilirse paylaşılan ve yayınlanan klasörler bu standarda göre adlandırılır. Proje Kodu, proje bilgilerindeki ÇŞB proje kodundan (EK-1) dolar; Revizyon No (000, 001 …) idarenin revizyon talebini sayar, ISO revizyon kodundan (P01 / C01) ayrıdır."]
+        : []),
       t({ tr: "Uygunluk ve revizyon kodları ISO düzenindedir (S0–S4, A, B, CR; P01 / C01). Sahadaki R00 düzeni Proje Ayarları → CDE → Kod Düzeni'nden seçilebilir.", en: "Suitability and revision codes follow ISO 19650 (S0–S4, A, B, CR; P01 / C01). The R00 scheme can be chosen in Project Settings → CDE → Code Scheme." }),
       t({ tr: "RFI, malzeme onayı ve toplantı ayarları Manage, form şablonları Field modülü kuruluysa uygulanır; değilse atlanır.", en: "RFI, submittal and meeting settings are applied when the Manage module is installed, form templates when Field is; otherwise they are skipped." }),
     ],

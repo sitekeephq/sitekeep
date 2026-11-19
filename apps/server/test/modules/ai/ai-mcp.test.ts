@@ -422,7 +422,7 @@ describe("API token scopes, MCP endpoint and AI governance", () => {
     expect(rfiType.fields.some((f: any) => f.required)).toBe(true);
     const invalid = await tool(writeToken, "cde_work_create", { projectId: p1.id, typeKey: rfiType.key, title: "Eksik alanlı" });
     expect(invalid.isError).toBe(true);
-    const company = (await admin.post("/companies", { name: "MSV" })).body;
+    const company = (await admin.post("/companies", { name: "MSV", projectId: p1.id })).body;
     const fields = { soru: "Kolon ölçüsü nedir?", disiplin: "M - Mekanik", kategori: "Tasarım Koordinasyonu", oncelik: "Normal", maliyet_etkisi: "Yok", takvim_etkisi: "Var" };
     const created = await tool(writeToken, "cde_work_create", {
       projectId: p1.id, typeKey: "rfi", title: "Kolon ölçüsü", fields, toCompanyIds: [company.id], dueDate: "2020-02-01",

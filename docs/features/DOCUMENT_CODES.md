@@ -10,7 +10,9 @@ standards. Part of the [CDE states](CDE_STATES.md) work; conformance:
 - The code is the part of the file name, without extension, that parses against a naming
   standard: the folder's own (or the nearest ancestor's), otherwise the project's container
   standard (`project_cde_settings.container_standard_id`, Project Settings → CDE → **Document Code
-  Standard**). With `allowSuffix`, the free text after the last field is not part of the code. The
+  Standard**). With `allowSuffix`, the free text after the last field is not part of the code; nor
+  are fields with `inCode: false` (the Revizyon No of the [ÇŞB 2026 profile](NAMING_CSB_2026.md)), so
+  `…_01_000.dwg` and `…_01_001.dwg` are one document. The
   ISO 19650 templates put their standard on Shared and Published and choose it as the document code
   standard (template `cde.containerStandard`), so codes are checked from WIP on; in other projects
   choose it in Project Settings → CDE.

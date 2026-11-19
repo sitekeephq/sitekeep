@@ -29,7 +29,7 @@ import { fileVersions, files, issues, modelMarkupComments, modelMarkups, version
 import { loadVersionIndex } from "../../jobs/version-index.js";
 import { requireModule } from "../../projects/modules.js";
 import { msg } from "../../i18n/index.js";
-import { isIfc } from "../service.js";
+import { isModelFile } from "../../files/model-formats.js";
 import { insertIssue, viewpointSchema } from "./issues.js";
 import { shapesSchema } from "./markups.js";
 
@@ -125,7 +125,7 @@ export async function modelMarkupRoutes(api: FastifyInstance, { db, storage }: A
     const refs = await versionRefs(db, a.project.id, viewIds);
     for (const id of viewIds) if (!refs.has(id) || !canView(tree, a, refs.get(id)!)) throw notFound(msg("coordination:entities.file"));
     const ref = refs.get(body.versionId)!;
-    if (!isIfc(ref.fileName)) throw badRequest(msg("coordination:modelMarkup.notIfc", { name: ref.fileName }));
+    if (!isModelFile(ref.fileName)) throw badRequest(msg("coordination:modelMarkup.notIfc", { name: ref.fileName }));
     if (!canMarkup(tree, a, ref)) throw forbidden(msg("coordination:modelMarkup.markupDenied"));
     if (body.kind === "pin" && !body.anchor) throw badRequest(msg("coordination:modelMarkup.pinNeedsAnchor"));
     if (body.kind === "drawing" && !body.shapes?.length) throw badRequest(msg("coordination:modelMarkup.drawingNeedsShapes"));

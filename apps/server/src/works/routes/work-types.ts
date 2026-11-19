@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { requireProjectCompanies } from "../../projects/companies.js";
 import {
   TRANSMITTAL_PURPOSES,
   WORK_CATEGORIES,
@@ -8,7 +9,7 @@ import {
 } from "@sitekeep/shared";
 import { projectAccess, requireProjectAdmin } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
-import { badRequest, notFound } from "../../core/platform/http.js";
+import { notFound } from "../../core/platform/http.js";
 import { DEFAULT_LANGUAGE, msg, render, requestLanguage } from "../../i18n/index.js";
 import {
   workTypes,
@@ -17,7 +18,7 @@ import {
 } from "../../db/schema.js";
 import { projectModules, workModuleOn as moduleOn } from "../../projects/modules.js";
 import { DELIVERY_CHANNELS, toChannelDto } from "../delivery.js";
-import { companyNames, projectTypes, toTypeDto } from "../service.js";
+import { projectTypes, toTypeDto } from "../service.js";
 import { defined, fieldDefSchema, uuid, type WorksRouteContext } from "./route-helpers.js";
 
 const typeSchema = z.object({
@@ -183,8 +184,7 @@ export function registerWorkTypeRoutes(r: WorksRouteContext) {
       send: z.boolean().default(true),
       include: z.enum(["approved", "all"]).default("approved"),
     }).parse(req.body);
-    const known = await companyNames(db, body.recipientCompanyIds);
-    if (known.size !== new Set(body.recipientCompanyIds).size) throw badRequest(msg("works:errors.companyNotFound"));
+    await requireProjectCompanies(db, a, body.recipientCompanyIds);
     const values = { ...body, recipientCompanyIds: [...new Set(body.recipientCompanyIds)], updatedAt: new Date() };
     await db.insert(workflowTemplateWorkOptions).values({ templateId: t.id, projectId: a.project.id, ...values })
       .onConflictDoUpdate({ target: workflowTemplateWorkOptions.templateId, set: values });

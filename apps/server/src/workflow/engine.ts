@@ -11,7 +11,7 @@ import {
   type WorkflowStatus,
   type WorkflowStep,
 } from "@sitekeep/shared";
-import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
+import { currentLanguage, tFor } from "../i18n/index.js";
 
 /** The acting user as seen by the engine. */
 export interface ActorContext {
@@ -173,7 +173,7 @@ export function addBusinessDays(from: Date, days: number): Date | null {
 }
 
 /** Problems in a template definition (empty when valid). */
-export function checkTemplate(steps: readonly WorkflowStep[], lang: string = DEFAULT_LANGUAGE): string[] {
+export function checkTemplate(steps: readonly WorkflowStep[], lang: string = currentLanguage()): string[] {
   const t = tFor(lang);
   const problems: string[] = [];
   if (!steps.length) problems.push(t("workflow:errors.noSteps"));

@@ -20,13 +20,11 @@ import { standardForFolder } from "../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, folderGate } from "../workflow/service.js";
 import { checkCodes, checkDocumentCode, checkUpload, type CdeCodes, type CdeWriteSource } from "../cde/guards.js";
 import { registerNewFileCode } from "../cde/document-code.js";
+import { isModelFile } from "./model-formats.js";
 import { acceptedLegacyCodes, type CheckedCodes, type CodeWarning } from "../cde/codes.js";
 
 export type FileRow = typeof files.$inferSelect;
 export type VersionRow = typeof fileVersions.$inferSelect;
-
-/** Extensions with a model-viewer derivative (IFC → Fragments). */
-export const VIEWABLE = new Set(["ifc"]);
 
 export interface AddVersionOptions {
   /** WOPI PutFile has already checked its own lock. */
@@ -74,7 +72,7 @@ export async function addVersion(
       .select()
       .from(files)
       .where(and(eq(files.folderId, folderId), eq(files.name, name), isNull(files.deletedAt)));
-    const derivativeStatus = VIEWABLE.has(splitExtension(name).extension.toLowerCase()) ? "pending" : "none";
+    const derivativeStatus = isModelFile(name) ? "pending" : "none";
     // CDE guards (refusals only when the project enforces the ISO 19650 rules): state, codes, document code.
     const txDb = tx as unknown as Db;
     const guard = { projectId: a.project.id, access: a, source: opts.source ?? "upload", lang: opts.lang } as const;
@@ -168,6 +166,21 @@ export async function addVersion(
 }
 
 /**
+ * Background work for a stored version: IFC derivative, title block check (PDF), drawing sheets,
+ * viewer previews and search text. Also used by the project restore (portability/import.ts).
+ */
+export async function queueVersionWork(db: Db, jobs: JobQueue, name: string, versionId: string): Promise<void> {
+  const ext = splitExtension(name).extension.toLowerCase();
+  if (isModelFile(name)) await jobs.enqueue("ifc_to_frag", { versionId });
+  // Title block and revision check (document intelligence), in the background.
+  if (ext === "pdf") await jobs.enqueue("docintel_extract", { versionId });
+  // Drawing sheets (FP-2): PDF/DWG/DXF in the folders of the sheet settings.
+  await queueSheetsFor(jobs, versionId, name);
+  // In-browser viewers: office PDF, sheet JSON, DXF, search text.
+  await queuePreviewsFor(db, jobs, versionId, name);
+}
+
+/**
  * Background work and audit after a version was stored: IFC derivative, title block check
  * (PDF), viewer previews and search text (see shared/viewers.ts).
  */
@@ -179,14 +192,7 @@ export async function afterVersionAdded(
   details: Record<string, unknown> = {},
 ): Promise<void> {
   const name = r.file.name;
-  const ext = splitExtension(name).extension.toLowerCase();
-  if (VIEWABLE.has(ext)) await jobs.enqueue("ifc_to_frag", { versionId: r.version.id });
-  // Title block and revision check (document intelligence), in the background.
-  if (ext === "pdf") await jobs.enqueue("docintel_extract", { versionId: r.version.id });
-  // Drawing sheets (FP-2): PDF/DWG/DXF in the folders of the sheet settings.
-  await queueSheetsFor(jobs, r.version.id, name);
-  // In-browser viewers: office PDF, sheet JSON, DXF, search text.
-  await queuePreviewsFor(db, jobs, r.version.id, name);
+  await queueVersionWork(db, jobs, name, r.version.id);
   await audit(db, {
     projectId: a.project.id,
     userId: a.user.id,

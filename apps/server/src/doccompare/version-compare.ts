@@ -16,6 +16,7 @@ import { randomUUID } from "node:crypto";
 import { readFile, rm } from "node:fs/promises";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import {
+  docCompareKind,
   ifcClassLabel,
   type CadCompareSummary,
   type DocCompareKind,
@@ -283,8 +284,9 @@ export class VersionCompareRunner {
 }
 
 function kindOf(name: string): VersionCompareKind | null {
-  const ext = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
-  return ext === "dwg" || ext === "dxf" ? "dwg" : ext === "ifc" ? "ifc" : null;
+  // IFC and the model formats modules convert to it (their element index is compared).
+  const kind = docCompareKind(name.slice(name.lastIndexOf(".") + 1));
+  return isVersionCompareKind(kind) ? kind : null;
 }
 
 // ---------------------------------------------------------------------------------------------

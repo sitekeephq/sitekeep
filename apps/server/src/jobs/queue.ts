@@ -6,12 +6,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Worker } from "node:worker_threads";
 import { randomUUID } from "node:crypto";
-import { and, asc, eq, sql } from "drizzle-orm";
-import type { IfcSummary } from "@sitekeep/shared";
+import { and, asc, eq, or, sql } from "drizzle-orm";
+import { splitExtension, type IfcSummary } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { fileVersions, files, jobs } from "../db/schema.js";
 import type { Storage } from "../core/platform/storage.js";
 import { saveVersionIndex } from "./version-index.js";
+import { converterVersion, modelFormatFor } from "../files/model-formats.js";
 import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
 
 /** Job errors are stored and shown later: the installation's language. */
@@ -184,12 +185,17 @@ export class JobQueue {
    * IFC → Fragments. `upgrade: true` rebuilds a ready derivative (new tessellation) without taking
    * the model offline: the old file is served until the new one replaces it, and stays when the
    * rebuild fails. Only the geometry changes, so the element index and its listeners are left alone.
+   *
+   * `reconvert: true` (a model a module converts, e.g. .rvt) converts the stored file again instead of
+   * reading the kept IFC (a new converter version, "Convert again"): in place like `upgrade` when the version
+   * has a model, and the element index is rebuilt too, since the elements may differ.
    */
   private async ifcToFrag(job: JobRow): Promise<void> {
     const versionId = String(job.payload.versionId);
-    const upgrade = job.payload.upgrade === true;
+    const reconvert = job.payload.reconvert === true;
+    const upgrade = job.payload.upgrade === true || reconvert;
     const [row] = await this.db
-      .select({ v: fileVersions, projectId: files.projectId })
+      .select({ v: fileVersions, projectId: files.projectId, name: files.name })
       .from(fileVersions)
       .innerJoin(files, eq(files.id, fileVersions.fileId))
       .where(eq(fileVersions.id, versionId));
@@ -205,15 +211,20 @@ export class JobQueue {
     // The comparison index is written next to the fragments output.
     const tmpIndex = `${tmp}.index.json`;
     const circleSegments = this.circleSegments;
+    let input: IfcInput | null = null;
     try {
+      input = await this.ifcInput(row.v, row.name, { fresh: reconvert });
+      const withIndex = !inPlace || reconvert;
       const { summary, index } = await runIfcWorker(
-        this.storage.localPath(row.v.storageKey),
+        input.path,
         tmp,
         this.opts.timeoutMs,
-        inPlace ? undefined : tmpIndex,
+        withIndex ? tmpIndex : undefined,
         circleSegments,
       );
       const stored = await this.storage.put(createReadStream(tmp), `projects/${row.projectId}/derivatives`);
+      // A freshly converted model keeps its IFC (download, later rebuilds read it instead of converting).
+      const keptIfc = input.converted ? (await this.storage.put(createReadStream(input.path), `projects/${row.projectId}/derivatives`)).key : null;
       let indexed: { ok: boolean; error?: string } = { ok: false, error: t("jobs:queue.indexNotCreated") };
       if (index && "elementCount" in index) {
         await saveVersionIndex(this.db, this.storage, versionId, row.projectId, tmpIndex, index.elementCount);
@@ -226,23 +237,61 @@ export class JobQueue {
       const keep = inPlace && row.v.ifcSummary?.sceneOffset ? { sceneOffset: row.v.ifcSummary.sceneOffset } : {};
       await this.db
         .update(fileVersions)
-        .set({ derivativeStatus: "ready", derivativeKey: stored.key, ifcSummary: { ...summary, ...keep, geometry: { circleSegments, revision: GEOMETRY_REVISION } } })
+        .set({
+          derivativeStatus: "ready",
+          derivativeKey: stored.key,
+          ifcSummary: { ...summary, ...keep, geometry: { circleSegments, revision: GEOMETRY_REVISION }, ...(input.source && { source: input.source }) },
+          ...(keptIfc && { ifcKey: keptIfc, converter: input.source?.tool ?? row.v.converter }),
+        })
         .where(eq(fileVersions.id, versionId));
       if (inPlace && row.v.derivativeKey && row.v.derivativeKey !== stored.key) await this.dropDerivative(row.v.derivativeKey, versionId);
-      if (!inPlace) await this.indexed(versionId, indexed.ok, indexed.error);
+      if (keptIfc && row.v.ifcKey && row.v.ifcKey !== keptIfc) await this.dropDerivative(row.v.ifcKey, versionId);
+      if (withIndex) await this.indexed(versionId, indexed.ok, indexed.error);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      // A conversion by a module records the converter it failed with: retried once per converter version.
+      const converter = await converterVersion(modelFormatFor(row.name));
       if (!inPlace) {
         await this.db
           .update(fileVersions)
-          .set({ derivativeStatus: "failed", derivativeError: message.slice(0, 1000) })
+          .set({ derivativeStatus: "failed", derivativeError: message.slice(0, 1000), ...(converter && { converter }) })
           .where(eq(fileVersions.id, versionId));
         await this.indexed(versionId, false, message);
+      } else if (converter && reconvert) {
+        // The model built before stays; the new converter is not tried again on its own.
+        await this.db.update(fileVersions).set({ converter }).where(eq(fileVersions.id, versionId));
       }
       throw err;
     } finally {
+      await input?.cleanup();
       await rm(tmp, { force: true });
       await rm(tmpIndex, { force: true });
+    }
+  }
+
+  /**
+   * The IFC file of a version: the stored file itself, or for a format a module converts (Connect: Revit
+   * .rvt, files/model-formats.ts) the IFC kept from its last conversion, else (or with `fresh`) a temporary
+   * IFC the module writes, removed by `cleanup`.
+   */
+  private async ifcInput(v: typeof fileVersions.$inferSelect, fileName: string, opts: { fresh?: boolean } = {}): Promise<IfcInput> {
+    const stored = this.storage.localPath(v.storageKey);
+    const ext = splitExtension(fileName).extension.toLowerCase();
+    if (ext === "ifc") return { path: stored, cleanup: async () => {} };
+    if (v.ifcKey && !opts.fresh && (await this.storage.size(v.ifcKey).catch(() => null)) !== null)
+      return { path: this.storage.localPath(v.ifcKey), source: v.ifcSummary?.source, cleanup: async () => {} };
+    const format = modelFormatFor(fileName);
+    if (!format) throw new Error(t("jobs:queue.noModelConverter", { ext: ext || fileName }));
+    const out = path.join(os.tmpdir(), `7dcde-${randomUUID()}.ifc`);
+    const cleanup = async () => {
+      await rm(out, { force: true });
+    };
+    try {
+      const source = await format.toIfc(stored, out, { timeoutMs: this.opts.timeoutMs ?? DEFAULT_TIMEOUT_MS });
+      return { path: out, source, converted: true, cleanup };
+    } catch (err) {
+      await cleanup();
+      throw err;
     }
   }
 
@@ -251,7 +300,11 @@ export class JobQueue {
    * gives its output version the source version's derivative).
    */
   private async dropDerivative(key: string, versionId: string): Promise<void> {
-    const [shared] = await this.db.select({ id: fileVersions.id }).from(fileVersions).where(eq(fileVersions.derivativeKey, key)).limit(1);
+    const [shared] = await this.db
+      .select({ id: fileVersions.id })
+      .from(fileVersions)
+      .where(or(eq(fileVersions.derivativeKey, key), eq(fileVersions.ifcKey, key)))
+      .limit(1);
     if (shared) return;
     await this.storage.remove(key).catch((err: unknown) => this.opts.log?.(`old derivative of ${versionId} not removed`, err));
   }
@@ -260,18 +313,21 @@ export class JobQueue {
   private async ifcIndex(job: JobRow): Promise<void> {
     const versionId = String(job.payload.versionId);
     const [row] = await this.db
-      .select({ v: fileVersions, projectId: files.projectId })
+      .select({ v: fileVersions, projectId: files.projectId, name: files.name })
       .from(fileVersions)
       .innerJoin(files, eq(files.id, fileVersions.fileId))
       .where(eq(fileVersions.id, versionId));
     if (!row) throw new Error(`Version ${versionId} not found`);
     const tmpIndex = path.join(os.tmpdir(), `7dcde-${randomUUID()}.index.json`);
+    let input: IfcInput | null = null;
     try {
-      const { index } = await runIfcWorker(this.storage.localPath(row.v.storageKey), null, this.opts.timeoutMs, tmpIndex);
+      input = await this.ifcInput(row.v, row.name);
+      const { index } = await runIfcWorker(input.path, null, this.opts.timeoutMs, tmpIndex);
       if (!index || "error" in index) throw new Error(index?.error ?? t("jobs:queue.indexFailed"));
       await saveVersionIndex(this.db, this.storage, versionId, row.projectId, tmpIndex, index.elementCount);
       await this.indexed(versionId, true);
     } finally {
+      await input?.cleanup();
       await rm(tmpIndex, { force: true });
     }
   }
@@ -288,6 +344,18 @@ function workerPath(): string {
   return path.join(path.dirname(here), `ifc-worker${path.extname(here)}`);
 }
 
+/** The IFC a job reads: the stored file or a converted temporary one (JobQueue.ifcInput). */
+interface IfcInput {
+  path: string;
+  /** Set when a module converted the file from another format. */
+  source?: IfcSummary["source"];
+  /** Converted by this job (not the kept IFC): worth keeping. */
+  converted?: boolean;
+  cleanup(): Promise<void>;
+}
+
+const DEFAULT_TIMEOUT_MS = 60 * 60_000;
+
 export interface IfcWorkerResult {
   summary: IfcSummary;
   /** Present when an index path was given. */
@@ -301,7 +369,7 @@ export interface IfcWorkerResult {
 export function runIfcWorker(
   inputPath: string,
   outputPath: string | null,
-  timeoutMs = 60 * 60_000,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
   indexPath?: string,
   circleSegments = DEFAULT_CIRCLE_SEGMENTS,
 ): Promise<IfcWorkerResult> {

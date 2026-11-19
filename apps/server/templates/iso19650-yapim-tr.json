@@ -884,6 +884,1261 @@
           "digits": 4
         }
       ]
+    },
+    {
+      "name": "ÇŞB 2026 (EK-2)",
+      "delimiter": "_",
+      "maxLength": 35,
+      "fields": [
+        {
+          "name": "Proje Kodu",
+          "type": "text",
+          "minLength": 6,
+          "maxLength": 6,
+          "charset": "alphanumeric",
+          "fixed": "{EK1}"
+        },
+        {
+          "name": "Bina Kodu",
+          "type": "text",
+          "minLength": 2,
+          "maxLength": 2,
+          "charset": "alphanumeric",
+          "suggestions": [
+            {
+              "code": "00",
+              "description": "Tek bina"
+            }
+          ]
+        },
+        {
+          "name": "Disiplin",
+          "type": "list",
+          "values": [
+            {
+              "code": "MM",
+              "description": "Mimari"
+            },
+            {
+              "code": "IM",
+              "description": "İç Mimari"
+            },
+            {
+              "code": "ST",
+              "description": "Statik"
+            },
+            {
+              "code": "EE",
+              "description": "Elektrik"
+            },
+            {
+              "code": "MK",
+              "description": "Mekanik"
+            },
+            {
+              "code": "HR",
+              "description": "Harita"
+            },
+            {
+              "code": "AL",
+              "description": "Altyapı"
+            },
+            {
+              "code": "PY",
+              "description": "Peyzaj"
+            },
+            {
+              "code": "ZE",
+              "description": "Zemin"
+            },
+            {
+              "code": "YN",
+              "description": "Yangın"
+            },
+            {
+              "code": "GS",
+              "description": "Güneş Enerji Sistemi"
+            },
+            {
+              "code": "AK",
+              "description": "Akustik"
+            }
+          ]
+        },
+        {
+          "name": "Alt Disiplin / Öge",
+          "type": "list",
+          "dependsOn": "Disiplin",
+          "values": [
+            {
+              "code": "AKSS",
+              "description": "Aks",
+              "parents": [
+                "MM"
+              ]
+            },
+            {
+              "code": "AKSR",
+              "description": "Aksesuar",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "ASAN",
+              "description": "Asansör",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "ASTV",
+              "description": "Asma Tavan",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "BACA",
+              "description": "Baca",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "BITK",
+              "description": "Bitki",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "BORD",
+              "description": "Bordür",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CAMM",
+              "description": "Cam",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CEPH",
+              "description": "Cephe",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CATI",
+              "description": "Çatı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CKAP",
+              "description": "Çatı Kaplama",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CKTA",
+              "description": "Çatı Kaplama Tahtası",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CTAS",
+              "description": "Çatı Taşıyıcı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CVRE",
+              "description": "Çevre",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "CORT",
+              "description": "Çörten",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "DENZ",
+              "description": "Denizlik",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "DOGR",
+              "description": "Doğrama",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "DOSM",
+              "description": "Döşeme",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "DUVA",
+              "description": "Duvar",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "DUVK",
+              "description": "Duvar Kaplama",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "EMSL",
+              "description": "Emsal",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "GIYC",
+              "description": "Giydirme Cephe",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "GNKR",
+              "description": "Güneş Kırıcı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "HARP",
+              "description": "Harpuşta",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "HATL",
+              "description": "Hatıl",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "ISYA",
+              "description": "Isı Yalıtımı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "ISLH",
+              "description": "Islak Hacim",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "KALD",
+              "description": "Kaldırım",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "KAPI",
+              "description": "Kapı",
+              "parents": [
+                "MM"
+              ]
+            },
+            {
+              "code": "KARP",
+              "description": "Kartonpiyer",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "KOLN",
+              "description": "Kolon",
+              "parents": [
+                "MM"
+              ]
+            },
+            {
+              "code": "KORK",
+              "description": "Korkuluk",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "LENT",
+              "description": "Lento",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "MERD",
+              "description": "Merdiven",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "OLUK",
+              "description": "Oluk",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "PENC",
+              "description": "Pencere",
+              "parents": [
+                "MM"
+              ]
+            },
+            {
+              "code": "RAMP",
+              "description": "Rampa",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "SAPP",
+              "description": "Şap",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "SESY",
+              "description": "Ses Yalıtımı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "SIVA",
+              "description": "Sıva",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "SUYA",
+              "description": "Su Yalıtımı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "SUPR",
+              "description": "Süpürgelik",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "TASI",
+              "description": "Taşıyıcı",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "TAVN",
+              "description": "Tavan",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "TEML",
+              "description": "Temel",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "TEFR",
+              "description": "Tefriş",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "TSVY",
+              "description": "Tesviye Betonu",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "TRET",
+              "description": "Tretuvar",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "YIBO",
+              "description": "Yağmur İniş Borusu",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "YOLL",
+              "description": "Yol",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "ZMNK",
+              "description": "Zemin Kaplama",
+              "parents": [
+                "MM",
+                "IM"
+              ]
+            },
+            {
+              "code": "XXXX",
+              "description": "Genel"
+            },
+            {
+              "code": "DIGR",
+              "description": "Diğer"
+            },
+            {
+              "code": "PANL",
+              "description": "Ahşap Panel",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "AKUS",
+              "description": "Akustik Panel",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "AYDN",
+              "description": "Aydınlatma Elemanı",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "BNYO",
+              "description": "Banyo Elemanı",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "BOLP",
+              "description": "Bölücü Panel",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "CMBL",
+              "description": "Cam İç Bölme",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "KPKN",
+              "description": "Kapı Kanat",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "KPKS",
+              "description": "Kapı Kasa",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "KLIM",
+              "description": "Klima İç Ünite",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "MNFZ",
+              "description": "Menfez",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "MTFK",
+              "description": "Mutfak Elemanı",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "PNKT",
+              "description": "Pencere Kanat",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "PNKS",
+              "description": "Pencere Kasa",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "PRDE",
+              "description": "Perde",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "PRIZ",
+              "description": "Priz/Anahtar",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "SMOB",
+              "description": "Sabit Mobilya",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "TZGH",
+              "description": "Tezgah",
+              "parents": [
+                "IM"
+              ]
+            },
+            {
+              "code": "BETO",
+              "description": "Betonarme",
+              "parents": [
+                "ST"
+              ]
+            },
+            {
+              "code": "CELK",
+              "description": "Çelik",
+              "parents": [
+                "ST"
+              ]
+            },
+            {
+              "code": "YIGM",
+              "description": "Yığma",
+              "parents": [
+                "ST"
+              ]
+            },
+            {
+              "code": "AHSP",
+              "description": "Ahşap",
+              "parents": [
+                "ST"
+              ]
+            },
+            {
+              "code": "KMPT",
+              "description": "Kompozit",
+              "parents": [
+                "ST"
+              ]
+            },
+            {
+              "code": "SHTT",
+              "description": "Sıhhi Tesisat",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "ISTT",
+              "description": "Isıtma Tesisat",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "HVLT",
+              "description": "Havalandırma Tesisat",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "SGTT",
+              "description": "Soğutma Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "TMST",
+              "description": "Temiz Su Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "PIST",
+              "description": "Pissu Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "YAGT",
+              "description": "Yağmur Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "BSHT",
+              "description": "Basınçlı Hava Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "OTMT",
+              "description": "Otomatik Kontrol Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "MDGZ",
+              "description": "Medikal Gaz",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "MUTT",
+              "description": "Mutfak Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "CMTT",
+              "description": "Çamaşırhane Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "DGTT",
+              "description": "Doğalgaz Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "BHTT",
+              "description": "Buhar Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "ORTT",
+              "description": "Müşterek Tesisat",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "BSTT",
+              "description": "Bahçe Sulama Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "HVZT",
+              "description": "Havuz Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "ASTT",
+              "description": "Atık Su Arıtma Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "DSDK",
+              "description": "Klima Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "YNGT",
+              "description": "Yangın Tesisatı",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "ASNR",
+              "description": "Asansör",
+              "parents": [
+                "MK"
+              ]
+            },
+            {
+              "code": "KUVA",
+              "description": "Kuvvetli Akım Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "ZAYA",
+              "description": "Zayıf Akım Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "AYDT",
+              "description": "Aydınlatma Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "GUDT",
+              "description": "Güç Dağıtım Tesisatı -Mekanik Tesisat İçin Güç Dağıtımı Tesisatı-Reaktif Güç Kompanzasyonu",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "DJGT",
+              "description": "Dizel Jeneratör Grubu Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "CAYT",
+              "description": "Çevre Aydınlatma Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "TOST",
+              "description": "Topraklama Sistemleri Tesisatı -Yıldırımdan Korunma Sistemi",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "OGET",
+              "description": "Orta Gerilim Enerji Temini (Trafo)",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "TBIA",
+              "description": "Telefon-Bilgi İletişim Ağı-TV Sistemleri Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "MYAS",
+              "description": "Müzik Yayın, Anons Sistemi-Merkezi Saat Sistemi- Intercom Sistemi",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "YAVA",
+              "description": "Yangın Algılama ve Alarm Tesisatı-Acil Anons Sistemleri -Acil Durum Aydınlatma ve Yönlendirme Tesisatı",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "CTVS",
+              "description": "Kapalı Devre TV Sistemleri (CCTV)-Kartlı Geçiş ve Güvenlik Sistemleri",
+              "parents": [
+                "EE"
+              ]
+            },
+            {
+              "code": "PKBL",
+              "description": "Proje Koordinat Bilgisi",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "KORD",
+              "description": "Koordinatlar",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "DOSB",
+              "description": "Dönüşüm Bilgisi",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "LJNT",
+              "description": "Lejant",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "PLGN",
+              "description": "Poligon",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "ADPL",
+              "description": "Ada Parsel",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "PZKT",
+              "description": "Parsel Zemin Kotu",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "BZKT",
+              "description": "Bina Zemin Kotu",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "BLKA",
+              "description": "Blok Adı",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "KMPL",
+              "description": "Komşu Parseller",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "CKMS",
+              "description": "Çekme Mesafesi",
+              "parents": [
+                "HR"
+              ]
+            },
+            {
+              "code": "YAGS",
+              "description": "Yağmur Suyu",
+              "parents": [
+                "AL"
+              ]
+            },
+            {
+              "code": "ATIS",
+              "description": "Atık Su",
+              "parents": [
+                "AL"
+              ]
+            },
+            {
+              "code": "ICMS",
+              "description": "İçme Suyu",
+              "parents": [
+                "AL"
+              ]
+            },
+            {
+              "code": "YAPS",
+              "description": "Yapısal",
+              "parents": [
+                "PY"
+              ]
+            },
+            {
+              "code": "BITS",
+              "description": "Bitkisel",
+              "parents": [
+                "PY"
+              ]
+            },
+            {
+              "code": "IKS",
+              "description": "İksa",
+              "parents": [
+                "ZE"
+              ]
+            },
+            {
+              "code": "KZK",
+              "description": "Kazık",
+              "parents": [
+                "ZE"
+              ]
+            },
+            {
+              "code": "ZTE",
+              "description": "Zemin ve Temel",
+              "parents": [
+                "ZE"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dosya Türü",
+          "type": "list",
+          "values": [
+            {
+              "code": "PL",
+              "description": "Plan"
+            },
+            {
+              "code": "KS",
+              "description": "Kesit (Tip kesitler de dahil)"
+            },
+            {
+              "code": "GR",
+              "description": "Görünüş"
+            },
+            {
+              "code": "DT",
+              "description": "Detay"
+            },
+            {
+              "code": "SM",
+              "description": "Şema"
+            },
+            {
+              "code": "MD",
+              "description": "Model"
+            },
+            {
+              "code": "FR",
+              "description": "Form"
+            },
+            {
+              "code": "LS",
+              "description": "Liste"
+            },
+            {
+              "code": "DK",
+              "description": "Doküman"
+            },
+            {
+              "code": "RP",
+              "description": "Rapor"
+            },
+            {
+              "code": "HS",
+              "description": "Hesap"
+            },
+            {
+              "code": "GN",
+              "description": "Genel"
+            }
+          ]
+        },
+        {
+          "name": "Dosya Tipi",
+          "type": "list",
+          "values": [
+            {
+              "code": "MMC",
+              "description": "Mimari Çizim"
+            },
+            {
+              "code": "MAP",
+              "description": "Mimari Açıklama Raporu"
+            },
+            {
+              "code": "ERP",
+              "description": "Erişilebilirlik Çizimi"
+            },
+            {
+              "code": "YKG",
+              "description": "Yangın Kaçış ve Güvenlik Planları"
+            },
+            {
+              "code": "CAT",
+              "description": "Çatı Planı ve Detayları"
+            },
+            {
+              "code": "VAZ",
+              "description": "Vaziyet Planı"
+            },
+            {
+              "code": "MIR",
+              "description": "Mimari Hesap Raporu"
+            },
+            {
+              "code": "STC",
+              "description": "Statik Çizim"
+            },
+            {
+              "code": "SHR",
+              "description": "Statik Hesap Raporu"
+            },
+            {
+              "code": "ISC",
+              "description": "İskele Çizimi"
+            },
+            {
+              "code": "IHR",
+              "description": "İskele Hesap Raporu"
+            },
+            {
+              "code": "MKC",
+              "description": "Mekanik Çizim"
+            },
+            {
+              "code": "ITH",
+              "description": "Isıtma Tesisatı Hesap Raporu"
+            },
+            {
+              "code": "IYP",
+              "description": "Isı Yalıtım Projesi Hesap Raporu"
+            },
+            {
+              "code": "IKR",
+              "description": "Isı Kaybı Isı Kazanç Hesapları Raporu"
+            },
+            {
+              "code": "EKB",
+              "description": "Enerji Kimlik Belgesi Ön Hesap Raporu"
+            },
+            {
+              "code": "ASN",
+              "description": "Asansör Trafik Hesabı"
+            },
+            {
+              "code": "MTS",
+              "description": "Mekanik Özel Teknik Şartname"
+            },
+            {
+              "code": "ELC",
+              "description": "Elektrik Çizim"
+            },
+            {
+              "code": "AGH",
+              "description": "Akim Kontrolü Ve Gerilim Düşümü Hesabi"
+            },
+            {
+              "code": "TGH",
+              "description": "Trafo Güç Hesabı"
+            },
+            {
+              "code": "AHR",
+              "description": "Aydınlatma Hesap Raporu"
+            },
+            {
+              "code": "ETS",
+              "description": "Elektrik Özel Teknik Şartname"
+            },
+            {
+              "code": "YAP",
+              "description": "Yapı Aplikasyon Projesi"
+            },
+            {
+              "code": "DIC",
+              "description": "Diğer Çizim"
+            },
+            {
+              "code": "DGR",
+              "description": "Diğer Raporlar"
+            },
+            {
+              "code": "MLZ",
+              "description": "Malzeme Listesi"
+            },
+            {
+              "code": "MHL",
+              "description": "Mahal Listesi"
+            },
+            {
+              "code": "XXX",
+              "description": "Tip yok"
+            },
+            {
+              "code": "MKF",
+              "description": "Model Kontrol Formu"
+            }
+          ]
+        },
+        {
+          "name": "Kat / Konum",
+          "type": "text",
+          "minLength": 3,
+          "maxLength": 3,
+          "charset": "alphanumeric",
+          "suggestions": [
+            {
+              "code": "B03",
+              "description": "3. Bodrum Kat"
+            },
+            {
+              "code": "B02",
+              "description": "2. Bodrum Kat"
+            },
+            {
+              "code": "B01",
+              "description": "1. Bodrum Kat"
+            },
+            {
+              "code": "K00",
+              "description": "Zemin Kat"
+            },
+            {
+              "code": "K01",
+              "description": "Kat 1"
+            },
+            {
+              "code": "K02",
+              "description": "Kat 2"
+            },
+            {
+              "code": "K03",
+              "description": "Kat 3"
+            },
+            {
+              "code": "K04",
+              "description": "Kat 4"
+            },
+            {
+              "code": "NNN",
+              "description": "Kattan Bağımsız"
+            }
+          ]
+        },
+        {
+          "name": "Sıra No",
+          "type": "number",
+          "digits": 2
+        },
+        {
+          "name": "Revizyon No",
+          "type": "number",
+          "digits": 3,
+          "inCode": false
+        }
+      ]
     }
   ],
   "attributes": [
@@ -1916,6 +3171,7 @@
     "Firma kodları (Kaynak, Gönderen, Alıcı) proje oluştururken her taraf için sorulur.",
     "Disiplin listesi ve kodlama alanları örnektir; kurulum sihirbazında müşterinin kodlamasına göre değiştirilir (ör. Alt Disiplin, Aşama alanı eklenir).",
     "Paylaşılan ve yayınlanan alanlara dosya yalnız onaylı inceleme ile girer (ISO 19650-2 §5.6.4, §5.7.4); geçiş kuralları açık.",
+    "ÇŞB 2026 (EK-2) dosya isimlendirmesi seçenek olarak gelir: kurulum sihirbazında doküman kodu standardı olarak seçilirse paylaşılan ve yayınlanan klasörler bu standarda göre adlandırılır. Proje Kodu, proje bilgilerindeki ÇŞB proje kodundan (EK-1) dolar; Revizyon No (000, 001 …) idarenin revizyon talebini sayar, ISO revizyon kodundan (P01 / C01) ayrıdır.",
     "Uygunluk ve revizyon kodları ISO düzenindedir (S0–S4, A, B, CR; P01 / C01). Sahadaki R00 düzeni Proje Ayarları → CDE → Kod Düzeni'nden seçilebilir.",
     "RFI, malzeme onayı ve toplantı ayarları Manage, form şablonları Field modülü kuruluysa uygulanır; değilse atlanır."
   ]

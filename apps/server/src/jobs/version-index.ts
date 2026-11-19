@@ -54,6 +54,13 @@ export interface IndexFile {
   geomV?: number;
   /** GlobalId → fingerprint of the element's shape representation (version comparison, FP-1). */
   geom?: Record<string, string>;
+  /** Version of the `meshQ` field (MESH_QUANTITIES_FORMAT); absent in older indexes. */
+  meshQV?: number;
+  /**
+   * GlobalId → [volume m³ (null: open mesh), one-side area m²] measured from the triangle mesh, for
+   * elements whose quantity sets have neither a volume nor an area.
+   */
+  meshQ?: Record<string, [number | null, number | null]>;
 }
 
 /** Index format that "Modele sor" and property-level comparison need. */
@@ -64,6 +71,9 @@ export const OPENINGS_FORMAT = 1;
 
 /** Shape fingerprint format the version comparison needs (jobs/ifc-worker.ts writes the same number). */
 export const GEOMETRY_FORMAT = 1;
+
+/** Quantities measured from the mesh, for the quantity inventory (jobs/ifc-worker.ts writes the same number). */
+export const MESH_QUANTITIES_FORMAT = 1;
 
 const cache = new Map<string, IndexFile>();
 const CACHE_SIZE = 8;

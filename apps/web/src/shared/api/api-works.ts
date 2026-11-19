@@ -60,6 +60,8 @@ export interface WorkFilter {
   parent?: string;
   /** Correspondence views: awaiting, unmailed, archived, cancelled. */
   view?: string;
+  /** Leave cancelled works out (unless the status filter asks for them). */
+  hideCancelled?: boolean;
 }
 /** Editable part of a letter (mailSentAt is set by the server). */
 export type LetterInput = Partial<Omit<LetterData, "mailSentAt" | "translations">> & {
@@ -100,6 +102,7 @@ export const worksApi = {
     if (f.category) q.set("category", f.category);
     if (f.parent) q.set("parent", f.parent);
     if (f.view) q.set("view", f.view);
+    if (f.hideCancelled) q.set("cancelled", "hide");
     const s = q.toString();
     return request<WorkSummaryDto[]>("GET", `${P(pid)}/works${s ? `?${s}` : ""}`);
   },

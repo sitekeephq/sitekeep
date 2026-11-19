@@ -1,13 +1,13 @@
 /** ZIP reader for office files (xlsx, docx, pptx): entries by name, inflated on demand. */
 import { inflateRawSync } from "node:zlib";
-import { defaultTranslate, type Translate } from "../../i18n/index.js";
+import { currentLanguage, tFor, type Translate } from "../../i18n/index.js";
 
 const MAX_ENTRY_BYTES = 200 * 1024 * 1024;
 
 export class XlsxError extends Error {}
 
 /** ZIP entries by name (lazy inflate). ZIP64 archives are not supported. */
-export function readZip(buf: Buffer, t: Translate = defaultTranslate()): Map<string, () => Buffer> {
+export function readZip(buf: Buffer, t: Translate = tFor(currentLanguage())): Map<string, () => Buffer> {
   const out = new Map<string, () => Buffer>();
   let eocd = -1;
   for (let p = buf.length - 22; p >= Math.max(0, buf.length - 22 - 0xffff); p--) {

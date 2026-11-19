@@ -47,7 +47,11 @@ These records are not separate modules; they are preset types of the same Work m
 | Submittal Item ("Teknik Onay Kalemi") | `{Gönderen}_{Tür}_{Disiplin}_{0000}` | draft, in review, approved, approved with comments, noted, revise and resubmit, rejected, closed, cancelled |
 | Submittal Package ("Teknik Onay Paketi") | `{Bölüm}-{00} {Disiplin}` | calculated from the items: draft, in review, awaiting revision, partially approved, approved or rejected |
 | Meeting ("Toplantı") | `{Proje}-TPL-{YYYY}-{000}` | planned, minutes in preparation, minutes published, cancelled |
-| Action ("Eylem") | `{Proje}-EYL-{0000}` | open, closed |
+| Action ("Eylem") | `{Proje}-EYL-{0000}` | open, closed, cancelled |
+
+Actions got the cancelled status like the other types (an action that is no longer needed is cancelled, not deleted,
+so the minutes keep it). Existing projects receive it when their preset types are next loaded. Actions have no
+workflow, so they are cancelled by setting the status.
 
 The stored `RFI` and `AKS` patterns of older projects are kept. Patterns can use `{Disiplin}` (discipline), `{Tür}` (kind), `{Bölüm}` (section) and
 `{Konu}` (subject), which is not part of the counter scope; the code of the list value is used ("M - Mekanik" → `M`). In the project settings, the standard
@@ -173,9 +177,9 @@ All paths are under `/api/v1`.
 | `POST /projects/:pid/work-types`, `PUT …/:tid`, `DELETE …/:tid`, `POST …/:tid/restore` | Type editor (project administrator). Deleting archives |
 | `GET /projects/:pid/work-automation`, `PUT …/:tid` | Automatic transmittal per review template |
 | `GET /delivery-channels` | Delivery channels |
-| `GET /projects/:pid/works?type=&status=&q=&open=1&due=overdue\|soon&mine=1&view=awaiting\|unmailed\|archived\|cancelled` | List (visible items only) |
+| `GET /projects/:pid/works?type=&status=&q=&open=1&due=overdue\|soon&mine=1&view=awaiting\|unmailed\|archived\|cancelled&cancelled=hide` | List (visible items only). `status` takes several keys separated by commas; `cancelled=hide` leaves out cancelled items unless `status` asks for `iptal` |
 | `POST /projects/:pid/works` | Create (`typeKey` or `typeId`, fields, recipients, links) |
-| `GET` / `PATCH /projects/:pid/works/:wid` | Detail (links, backlinks, timeline, permission flags) / update |
+| `GET` / `PATCH /projects/:pid/works/:wid` | Detail (links, backlinks, timeline, permission flags) / update. A `status` the type does not have is refused (400) with the type's valid status keys in the message |
 | `POST …/:wid/comments` | Note |
 | `POST …/:wid/links`, `PATCH …/links/:lid` (`signed`), `DELETE …/links/:lid` | Attachment and reference links |
 | `GET …/:wid/links/:lid/download[?inline=1]` | Download the fixed version through the work item |
@@ -192,6 +196,8 @@ All paths are under `/api/v1`.
 ## UI
 
 - **Works** project tab: type filters, search, status and due-date filter, "New Work Item" (choose a type first, then a form is built from the type's fields).
+  Cancelled items are hidden by default; **Show cancelled** in the filter menu (`?iptal=1` in the address, so a saved view keeps it)
+  shows them. Choosing the Cancelled status, or the correspondence "Cancelled" view, shows them as well.
 - Work item detail: fields, delivery box, receipts, attachments (version picker, signed PDF flag, download), reference links (work item / issue / review), correspondence chain, timeline and notes. Actions: Send, Received, Write Reply, Edit, Regenerate Cover PDF.
 - In correspondence, the "Letter" section: letter details, PDF preview, email, archive / cancel / return to draft / delete. Correspondence filters and grouping in the list.
 - **Today** in the top menu: replaced the old "My Tasks" page. The `/tasks` address redirects to `/today`.

@@ -9,6 +9,7 @@
  */
 import { and, asc, desc, eq, inArray, isNotNull, lte } from "drizzle-orm";
 import {
+  shownRoleName,
   OUTCOME_CODE_KIND,
   OUTCOME_KIND_CODE,
   RFI_ANSWER_OPTIONS,
@@ -647,7 +648,7 @@ export async function nameBook(db: Db, projectId: string, instances: InstanceRow
     companies: new Map(c.map((x) => [x.id, x.name])),
     roles: new Map([
       ...Object.keys(WORKFLOW_ROLE_LABELS_TR).map((k) => [k, labelFor(lang, "workflowRole", k)] as [string, string]),
-      ...r.map((x) => [x.id, x.name] as [string, string]),
+      ...r.map((x) => [x.id, shownRoleName(x.name, lang)] as [string, string]),
     ]),
     lang,
   };
@@ -783,12 +784,17 @@ export async function flowDto(
 /**
  * "Ball in court": companies that have to act now. Running → the current step's company
  * assignees and the companies of its user / team assignees; sent back → the submitter's company.
+ * An RFI or submittal that waits for its answer without a running workflow (its status was set
+ * to the submitted one directly, e.g. by an import or an API client), or whose current step names
+ * no company, is in its addressees' court.
  */
 export function ballInCourt(work: WorkRow, type: TypeRow, instance: InstanceRow | undefined, members: readonly Member[]): string[] {
   if (isClosed(type, work.status)) return [];
+  const waitsForAnswer = (type.category === "rfi" || type.category === "submittal") && work.status === submittedStatus(type);
+  const addressees = () => (waitsForAnswer ? addresseeCompanies(work, members) : []);
   if (instance?.status === "running") {
     const step = instance.template.steps[instance.stepIndex];
-    if (!step) return [];
+    if (!step) return addressees();
     const out = new Set(step.assignees.filter((x) => x.type === "company").map((x) => x.id));
     for (const uid of resolveAssigneeUsers(
       step.assignees.filter((x) => x.type !== "company"),
@@ -798,12 +804,19 @@ export function ballInCourt(work: WorkRow, type: TypeRow, instance: InstanceRow 
       const c = members.find((m) => m.userId === uid)?.companyId;
       if (c) out.add(c);
     }
-    return [...out];
+    return out.size ? [...out] : addressees();
   }
   if (type.category === "action") return work.toCompanyIds;
   const back = work.status === "revize" || (work.status === "taslak" && !!instance);
   if (back || work.status === "cevaplandi") return [work.fromCompanyId ?? work.ownerCompanyId].filter((x): x is string => !!x);
-  return [];
+  return addressees();
+}
+
+/** The addressee companies of a work, else the company of its assignee. */
+function addresseeCompanies(work: WorkRow, members: readonly Member[]): string[] {
+  if (work.toCompanyIds.length) return [...work.toCompanyIds];
+  const c = work.assigneeUserId ? members.find((m) => m.userId === work.assigneeUserId)?.companyId : null;
+  return c ? [c] : [];
 }
 
 // ---- Reminders ----------------------------------------------------------------------------------

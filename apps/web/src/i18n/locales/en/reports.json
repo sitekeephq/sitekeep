@@ -77,7 +77,7 @@
     },
     "importHint": "Creates submittal items from the rows that are not excluded",
     "jsonHint": "For transfer to the submittals module",
-    "aiClassifyHint": "Unclassified items are classified with the local model; item edits are reset.",
+    "aiClassifyHint": "Unclassified items are classified with the AI model; item edits are reset.",
     "rebuildHint": "Reads the specification again; item edits are reset.",
     "pages_one": "{{count}} page",
     "pages_other": "{{count}} pages",

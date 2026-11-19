@@ -104,6 +104,8 @@ readability but does not provide confidentiality. The real protection is the sig
 4. **Configuration:** `/opt/sitekeep/.env` (compose) and `config/app.env` (application), both 0600.
    Randomly generated: database password, `CDE_SECRET_KEY` (encryption key for secrets),
    installation ID (`config/installation.id`, the licence will be bound to it later). Caddyfile.
+   Revit model conversion (Enterprise bundle) is set in `config/app.env` too (`SITEKEEP_RVT_MEMORY_MB`):
+   [Revit models](docker-compose.md#revit-models-enterprise).
 5. **Start:** `docker compose up -d`, waits up to 3 minutes for health; once the first administrator is created,
    `ADMIN_PASSWORD` is removed from the file. HTTPS through the proxy is tested.
 6. **Nightly backup:** systemd timer (`sitekeep-backup.timer`), otherwise cron.

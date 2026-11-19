@@ -2,6 +2,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import {
   can,
   effectivePermission,
+  shownFolderName,
   type Action,
   type CdeWipPolicy,
   type EffectivePermission,
@@ -12,7 +13,7 @@ import {
 import type { Db } from "../../db/index.js";
 import { folderGrants, folders, memberRoles, projectCdeSettings, projectMembers, projectRoles, projects, users } from "../../db/schema.js";
 import { forbidden, notFound } from "../platform/http.js";
-import { msg } from "../../i18n/index.js";
+import { currentLanguage, msg } from "../../i18n/index.js";
 
 export interface AuthUser {
   id: string;
@@ -157,6 +158,17 @@ export class FolderTree {
   }
 
   /** Folder ids from the root down to `id`. */
+  /**
+   * The name a reader sees: the built-in folders (root, cover / letter / intake / ISO state folders
+   * under it) in the reader's language while their stored name is the seeded default.
+   */
+  displayName(id: string, lang: string = currentLanguage()): string {
+    const f = this.get(id);
+    const parent = f.parentId ? this.byId.get(f.parentId) : undefined;
+    const place = f.parentId === null ? "root" : parent && parent.parentId === null ? "rootChild" : "other";
+    return shownFolderName(f.name, place, lang);
+  }
+
   ancestry(id: string): string[] {
     const chain: string[] = [];
     let cur: FolderRow | undefined = this.get(id);

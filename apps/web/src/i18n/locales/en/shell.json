@@ -69,7 +69,8 @@
       "cde": "CDE",
       "aktivite": "Audit Log",
       "sistemDurumu": "System Status",
-      "kapanis": "Close-out"
+      "kapanis": "Close-out",
+      "disaAktarma": "Export"
     },
     "hub": {
       "views": "Views",

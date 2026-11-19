@@ -24,6 +24,7 @@
     "notIfcFile": "{{name}} is not an IFC file.",
     "snapshotFormat": "snapshot must be a PNG/JPEG data URL",
     "issueEditRole": "Only the creator, the assignee or a project administrator can change the issue.",
+    "issueDeleteRole": "Only the creator or a project administrator can delete the issue.",
     "assigneeNotMember": "The assignee is not a project member.",
     "colourFormat": "The colour must be in #RRGGBB format.",
     "markupFolderDenied": "You do not have markup permission in this folder.",

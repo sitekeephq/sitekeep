@@ -11,6 +11,22 @@ exported and imported as BCF files. BCF API 3.0 will use the same mapping layer.
   listed as thumbnails. Each one opens in the Model Viewer (`?issue=…&vp=<GUID>`).
 - **MCP**: `cde_bcf_export` (read) and `cde_bcf_import` (write; preview first, then `commit: true`).
 
+## Issues without a model
+
+Projects that work with documents only create issues on the **Issues** page with **+ New Issue**: title,
+description, type, priority, assignee, due date and, optionally, documents (the current version of each picked file is
+linked, as an issue link of kind `version`). An issue with a viewpoint or a pin is still created in the Model Viewer.
+Such an issue is exported to BCF like any other, without a viewpoint.
+
+In the issue detail, its creator, assignee or a project administrator can link further documents and remove document
+links (**Linked Documents**).
+
+**Deleting:** the creator or a project administrator deletes an issue from its detail (`DELETE
+/api/v1/projects/:pid/issues/:iid`). The issue goes with its comments, viewpoints and document links; its location link and
+the links from works to it are removed, model markups keep their drawing without the issue. The audit log keeps an
+`issue.deleted` entry with the number, title, status, GUID and the number of comments and work links removed. The
+numbers of deleted issues are not given again (new issues and BCF imports continue after them).
+
 ## Supported versions
 
 | Version | Export | Import |
@@ -127,6 +143,7 @@ Rules:
 | POST | `/api/v1/projects/:pid/bcf/import/preview` | multipart `file` or JSON `{fileName, data}` |
 | POST | `/api/v1/projects/:pid/bcf/import` | same + `mapping` |
 | GET | `/api/v1/projects/:pid/issues/:iid/viewpoints` | all viewpoints of the issue |
+| DELETE | `/api/v1/projects/:pid/issues/:iid` | delete the issue (creator or project administrator; audited) |
 
 Schema: `0029_bcfzip` (issues: `guid`, `labels`, `stage`, `reference_links`, `modified_by`, `imported_from`;
 issue_comments: `guid`, `viewpoint_guid`, `modified_at`, `modified_by`, `imported_author`; new tables
@@ -134,6 +151,8 @@ issue_comments: `guid`, `viewpoint_guid`, `modified_at`, `modified_by`, `importe
 
 ## What is tested
 
+- Issues without a model (`apps/server/test/coordination/issues.test.ts`, e2e `e2e/specs/coordination-issues.spec.ts`):
+  creating with a linked document, delete permissions, cleanup, the audit entry and numbering after a delete.
 - Automated tests (`apps/server/test/coordination/bcf.test.ts`, `packages/shared/test/bcf.test.ts`):
   - Exported 2.1 and 3.0 XML is validated against the official buildingSMART XSDs (`test/fixtures/bcf-xsd`).
   - buildingSMART test files (2.1: "One part visible", "user assignment"; 3.0: "Orthogonal camera",

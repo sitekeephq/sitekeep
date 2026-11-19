@@ -1,7 +1,7 @@
 import { and, asc, eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { checkStandard, validateName, type NamingStandard } from "@sitekeep/shared";
+import { NAMING_CHARSETS, checkStandard, validateName, type NamingStandard } from "@sitekeep/shared";
 import type { AppDeps } from "../../app/deps.js";
 import { FolderTree, projectAccess, requireAction, requireProjectAdmin } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
@@ -10,17 +10,34 @@ import { namingStandards } from "../../db/schema.js";
 import { badRequest, notFound } from "../../core/platform/http.js";
 import { msg, requestLanguage } from "../../i18n/index.js";
 
-const valueSchema = z.object({ code: z.string().trim().min(1), description: z.string().optional() });
+const valueSchema = z.object({
+  code: z.string().trim().min(1),
+  description: z.string().optional(),
+  /** Parent codes (`dependsOn` of the field) after which the value is allowed. */
+  parents: z.array(z.string().trim().min(1)).min(1).optional(),
+});
 /** false = metadata field (attribute only, not part of the name). */
 const inName = z.boolean().optional();
+/** false = in the name but not in the document code (e.g. a revision number). */
+const inCode = z.boolean().optional();
 const fieldSchema = z.discriminatedUnion("type", [
-  z.object({ name: z.string().trim().min(1), type: z.literal("list"), values: z.array(valueSchema).min(1), inName }),
+  z.object({
+    name: z.string().trim().min(1),
+    type: z.literal("list"),
+    values: z.array(valueSchema).min(1),
+    dependsOn: z.string().trim().min(1).optional(),
+    inName,
+    inCode,
+  }),
   z.object({
     name: z.string().trim().min(1),
     type: z.literal("text"),
     minLength: z.number().int().min(0).optional(),
     maxLength: z.number().int().min(1).optional(),
+    charset: z.enum(NAMING_CHARSETS).optional(),
+    suggestions: z.array(valueSchema.omit({ parents: true })).max(5000).optional(),
     inName,
+    inCode,
   }),
   z.object({
     name: z.string().trim().min(1),
@@ -29,6 +46,7 @@ const fieldSchema = z.discriminatedUnion("type", [
     minDigits: z.number().int().min(1).max(12).optional(),
     maxDigits: z.number().int().min(1).max(12).optional(),
     inName,
+    inCode,
   }),
 ]);
 export const standardSchema = z.object({
@@ -37,6 +55,8 @@ export const standardSchema = z.object({
   fields: z.array(fieldSchema).min(1).max(30),
   allowSuffix: z.boolean().optional(),
   allowDelimiterInCodes: z.boolean().optional(),
+  /** Longest name without the extension (ÇŞB 2026 EK-2: 35). */
+  maxLength: z.number().int().min(1).max(1000).optional(),
 });
 
 export async function namingRoutes(api: FastifyInstance, { db }: AppDeps) {

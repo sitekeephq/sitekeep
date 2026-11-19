@@ -298,6 +298,7 @@
     "partCount_other": "The name must have {{expected}} fields; it has {{count}} (delimiter \"{{delimiter}}\").",
     "fieldProblem": "{{field}}: {{problem}}",
     "noMatch": "The name does not follow the standard.",
+    "tooLong": "The name is {{length}} characters long; at most {{count}} are allowed (without the extension).",
     "field": {
       "missing": "missing",
       "notAllowed": "\"{{value}}\" is not one of the allowed values",
@@ -305,7 +306,13 @@
       "minLength_one": "at least {{count}} character",
       "minLength_other": "at least {{count}} characters",
       "maxLength_one": "at most {{count}} character",
-      "maxLength_other": "at most {{count}} characters"
+      "maxLength_other": "at most {{count}} characters",
+      "notForParent": "\"{{value}}\" is not allowed with {{field}} \"{{parent}}\"",
+      "charset": {
+        "alphanumeric": "only capital letters A–Z and digits",
+        "alphabetic": "only capital letters A–Z",
+        "numeric": "only digits"
+      }
     },
     "standard": {
       "nameEmpty": "The standard name is empty.",
@@ -318,7 +325,11 @@
       "codeHasDelimiter": "The code \"{{code}}\" in the field \"{{field}}\" contains the delimiter.",
       "codeDelimiterEdge": "The code \"{{code}}\" in the field \"{{field}}\" cannot start or end with the delimiter.",
       "digits": "The number of digits of \"{{field}}\" must be 1–12.",
-      "digitRange": "The minimum/maximum digits of \"{{field}}\" must be between 1 and 12 (minimum ≤ maximum)."
+      "digitRange": "The minimum/maximum digits of \"{{field}}\" must be between 1 and 12 (minimum ≤ maximum).",
+      "maxLength": "The maximum name length must be a whole number of at least 1.",
+      "dependsOn": "\"{{field}}\" depends on \"{{parent}}\", which must be an earlier list field of the name.",
+      "parentCodes": "\"{{field}}\" refers to codes not in \"{{parent}}\": {{codes}}.",
+      "charset": "The character set of \"{{field}}\" is unknown."
     }
   },
   "oauth": {
@@ -543,6 +554,7 @@
     "transitionNotReview": "Transition {{transition}} is not made through a review; only review transitions take a workflow.",
     "dateInvalid": "\"{{value}}\" is not a date (YYYY-MM-DD).",
     "endBeforeStart": "The end date is before the start date.",
+    "csbProjectCodeInvalid": "The ÇŞB project code (EK-1) must be six capital letters or digits (e.g. 270001): \"{{value}}\".",
     "tooLong": "{{field}} is longer than {{max}} characters.",
     "tooManyPeople": "At most {{max}} people can be added while the project is created.",
     "emailInvalid": "\"{{email}}\" is not an e-mail address.",

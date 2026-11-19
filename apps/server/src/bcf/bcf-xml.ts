@@ -20,7 +20,7 @@ import {
   type BcfVersion,
   type BcfViewpoint,
 } from "@sitekeep/shared";
-import { DEFAULT_LANGUAGE, msg, tFor } from "../i18n/index.js";
+import { currentLanguage, msg, tFor } from "../i18n/index.js";
 import { BcfFormatError, attr, bool, dbl, el, kid, kids, num, parseBcfXml, render, text, tx, type El, type XmlNode } from "./xml.js";
 
 // ------------------------------------------------------------------ writer
@@ -278,7 +278,7 @@ export function readProject(buf: Buffer): { projectId: string | null; name: stri
 }
 
 /** Warnings come back in `lang` (the importer's language). */
-export function readMarkup(buf: Buffer, where: string, lang = DEFAULT_LANGUAGE): ParsedMarkup {
+export function readMarkup(buf: Buffer, where: string, lang = currentLanguage()): ParsedMarkup {
   const tr = tFor(lang);
   const root = parseBcfXml(buf, where);
   if (root.name !== "Markup") throw new BcfFormatError(msg("bcf:xml.noMarkup", { where }));
@@ -368,7 +368,7 @@ export function readMarkup(buf: Buffer, where: string, lang = DEFAULT_LANGUAGE):
   return { topic, files, comments, viewpoints, warnings };
 }
 
-export function readVisinfo(buf: Buffer, where: string, lang = DEFAULT_LANGUAGE): { viewpoint: BcfViewpoint; warnings: string[] } {
+export function readVisinfo(buf: Buffer, where: string, lang = currentLanguage()): { viewpoint: BcfViewpoint; warnings: string[] } {
   const tr = tFor(lang);
   const root = parseBcfXml(buf, where);
   if (root.name !== "VisualizationInfo") throw new BcfFormatError(msg("bcf:xml.noVisinfo", { where }));

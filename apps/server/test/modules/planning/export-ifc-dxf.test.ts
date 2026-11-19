@@ -36,7 +36,7 @@ function activity(id: string, over: Partial<ActivityDto>): ActivityDto {
   };
 }
 
-function location(code: string, kmStart: number, kmEnd: number, category: LinearCategory | null): ActivityLocationDto {
+function location(code: string, kmStart: number, kmEnd: number, category: LinearCategory | null, display: ActivityLocationDto["display"] = null): ActivityLocationDto {
   return {
     seriesId: "series",
     activityCode: code,
@@ -44,6 +44,7 @@ function location(code: string, kmStart: number, kmEnd: number, category: Linear
     kmEnd,
     locationId: null,
     category,
+    display,
     source: "manual",
     rule: null,
     detail: null,
@@ -243,6 +244,28 @@ describe("time–distance DXF export", () => {
     expect(entities.some((e) => e.type === "POLYLINE" && e.g.get(8) === "TD-STRUCTURES")).toBe(true);
     const dd = entities.find((e) => e.type === "LINE" && e.g.get(8) === "TD-DATADATE")!;
     expect(dd.g.get(6)).toBe("DASHED");
+  });
+
+  it("draws tunnel drives as lines, reversed when the planner chose line_reverse, and blocks on request", () => {
+    const m = model();
+    m.locations.set("A1000", location("A1000", 26.47, 28, "tunnel", "line_reverse"));
+    m.locations.set("A1010", location("A1010", 26.47, 40, "track", "block"));
+    m.locations.set("A1020", location("A1020", 30, 31.5, "tunnel"));
+    const ents = writeTimeDistanceDxf(m, { title: "TD" }).data.toString("latin1").split("\n");
+    const lineOf = (layer: string) => {
+      const out: string[][] = [];
+      for (let i = 0; i + 1 < ents.length; i += 2) {
+        if (Number(ents[i]) === 0 && ents[i + 1] === "LINE") {
+          const g = new Map<string, string>();
+          for (let j = i + 2; j + 1 < ents.length && Number(ents[j]) !== 0; j += 2) g.set(String(Number(ents[j])), ents[j + 1]!);
+          if (g.get("8") === layer) out.push([g.get("10")!, g.get("11")!]);
+        }
+      }
+      return out;
+    };
+    // A1000: from km 28 at its start to km 26.47 at its finish; A1020 (automatic tunnel, 1.5 km): forwards.
+    expect(lineOf("TD-ACTIVITIES-TUNNEL")).toEqual(expect.arrayContaining([["28000", "26470"], ["30000", "31500"]]));
+    expect(lineOf("TD-ACTIVITIES-TRACK")).toEqual([]);
   });
 
   it("writes labels with \\U+ escapes for Turkish letters", () => {

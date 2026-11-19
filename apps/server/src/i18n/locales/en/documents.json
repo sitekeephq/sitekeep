@@ -39,7 +39,10 @@
     "copyNeedsDownload": "You need download permission to copy this file.",
     "existsInTarget": "\"{{name}}\" already exists in the target folder.",
     "noDownloadPermission": "You do not have permission to download this file.",
-    "modelNotReady": "The model is not ready for viewing yet ({{status}})."
+    "modelNotReady": "The model is not ready for viewing yet ({{status}}).",
+    "ifcNotKept": "No converted IFC is kept for this version yet. A project administrator can convert it again.",
+    "notConvertible": "This file is not converted to a model by a module.",
+    "conversionBusy": "The model of this version is being converted already."
   },
   "messages": {
     "copiedFrom": "Copied from \"{{name}}\"."

@@ -18,7 +18,7 @@ published as a versioned package and pulled into the application at a pinned ver
 | **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private) | `@sitekeephq/sitekeep-ee-planning` | `0.5.0` | Separate repository, GitHub Packages. [Details](planning.md) |
 | **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private) | `@sitekeephq/sitekeep-ee-ai` | `0.5.0` | Separate repository, GitHub Packages. [Details](ai.md) |
 | **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private) | `@sitekeephq/sitekeep-ee-manage` | `0.5.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
-| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private) | `@sitekeephq/sitekeep-ee-connect` | `0.4.0` | Separate repository; Office conversion is in the core. [Details](connect.md) |
+| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private) | `@sitekeephq/sitekeep-ee-connect` | `0.5.1` | Separate repository; Office conversion is in the core. [Details](connect.md) |
 | **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | [sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private) | `@sitekeephq/sitekeep-ee-platform` | `0.2.0` | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
 
 | Package | Source | Version |
@@ -104,6 +104,7 @@ export default defineServerModule({
   async rootRoutes(app, deps) { … },       // endpoints outside /api/v1 with their own authentication (AI: /mcp)
   devTools: { cde_dev_ai_eval: devAiEval }, // developer tools (CDE_DEV_TOOLS=1)
   async start({ db, jobs, log }) { … },     // background jobs at startup (Connect: sync scheduler); returns a stop function
+  modelFormats: [{ extensions: ["rvt"], label: "Revit", toIfc, version }], // formats converted to IFC for the model viewer (Connect; SDK 0.17.0, `version` 0.18.0)
 });
 ```
 
@@ -118,8 +119,15 @@ export default defineWebModule({
   projectRoutes: [{ path: "contracts", element: <ContractsPage /> }, …], // under /projects/:pid/
   projectNav: [{ group: "planning", to: "contracts", labelKey: "…", icon: "doc" }, …],
   capabilities: { cost: { CostDialog, cashflow, … }, "cost.takeoff": { get, add } },
+  modelExtensions: ["rvt"],                 // opened with the model viewer; the server side converts them (Connect)
 });
 ```
+
+`modelFormats` / `modelExtensions` ([model formats](../features/MODEL_FORMATS.md)): a version of such a file is
+converted to IFC by the module, then takes the IFC path unchanged (viewer derivative, element index, comparison,
+"Modele sor"). Only while the module is on; without it the file stays a plain file. The optional `version()` (SDK
+0.18.0) returns the installed converter in the same form as `toIfc`'s `tool` ("rvt-rs 0.25.0"): the core then converts
+models from another converter version again at start-up and retries failed ones once per converter version.
 
 In the core's `LEGACY_URLS` table (`app/navigation/routes-table.ts`), a module's own pages are marked with
 `module: "<id>"`; if the module is not installed, those addresses are not expected.
@@ -231,6 +239,11 @@ node tools/third-party-notices.mjs --module ../sitekeep-ai [--out ../sitekeep-ai
 
 1. In the module repository: PR → merge → version → `vX.Y.Z` tag (CI publishes). A module with its own `THIRD_PARTY_NOTICES.md`: `npm run notices:check` first ([above](#third-party-notices-of-a-module)).
 2. Here: `npm install @sitekeephq/sitekeep-ee-<id>@X.Y.Z --save-exact -w @sitekeep/server -w @sitekeep/web`, the version row in this document → PR → green CI → merge.
+   Check `package-lock.json` afterwards: the module must stay at `node_modules/@sitekeephq/sitekeep-ee-<id>`. When the
+   module's SDK range was raised, npm can mistake the workspace SDK link for a conflict and nest the module under
+   `apps/server/node_modules` and `apps/web/node_modules` instead; the Community image removes modules only from the
+   root `node_modules`, so a nested copy would ship closed code. Move the entry back to the root (one entry, same
+   `resolved` / `integrity`) and confirm with `npm ci` (seen with Connect 0.5.0 / 0.5.1, 18.11.2026).
 3. Production: deploy (the `.npm_token` on the server must have read access).
 
 ## GitHub Packages access

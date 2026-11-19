@@ -141,6 +141,25 @@ export const projectMembers = pgTable(
   (t) => [primaryKey({ columns: [t.projectId, t.userId] })],
 );
 
+/**
+ * Companies on a project (docs/features/COMPANIES.md): the only companies the project's pickers offer
+ * and its records may refer to. A non-administrator sees a company only through the projects they are
+ * a member of (and their own company). Project administrators put companies on a project.
+ */
+export const projectCompanies = pgTable(
+  "project_companies",
+  {
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "cascade" }),
+    addedAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.projectId, t.companyId] }), index("project_companies_company_idx").on(t.companyId)],
+);
+
 export const namingStandards = pgTable("naming_standards", {
   id: id(),
   projectId: uuid("project_id")
@@ -244,6 +263,13 @@ export const fileVersions = pgTable(
     derivativeKey: text("derivative_key"),
     derivativeError: text("derivative_error"),
     ifcSummary: jsonb("ifc_summary").$type<IfcSummary>(),
+    /**
+     * A model converted to IFC by a module (Revit .rvt): the converted IFC kept in storage (downloadable,
+     * read again instead of converting) and the converter of the last conversion, successful or not
+     * ("rvt-rs 0.25.0"), so a new converter version converts again and a failed version is retried once.
+     */
+    ifcKey: text("ifc_key"),
+    converter: text("converter"),
     /** ISO 19650 codes of this version (D-1): suitability "S2", revision "P01.02". */
     suitabilityCode: text("suitability_code"),
     revisionCode: text("revision_code"),
@@ -537,3 +563,4 @@ export * from "./schema-two-factor.js";
 export * from "./schema-privacy-notice.js";
 export * from "./schema-retention.js";
 export * from "./schema-closeout.js";
+export * from "./schema-portability.js";

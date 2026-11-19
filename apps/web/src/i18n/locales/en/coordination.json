@@ -28,7 +28,9 @@
     "clashGroup": "Clash Group",
     "clashGroupMeta": "Clash Group · {{file}} V{{version}}",
     "markupMeta": "V{{version}} · page {{page}} · markup",
-    "versionMeta": "V{{version}} · version"
+    "versionMeta": "V{{version}} · version",
+    "empty": "No linked documents.",
+    "remove": "Remove link to {{name}}"
   },
   "paramFile": {
     "hint": "Requests to change this model's element data (new IFC version)",
@@ -155,7 +157,8 @@
     "actions": {
       "newInModel": "New Issue in Model",
       "report": "Report",
-      "exportBcfCount": "Export as BCF ({{n}})"
+      "exportBcfCount": "Export as BCF ({{n}})",
+      "new": "+ New Issue"
     },
     "empty": "No issues yet. Create one with \"+ New\" or with \"📍 Issue from Pin\" in Model → Viewer.",
     "columns": {
@@ -167,13 +170,20 @@
       "due": "Due Date",
       "updated": "Updated"
     },
-    "selectIssue": "Select Issue"
+    "selectIssue": "Select Issue",
+    "form": {
+      "documents": "Documents",
+      "addDocument": "Link Document",
+      "removeDocument": "Remove {{name}}",
+      "hint": "For a viewpoint or a pin, create the issue in the model viewer."
+    }
   },
   "issue": {
     "viewpoint": "Viewpoint",
     "viewpointN": "Viewpoint {{n}}",
     "actions": {
-      "openInModel": "🧊 Open Viewpoint in Model"
+      "openInModel": "🧊 Open Viewpoint in Model",
+      "delete": "Delete Issue"
     },
     "importedFrom": "Imported from a BCF {{version}} file",
     "importedFromFile": "Imported from a BCF {{version}} file ({{file}})",
@@ -181,7 +191,9 @@
     "editHint": "The creator, the assignee or a project administrator can change the status.",
     "comments": "Comments",
     "noComments": "No comments yet.",
-    "commentPlaceholder": "Write a comment…"
+    "commentPlaceholder": "Write a comment…",
+    "deleteTitle": "Delete Issue",
+    "deleteConfirm": "Delete issue #{{number}} \"{{title}}\" with its comments and links? This cannot be undone; the audit log keeps a record."
   },
   "paramChanges": {
     "title": "Parameter Changes",

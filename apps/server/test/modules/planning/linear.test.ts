@@ -146,9 +146,25 @@ describe("Doğrusal planlama API", () => {
     expect(list.body).toHaveLength(3);
   });
 
-  it("deletes assignments", async () => {
+  it("stores the drawing style and keeps it when a chainage table re-imports the activity", async () => {
+    const base = { activityCode: "A30", kmStart: 2, kmEnd: 2.5, source: "manual", category: "tunnel" };
+    expect((await admin.put(`/projects/${pid}/schedules/${sid}/locations`, { items: [{ ...base, display: "sideways" }] })).status).toBe(400);
+    expect((await admin.put(`/projects/${pid}/schedules/${sid}/locations`, { items: [{ ...base, display: "line_reverse" }] })).body).toEqual({ saved: 1 });
+    const a30 = async () => (await member.get(`/projects/${pid}/schedules/${sid}/locations`)).body.find((l: { activityCode: string }) => l.activityCode === "A30");
+    expect(await a30()).toMatchObject({ display: "line_reverse", category: "tunnel" });
+    const file = xlsx([["Activity ID", "Start km", "End km"], ["A30", 2, 2.6]]);
+    expect((await admin.upload(`/projects/${pid}/schedules/${sid}/locations/import`, "km.xlsx", file)).status).toBe(200);
+    expect(await a30()).toMatchObject({ kmEnd: 2.6, display: "line_reverse", source: "table" });
+    // An explicit null resets to automatic.
+    await admin.put(`/projects/${pid}/schedules/${sid}/locations`, { items: [{ ...base, display: null }] });
+    expect((await a30()).display).toBeNull();
+  });
+
+  it("deletes assignments (planners only, audited)", async () => {
+    expect((await member.post(`/projects/${pid}/schedules/${sid}/locations/delete`, { codes: ["A10"] })).status).toBe(403);
     const r = await admin.post(`/projects/${pid}/schedules/${sid}/locations/delete`, { codes: ["A10"] });
     expect(r.body).toEqual({ deleted: 1 });
     expect((await member.get(`/projects/${pid}/schedules/${sid}/locations`)).body).toHaveLength(2);
+    expect((await admin.post(`/projects/${pid}/schedules/${sid}/locations/delete`, { codes: [] })).status).toBe(400);
   });
 });

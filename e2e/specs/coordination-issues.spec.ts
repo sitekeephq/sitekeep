@@ -1,5 +1,8 @@
 import { expect, runState, test } from "../support/project-features";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { moduleInstalled } from "../support/modules";
+import { E2E_FIXTURES, uploadProjectFile } from "../support/seed-files";
 
 test("coordination routes show their tabs and deterministic empty states", async ({ page }) => {
   const { project } = await runState();
@@ -45,4 +48,40 @@ test("issues page opens and cancels BCF export", async ({ page, seededIssue }) =
   await expect(dialog.getByRole("button", { name: "Dışa Aktar" })).toBeEnabled();
   await dialog.getByRole("button", { name: "Vazgeç" }).click();
   await expect(dialog).toHaveCount(0);
+});
+
+test("creates an issue without a model, with a linked document, and deletes it", async ({ page }) => {
+  const { project } = await runState();
+  const docName = `e2e-issue-doc-${Date.now()}.pdf`;
+  await uploadProjectFile(page.request, project.id, project.rootFolderId, docName, await readFile(path.join(E2E_FIXTURES, "tiny.pdf")), "application/pdf");
+  await page.goto(`/projects/${project.id}/issues`);
+
+  await page.getByRole("button", { name: "+ Yeni Sorun", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Yeni Sorun" });
+  await expect(dialog.getByRole("button", { name: "Oluştur" })).toBeDisabled();
+  await dialog.getByLabel("Başlık").fill("E2E dokümandan sorun");
+  await dialog.getByLabel("Açıklama").fill("Kesit ile plan uyuşmuyor.");
+  await dialog.getByLabel("Öncelik").selectOption("high");
+  await dialog.getByLabel("Termin").fill("2027-01-15");
+
+  await dialog.getByRole("button", { name: "Doküman Bağla" }).click();
+  const picker = page.getByRole("dialog", { name: "Dosya Versiyonu Ekle" });
+  await picker.getByPlaceholder("Dosya adı veya öznitelik ara…").fill(docName);
+  await picker.getByRole("row", { name: new RegExp(docName.replace(/\./g, "\\.")) }).click();
+  await picker.getByRole("button", { name: "Ekle" }).click();
+  await expect(dialog.getByTestId("new-issue-doc")).toContainText(docName);
+
+  await dialog.getByRole("button", { name: "Oluştur" }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/issues/[0-9a-f-]{36}`));
+  const detail = page.locator("aside.panel.right");
+  await expect(detail.getByRole("heading", { name: "E2E dokümandan sorun" })).toBeVisible();
+  await expect(detail.getByRole("link", { name: docName })).toBeVisible();
+  await expect(page.getByRole("row", { name: /E2E dokümandan sorun/ })).toBeVisible();
+
+  await detail.getByRole("button", { name: "Sorunu Sil" }).click();
+  const confirm = page.getByRole("dialog", { name: "Sorunu Sil" });
+  await confirm.getByRole("button", { name: "Sil" }).click();
+  await expect(page).toHaveURL(new RegExp(`/projects/${project.id}/issues$`));
+  await expect(page.getByRole("row", { name: /E2E dokümandan sorun/ })).toHaveCount(0);
 });

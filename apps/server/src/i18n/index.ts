@@ -11,6 +11,7 @@
  * Languages are the folders under ./locales (copied to dist by scripts/copy-locales.mjs); the web
  * app has the same list (apps/web/src/i18n/locales, test: test/i18n/server-parity.test.ts).
  */
+import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -191,6 +192,29 @@ export function fromAcceptLanguage(header: string | undefined): string | null {
  */
 export function requestLanguage(req: Pick<FastifyRequest, "headers"> & { user?: { language?: string | null } | null }): string {
   return fromAcceptLanguage(req.headers["accept-language"]) ?? supportedLanguage(req.user?.language) ?? DEFAULT_LANGUAGE;
+}
+
+// ---- Language of the running request ------------------------------------------------------------
+
+const requestScope = new AsyncLocalStorage<() => string>();
+
+/**
+ * Runs fn with the request's language available to currentLanguage() (build-app.ts onRequest hook).
+ * `lang` is read when asked, so the signed-in user's profile language counts once auth has run.
+ */
+export function withRequestLanguage<T>(lang: () => string, fn: () => T): T {
+  return requestScope.run(lang, fn);
+}
+
+/**
+ * The language of the request being answered; outside a request (jobs, startup, e-mails) the
+ * installation default. For texts the requester reads where no `lang` is passed down: default
+ * parameters, error texts built deep in a call, seeded labels shown in their language.
+ * Stored data and texts for someone else keep an explicit language.
+ */
+export function currentLanguage(): string {
+  const get = requestScope.getStore();
+  return (get && supportedLanguage(get())) ?? DEFAULT_LANGUAGE;
 }
 
 /** The language of a person who is not the requester (notification e-mail, export for someone else). */

@@ -14,6 +14,7 @@ import {
   resolveNamingTokens,
   setupFolderOptions,
   validateName,
+  valuesFor,
   type NamingStandard,
   type ProjectTemplate,
 } from "@sitekeep/shared";
@@ -163,17 +164,32 @@ function tokenContext(draft: SetupDraft, template: ProjectTemplate, companies: S
     slotCodes[slot.key] = draft.slotCodes[slot.key]?.trim() || company?.code || slot.code;
     slotNames[slot.key] = company?.name ?? slot.label;
   }
-  return { projectCode: draft.code.trim() || "PROJ", slotCodes, slotNames };
+  const csbProjectCode = draft.csbProjectCode?.trim().toUpperCase();
+  return { projectCode: draft.code.trim() || "PROJ", slotCodes, slotNames, ...(csbProjectCode ? { csbProjectCode } : {}) };
 }
 
-/** A name that should pass the standard: the first code of each list, 1 for numbers. */
+/**
+ * A name that should pass the standard: the first code of each list allowed after its parent, 1 for
+ * numbers, the first suggestion (or X…) for text.
+ */
 export function sampleName(standard: NamingStandard): string {
-  return nameFields(standard)
-    .map((f) => (f.type === "list" ? (f.values[0]?.code ?? "") : f.type === "number" ? "1".padStart(digitRange(f).min, "0") : "X".repeat(Math.max(1, f.minLength ?? 1))))
+  const fields = nameFields(standard);
+  const chosen: Record<string, string> = {};
+  return fields
+    .map((f) => {
+      const value =
+        f.type === "list"
+          ? (valuesFor(f, f.dependsOn ? chosen[f.dependsOn] : undefined)[0]?.code ?? "")
+          : f.type === "number"
+            ? "1".padStart(digitRange(f).min, "0")
+            : (f.suggestions?.[0]?.code ?? "X".repeat(Math.max(1, f.minLength ?? 1)));
+      chosen[f.name] = value;
+      return value;
+    })
     .join(standard.delimiter);
 }
 
-const hasToken = (text: string) => /\{(PROJE|slot:|firma:)/.test(text);
+const hasToken = (text: string) => /\{(PROJE|EK1|slot:|firma:)/.test(text);
 
 export function NamingStep({ draft, update, base, template, companies }: StepProps) {
   const { t, i18n } = useTranslation(["projects", "cde", "common"]);
@@ -271,8 +287,18 @@ export function NamingStep({ draft, update, base, template, companies }: StepPro
                         <span className="muted small"> · {t("setup.naming.fromParties")}</span>
                       </span>
                     )}
+                    {field.type === "list" && field.dependsOn && (
+                      <div className="muted small">{t("setup.naming.dependsOn", { field: field.dependsOn })}</div>
+                    )}
                     {field.type === "number" && <span>{t("setup.naming.digits", { count: digitRange(field).min })}</span>}
-                    {field.type === "text" && <span className="muted">{t("setup.naming.freeText")}</span>}
+                    {field.type === "text" && field.fixed && live.type === "list" && (
+                      <span>
+                        {live.values.map((v) => v.code).join(", ")}
+                        <span className="muted small"> · {t("setup.naming.fromCsbCode")}</span>
+                      </span>
+                    )}
+                    {field.type === "text" && !(field.fixed && live.type === "list") && <TextRule field={field} />}
+                    {field.inCode === false && <div className="muted small">{t("setup.naming.notInCode")}</div>}
                   </td>
                 </tr>
               );
@@ -280,6 +306,7 @@ export function NamingStep({ draft, update, base, template, companies }: StepPro
           </tbody>
         </table>
       )}
+      {shown?.maxLength !== undefined && <p className="muted small">{t("setup.naming.maxLength", { count: shown.maxLength })}</p>}
       {shown && (
         <div className="card">
           <label htmlFor="setup-sample">{t("setup.naming.sample")}</label>
@@ -340,5 +367,22 @@ export function CodesStep({ draft, update, template }: StepProps) {
       </table>
       <p className="field-hint">{t("setup.codes.customHint")}</p>
     </div>
+  );
+}
+
+/** Length, characters and suggested codes of a text field; "Free text" when it has none. */
+function TextRule({ field }: { field: Extract<NamingStandard["fields"][number], { type: "text" }> }) {
+  const { t } = useTranslation("projects");
+  const parts: string[] = [];
+  if (field.minLength !== undefined && field.minLength === field.maxLength) parts.push(t("setup.naming.textLength", { count: field.minLength }));
+  if (field.charset) parts.push(t(`setup.naming.charset.${field.charset}`));
+  if (!parts.length && !field.suggestions?.length) return <span className="muted">{t("setup.naming.freeText")}</span>;
+  return (
+    <span>
+      {parts.join(" · ")}
+      {field.suggestions?.length ? (
+        <div className="muted small">{t("setup.naming.suggested", { codes: field.suggestions.map((v) => v.code).join(", ") })}</div>
+      ) : null}
+    </span>
   );
 }

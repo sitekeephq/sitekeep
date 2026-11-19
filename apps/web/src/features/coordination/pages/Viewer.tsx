@@ -21,6 +21,7 @@ import { viewerMoreItems } from "../../../viewers/viewer-phone";
 import { labelEntries, useLabel } from "../../../i18n";
 import { MarkupLayer } from "../model-markup/MarkupLayer";
 import { MarkupPanel } from "../model-markup/MarkupPanel";
+import { ISSUE_TYPES } from "../components/NewIssueDialog";
 import { useModelMarkups } from "../model-markup/useModelMarkups";
 
 const PIN_COLORS: Record<string, string> = {
@@ -29,16 +30,6 @@ const PIN_COLORS: Record<string, string> = {
   in_review: "#2e90fa",
   closed: "#12b76a",
 };
-
-/** Issue type values as stored on the issue (Turkish, like existing data); labels: `newIssue.types.<key>`. */
-const ISSUE_TYPES: { value: string; key: "coordination" | "design" | "site" | "quality" | "ohs" | "other" }[] = [
-  { value: "Koordinasyon", key: "coordination" },
-  { value: "Tasarım", key: "design" }, // i18n-ok
-  { value: "Saha", key: "site" },
-  { value: "Kalite", key: "quality" },
-  { value: "İSG", key: "ohs" }, // i18n-ok
-  { value: "Diğer", key: "other" }, // i18n-ok
-];
 
 export function ViewerPage() {
   const { t } = useTranslation(["coordination", "common", "modelMarkup"]);

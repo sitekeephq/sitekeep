@@ -7,15 +7,19 @@
  */
 import { inArray } from "drizzle-orm";
 import {
-  ALL_BUILT_IN_WORK_TYPES,
   DELIVERY_STATUS_LABELS_TR,
   LETTER_LANGUAGE_LABELS,
   OUTCOME_LABELS_TR,
   SUBMITTAL_KINDS,
+  DISCIPLINE_OPTIONS,
+  IMPACT_OPTIONS,
+  MEETING_KINDS,
+  RFI_CATEGORIES,
+  RFI_PRIORITIES,
   TRANSMITTAL_PURPOSE_LABELS_TR,
   WORK_CATEGORY_LABELS_TR,
   WORK_STATUS,
-  defaultStatuses,
+  WORK_STATUS_LABELS_TR,
   submittalKindOf,
   type ReportRow,
   type WorkCategory,
@@ -35,12 +39,12 @@ import { moduleInstalled } from "../app/module-ids.js";
 
 const DAY_MS = 86_400_000;
 
-/** Status code → label of every built-in work type (custom statuses fall back to the code; rows carry statusLabel). */
-const WORK_STATUS_VALUES: Record<string, string> = Object.fromEntries(
-  ALL_BUILT_IN_WORK_TYPES.flatMap((t) => (t.statuses ?? defaultStatuses(t.category)).map((s) => [s.key, s.label])),
-);
+/** Status code → label of every built-in work type, in the reader's language (custom statuses fall back to the code; rows carry statusLabel). */
+const WORK_STATUS_VALUES = labelValues("workStatus", WORK_STATUS_LABELS_TR);
 const CHANNEL_VALUES: Record<string, string | Msg> = Object.fromEntries(DELIVERY_CHANNELS.map((c) => [c.id, c.label]));
-const KIND_VALUES: Record<string, string> = Object.fromEntries(SUBMITTAL_KINDS.map((k) => [k.code, k.label]));
+/** Seeded list options of the built-in fields: rows keep the stored value, the label follows the reader (seededText). */
+const optionValues = (options: readonly string[]) => labelValues("seededText", Object.fromEntries(options.map((o) => [o, o])));
+const KIND_VALUES = Object.fromEntries(SUBMITTAL_KINDS.map((k) => [k.code, { table: "seededText", key: k.label }]));
 const DIRECTION_VALUES = { gelen: msg("reports:values.direction.gelen"), giden: msg("reports:values.direction.giden") };
 
 export interface WorkBase {
@@ -155,7 +159,7 @@ const F = {
   deliveryStatus: { type: "string", label: msg("reports:datasets.workCommon.fields.deliveryStatus"), values: labelValues("deliveryStatus", DELIVERY_STATUS_LABELS_TR) },
   mailSent: { type: "boolean", label: msg("reports:datasets.workCommon.fields.mailSent") },
   letterLanguage: { type: "string", label: msg("reports:datasets.workCommon.fields.letterLanguage"), values: LETTER_LANGUAGE_LABELS },
-  discipline: { type: "string", label: msg("reports:datasets.workCommon.fields.discipline"), description: msg("reports:datasets.workCommon.hints.discipline") },
+  discipline: { type: "string", label: msg("reports:datasets.workCommon.fields.discipline"), values: optionValues(DISCIPLINE_OPTIONS), description: msg("reports:datasets.workCommon.hints.discipline") },
 } satisfies Record<string, DatasetField>;
 
 function common(b: WorkBase): ReportRow {
@@ -305,10 +309,10 @@ if (moduleInstalled("manage")) {
       isOpen: F.isOpen,
       answered: { type: "boolean", label: msg("reports:datasets.rfis.fields.answered") },
       discipline: F.discipline,
-      rfiCategory: { type: "string", label: msg("reports:datasets.rfis.fields.rfiCategory"), description: msg("reports:datasets.rfis.hints.rfiCategory") },
-      priority: { type: "string", label: msg("reports:datasets.rfis.fields.priority"), description: msg("reports:datasets.rfis.hints.priority") },
-      costImpact: { type: "string", label: msg("reports:datasets.rfis.fields.costImpact"), description: msg("reports:datasets.rfis.hints.costImpact") },
-      scheduleImpact: { type: "string", label: msg("reports:datasets.rfis.fields.scheduleImpact"), description: msg("reports:datasets.rfis.hints.scheduleImpact") },
+      rfiCategory: { type: "string", label: msg("reports:datasets.rfis.fields.rfiCategory"), values: optionValues(RFI_CATEGORIES), description: msg("reports:datasets.rfis.hints.rfiCategory") },
+      priority: { type: "string", label: msg("reports:datasets.rfis.fields.priority"), values: optionValues(RFI_PRIORITIES), description: msg("reports:datasets.rfis.hints.priority") },
+      costImpact: { type: "string", label: msg("reports:datasets.rfis.fields.costImpact"), values: optionValues(IMPACT_OPTIONS), description: msg("reports:datasets.rfis.hints.costImpact") },
+      scheduleImpact: { type: "string", label: msg("reports:datasets.rfis.fields.scheduleImpact"), values: optionValues(IMPACT_OPTIONS), description: msg("reports:datasets.rfis.hints.scheduleImpact") },
       fromCompany: F.fromCompany,
       toCompany: F.toCompany,
       ballInCourt: F.ballInCourt,
@@ -425,7 +429,7 @@ if (moduleInstalled("manage")) {
     fields: {
       number: F.number,
       title: F.title,
-      kind: { type: "string", label: msg("reports:datasets.meetings.fields.kind"), description: msg("reports:datasets.meetings.hints.kind") },
+      kind: { type: "string", label: msg("reports:datasets.meetings.fields.kind"), values: optionValues(MEETING_KINDS), description: msg("reports:datasets.meetings.hints.kind") },
       date: { type: "date", label: msg("reports:datasets.meetings.fields.date") },
       place: { type: "string", label: msg("reports:datasets.meetings.fields.place") },
       status: F.status,

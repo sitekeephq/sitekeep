@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, count, desc, eq, inArray, max } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, max, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { IssueCommentDto, IssueDto, IssuePin, IssuePriority, IssueViewpoint } from "@sitekeep/shared";
@@ -7,9 +7,10 @@ import type { AppDeps } from "../../app/deps.js";
 import { isUuid, projectAccess, userNames } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
 import type { Db } from "../../db/index.js";
-import { issueComments, issueViewpoints, issues, projectMembers } from "../../db/schema.js";
+import { auditLog, issueComments, issueViewpoints, issues, locationLinks, projectMembers, workLinks } from "../../db/schema.js";
 import { badRequest, forbidden, notFound } from "../../core/platform/http.js";
 import { requireModule } from "../../projects/modules.js";
+import { requireProjectCompanies } from "../../projects/companies.js";
 import { viewerStateFields, viewpointBcfFields, viewpointCameraSchema } from "../../bcf/viewpoint-schema.js";
 import { issueViewpointList } from "../../bcf/topics.js";
 import { DEFAULT_LANGUAGE, msg, render } from "../../i18n/index.js";
@@ -90,6 +91,7 @@ export async function issueRoutes(api: FastifyInstance, { db }: AppDeps) {
     requireModule(a, "issues");
     const body = withGuid(z.object(issueFields).parse(req.body));
     await checkAssignee(a.project.id, body.assigneeUserId);
+    await requireProjectCompanies(db, a, [body.assigneeCompanyId]);
     const row = await insertIssue(db, a.project.id, a.user.id, body);
     await audit(db, {
       projectId: a.project.id,
@@ -125,6 +127,7 @@ export async function issueRoutes(api: FastifyInstance, { db }: AppDeps) {
       z.object({ ...issueFields, title: issueFields.title.optional(), status: statusSchema.optional() }).parse(req.body),
     );
     await checkAssignee(a.project.id, body.assigneeUserId);
+    await requireProjectCompanies(db, a, [body.assigneeCompanyId]);
     // An imported assignee without a member match is dropped once someone sets the assignee here.
     const importedFrom =
       body.assigneeUserId !== undefined && row.importedFrom?.assignedTo ? { ...row.importedFrom, assignedTo: undefined } : undefined;
@@ -142,6 +145,37 @@ export async function issueRoutes(api: FastifyInstance, { db }: AppDeps) {
       details: { number: row.number, ...withoutBlobs(body) },
     });
     return toIssueDto(updated!, await userNames(db, [updated!.createdBy, updated!.assigneeUserId]));
+  });
+
+  /**
+   * Deletes an issue with its comments, viewpoints and document links; its location and the links
+   * from works to it go too, model markups keep their drawing without the issue. Project
+   * administrators and the creator; the audit entry keeps number, title and status.
+   */
+  api.delete<{ Params: { pid: string; iid: string } }>("/projects/:pid/issues/:iid", async (req) => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireModule(a, "issues");
+    const row = await loadIssue(a.project.id, req.params.iid);
+    if (!a.isProjectAdmin && row.createdBy !== a.user.id) throw forbidden(msg("coordination:errors.issueDeleteRole"));
+    const removed = await db.transaction(async (tx) => {
+      const [{ n: comments } = { n: 0 }] = await tx.select({ n: count() }).from(issueComments).where(eq(issueComments.issueId, row.id));
+      const works = await tx
+        .delete(workLinks)
+        .where(and(eq(workLinks.kind, "issue"), eq(workLinks.targetId, row.id)))
+        .returning({ id: workLinks.id });
+      await tx.delete(locationLinks).where(and(eq(locationLinks.kind, "issue"), eq(locationLinks.targetId, row.id), eq(locationLinks.projectId, a.project.id)));
+      await tx.delete(issues).where(eq(issues.id, row.id));
+      return { comments: Number(comments), workLinks: works.length };
+    });
+    await audit(db, {
+      projectId: a.project.id,
+      userId: a.user.id,
+      action: "issue.deleted",
+      targetType: "issue",
+      targetId: row.id,
+      details: { number: row.number, title: row.title, status: row.status, guid: row.guid, ...removed },
+    });
+    return { ok: true };
   });
 
   api.get<{ Params: { pid: string; iid: string } }>("/projects/:pid/issues/:iid/comments", async (req) => {
@@ -194,6 +228,21 @@ export async function issueRoutes(api: FastifyInstance, { db }: AppDeps) {
   }
 }
 
+type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
+
+/**
+ * Next issue number of a project. Numbers of deleted issues are not given again: their audit
+ * entries, exported BCF files and correspondence keep referring to them.
+ */
+export async function nextIssueNumber(db: Db | Tx, projectId: string): Promise<number> {
+  const [m] = await db.select({ n: max(issues.number) }).from(issues).where(eq(issues.projectId, projectId));
+  const [d] = await db
+    .select({ n: sql<number | string | null>`max((${auditLog.details}->>'number')::int)` })
+    .from(auditLog)
+    .where(and(eq(auditLog.projectId, projectId), eq(auditLog.action, "issue.deleted")));
+  return Math.max(m?.n ?? 0, Number(d?.n ?? 0)) + 1;
+}
+
 /** Inserts an issue with the next project number (also used by clash groups → issue). */
 export async function insertIssue(
   db: Db,
@@ -218,14 +267,13 @@ export async function insertIssue(
   const id = randomUUID();
   const viewpoint = body.viewpoint ? { ...body.viewpoint, guid: body.viewpoint.guid ?? randomUUID() } : null;
   return db.transaction(async (tx) => {
-    const [m] = await tx.select({ n: max(issues.number) }).from(issues).where(eq(issues.projectId, projectId));
     const [inserted] = await tx
       .insert(issues)
       .values({
         id,
         guid: id,
         projectId,
-        number: (m?.n ?? 0) + 1,
+        number: await nextIssueNumber(tx, projectId),
         title: body.title,
         description: body.description ?? null,
         priority: body.priority ?? "normal",

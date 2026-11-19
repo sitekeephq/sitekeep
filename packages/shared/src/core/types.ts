@@ -45,6 +45,11 @@ export interface CompanyDto {
   /** Postal address (multi-line) and e-mail, used as the recipient of official letters. */
   address?: string | null;
   email?: string | null;
+  /**
+   * System administrators' GET /companies only: the active projects the company is on
+   * (docs/features/COMPANIES.md).
+   */
+  projects?: { id: string; code: string; name: string }[];
 }
 
 export interface ProjectDto {
@@ -61,7 +66,7 @@ export interface ProjectDto {
   /** Issue types of the project by category (from its template); missing = the built-in types. */
   issueTypes?: { category: string; types: string[] }[];
   /** Dates, location and client given in the project set-up wizard. */
-  details?: { startDate?: string; endDate?: string; location?: string; client?: string };
+  details?: { startDate?: string; endDate?: string; location?: string; client?: string; csbProjectCode?: string };
   /** Closed after its close-out archive (read-only: no uploads or edits); docs/features/CLOSEOUT_ARCHIVE.md. */
   closedAt?: string | null;
 }
@@ -125,6 +130,27 @@ export interface IfcSummary {
      */
     revision?: number;
   };
+  /**
+   * The model was converted to IFC from another format by a module (Connect: Revit .rvt) before the
+   * viewer derivative was built (docs/features/MODEL_FORMATS.md). Missing for IFC uploads.
+   */
+  source?: {
+    /** Source format, lower case extension ("rvt"). */
+    format: string;
+    /** Converter and its version ("rvt-rs 0.25.0"). */
+    tool: string;
+    /** Release of the authoring software the file was saved with ("2024"). */
+    sourceVersion?: string | null;
+    /** Elements drawn with an approximate shape (bounding box). */
+    approximated?: number;
+    /** Placeholder objects without geometry left out of the view (trees, people). */
+    hidden?: number;
+    /**
+     * Support level of that release in the converter ("verified", "partial", "experimental"), or "incomplete"
+     * when part of the file was too large to read.
+     */
+    support?: string | null;
+  };
 }
 
 export interface FileVersionDto {
@@ -140,6 +166,8 @@ export interface FileVersionDto {
   derivativeStatus: DerivativeStatus;
   derivativeError: string | null;
   ifcSummary: IfcSummary | null;
+  /** A model a module converted (Revit .rvt) whose IFC is kept: downloadable at GET …/versions/:vid/ifc. */
+  ifcAvailable?: boolean;
   /** ISO 19650 suitability code of this version ("S2"); null or missing: not set. */
   suitabilityCode?: string | null;
   /** ISO 19650 revision code of this version ("P01.02", "C01"); null or missing: not set. */

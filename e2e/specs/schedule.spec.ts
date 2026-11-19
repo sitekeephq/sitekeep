@@ -54,6 +54,29 @@ test("assigns a chainage in the location wizard and draws it in the time–dista
   await chart.locator('.td-item[aria-label*="Site setup"]').hover();
   await expect(chart.getByTestId("td-tip")).toContainText("Site setup");
   await expect(page.getByText("1 / 2 faaliyetin konumu var")).toBeVisible();
+
+  // Clicking the activity opens its drawer: the chainage section shows the range and sets the drawing style.
+  await chart.locator('.td-item[aria-label*="Site setup"]').click();
+  const km = page.getByTestId("activity-chainage");
+  await expect(km).toContainText("1+000");
+  await expect(km).toContainText("1+500");
+  await km.getByRole("button", { name: "Düzenle" }).click();
+  await km.getByLabel("Çizim").selectOption("line");
+  await km.getByRole("button", { name: "Kaydet" }).click();
+  await expect(km).toContainText("Eğik çizgi");
+  await expect(chart.locator('line.td-item[aria-label*="Site setup"]')).toHaveCount(1);
+  await page.locator("aside.drawer").getByRole("button", { name: "Kapat" }).click();
+
+  // Wizard, Assigned tab: remove the chainage; the activity leaves the diagram.
+  await page.getByRole("button", { name: /^Konum Ata/ }).click();
+  const wizard = page.getByRole("dialog", { name: "Konum Atama Sihirbazı" });
+  await wizard.getByRole("tab", { name: "Atanmış" }).click();
+  await wizard.getByRole("checkbox", { name: "E2E-100" }).check();
+  await wizard.getByRole("button", { name: "Kilometreyi Kaldır" }).click();
+  await page.getByRole("dialog", { name: "Kilometreyi Kaldır" }).getByRole("button", { name: "Kilometreyi Kaldır" }).click();
+  await expect(wizard.getByText("1 faaliyetin kilometresi kaldırıldı.")).toBeVisible();
+  await wizard.getByRole("button", { name: "Kapat", exact: true }).last().click();
+  await expect(chart.locator('.td-item[aria-label*="Site setup"]')).toHaveCount(0);
 });
 
 test("builds a programme from scratch: two activities, a link, calculation and bars", async ({ page, allowApiFailure }) => {

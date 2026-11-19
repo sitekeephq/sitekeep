@@ -25,6 +25,7 @@ export function toVersionDto(v: VersionRow, names: Map<string, string>): FileVer
     derivativeStatus: v.derivativeStatus,
     derivativeError: v.derivativeError,
     ifcSummary: v.ifcSummary,
+    ...(v.ifcKey && { ifcAvailable: true }),
     suitabilityCode: v.suitabilityCode ?? null,
     revisionCode: v.revisionCode ?? null,
   };

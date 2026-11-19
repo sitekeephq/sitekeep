@@ -15,7 +15,9 @@
     "templateRequired": "templateId veya template gerekli.",
     "invalidFolderName": "Geçersiz klasör adı: \"{{name}}\".",
     "roleNotInTemplate": "\"{{key}}\" rolü şablonda yok.",
-    "companyNotFound": "Seçilen firmalardan biri bulunamadı."
+    "companyNotFound": "Seçilen firmalardan biri bulunamadı.",
+    "companyNotInProject": "Firma bu projede değil. Firmaları projeye proje yöneticisi ekler.",
+    "companyInUse": "Firma bu projede hâlâ kullanılıyor (üyeler, roller, izinler ya da kayıtlar)."
   },
   "warnings": {
     "rolesWithoutCompany": "Firma atanmamış roller: {{roles}}. Bu rollerin klasör yetkileri ve akış adımları atlanır; sonradan elle eklenebilir.",
@@ -38,5 +40,14 @@
     "numberingRefused": "Numara düzeni uygulanmadı: {{problem}}",
     "transmittalAttributes": "Gönderim formu kapak sayfasının sütunları sabittir; şablondaki öznitelik listesi uygulanmadı.",
     "issueFields": "Sorun özel alanları proje ayarlarında saklandı; sorunlarda henüz özel alan yok."
+  },
+  "seed": {
+    "rootFolder": "Proje Dosyaları",
+    "isoFolders": {
+      "wip": "01-WIP (Çalışmada)",
+      "shared": "02-SHARED (Paylaşılan)",
+      "published": "03-PUBLISHED (Yayınlanan)",
+      "archived": "04-ARCHIVED (Arşiv)"
+    }
   }
 }

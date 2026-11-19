@@ -91,7 +91,8 @@
       "openOnly": "Yalnız Açık İşler",
       "allStatuses": "Tüm Durumlar",
       "allDueDates": "Tüm Terminler",
-      "list": "Liste"
+      "list": "Liste",
+      "showCancelled": "İptalleri Göster"
     },
     "fields": {
       "quickFilter": "Hızlı Filtre",
@@ -423,7 +424,10 @@
     "actions": {
       "submitItems": "Kalemleri Onaya Gönder",
       "submit": "Onaya Gönder",
-      "revise": "Yeni Revizyon (Rev {{rev}})"
+      "revise": "Yeni Revizyon (Rev {{rev}})",
+      "cancel": "İptal Et",
+      "cancelRfi": "Bilgi Talebini İptal Et",
+      "cancelSubmittal": "Teknik Onay Kalemini İptal Et"
     },
     "cancel": {
       "title": "İşi İptal Et",

@@ -531,10 +531,11 @@ describe("viewer API", () => {
     await jobs.drain();
     expect((await status(vid)).previews[0]!.status).toBe("ready");
 
-    const rvt = await upload("Model.rvt", Buffer.from("rvt"));
-    expect(await status(rvt)).toMatchObject({ viewer: "none", viewerLabel: "Önizleme yok", previews: [], canRequest: [] });
-    expect((await call("GET", `/projects/${pid}/versions/${rvt}/media`)).statusCode).toBe(415);
-    expect((await call("GET", `/projects/${pid}/versions/${rvt}/preview/nope`)).statusCode).toBe(404);
+    // Navisworks: no viewer (.rvt opens in the model viewer when Connect converts it).
+    const nwd = await upload("Model.nwd", Buffer.from("nwd"));
+    expect(await status(nwd)).toMatchObject({ viewer: "none", viewerLabel: "Önizleme yok", previews: [], canRequest: [] });
+    expect((await call("GET", `/projects/${pid}/versions/${nwd}/media`)).statusCode).toBe(415);
+    expect((await call("GET", `/projects/${pid}/versions/${nwd}/preview/nope`)).statusCode).toBe(404);
   });
 
   it("reports converter status to administrators", async () => {

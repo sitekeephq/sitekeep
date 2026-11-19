@@ -6,6 +6,7 @@
 import type { ReactNode } from "react";
 import type { IconName } from "../shared/ui/Icon";
 import type { ShellKey } from "../app/navigation/nav";
+import { registerModelExtension } from "@sitekeep/shared";
 import { provideWebCapability, type WebCapabilities } from "./capabilities";
 
 export interface WebModule {
@@ -15,6 +16,11 @@ export interface WebModule {
   /** Project menu entries, appended to the named group. */
   projectNav?: { group: "work" | "model" | "planning" | "admin"; to: string; labelKey: ShellKey; icon: IconName; adminOnly?: boolean }[];
   capabilities?: Partial<WebCapabilities>;
+  /**
+   * Extensions the module's server side converts to IFC (Connect: ["rvt"]); the app opens them with the
+   * model viewer like IFC (ServerModule.modelFormats, docs/features/MODEL_FORMATS.md).
+   */
+  modelExtensions?: string[];
 }
 
 /** A module describes itself; nothing is registered until the app turns it on (activateWebModule). */
@@ -25,4 +31,5 @@ export function defineWebModule(m: WebModule): WebModule {
 /** Turns a module on: its capabilities become available (app/modules.ts, for the modules the server runs). */
 export function activateWebModule(m: WebModule): void {
   for (const [key, impl] of Object.entries(m.capabilities ?? {}) as [keyof WebCapabilities, never][]) provideWebCapability(key, impl);
+  for (const ext of m.modelExtensions ?? []) registerModelExtension(ext);
 }

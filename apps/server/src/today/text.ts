@@ -17,6 +17,7 @@ import {
   type TodayRowDto,
   type TodaySummaryBullet,
 } from "@sitekeep/shared";
+import { answerLanguageRule } from "../ai/language.js";
 import { stripThinking } from "../ai/provider.js";
 import { DEFAULT_LANGUAGE, intlLocale, msg, tFor, type MsgKey } from "../i18n/index.js";
 
@@ -253,12 +254,20 @@ export function autoSummary(d: TodayData, today: string, lang: string = DEFAULT_
   return bullets.map((text) => ({ text, refs: refsOf(text, input.links) }));
 }
 
-/** System prompt: tiny on purpose (the local model runs on CPU). Model-facing: Turkish. */
-export const TODAY_SUMMARY_SYSTEM =
-  "Bir inşaat projesinin doküman yönetim sisteminde kullanıcının bugünkü durumunu özetliyorsun. " + // i18n-ok: AI prompt
-  "Verilen sayılar ve kayıt satırlarından 3-6 kısa Türkçe madde yaz; her madde '- ' ile başlasın ve tek cümle olsun. " + // i18n-ok: AI prompt
-  "Önce bugün termini dolanları ve geciken işleri, sonra bekleyenleri ve son değişiklikleri yaz; son madde 'En acil: <numara> <konu>.' olsun. " + // i18n-ok: AI prompt
-  "Kayıt numaralarını aynen yaz. Girdide olmayan numara, sayı, kişi veya firma uydurma. Giriş veya kapanış cümlesi yazma."; // i18n-ok: AI prompt
+/**
+ * System prompt: tiny on purpose (the local model runs on CPU). The instructions and the input are
+ * Turkish; the bullets are written in the reader's language (ai/language.ts, answer language).
+ */
+export function todaySummarySystem(lang: string = DEFAULT_LANGUAGE): string {
+  const urgent = tFor(lang)("today:summary.urgent", { number: "<numara>", title: "<konu>" });
+  return (
+    "Bir inşaat projesinin doküman yönetim sisteminde kullanıcının bugünkü durumunu özetliyorsun. " + // i18n-ok: AI prompt
+    "Verilen sayılar ve kayıt satırlarından 3-6 kısa madde yaz; her madde '- ' ile başlasın ve tek cümle olsun. " + // i18n-ok: AI prompt
+    `Önce bugün termini dolanları ve geciken işleri, sonra bekleyenleri ve son değişiklikleri yaz; son madde '${urgent}' olsun. ` + // i18n-ok: AI prompt
+    "Kayıt numaralarını aynen yaz. Girdide olmayan numara, sayı, kişi veya firma uydurma. Giriş veya kapanış cümlesi yazma. " + // i18n-ok: AI prompt
+    answerLanguageRule(lang)
+  );
+}
 
 export interface ParsedSummary {
   bullets: TodaySummaryBullet[];

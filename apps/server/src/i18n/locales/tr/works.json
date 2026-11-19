@@ -82,7 +82,8 @@
     "typeKeyFormat": "Anahtar küçük harf, rakam ve - içerebilir.",
     "aiBadTranslation": "Model geçerli bir çeviri döndürmedi.",
     "fileTooLarge": "Dosya {{mb}} MB sınırından büyük.",
-    "invalidFileName": "Geçersiz dosya adı."
+    "invalidFileName": "Geçersiz dosya adı.",
+    "invalidStatusFor": "\"{{status}}\", {{type}} iş tipinin bir durumu değil. Geçerli durumlar: {{allowed}}."
   },
   "intake": {
     "wordUnreadable": "Word dosyası okunamadı.",

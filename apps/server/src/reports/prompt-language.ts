@@ -1,7 +1,7 @@
 /**
- * Language of everything the report builder sends to the model (system prompt, dataset catalog,
- * example dashboard, validation errors on repair): the prompts are written in Turkish and ask for
- * Turkish dashboards, so their inputs stay Turkish whatever the reader's language
- * (docs/architecture/i18n.md §8.2).
+ * Language of the report builder's model-facing inputs that do not depend on the reader (dataset
+ * catalog and validation errors of "Yapay zekâ ile onar"): the prompts are written for Turkish
+ * inputs (docs/architecture/i18n.md §8.2). What the model writes for the user follows the reader's
+ * language (§8.4); a new dashboard's catalog and example are described in that language too.
  */
 export const PROMPT_LANGUAGE = "tr";

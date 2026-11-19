@@ -7,9 +7,10 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { requireProjectCompanies } from "../projects/companies.js";
 import { INVITATION_LANGUAGES, PROVISION_PASSWORD, isGroupAddress, type InvitationInfoDto, type InvitationListDto, type InviteResultDto } from "@sitekeep/shared";
 import type { ResolvedDeps } from "../app/deps.js";
-import { companies, invitations, projectRoles, users } from "../db/schema.js";
+import { invitations, projectRoles, users } from "../db/schema.js";
 import { audit } from "../core/platform/audit.js";
 import { HttpError, badRequest, forbidden, notFound } from "../core/platform/http.js";
 import { passwordProblem } from "../core/security/auth.js";
@@ -127,10 +128,8 @@ export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps)
         .where(and(eq(projectRoles.projectId, a.project.id), inArray(projectRoles.id, roleIds)));
       if (found.length !== roleIds.length) throw badRequest(msg("auth:errors.roleNotInProject"));
     }
-    if (body.companyId) {
-      const [company] = await db.select({ id: companies.id }).from(companies).where(eq(companies.id, body.companyId));
-      if (!company) throw notFound(msg("auth:entities.company"));
-    }
+    // Only a company on the project, or one the project administrator puts on it (docs/features/COMPANIES.md).
+    await requireProjectCompanies(db, a, [body.companyId]);
     const isProjectAdmin = !!body.isProjectAdmin;
     const account = await accountFor(db, body.email);
     if (account.kind === "disabled") throw badRequest(msg("auth:errors.accountDisabled", { email: body.email }));

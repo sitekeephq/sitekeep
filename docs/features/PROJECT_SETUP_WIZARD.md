@@ -18,11 +18,11 @@ PROJE_KURULUM_SIHIRBAZI.md.
 |---|---|---|---|
 | 1 | Language | The project language (English or Turkish): folder, workflow and list names. The interface language stays each person's own | `language` of the request: picks the template file of a family (`iso19650-yapim-en` / `-tr`) and the per-language values |
 | 2 | Template | A built-in template or a template file. The card shows what the template brings (parties, naming standards, workflows, ISO 19650 rules) and each v2 part with who applies it: SiteKeep Community, or SiteKeep Manage / Field. A part whose module is not installed shows **Requires SiteKeep Manage** and is skipped; the rest of the template is set up. Parts with a project module switch (issues, transmittals, RFI, submittals, meetings, forms) can be left out | `setup.modules` (an off switch reports the part as `skipped`, `module_off`) |
-| 3 | Project basics | Name, code (proposed from the name), description, start and end dates, location, client | `code`, `name`, `description`; `details` → project settings (`settings.details`, returned as `details` on the project) |
+| 3 | Project basics | Name, code (proposed from the name), description, start and end dates, location, client; the ÇŞB project code (EK-1) when a naming standard of the template uses it ([ÇŞB 2026 profile](NAMING_CSB_2026.md)) | `code`, `name`, `description`; `details` → project settings (`settings.details`, returned as `details` on the project; `csbProjectCode` fills the `{EK1}` token) |
 | 4 | Parties and task teams | A company per party (pick or create, with its short code), the party code used by the naming tokens, more parties (e.g. the client's technical unit), which parties get a task team, and the lead appointed party | `slotCompanies`, `slotCodes`, `setup.parties` (added slots), `setup.taskTeams` (replaces `cde.taskTeams`) |
 | 5 | People and roles | People by e-mail (several at once, or [from a CSV / Excel file](#importing-people)), the party each joins and the template's project roles; project administrators; **Invite People Without an Account** (on by default) and the invitation language | `people`: members in the company of their party, in its task team, with the roles. With `invite`, addresses without an account are [invited](INVITATIONS.md) (a name can be given); without it they are listed and not added. Shared mailboxes (info@, noreply@ …) are never added |
 | 6 | Folder structure | The tree of the template (server preview), the skeleton dimensions (disciplines, zones …), folders added below template folders, template folders left out | `dimensions`, `setup.folders.add` / `remove` |
-| 7 | Document codes | The document code standard; the codes of the list fields of each naming standard (one per line, code then description; fields filled from the project and party codes are shown resolved); a sample name checked against the standard while typing | `setup.containerStandard`, `setup.naming` |
+| 7 | Document codes | The document code standard (the Turkish construction template also offers **ÇŞB 2026 (EK-2)**); the codes of the list fields of each naming standard (one per line, code then description; fields filled from the project and party codes are shown resolved; a dependent list shows the field it depends on and its codes keep their parents); the length, characters and suggested codes of text fields; a sample name checked against the standard while typing | `setup.containerStandard` (another standard than the template's also renames the folders named by the template's document code standard), `setup.naming` |
 | 8 | Revision and suitability codes | ISO 19650 (UK NA: S0–S4, A, B, CR; P01.01 / P01 / C01) or legacy R00, with the codes each state allows | `setup.cde.codeScheme` |
 | 9 | Workflows | The ISO 19650 transition table (D-7) with the workflow of each review transition, and every workflow step: duration, rule (any / all) and approvers: a party's task team, a project role or the project administrators | `setup.transitions`, `setup.workflows` |
 | 10 | ISO 19650 rules | Enforce the transition table; who sees work in progress (folder permissions / owning task team only); whether project administrators see all WIP | `setup.cde.enforceTransitions`, `wipPolicy`, `adminSeesWip` |
@@ -155,6 +155,7 @@ invitation has its own `invitation.created` row.
 |---|---|
 | Choices applied to a copy, refused outside the limits, references checked; dry run (choices, code taken, accounts, administrators only); create with choices: task teams from parties and the lead, people in their party's company, team and roles, CDE settings, document code standard and codes, approvers, transition workflow, folders, details, part report with a switched-off module, audit; a request without choices equals a template request | `apps/server/test/projects/setup-wizard.test.ts` |
 | Step validation, request built from the draft, template change, code proposal, browser draft | `apps/web/test/projects/setup-wizard.test.ts` |
+| ÇŞB 2026 profile: EK-1 code in the basics step and the request, sample name | `apps/web/test/projects/setup-csb.test.ts`; server side `apps/server/test/projects/naming-csb2026.test.ts` |
 | The full wizard with the English construction template (teams, lead, people, folder, codes profile, approver, ISO rules, part report with and without modules); the draft after a reload; quick create | `e2e/specs/project-setup-wizard.spec.ts` |
 | iPhone: every step without sideways scrolling, a project created | `e2e/specs/mobile-project-setup-wizard.spec.ts` |
 | Invitations in the dry run and on create, people files; people import, the request with invitations | `apps/server/test/auth/invitations.test.ts`, `apps/web/test/projects/invitations.test.ts` |
@@ -163,7 +164,7 @@ invitation has its own `invitation.created` row.
 ## Planned
 
 - Disciplines and levels as their own step (today: the skeleton dimensions and the naming codes).
-- Working-day calendars for step durations; importing a Forma naming workbook; the ÇŞB 2026 naming
-  profile ([project templates](PROJECT_TEMPLATES.md#planned)).
+- Working-day calendars for step durations; importing a Forma naming workbook
+  ([project templates](PROJECT_TEMPLATES.md#planned)).
 - A set-up report (PDF) and an end-to-end trial (WIP → check → Shared → approval → Published) after
   creation, as in the design's verification step.

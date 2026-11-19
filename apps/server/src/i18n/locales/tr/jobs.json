@@ -3,7 +3,8 @@
     "indexNotCreated": "İndeks oluşturulmadı.",
     "indexFailed": "İndeks oluşturulamadı.",
     "ifcTimeout": "IFC dönüşümü zaman aşımına uğradı.",
-    "ifcExit": "IFC dönüşüm işlemi {{code}} koduyla bitti."
+    "ifcExit": "IFC dönüşüm işlemi {{code}} koduyla bitti.",
+    "noModelConverter": ".{{ext}} dosyalarını IFC'ye çeviren açık bir modül yok; dosya saklanır ama model görünümü yok."
   },
   "spatial": {
     "versionNotFound": "IFC versiyonu bulunamadı.",

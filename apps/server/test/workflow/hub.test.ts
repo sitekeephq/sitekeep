@@ -87,6 +87,8 @@ describe("simple screen: setup", () => {
       expect((await admin.post(`${P()}/members`, { email: `${key}@hub.test`, isProjectAdmin: key === "pm" })).status).toBe(200);
       expect((await admin.post(`/projects/${pid2}/members`, { email: `${key}@hub.test` })).status).toBe(200);
     }
+    // CNS has no member here: works may address it once it is on the project (docs/features/COMPANIES.md).
+    expect((await admin.post(`${P()}/companies`, { companyId: ids.CNS })).status).toBe(200);
     pm = api(await login("pm@hub.test"));
     field = api(await login("field@hub.test"));
     other = api(await login("other@hub.test"));

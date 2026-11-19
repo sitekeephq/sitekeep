@@ -10,6 +10,7 @@ import type { ProjectModule } from "../core/module-state.js";
 import type { CdeCodeScheme, CdeState, CdeWipPolicy, TemplateTaskTeam } from "../documents/cde.js";
 import { cdeTransitionKey } from "../documents/cde.js";
 import type { StepRule } from "../workflow/workflow.js";
+import { CSB_PROJECT_CODE_PATTERN } from "../kernel/naming-csb2026.js";
 import { SHARED_DEFAULT_LANGUAGE, sharedText } from "./i18n.js";
 import type { InvitationDeliveryDto, InvitationLanguage } from "./invitations.js";
 import {
@@ -42,6 +43,11 @@ export interface ProjectSetupDetails {
   location?: string;
   /** The client (appointing party) as written on title blocks. */
   client?: string;
+  /**
+   * ÇŞB EK-1 project code (six characters, e.g. "270001"), given by the authority. Fills the
+   * "{EK1}" token of naming standards (ÇŞB 2026 EK-2 profile: docs/features/NAMING_CSB_2026.md).
+   */
+  csbProjectCode?: string;
 }
 
 /**
@@ -95,7 +101,11 @@ export interface ProjectSetupOverrides {
   taskTeams?: TemplateTaskTeam[];
   /** Folders added below template folders and template folders left out (no state, not referenced). */
   folders?: { add?: ProjectSetupFolderAdd[]; remove?: string[] };
-  /** Name of the naming standard that gives document codes (`cde.containerStandard`). */
+  /**
+   * Name of the naming standard that gives document codes (`cde.containerStandard`). When it differs
+   * from the template's, folders named by the template's document code standard switch to it (e.g.
+   * the ÇŞB 2026 profile instead of the ISO 19650 naming of the Turkish construction template).
+   */
   containerStandard?: string;
   naming?: ProjectSetupNamingValues[];
   workflows?: ProjectSetupStepOverride[];
@@ -251,7 +261,12 @@ export function applySetupOverrides(
     else children.push({ name });
   }
 
-  if (setup.containerStandard !== undefined) cde.containerStandard = setup.containerStandard;
+  if (setup.containerStandard !== undefined) {
+    const previous = cde.containerStandard;
+    if (previous && previous !== setup.containerStandard && template.namingStandards?.some((s) => s.name === setup.containerStandard))
+      replaceFolderNaming(template, previous, setup.containerStandard);
+    cde.containerStandard = setup.containerStandard;
+  }
 
   for (const change of setup.naming ?? []) {
     const standard = template.namingStandards?.find((s) => s.name === change.standard);
@@ -264,7 +279,13 @@ export function applySetupOverrides(
       errors.push(text("namingFieldNotList", { field: change.field }));
       continue;
     }
-    const values = change.values.map((v) => ({ code: v.code.trim(), ...(v.description?.trim() ? { description: v.description.trim() } : {}) }));
+    // Codes the template already has keep their `parents` (dependent lists, e.g. Alt Disiplin / Öge).
+    const parentsOf = new Map(field.values.filter((v) => v.parents).map((v) => [v.code, v.parents!]));
+    const values = change.values.map((v) => {
+      const code = v.code.trim();
+      const parents = parentsOf.get(code);
+      return { code, ...(v.description?.trim() ? { description: v.description.trim() } : {}), ...(parents ? { parents: [...parents] } : {}) };
+    });
     if (!values.length || values.some((v) => !v.code)) {
       errors.push(text("namingValuesEmpty", { field: change.field }));
       continue;
@@ -315,6 +336,19 @@ export function applySetupOverrides(
   return { template, errors: [...new Set(errors)] };
 }
 
+/** Points the folders (and the root) named by `from` at the naming standard `to`. */
+function replaceFolderNaming(template: ProjectTemplate, from: string, to: string): void {
+  if (template.root?.naming === from) template.root.naming = to;
+  const walk = (list: (string | TemplateFolder)[]) => {
+    for (const node of list) {
+      if (typeof node === "string") continue;
+      if (node.naming === from) node.naming = to;
+      if (node.children) walk(node.children);
+    }
+  };
+  walk(template.folders);
+}
+
 /** Problems of the project details (dates, lengths). */
 export function checkSetupDetails(details: ProjectSetupDetails | undefined, lang: string = SHARED_DEFAULT_LANGUAGE): string[] {
   if (!details) return [];
@@ -326,6 +360,8 @@ export function checkSetupDetails(details: ProjectSetupDetails | undefined, lang
     errors.push(sharedText(lang, "setup.endBeforeStart"));
   if ((details.location ?? "").length > 200) errors.push(sharedText(lang, "setup.tooLong", { field: "location", max: 200 }));
   if ((details.client ?? "").length > 200) errors.push(sharedText(lang, "setup.tooLong", { field: "client", max: 200 }));
+  if (details.csbProjectCode && !CSB_PROJECT_CODE_PATTERN.test(details.csbProjectCode))
+    errors.push(sharedText(lang, "setup.csbProjectCodeInvalid", { value: details.csbProjectCode }));
   return errors;
 }
 

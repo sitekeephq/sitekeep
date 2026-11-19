@@ -6,6 +6,10 @@ builds this as one ZIP package, with a metadata manifest, the project's audit lo
 audit chain check, and can then close the project so that nothing changes any more. Part of SiteKeep
 Community ([ISO 19650 conformance](../compliance/ISO19650.md#related-iso-19650-2-clauses)).
 
+The [full project export](PROJECT_EXPORT.md) is built on the same parts (version planning, manifest
+metadata, streaming, limits); it holds the whole project rather than the published record and can be
+restored into another installation.
+
 ## Using it
 
 Project Settings → **Close-out** (project administrators):

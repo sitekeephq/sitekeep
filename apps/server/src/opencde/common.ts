@@ -14,7 +14,7 @@ import { HttpError, forbidden, notFound } from "../core/platform/http.js";
 import { publicBaseUrl, type ResolvedOAuthOptions } from "../oauth/config.js";
 import { isLoopbackUri, matchRegisteredRedirect } from "../oauth/redirect.js";
 import type { Storage } from "../core/platform/storage.js";
-import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
 
 export type DocSessionRow = typeof opencdeDocSessions.$inferSelect;
 export type DocSessionFileRow = typeof opencdeDocSessionFiles.$inferSelect;
@@ -80,7 +80,7 @@ export async function callbackProblem(db: Db, user: AuthUser, url: string): Prom
 }
 
 /** Host the browser returns to, for the pages. */
-export function callbackTarget(url: string, lang: string = DEFAULT_LANGUAGE): string {
+export function callbackTarget(url: string, lang: string = currentLanguage()): string {
   try {
     const u = new URL(url);
     return isLoopbackUri(u) ? render(lang, msg("opencde:thisComputer", { host: `${u.hostname}:${u.port || "80"}` })) : u.host || u.protocol.slice(0, -1);

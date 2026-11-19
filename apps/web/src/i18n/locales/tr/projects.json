@@ -233,7 +233,9 @@
       "endDate": "Bitiş Tarihi",
       "location": "Konum",
       "locationPlaceholder": "İl, ilçe ya da şantiye adresi",
-      "client": "İşveren"
+      "client": "İşveren",
+      "csbProjectCode": "ÇŞB Proje Kodu (EK-1)",
+      "csbProjectCodeHint": "İdarenin verdiği altı karakter (ör. 270001). ÇŞB 2026 isimlendirmesinin Proje Kodu alanını doldurur; henüz bilinmiyorsa boş bırakın."
     },
     "parties": {
       "team": "Görev Ekibi",
@@ -336,7 +338,19 @@
       "digits_other": "{{count}} hane",
       "freeText": "Serbest metin",
       "sample": "Örnek Ad",
-      "sampleOk": "Örnek ad standarda uyuyor."
+      "sampleOk": "Örnek ad standarda uyuyor.",
+      "textLength_one": "{{count}} karakter",
+      "textLength_other": "{{count}} karakter",
+      "charset": {
+        "alphanumeric": "A–Z, 0–9",
+        "alphabetic": "A–Z",
+        "numeric": "0–9"
+      },
+      "suggested": "Önerilen: {{codes}}",
+      "dependsOn": "{{field}} alanına bağlı",
+      "notInCode": "doküman koduna dahil değil",
+      "fromCsbCode": "ÇŞB proje kodundan",
+      "maxLength": "Uzantısız en fazla {{count}} karakter."
     },
     "codes": {
       "suitability": "Uygunluk Kodları",
@@ -412,5 +426,28 @@
       "emailRequired": "Boş e-posta satırlarını doldurun ya da kaldırın.",
       "standard": "{{name}} kodlaması şablonda yok."
     }
+  },
+  "restore": {
+    "action": "Projeyi Geri Yükle",
+    "title": "Bir Dışa Aktarımdan Proje Geri Yükle",
+    "hint": "Bir SiteKeep proje dışa aktarımını (ZIP) yükleyin. Yeni bir proje olarak geri yüklenir: tüm versiyonları ve kodlarıyla dosyalar, durumları ve izinleriyle klasörler, üyeler (e-postayla eşleşir; burada hesabı olmayan kişiler listelenir, oluşturulmaz), roller, görev ekipleri ve sorunlar. Önce her sağlama değeri doğrulanır: değişmiş veya bozulmuş paket reddedilir.",
+    "file": "Dışa aktarım paketi (ZIP)",
+    "code": "Yeni projenin proje kodu",
+    "name": "Proje adı (boş: paketteki ad)",
+    "start": "Yükle ve Geri Yükle",
+    "uploading": "Yükleniyor…",
+    "verifying": "Sağlama değerleri denetleniyor: {{done}} / {{total}}",
+    "importing": "Geri yükleniyor: {{done}} / {{total}} versiyon",
+    "queued": "Sırada",
+    "failed": "Geri yükleme başarısız: {{error}}",
+    "done": "{{code}} projesi geri yüklendi: {{files}} dosya, {{versions}} versiyon, {{topics}} sorun, {{members}} üye.",
+    "unknownUsers": "Bu kurulumda hesabı olmayan kişiler (oluşturulmadı; ekleyip rollerini verin):",
+    "unknownCompanies": "Burada eşleşmeyen firmalar:",
+    "skippedGrants_one": "{{count}} klasör izni alınmadı (kişisi, firması veya rolü eşleşmedi).",
+    "skippedGrants_other": "{{count}} klasör izni alınmadı (kişisi, firması veya rolü eşleşmedi).",
+    "missingVersions": "Pakette baytları olmayan versiyonlar: {{count}}.",
+    "warnings": "Notlar:",
+    "open": "Projeyi Aç",
+    "close": "Kapat"
   }
 }

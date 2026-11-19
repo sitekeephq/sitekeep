@@ -280,7 +280,8 @@ export function DerivativeBadge({ file, projectId }: { file: FileDto; projectId:
 }
 
 export function iconFor(ext: string): string {
-  if (ext === "ifc") return "🧊";
+  // IFC and the formats a module converts to it (Connect: .rvt) open in the model viewer.
+  if (ext === "ifc" || viewerFor(`x.${ext}`).kind === "ifc") return "🧊";
   if (ext === "pdf") return "📕";
   if (["dwg", "dxf"].includes(ext)) return "📐";
   if (["rvt", "nwd", "nwc"].includes(ext)) return "🏗";

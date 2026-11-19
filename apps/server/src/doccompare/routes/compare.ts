@@ -52,7 +52,9 @@ export async function compareRoutes(api: FastifyInstance, deps: AppDeps) {
       source: "deterministic",
     };
     if (!body.ai || !groups.length) return out;
-    const key = `${c.from.versionId}|${c.to.versionId}`;
+    // The AI wording is in the requester's language: cached per language.
+    const lang = requestLanguage(req);
+    const key = `${c.from.versionId}|${c.to.versionId}|${lang}`;
     const cached = body.refresh ? undefined : summaryCache.get(key);
     if (cached) return { ...out, ai: cached, source: "ai", cached: true };
     let provider;
@@ -67,7 +69,7 @@ export async function compareRoutes(api: FastifyInstance, deps: AppDeps) {
       const head =
         `Dosya: ${c.to.fileName}, V${c.from.version} → V${c.to.version}. ` + // i18n-ok: sent to the language model
         `Toplam: ${c.added.length} eklendi, ${c.removed.length} silindi, ${c.changed.length} değişti, ${c.unchanged} aynı.`; // i18n-ok: sent to the language model
-      const ai = await aiCompareSummary(provider, head, groups, ac.signal);
+      const ai = await aiCompareSummary(provider, head, groups, ac.signal, lang);
       if (c.detailed) summaryCache.set(key, ai);
       await audit(db, {
         projectId: p.b.a.project.id,
@@ -89,7 +91,7 @@ export async function compareRoutes(api: FastifyInstance, deps: AppDeps) {
   api.get<{ Params: { pid: string }; Querystring: { from?: string; to?: string } }>("/projects/:pid/compare/report", async (req, reply) => {
     const p = await loadComparePair(deps, req.params.pid, req.query.from, req.query.to, req.user!);
     const c = compareOf(p);
-    const ai = summaryCache.get(`${c.from.versionId}|${c.to.versionId}`) ?? null;
+    const ai = summaryCache.get(`${c.from.versionId}|${c.to.versionId}|${requestLanguage(req)}`) ?? null;
     reply.header("content-type", "text/html; charset=utf-8");
     reply.header("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:");
     return compareReportHtml(c, ai, p.b.a.project.name, requestLanguage(req));

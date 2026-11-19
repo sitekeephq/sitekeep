@@ -460,6 +460,27 @@ describe("build works: RFI, submittal, meetings", () => {
     expect((await aytug.post(`${P()}/works/${c.body.id}/respond`, { outcome: "approved" })).status).toBe(409);
   });
 
+  it("puts an RFI opened without a workflow in its addressees' court (detail, RFI log, report)", async () => {
+    // e.g. imported or set to "acik" by an API client instead of being submitted
+    const w = await semih.post(`${P()}/works`, { typeKey: "rfi", title: "Top kimde", fields: { ...RFI_FIELDS, disiplin: "M - Mekanik" }, toCompanyIds: [ids.HLL] });
+    expect(w.status, JSON.stringify(w.body)).toBe(200);
+    expect((await semih.get(`${P()}/works/${w.body.id}`)).body.build.ballInCourt).toEqual([]);
+    expect((await semih.patch(`${P()}/works/${w.body.id}`, { status: "acik" })).status).toBe(200);
+    const d = (await semih.get(`${P()}/works/${w.body.id}`)).body;
+    expect(d).toMatchObject({ status: "acik", build: { ballInCourt: [ids.HLL] } });
+    expect((await semih.get(`${P()}/rfis/log`)).body.find((l: any) => l.id === w.body.id)).toMatchObject({ ballInCourt: ["HLL"] });
+    const q = await semih.post(`${P()}/reports/query`, {
+      queries: [{ id: "open", spec: { dataset: "rfis", filters: [{ field: "isOpen", op: "eq", value: true }], fields: ["number", "ballInCourt"] } }],
+    });
+    expect(q.status, JSON.stringify(q.body)).toBe(200);
+    expect(q.body.results.open).toContainEqual({ number: d.number, ballInCourt: "HLL" });
+    // Answered: back in the submitter's court; closed: nobody's.
+    expect((await semih.patch(`${P()}/works/${w.body.id}`, { status: "cevaplandi" })).status).toBe(200);
+    expect((await semih.get(`${P()}/works/${w.body.id}`)).body.build.ballInCourt).toEqual([ids.CNS]);
+    expect((await semih.patch(`${P()}/works/${w.body.id}`, { status: "kapandi" })).status).toBe(200);
+    expect((await semih.get(`${P()}/works/${w.body.id}`)).body.build.ballInCourt).toEqual([]);
+  });
+
   it.skipIf(!hasAi)("suggests actions from minutes and drafts RFIs with a (fake) local model", async () => {
     const body = { text: "Kalıp çizimi Aytuğ tarafından 15.11.2026'ya kadar revize edilecek. İSG eğitimi yapılacak." };
     expect((await semih.post(`${P()}/ai/minutes-actions`, body)).status).toBe(503);

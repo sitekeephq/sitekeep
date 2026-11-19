@@ -30,6 +30,10 @@ export default async function globalSetup(config: FullConfig) {
     });
     if (!login.ok()) throw new Error(`E2E login failed (${login.status()}): ${await login.text()}`);
 
+    // Turkish profile first: the project's seeded folder names follow the creator's language.
+    const prefs = await context.patch("/api/v1/me/prefs", { data: { language: E2E_LANGUAGE.value } });
+    if (!prefs.ok()) throw new Error(`E2E language preference failed (${prefs.status()}).`);
+
     const suffix = Date.now().toString(36).toUpperCase();
     const projectResponse = await context.post("/api/v1/projects", {
       data: {
@@ -49,8 +53,6 @@ export default async function globalSetup(config: FullConfig) {
       name: string;
       rootFolderId: string;
     };
-    const prefs = await context.patch("/api/v1/me/prefs", { data: { language: E2E_LANGUAGE.value } });
-    if (!prefs.ok()) throw new Error(`E2E language preference failed (${prefs.status()}).`);
 
     const modulesResponse = await context.get(`/api/v1/projects/${project.id}/modules`);
     if (!modulesResponse.ok()) throw new Error(`E2E module lookup failed (${modulesResponse.status()}).`);

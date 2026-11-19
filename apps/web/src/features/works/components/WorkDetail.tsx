@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  fieldValueLabel,
   type CompanyDto,
   type DeliveryStatus,
   type WorkDetailDto,
@@ -162,7 +163,7 @@ export function WorkDetail({
               <tr key={f.key}>
                 <td>{f.label}</td>
                 <td style={{ whiteSpace: "pre-wrap" }}>
-                  {typeof w.fields[f.key] === "boolean" ? (w.fields[f.key] ? t("common:actions.yes") : t("common:actions.no")) : String(w.fields[f.key])}
+                  {typeof w.fields[f.key] === "boolean" ? (w.fields[f.key] ? t("common:actions.yes") : t("common:actions.no")) : fieldValueLabel(f, String(w.fields[f.key]))}
                 </td>
               </tr>
             ) : null,

@@ -8,20 +8,21 @@ import { joinCompanyTeam } from "../cde/teams.js";
 import { toAuditDtos } from "../audit/query.js";
 import { audit } from "../core/platform/audit.js";
 import { ensureCdeSettings } from "../cde/settings.js";
-import { auditLog, companies, folders, invitations, memberRoles, projectMembers, projectRoles, projects, users } from "../db/schema.js";
-import { badRequest, forbidden, notFound } from "../core/platform/http.js";
-import { msg } from "../i18n/index.js";
+import { auditLog, companies, folders, invitations, memberRoles, projectCompanies, projectMembers, projectRoles, projects, users } from "../db/schema.js";
+import { badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
+import { companyUsedInProject, linkProjectCompanies, listProjectCompanies, projectCompanyIds, requireProjectCompanies } from "./companies.js";
+import { msg, tReq } from "../i18n/index.js";
 import { projectModules } from "./modules.js";
 import { toProjectDto } from "./dto.js";
 import { assertProjectCodeFree } from "./project-templates.js";
 import { ensureDefaultProjectRoles, ensureProjectAdminsHoldAdminRole } from "../core/security/default-roles.js";
 
-/** ISO 19650 container states as top-level folders (folder names are data, written once). */
-const ISO_TEMPLATE: { name: string; state: FolderState }[] = [
-  { name: "01-WIP (Çalışmada)", state: "wip" },  // i18n-ok: data
-  { name: "02-SHARED (Paylaşılan)", state: "shared" },  // i18n-ok: data
-  { name: "03-PUBLISHED (Yayınlanan)", state: "published" },  // i18n-ok: data
-  { name: "04-ARCHIVED (Arşiv)", state: "archived" },  // i18n-ok: data
+/** ISO 19650 container states as top-level folders (folder names are data, written once in the creator's language). */
+const ISO_TEMPLATE: { key: "wip" | "shared" | "published" | "archived"; state: FolderState }[] = [
+  { key: "wip", state: "wip" },
+  { key: "shared", state: "shared" },
+  { key: "published", state: "published" },
+  { key: "archived", state: "archived" },
 ];
 
 export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
@@ -51,6 +52,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
       })
       .parse(req.body);
     await assertProjectCodeFree(db, body.code);
+    const seedText = tReq(req);
     const project = await db.transaction(async (tx) => {
       const [p] = await tx
         .insert(projects)
@@ -58,14 +60,14 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
         .returning();
       const [root] = await tx
         .insert(folders)
-        .values({ projectId: p!.id, parentId: null, name: "Proje Dosyaları", createdBy: req.user!.id })  // i18n-ok: data
+        .values({ projectId: p!.id, parentId: null, name: seedText("projects:seed.rootFolder"), createdBy: req.user!.id })
         .returning();
       if (body.template === "iso19650") {
         await tx.insert(folders).values(
           ISO_TEMPLATE.map((f) => ({
             projectId: p!.id,
             parentId: root!.id,
-            name: f.name,
+            name: seedText(`projects:seed.isoFolders.${f.key}`),
             state: f.state,
             createdBy: req.user!.id,
           })),
@@ -85,6 +87,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
       return updated!;
     });
     await ensureCdeSettings(db, project.id);
+    await linkProjectCompanies(db, project.id, [req.user!.companyId]);
     await audit(db, { projectId: project.id, userId: req.user!.id, action: "project.created", details: body });
     const roleIds = await ensureDefaultProjectRoles(db, project.id, project.rootFolderId);
     const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
@@ -162,6 +165,41 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
     return modules;
   });
 
+  // ---- Companies on the project (docs/features/COMPANIES.md) ----------------------------
+
+  /** The companies on the project: what every picker inside the project offers. */
+  api.get<{ Params: { pid: string } }>("/projects/:pid/companies", async (req) => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    return listProjectCompanies(db, a.project.id);
+  });
+
+  /** Puts a company the caller can see on the project (project administrators). */
+  api.post<{ Params: { pid: string } }>("/projects/:pid/companies", async (req) => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireProjectAdmin(a);
+    const body = z.object({ companyId: z.string().uuid() }).parse(req.body);
+    const before = await projectCompanyIds(db, a.project.id);
+    await requireProjectCompanies(db, a, [body.companyId]);
+    if (!before.has(body.companyId))
+      await audit(db, { projectId: a.project.id, userId: a.user.id, action: "project.company_added", targetType: "company", targetId: body.companyId });
+    return listProjectCompanies(db, a.project.id);
+  });
+
+  /** Takes a company off the project; refused while members, roles, permissions or records use it. */
+  api.delete<{ Params: { pid: string; cid: string } }>("/projects/:pid/companies/:cid", async (req) => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireProjectAdmin(a);
+    const companyId = z.string().uuid().parse(req.params.cid);
+    if (await companyUsedInProject(db, a.project.id, companyId)) throw conflict(msg("projects:errors.companyInUse"));
+    const rows = await db
+      .delete(projectCompanies)
+      .where(and(eq(projectCompanies.projectId, a.project.id), eq(projectCompanies.companyId, companyId)))
+      .returning();
+    if (rows.length)
+      await audit(db, { projectId: a.project.id, userId: a.user.id, action: "project.company_removed", targetType: "company", targetId: companyId });
+    return { ok: true };
+  });
+
   // ---- Members -------------------------------------------------------------------------
 
   api.get<{ Params: { pid: string } }>("/projects/:pid/members", async (req) => {
@@ -198,6 +236,9 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
       .parse(req.body);
     const [user] = await db.select().from(users).where(eq(users.email, body.email));
     if (!user) throw notFound(msg("projects:entities.userCreateFirst"));
+    // A chosen company must be on the project (or be put on it); the person's own company comes with them.
+    if (body.companyId) await requireProjectCompanies(db, a, [body.companyId]);
+    else await linkProjectCompanies(db, a.project.id, [user.companyId]);
     await ensureDefaultProjectRoles(db, a.project.id, a.project.rootFolderId);
     let roleId = body.roleId ?? null;
     let chosenName: string | undefined;
@@ -248,6 +289,7 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
     const body = z
       .object({ companyId: z.string().uuid().nullable().optional(), isProjectAdmin: z.boolean().optional() })
       .parse(req.body);
+    if (body.companyId) await requireProjectCompanies(db, a, [body.companyId]);
     const rows = await db
       .update(projectMembers)
       .set(body)

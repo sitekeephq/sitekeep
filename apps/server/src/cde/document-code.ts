@@ -49,14 +49,18 @@ export function normalizeDocumentCode(code: string): string {
 
 /**
  * The document code a name gives under a standard, or null when the name does not parse. With
- * `allowSuffix`, the free text after the last field is not part of the code.
+ * `allowSuffix`, the free text after the last field is not part of the code; neither are fields
+ * with `inCode: false` (ÇŞB 2026 Revizyon No), so revisions of a document keep its container.
  */
 export function documentCodeOf(standard: NamingStandard | null, name: string): string | null {
   if (!standard) return null;
   const values = parseName(standard, name);
   if (!values) return null;
+  const fields = nameFields(standard);
+  const coded = fields.filter((f) => f.inCode !== false);
+  if (coded.length < fields.length) return coded.map((f) => values[f.name] ?? "").join(standard.delimiter).trim() || null;
   const base = splitExtension(name.trim()).base;
-  const joined = nameFields(standard)
+  const joined = fields
     .map((f) => values[f.name] ?? "")
     .join(standard.delimiter);
   const code = joined && base.startsWith(joined) ? joined : base;

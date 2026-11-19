@@ -243,6 +243,9 @@ ADMIN_PASSWORD=$ADMIN_PASSWORD
 # GOOGLE_CLIENT_ID=
 # GOOGLE_CLIENT_SECRET=
 # GOOGLE_CALLBACK_URL=$PUBLIC_URL/api/v1/auth/google/callback
+# Revit models (Enterprise, Connect; docs/onprem/docker-compose.md#revit-models-enterprise): memory cap of one
+# conversion in MB (default 2048, 0 = none)
+# SITEKEEP_RVT_MEMORY_MB=2048
 EOF
 printf '%s\n' "$INSTALLATION_ID" > "$CDE_HOME/config/installation.id"
 

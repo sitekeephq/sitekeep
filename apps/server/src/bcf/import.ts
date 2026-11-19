@@ -8,7 +8,7 @@
  * chose to overwrite a conflict.
  */
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray, isNull, max } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import {
   bcfToViewpoint,
   can,
@@ -33,9 +33,10 @@ import { fileVersions, files, issueComments, issueRelatedTopics, issueViewpoints
 import { guidFrom, readMarkup, readProject, readVersion, readVisinfo, type ParsedMarkup } from "./bcf-xml.js";
 import { sanitizeSnapshot, toDataUrl, type CleanImage } from "./image.js";
 import { primaryViewpointGuid } from "./topics.js";
+import { nextIssueNumber } from "../coordination/routes/issues.js";
 import { BcfZipError, readBcfZip } from "./unzip.js";
 import { BcfFormatError, BcfUnsafeXmlError } from "./xml.js";
-import { DEFAULT_LANGUAGE, msg, render, tFor, type Msg, type MsgKey } from "../i18n/index.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, render, tFor, type Msg, type MsgKey } from "../i18n/index.js";
 
 export const MAX_TOPICS = 2000;
 
@@ -96,7 +97,7 @@ function normGuid(raw: string, kind: string, warnings: string[], lang: string): 
 }
 
 /** Parses a .bcfzip; warnings are written in `lang` (the importer's language). */
-export async function parseBcfPackage(buf: Buffer, lang = DEFAULT_LANGUAGE): Promise<ParsedBcf> {
+export async function parseBcfPackage(buf: Buffer, lang = currentLanguage()): Promise<ParsedBcf> {
   const t = tFor(lang);
   const { files: entries, skipped } = await readBcfZip(buf);
   const warnings: string[] = [];
@@ -514,14 +515,13 @@ export async function commitImport(
       let changed = false;
       let primaryGuid: string | null = null;
       if (!e) {
-        const [m] = await tx.select({ n: max(issues.number) }).from(issues).where(eq(issues.projectId, a.project.id));
         const id = randomUUID();
         const [row] = await tx
           .insert(issues)
           .values({
             id,
             projectId: a.project.id,
-            number: (m?.n ?? 0) + 1,
+            number: await nextIssueNumber(tx, a.project.id),
             guid: tp.guid,
             ...fields,
             viewpoint: viewpoints[0] ?? null,

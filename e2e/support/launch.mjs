@@ -35,6 +35,9 @@ const child = spawn(process.execPath, [serverEntry], {
   cwd: root,
   stdio: "inherit",
   env: {
+    // The journeys are written against a Turkish installation (admin name, TRY contract defaults);
+    // the English defaults are covered by the server tests (test/works/i18n-139.test.ts and the cost module tests).
+    CDE_DEFAULT_LANGUAGE: "tr",
     ...process.env,
     DATA_DIR: dataDir,
     DATABASE_URL: "memory://",

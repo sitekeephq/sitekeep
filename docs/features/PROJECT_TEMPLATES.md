@@ -21,8 +21,8 @@ features ([ISO 19650 conformance](../compliance/ISO19650.md#covered-by-documents
 |---|---|---|---|
 | `iso19650-temel` | ISO 19650 Basic / ISO 19650 Temel | tr | Four parties, WIP per party, Shared (review, approval), Published, Archived; one naming standard; the D-7 transitions on ([CDE states](CDE_STATES.md#transitions)) |
 | `iso19650-yapim-en` | ISO 19650 Construction Project (multi-party, English names) | en | Client, consultant, designer, contractor: general area with information requirement, BEP / delivery plan and standards folders, WIP per party, Shared (for review, for approval, construction documents), Published (+ as-built), Archived; document and correspondence naming with the UK NA codes; 8 workflows; ISO 19650 rules on; every v2 part |
-| `iso19650-yapim-tr` | ISO 19650 Yapım Projesi (çok taraflı, Türkçe adlarla) | tr | The same in Turkish, with 3-letter Turkish discipline codes (MIM, INS, MEK …) |
-| `metro-ibb` | Metro / Rail System (İBB type) | tr | Zone × discipline × document type skeleton, on-demand folders, party WIP areas 96–99 |
+| `iso19650-yapim-tr` | ISO 19650 Yapım Projesi (çok taraflı, Türkçe adlarla) | tr | The same in Turkish, with 3-letter Turkish discipline codes (MIM, INS, MEK …), plus the [ÇŞB 2026 (EK-2) naming profile](NAMING_CSB_2026.md) as an option for the document code standard |
+| `metro-ibb` | Metro / Rail System (İBB type) | tr | Zone × discipline × document type skeleton, on-demand folders, party WIP areas 96–99; the naming standard on the design and construction state folders (WIP areas free, as in the ISO templates) |
 | `bina-veri-merkezi` | Building (data-centre type) | tr | Demo: state folders, discipline folders in WIP, a data-centre naming system and a four-step approval. Company codes are invented examples |
 
 The two construction templates are generated from one source: see [authoring](#authoring-with-the-generator).
@@ -45,7 +45,7 @@ revisions A, B, C … (projects imported from Autodesk Forma / ACC) are `letter_
   "dimensions": { "Discipline": ["A", "S", "M"] },
   "root": { "naming": "…", "attributes": ["…"], "grants": [{ "slot": "*", "level": "view" }] },
   "folders": [/* tree: name, state, stateLabel, naming, attributes, grants, gate, lazy, children, skeleton */],
-  "namingStandards": [/* tokens {PROJE}, {slot:key}, {firma:key} */],
+  "namingStandards": [/* tokens {PROJE}, {EK1}, {slot:key}, {firma:key} */],
   "attributes": [{ "name": "Sheet / Document Title", "type": "text" }],
   "workflows": [/* steps with { slot } / { role } / { projectRole } assignees, review chains */],
   "modules": { "rfi": true, "forms": false },  // project module switches; missing = on
@@ -64,7 +64,10 @@ with zod (`apps/server/src/projects/template-schemas.ts`) and checks references 
 Unknown top-level keys are ignored.
 
 The folder tree, slots, skeletons, on-demand folders and naming tokens are described in the header of
-`template.ts`; the concept behind them in [concept](../product/CONCEPT.md).
+`template.ts`; the concept behind them in [concept](../product/CONCEPT.md). `{EK1}` is the ÇŞB EK-1
+project code of the project details (`details.csbProjectCode`); a text field with `"fixed": "{EK1}"`
+becomes a one-value list when the code is given and stays a text field otherwise
+([ÇŞB 2026 profile](NAMING_CSB_2026.md)).
 
 ### Per-language values
 
@@ -211,9 +214,6 @@ passes `checkProjectTemplate` and previews without errors.
   `assigneeRule`).
 - Working-day calendars for step durations, and holidays.
 - Importing an Autodesk Forma naming standard workbook into a template's naming standard.
-- A selectable naming profile following the 2026 Turkish Ministry of Environment, Urbanisation and
-  Climate Change (ÇŞB) coding; the Turkish construction template uses the 3-letter discipline codes
-  common on sites.
 - Issue custom fields.
 - The set-up wizard is done ([project set-up wizard](PROJECT_SETUP_WIZARD.md)); its planned additions
   (invitations, disciplines step, verification run) are listed there.
@@ -225,6 +225,7 @@ passes `checkProjectTemplate` and previews without errors.
 | Built-in templates parse, check and preview; projects from them; export round trip | `apps/server/test/projects/templates.test.ts` |
 | Construction templates: generator up to date, both languages, `cde` block, teams, roles, issue types, transmittal, folders for ISO-8 / ISO-14, on-demand folders, part report without modules; per-language values; project-role steps and export; module hook with fake handlers; anonymised demo | `apps/server/test/projects/template-v2.test.ts` |
 | Template `cde` block applied and exported | `apps/server/test/cde/settings.test.ts` |
+| ÇŞB 2026 (EK-2) profile in the Turkish construction template, chosen in the wizard | `apps/server/test/projects/naming-csb2026.test.ts` |
 | Template `deliveryPlan` block applied and exported; duplicate milestones refused | `apps/server/test/cde/delivery-plan.test.ts`, `packages/shared/test/delivery-plan.test.ts` |
 | `patchWorkType` (SDK) | `apps/server/test/projects/template-v2.test.ts` |
 | Module parts against the real modules (run when the installed version has the handler) | `apps/server/test/modules/manage/template-apply.test.ts`, `apps/server/test/modules/field/template-apply.test.ts` |

@@ -247,7 +247,7 @@ function RolePackageWizard({ onClose }: { onClose(): void }) {
   const label = useLabel();
   const project = useProject();
   const { data: packages } = useLoad(() => api.rolePackages(project.id), [project.id]);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const [companyId, setCompanyId] = useState("");
   const [pkg, setPkg] = useState<RolePackageKey>("tasarimci");
   const [useArea, setUseArea] = useState(false);

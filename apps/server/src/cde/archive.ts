@@ -100,6 +100,8 @@ export async function archiveCurrentPublications(db: Db, input: ArchiveInput): P
         derivativeStatus: current.derivativeStatus,
         derivativeKey: current.derivativeKey,
         ifcSummary: current.ifcSummary,
+        ifcKey: current.ifcKey,
+        converter: current.converter,
         suitabilityCode: current.suitabilityCode,
         revisionCode: current.revisionCode,
         codesSetBy: current.codesSetBy,

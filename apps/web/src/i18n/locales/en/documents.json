@@ -153,7 +153,21 @@
     "deleteConfirm": "Delete \"{{name}}\"? The file is moved to the recycle bin; a project administrator can restore it.",
     "ifc": {
       "heading": "IFC Summary",
-      "summary": "Schema: <b>{{schema}}</b> · Project: {{project}} · Elements: <b>{{elements}}</b>"
+      "summary": "Schema: <b>{{schema}}</b> · Project: {{project}} · Elements: <b>{{elements}}</b>",
+      "converted": "Converted automatically from {{format}}{{version}} ({{tool}}).",
+      "approximated_one": "{{count}} element with an approximate shape",
+      "approximated_other": "{{count}} elements with an approximate shape",
+      "experimental": "conversion is experimental for this release",
+      "incomplete": "part of the file was too large to read; the model may be incomplete",
+      "download": "⬇ Download IFC",
+      "downloadHint": "The IFC this version was converted to",
+      "convertAgain": "↻ Convert Again",
+      "convertAgainHint": "Converts this version again with the converter installed now; the current model stays open meanwhile",
+      "convertAgainQueued": "Conversion queued.",
+      "retryFailed": "↻ Convert All Failed Models Again",
+      "retryFailedConfirm": "Convert every model of this project whose conversion failed again?",
+      "retryFailedQueued_one": "{{count}} version queued.",
+      "retryFailedQueued_other": "{{count}} versions queued."
     },
     "otherAttributes": {
       "heading": "Other Attributes"
@@ -166,6 +180,7 @@
       "uploader": "Uploaded By",
       "review": "Review #{{number}}",
       "model": "Model",
+      "ifc": "IFC",
       "compareHint": "Compare with the previous version"
     }
   },
@@ -463,7 +478,7 @@
     "readingTitleBlocks": "Reading PDF title blocks…",
     "suggestionsFound_one": "Title block suggestion: a new standard-compliant name was found for {{count}} file.",
     "suggestionsFound_other": "Title block suggestion: new standard-compliant names were found for {{count}} files.",
-    "aiHint": "Only unclear fields are sent to the local model; the answer is not used if it does not comply with the standard.",
+    "aiHint": "Only unclear fields are sent to the AI model; the answer is not used if it does not comply with the standard.",
     "status": {
       "aiThinking": "AI Is Thinking…"
     },

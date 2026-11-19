@@ -13,6 +13,7 @@ import type { ServerModule } from "../sdk/module.js";
 import { registerLocaleFolder } from "../i18n/index.js";
 import { setLoadingModule } from "./module-owner.js";
 import { registerLegacyConnections } from "../privacy/legacy-connections.js";
+import { registerModelViewerExtensions, setModelFormats } from "../files/model-formats.js";
 
 export { KNOWN_MODULES, moduleIds } from "./module-ids.js";
 import { loadedModuleIds, moduleIds } from "./module-ids.js";
@@ -43,6 +44,10 @@ export function activeModules(): ServerModule[] {
   const on = moduleIds();
   return loaded.filter((m) => on.includes(m.id));
 }
+
+// Model formats (Connect: .rvt) come from the modules that are on, read when a version is converted.
+setModelFormats(() => activeModules().flatMap((m) => m.modelFormats ?? []));
+registerModelViewerExtensions();
 
 for (const m of loadedModules) {
   if (!m.locales) continue;

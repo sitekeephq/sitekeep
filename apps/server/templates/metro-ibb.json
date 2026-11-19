@@ -266,6 +266,7 @@
           "name": "01-Paylaşılan (Shared for Review)",
           "state": "shared",
           "stateLabel": "İnceleme için",
+          "naming": "Metro Kodlama Sistemi",
           "skeleton": {
             "order": [
               "Yapım konusu"
@@ -276,6 +277,7 @@
           "name": "02-Onaya Sunulan (Shared for Approval)",
           "state": "shared",
           "stateLabel": "Onay için",
+          "naming": "Metro Kodlama Sistemi",
           "skeleton": {
             "order": [
               "Yapım konusu"
@@ -285,6 +287,7 @@
         {
           "name": "03-Onaylanan (Published)",
           "state": "published",
+          "naming": "Metro Kodlama Sistemi",
           "skeleton": {
             "order": [
               "Yapım konusu"

@@ -88,7 +88,8 @@
     "columns": {
       "shortCode": "Kısa Kod",
       "address": "Adres",
-      "people": "Kişi"
+      "people": "Kişi",
+      "projects": "Projeler"
     },
     "fields": {
       "addressOf": "{{name}} Adresi",
@@ -100,6 +101,11 @@
     "placeholder": {
       "name": "Firma adı",
       "code": "Kod (ör. PAS)"
+    },
+    "projectFilter": {
+      "label": "Proje",
+      "all": "Tüm Firmalar",
+      "none": "Hiçbir projede değil"
     }
   },
   "googleDomain": {

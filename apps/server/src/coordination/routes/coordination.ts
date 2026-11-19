@@ -226,7 +226,7 @@ async function toSetDto(db: Db, ctx: Ctx, set: SetRow): Promise<ModelSetDto> {
         fileName: r.file.name,
         folderPath: ctx.tree
           .ancestry(r.file.folderId)
-          .map((id) => ctx.tree.get(id).name)
+          .map((id) => ctx.tree.displayName(id))
           .join(" / "),
         resolvedVersionId: r.version?.id ?? null,
         resolvedVersion: r.version?.version ?? null,

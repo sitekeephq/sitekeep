@@ -82,7 +82,8 @@
     "typeKeyFormat": "The key may contain lower-case letters, digits and -.",
     "aiBadTranslation": "The model did not return a valid translation.",
     "fileTooLarge": "The file is larger than the {{mb}} MB limit.",
-    "invalidFileName": "Invalid file name."
+    "invalidFileName": "Invalid file name.",
+    "invalidStatusFor": "\"{{status}}\" is not a status of the work type {{type}}. Valid statuses: {{allowed}}."
   },
   "intake": {
     "wordUnreadable": "The Word file could not be read.",

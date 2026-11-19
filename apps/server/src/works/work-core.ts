@@ -1,12 +1,15 @@
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import {
   ALL_BUILT_IN_WORK_TYPES,
   BUILT_IN_WORK_TYPE_OLD_NAMES,
+  SEEDED_COVER_FOLDER_OLD_NAMES,
+  SEEDED_FOLDER_NAMES,
   WORK_STATUS,
   canEditWork,
   canSeeWork,
   defaultStatuses,
   isSeededDefaultLabel,
+  localizedWorkType,
   numberingScope,
   renderWorkNumber,
   type WorkEventKind,
@@ -19,12 +22,13 @@ import {
 } from "@sitekeep/shared";
 import type { ProjectAccess } from "../core/security/access.js";
 import { badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
-import { msg } from "../i18n/index.js";
+import { currentLanguage, msg } from "../i18n/index.js";
 import type { Storage } from "../core/platform/storage.js";
 import type { Db } from "../db/index.js";
 import {
   companies,
   projectMembers,
+  projectSlots,
   workCounters,
   workEvents,
   workTypes,
@@ -40,10 +44,11 @@ export interface WorksCtx {
   storage: Storage;
 }
 
-export const COVER_FOLDER_NAME = "Gönderim formları"; // i18n-ok: folder name stored as data
-export const COVER_FOLDER_OLD_NAMES = ["Transmittaller"];
-export const LETTER_FOLDER_NAME = "Yazılar"; // i18n-ok: folder name stored as data
-export const INTAKE_FOLDER_NAME = "Gelen belgeler";
+// Built-in folder names (data, found by name; shown translated: shownFolderName).
+export const COVER_FOLDER_NAME = SEEDED_FOLDER_NAMES.covers;
+export const COVER_FOLDER_OLD_NAMES = SEEDED_COVER_FOLDER_OLD_NAMES;
+export const LETTER_FOLDER_NAME = SEEDED_FOLDER_NAMES.letters;
+export const INTAKE_FOLDER_NAME = SEEDED_FOLDER_NAMES.intake;
 
 export function workLink(projectId: string, workId: string) {
   return projectPath(projectId, `works/${workId}`);
@@ -142,7 +147,17 @@ export async function projectTypes(db: Db, projectId: string): Promise<TypeRow[]
   return db.select().from(workTypes).where(eq(workTypes.projectId, projectId)).orderBy(asc(workTypes.createdAt));
 }
 
-export function toTypeDto(t: TypeRow): WorkTypeDto {
+/**
+ * A type as its reader sees it: the seeded default texts of a built-in type (name, field labels,
+ * status labels) in the reader's language; texts the admin changed as written (localizedWorkType).
+ * Only for output: rows written back keep their stored texts.
+ */
+export function shownType(t: TypeRow, lang: string = currentLanguage()): TypeRow {
+  return localizedWorkType(t, lang);
+}
+
+export function toTypeDto(row: TypeRow): WorkTypeDto {
+  const t = shownType(row);
   return {
     id: t.id,
     projectId: t.projectId,
@@ -163,7 +178,7 @@ export function toTypeDto(t: TypeRow): WorkTypeDto {
 }
 
 export function statusDef(t: TypeRow, key: string): WorkStatusDef {
-  return t.statuses.find((s) => s.key === key) ?? { key, label: key, tone: "" };
+  return shownType(t).statuses.find((s) => s.key === key) ?? { key, label: key, tone: "" };
 }
 
 export function initialStatus(t: TypeRow): string {
@@ -243,6 +258,25 @@ export async function companyRows(db: Db, ids: (string | null | undefined)[]): P
   return new Map(rows.map((r) => [r.id, { name: r.name, code: r.code }]));
 }
 
+/**
+ * The parties of the project, for {Gönderen} in numbers: the companies of its template slots
+ * (idare, müşavir, yüklenici …) when it has any, else the project companies of its members. A
+ * member's company outside these (e.g. the operator's own company, brought along as the project
+ * creator's company) is not a party, and its code does not belong in the project's numbers.
+ */
+export async function projectCompanyIds(db: Db, projectId: string): Promise<Set<string>> {
+  const slots = await db
+    .select({ companyId: projectSlots.companyId })
+    .from(projectSlots)
+    .where(and(eq(projectSlots.projectId, projectId), isNotNull(projectSlots.companyId)));
+  if (slots.length) return new Set(slots.map((r) => r.companyId!));
+  const members = await db
+    .select({ companyId: projectMembers.companyId })
+    .from(projectMembers)
+    .where(and(eq(projectMembers.projectId, projectId), isNotNull(projectMembers.companyId)));
+  return new Set(members.map((r) => r.companyId!));
+}
+
 export async function checkCompanies(db: Db, ids: string[]) {
   const unique = [...new Set(ids)];
   if (!unique.length) return;
@@ -301,7 +335,7 @@ export function toSummary(w: WorkRow, t: TypeRow, names: Map<string, string>, to
     projectId: w.projectId,
     typeId: t.id,
     typeKey: t.key,
-    typeName: t.name,
+    typeName: shownType(t).name,
     category: t.category,
     number: w.number,
     title: w.title,

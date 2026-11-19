@@ -9,7 +9,7 @@
  */
 import { inflateRawSync } from "node:zlib";
 import { ZipFile } from "yazl";
-import { DEFAULT_LANGUAGE, tFor } from "../../i18n/index.js";
+import { currentLanguage, tFor } from "../../i18n/index.js";
 
 export type Cell = string | number | null | undefined;
 
@@ -113,7 +113,7 @@ export async function writeXlsx(sheets: Sheet[]): Promise<Buffer> {
 // ---- Reader -------------------------------------------------------------------------------------
 
 /** Entries of a zip file (stored or deflated), read through the central directory. */
-export function unzipEntries(buf: Buffer, limit = 50 * 1024 * 1024, lang: string = DEFAULT_LANGUAGE): Map<string, Buffer> {
+export function unzipEntries(buf: Buffer, limit = 50 * 1024 * 1024, lang: string = currentLanguage()): Map<string, Buffer> {
   const t = tFor(lang);
   const out = new Map<string, Buffer>();
   let eocd = -1;
@@ -171,7 +171,7 @@ function colIndex(ref: string): number {
 }
 
 /** First worksheet as rows of strings. */
-export function readXlsx(buf: Buffer, lang: string = DEFAULT_LANGUAGE): string[][] {
+export function readXlsx(buf: Buffer, lang: string = currentLanguage()): string[][] {
   const files = unzipEntries(buf, undefined, lang);
   const shared = files.get("xl/sharedStrings.xml")?.toString("utf8") ?? "";
   const strings = [...shared.matchAll(/<si>([\s\S]*?)<\/si>/g)].map((m) => textOf(m[1]!));

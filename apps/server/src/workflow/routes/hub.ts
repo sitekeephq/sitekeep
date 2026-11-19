@@ -321,7 +321,7 @@ export async function projectToday(db: Db, a: ProjectAccess, now = new Date(), l
       id: w.id,
       number: w.number,
       title: w.title,
-      typeLabel: t.name,
+      typeLabel: s.typeName,
       statusLabel: s.statusLabel,
       statusTone: s.statusTone,
       dueDate: w.dueDate,

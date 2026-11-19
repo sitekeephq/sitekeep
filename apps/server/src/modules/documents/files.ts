@@ -3,7 +3,7 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 import { can, splitExtension, validateAttributes, validateName, type CdeCodeWarningDto } from "@sitekeep/shared";
 import type { AppDeps } from "../../app/deps.js";
-import { FolderTree, isUuid, projectAccess, requireAction, userNames, type ProjectAccess } from "../../core/security/access.js";
+import { FolderTree, isUuid, projectAccess, requireAction, requireProjectAdmin, userNames, type ProjectAccess } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
 import type { Db } from "../../db/index.js";
 import { fileVersions, files } from "../../db/schema.js";
@@ -13,7 +13,9 @@ import type { StoredObject } from "../../core/platform/storage.js";
 import { standardForFolder } from "../../modules/documents/naming-routes.js";
 import { GATE_MESSAGE, assertDirectWriteAllowed, folderGate } from "../../workflow/service.js";
 import { effectiveDefinitions } from "./attributes.js";
-import { VIEWABLE, addVersion, afterVersionAdded, type FileRow } from "../../files/new-version.js";
+import { addVersion, afterVersionAdded, type FileRow } from "../../files/new-version.js";
+import { isModelFile } from "../../files/model-formats.js";
+import { queueFailedConversions, queueVersionConversion } from "../../files/model-backfill.js";
 import { checkDocumentCode, checkMove, checkUpload } from "../../cde/guards.js";
 import { documentCodeWarning, registerNewFileCode } from "../../cde/document-code.js";
 import { clientInfo, recordTransition, recordView } from "../../cde/events.js";
@@ -324,7 +326,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
         })
         .returning();
       const newFile = await registerNewFileCode(tx as unknown as Db, inserted!, "copy");
-      const pendingDerivative = VIEWABLE.has(splitExtension(name).extension.toLowerCase());
+      const pendingDerivative = isModelFile(name);
       const [version] = await tx
         .insert(fileVersions)
         .values({
@@ -361,12 +363,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
 
   api.get<{ Params: { pid: string; vid: string } }>("/projects/:pid/versions/:vid/download", async (req, reply) => {
     const { a, file, version, tree } = await loadVersion(db, req.params.pid, req.params.vid, req.user!);
-    const perm = tree.permission(a.principal, file.folderId);
-    const own = perm.canUpload && file.createdBy === a.user.id;
-    if (!can(perm.level, "download") && !own) {
-      if (!can(perm.level, "view")) throw notFound(msg("documents:entities.file"));
-      throw forbidden(msg("documents:errors.noDownloadPermission"));
-    }
+    requireDownload(tree, a, file);
     await audit(db, {
       projectId: a.project.id,
       userId: a.user.id,
@@ -376,6 +373,64 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       details: { version: version.version },
     });
     return sendStream(reply, storage.get(version.storageKey), file.name, version.size);
+  });
+
+  /**
+   * The IFC a module converted a version to (Revit .rvt → IFC, docs/features/MODEL_FORMATS.md), kept since the
+   * conversion. Same permission and audit entry as downloading the file itself.
+   */
+  api.get<{ Params: { pid: string; vid: string } }>("/projects/:pid/versions/:vid/ifc", async (req, reply) => {
+    const { a, file, version, tree } = await loadVersion(db, req.params.pid, req.params.vid, req.user!);
+    requireDownload(tree, a, file);
+    let size: number | null = null;
+    if (version.ifcKey) size = await storage.size(version.ifcKey).catch(() => null);
+    if (!version.ifcKey || size === null) throw notFound(msg("documents:errors.ifcNotKept"));
+    await audit(db, {
+      projectId: a.project.id,
+      userId: a.user.id,
+      action: "file.downloaded",
+      targetType: "file",
+      targetId: file.id,
+      details: { version: version.version, format: "ifc" },
+    });
+    return sendStream(reply, storage.get(version.ifcKey), `${splitExtension(file.name).base}.ifc`, size);
+  });
+
+  /**
+   * "Convert again" (project administrators): converts a version of a file a module converts (.rvt) once more with
+   * the converter installed now; a ready model stays open until the new one replaces it.
+   */
+  api.post<{ Params: { pid: string; vid: string } }>("/projects/:pid/versions/:vid/convert-again", async (req) => {
+    const { a, file, version } = await loadVersion(db, req.params.pid, req.params.vid, req.user!);
+    requireProjectAdmin(a);
+    const refused = await queueVersionConversion(db, jobs, version, file.name);
+    if (refused === "notConvertible") throw badRequest(msg("documents:errors.notConvertible"));
+    if (refused === "busy") throw conflict(msg("documents:errors.conversionBusy"));
+    await audit(db, {
+      projectId: a.project.id,
+      userId: a.user.id,
+      action: "file.model_reconverted",
+      targetType: "file",
+      targetId: file.id,
+      details: { version: version.version, status: version.derivativeStatus },
+    });
+    return { queued: 1 };
+  });
+
+  /** "Convert failed models again" for the whole project (project administrators). */
+  api.post<{ Params: { pid: string } }>("/projects/:pid/model-conversions/retry-failed", async (req) => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireProjectAdmin(a);
+    const queued = await queueFailedConversions(db, jobs, a.project.id);
+    await audit(db, {
+      projectId: a.project.id,
+      userId: a.user.id,
+      action: "file.model_retry_failed",
+      targetType: "project",
+      targetId: a.project.id,
+      details: { queued },
+    });
+    return { queued };
   });
 
   /** Viewer derivative (That Open Fragments) of an IFC version. */
@@ -416,7 +471,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
       .where(and(eq(files.projectId, a.project.id), isNull(files.deletedAt)));
     const names = await userNames(db, rows.map((r) => r.file_versions.uploadedBy));
     return rows
-      .filter((r) => VIEWABLE.has(splitExtension(r.files.name).extension.toLowerCase()))
+      .filter((r) => isModelFile(r.files.name))
       .filter((r) => tree.byId.has(r.files.folderId) && can(tree.permission(a.principal, r.files.folderId).level, "view"))
       .filter((r) => req.query.all === "1" || r.file_versions.version === r.files.currentVersion)
       .map((r) => ({
@@ -452,6 +507,15 @@ export async function loadVersion(db: Db, pid: string, vid: string, user: NonNul
   if (!version) throw notFound(msg("documents:entities.version"));
   const r = await loadFile(db, pid, version.fileId, user);
   return { ...r, version };
+}
+
+/** Download permission on the file (or its own uploader); 404 when the caller cannot even see it. */
+export function requireDownload(tree: FolderTree, a: ProjectAccess, file: FileRow) {
+  const perm = tree.permission(a.principal, file.folderId);
+  const own = perm.canUpload && file.createdBy === a.user.id;
+  if (can(perm.level, "download") || own) return;
+  if (!can(perm.level, "view")) throw notFound(msg("documents:entities.file"));
+  throw forbidden(msg("documents:errors.noDownloadPermission"));
 }
 
 export function requireView(tree: FolderTree, a: ProjectAccess, file: FileRow) {

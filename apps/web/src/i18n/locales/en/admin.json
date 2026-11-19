@@ -88,7 +88,8 @@
     "columns": {
       "shortCode": "Short Code",
       "address": "Address",
-      "people": "People"
+      "people": "People",
+      "projects": "Projects"
     },
     "fields": {
       "addressOf": "{{name}} Address",
@@ -100,6 +101,11 @@
     "placeholder": {
       "name": "Company name",
       "code": "Code (e.g. PAS)"
+    },
+    "projectFilter": {
+      "label": "Project",
+      "all": "All Companies",
+      "none": "On no project"
     }
   },
   "googleDomain": {

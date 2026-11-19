@@ -231,13 +231,14 @@ export async function purgeFiles(
 ): Promise<{ versions: number; removedObjects: number }> {
   if (!fileIds.length) return { versions: 0, removedObjects: 0 };
   const versions = await db
-    .select({ id: fileVersions.id, storageKey: fileVersions.storageKey, derivativeKey: fileVersions.derivativeKey })
+    .select({ id: fileVersions.id, storageKey: fileVersions.storageKey, derivativeKey: fileVersions.derivativeKey, ifcKey: fileVersions.ifcKey })
     .from(fileVersions)
     .where(inArray(fileVersions.fileId, fileIds));
   const keys = new Set<string>();
   for (const v of versions) {
     keys.add(v.storageKey);
     if (v.derivativeKey) keys.add(v.derivativeKey);
+    if (v.ifcKey) keys.add(v.ifcKey);
   }
   // Viewer previews (office PDF, sheet JSON, DXF, 2D scenes) belong to one version each.
   const previewKeys = versions.length
@@ -256,10 +257,10 @@ export async function purgeFiles(
   const list = [...keys];
   if (list.length) {
     const stillUsed = await db
-      .select({ storageKey: fileVersions.storageKey, derivativeKey: fileVersions.derivativeKey })
+      .select({ storageKey: fileVersions.storageKey, derivativeKey: fileVersions.derivativeKey, ifcKey: fileVersions.ifcKey })
       .from(fileVersions)
-      .where(or(inArray(fileVersions.storageKey, list), inArray(fileVersions.derivativeKey, list)));
-    const used = new Set(stillUsed.flatMap((v) => [v.storageKey, v.derivativeKey]));
+      .where(or(inArray(fileVersions.storageKey, list), inArray(fileVersions.derivativeKey, list), inArray(fileVersions.ifcKey, list)));
+    const used = new Set(stillUsed.flatMap((v) => [v.storageKey, v.derivativeKey, v.ifcKey]));
     for (const key of list) {
       if (used.has(key)) continue;
       await storage.remove(key);

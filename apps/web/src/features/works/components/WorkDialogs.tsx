@@ -78,7 +78,8 @@ export function FilePickerDialog({
   exclude,
 }: {
   onClose(): void;
-  onPick(versionIds: string[]): void;
+  /** Picked version ids; `names` has the file name of each, in the same order. */
+  onPick(versionIds: string[], names: string[]): void;
   exclude: string[];
 }) {
   const { t } = useTranslation(["works", "common"]);
@@ -86,6 +87,8 @@ export function FilePickerDialog({
   const [q, setQ] = useState("");
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<string[]>([]);
+  // File names of picked versions (kept across searches).
+  const [names, setNames] = useState<Record<string, string>>({});
   const { data, error } = useLoad(() => documentsApi.search(project.id, { q: query }), [project.id, query]);
   useEffect(() => {
     const timer = setTimeout(() => setQuery(q.trim()), 300);
@@ -106,7 +109,10 @@ export function FilePickerDialog({
                   <tr
                     key={f.id}
                     className={`clickable${on ? " selected" : ""}`}
-                    onClick={() => setPicked(on ? picked.filter((x) => x !== f.latest.id) : [...picked, f.latest.id])}
+                    onClick={() => {
+                      setNames((n) => ({ ...n, [f.latest.id]: f.name }));
+                      setPicked(on ? picked.filter((x) => x !== f.latest.id) : [...picked, f.latest.id]);
+                    }}
                   >
                     <td className="pc-inline" style={{ width: 30 }}>
                       <input type="checkbox" readOnly checked={on} style={{ width: "auto" }} />
@@ -128,7 +134,7 @@ export function FilePickerDialog({
         <span className="muted small">{t("filePicker.selected", { count: picked.length })}</span>
         <div className="spacer" />
         <button onClick={onClose}>{t("common:actions.cancel")}</button>
-        <button className="primary" disabled={!picked.length} onClick={() => onPick(picked)}>
+        <button className="primary" disabled={!picked.length} onClick={() => onPick(picked, picked.map((v) => names[v] ?? v))}>
           {t("common:actions.add")}
         </button>
       </div>

@@ -66,6 +66,7 @@ const SENTENCE_TABLES = new Set([
   "MODEL_OP_LABELS_TR", // "içerir", "var", "yok" read inline: "Ad içerir …"
   "ROLE_PACKAGE_ACTION_LABELS_TR", // "Yeni yetki yazılacak": what applying a package does
   "STAGE_REVISE_LABELS_TR", // whole sentences as options
+  "SEEDED_TEXT_LABELS_TR", // stored seed data (folder and role names, role descriptions) matched exactly as written
 ]);
 
 /** Values that are not Title Case (titleCaseTr would change them), as "where: text". */

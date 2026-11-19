@@ -298,6 +298,7 @@
     "partCount_other": "Ad {{expected}} alandan oluşmalı, {{count}} alan var (ayraç \"{{delimiter}}\").",
     "fieldProblem": "{{field}}: {{problem}}",
     "noMatch": "Ad standarda uymuyor.",
+    "tooLong": "Ad {{length}} karakter; uzantısız en fazla {{count}} karakter olabilir.",
     "field": {
       "missing": "eksik",
       "notAllowed": "\"{{value}}\" izinli değerlerden biri değil",
@@ -305,7 +306,13 @@
       "minLength_one": "en az {{count}} karakter",
       "minLength_other": "en az {{count}} karakter",
       "maxLength_one": "en fazla {{count}} karakter",
-      "maxLength_other": "en fazla {{count}} karakter"
+      "maxLength_other": "en fazla {{count}} karakter",
+      "notForParent": "\"{{value}}\", {{field}} \"{{parent}}\" ile kullanılamaz",
+      "charset": {
+        "alphanumeric": "yalnız A–Z büyük harf ve rakam",
+        "alphabetic": "yalnız A–Z büyük harf",
+        "numeric": "yalnız rakam"
+      }
     },
     "standard": {
       "nameEmpty": "Standart adı boş.",
@@ -318,7 +325,11 @@
       "codeHasDelimiter": "\"{{field}}\" alanındaki \"{{code}}\" kodu ayraç içeriyor.",
       "codeDelimiterEdge": "\"{{field}}\" alanındaki \"{{code}}\" kodu ayraçla başlayamaz veya bitemez.",
       "digits": "\"{{field}}\" için hane sayısı 1–12 olmalı.",
-      "digitRange": "\"{{field}}\" için en az/en çok hane 1–12 arasında olmalı (en az ≤ en çok)."
+      "digitRange": "\"{{field}}\" için en az/en çok hane 1–12 arasında olmalı (en az ≤ en çok).",
+      "maxLength": "En uzun ad uzunluğu 1 veya daha büyük bir tam sayı olmalı.",
+      "dependsOn": "\"{{field}}\", \"{{parent}}\" alanına bağlı; bu alan addaki önceki bir liste alanı olmalı.",
+      "parentCodes": "\"{{field}}\", \"{{parent}}\" alanında olmayan kodlara bağlı: {{codes}}.",
+      "charset": "\"{{field}}\" için karakter kümesi bilinmiyor."
     }
   },
   "oauth": {
@@ -543,6 +554,7 @@
     "transitionNotReview": "{{transition}} geçişi inceleme ile yapılmıyor; iş akışı yalnız inceleme geçişlerine seçilir.",
     "dateInvalid": "\"{{value}}\" bir tarih değil (YYYY-AA-GG).",
     "endBeforeStart": "Bitiş tarihi başlangıçtan önce.",
+    "csbProjectCodeInvalid": "ÇŞB proje kodu (EK-1) altı büyük harf veya rakam olmalı (ör. 270001): \"{{value}}\".",
     "tooLong": "{{field}} {{max}} karakteri geçiyor.",
     "tooManyPeople": "Proje kurulurken en fazla {{max}} kişi eklenebilir.",
     "emailInvalid": "\"{{email}}\" bir e-posta adresi değil.",

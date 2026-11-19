@@ -41,19 +41,20 @@ export interface PlannedEntry {
   version: VersionRow;
   latest: boolean;
   folderPath: string;
-  state: CdeState;
+  /** CDE state of the folder (own or nearest ancestor's); null only in a project export. */
+  state: CdeState | null;
 }
 
 const CHUNK = 1000;
 
-function chunks<T>(list: T[], size = CHUNK): T[][] {
+export function chunks<T>(list: T[], size = CHUNK): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
   return out;
 }
 
 /** A folder or file name as one ZIP path segment: no separators, no control characters. */
-function segment(name: string): string {
+export function segment(name: string): string {
   const s = name.replace(/[\\/]/g, "_").replace(/[\u0000-\u001f]/g, "").trim();
   return s === "" || s === "." || s === ".." ? "_" : s;
 }
@@ -62,28 +63,51 @@ export function statesOf(options: Pick<CloseoutOptions, "includeShared">): CdeSt
   return options.includeShared ? ["shared", "published", "archived"] : ["published", "archived"];
 }
 
-/** The folders in the chosen states, with their path from the project root (root left out). */
-function stateFolders(tree: FolderTree, states: CdeState[]): Map<string, { path: string; state: CdeState }> {
-  const out = new Map<string, { path: string; state: CdeState }>();
+/**
+ * Folders picked by `pick` (given the folder and its CDE state), with their path from the project
+ * root (root left out) and their state. Shared with the project export (portability/collect.ts).
+ */
+export function pickFolders(tree: FolderTree, pick: (folderId: string, state: CdeState | null) => boolean): Map<string, { path: string; state: CdeState | null }> {
+  const out = new Map<string, { path: string; state: CdeState | null }>();
   for (const f of tree.byId.values()) {
     const state = cdeStateOf(tree, f.id);
-    if (!state || !states.includes(state)) continue;
-    const names = tree
-      .ancestry(f.id)
-      .map((id) => tree.get(id))
-      .filter((x) => x.parentId !== null)
-      .map((x) => segment(x.name));
-    out.set(f.id, { path: names.join("/"), state });
+    if (!pick(f.id, state)) continue;
+    out.set(f.id, { path: folderPathOf(tree, f.id), state });
   }
   return out;
+}
+
+/** A folder's path from the project root (root left out), as ZIP path segments. */
+export function folderPathOf(tree: FolderTree, folderId: string): string {
+  return tree
+    .ancestry(folderId)
+    .map((id) => tree.get(id))
+    .filter((x) => x.parentId !== null)
+    .map((x) => segment(x.name))
+    .join("/");
 }
 
 /** The versions of the archive, in folder and name order, each with a unique path under files/. */
 export async function planEntries(db: Db, projectId: string, options: Pick<CloseoutOptions, "includeShared" | "versions">, tree?: FolderTree): Promise<{ tree: FolderTree; entries: PlannedEntry[] }> {
   tree ??= await FolderTree.load(db, projectId);
-  const folderMap = stateFolders(tree, statesOf(options));
+  const states = statesOf(options);
+  const folderMap = pickFolders(tree, (_id, state) => !!state && states.includes(state));
+  return { tree, entries: await planVersions(db, projectId, folderMap, options.versions) };
+}
+
+/**
+ * The versions of the files in the given folders (all, or the current one of each file), in folder
+ * and name order, each with a unique path under files/: the current version keeps the file's name,
+ * older ones are `name (V2).ext`, names that differ only in case get ` (2)`.
+ */
+export async function planVersions(
+  db: Db,
+  projectId: string,
+  folderMap: Map<string, { path: string; state: CdeState | null }>,
+  versions: CloseoutOptions["versions"],
+): Promise<PlannedEntry[]> {
   const entries: PlannedEntry[] = [];
-  if (!folderMap.size) return { tree, entries };
+  if (!folderMap.size) return entries;
   const fileRows: FileRow[] = [];
   for (const ids of chunks([...folderMap.keys()]))
     fileRows.push(...(await db.select().from(files).where(and(eq(files.projectId, projectId), inArray(files.folderId, ids), isNull(files.deletedAt)))));
@@ -91,7 +115,7 @@ export async function planEntries(db: Db, projectId: string, options: Pick<Close
   const versionRows: VersionRow[] = [];
   for (const ids of chunks([...byFile.keys()])) {
     const rows = await db.select().from(fileVersions).where(inArray(fileVersions.fileId, ids));
-    versionRows.push(...(options.versions === "all" ? rows : rows.filter((v) => v.version === byFile.get(v.fileId)!.currentVersion)));
+    versionRows.push(...(versions === "all" ? rows : rows.filter((v) => v.version === byFile.get(v.fileId)!.currentVersion)));
   }
   for (const v of versionRows) {
     const file = byFile.get(v.fileId)!;
@@ -113,7 +137,7 @@ export async function planEntries(db: Db, projectId: string, options: Pick<Close
     used.add(p.toLowerCase());
     e.path = p;
   }
-  return { tree, entries };
+  return entries;
 }
 
 /** Files, versions and bytes the archive would hold, for each choice of options. */
@@ -236,7 +260,7 @@ export async function describeEntries(db: Db, projectId: string, tree: FolderTre
       containerId: e.file.containerId,
       revision: v.revisionCode ?? null,
       suitability: v.suitabilityCode ?? null,
-      cdeState: e.state,
+      cdeState: e.state ?? "",
       cdeStatus: e.file.cdeStatus ?? null,
       size: v.size,
       sha256: v.sha256,

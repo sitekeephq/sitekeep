@@ -7,6 +7,7 @@
  */
 import type { AntetFieldKey } from "./docintel.js";
 import type { CadCompareSummary, ModelCompareSummary } from "./version-compare.js";
+import { viewerForExtension } from "../viewers/viewers.js";
 
 /** "dwg" covers DWG and DXF drawings, "ifc" IFC models (FP-1, docs/features/DOCUMENT_COMPARISON.md). */
 export type DocCompareKind = "pdf" | "xlsx" | "csv" | "docx" | "text" | "dwg" | "ifc";
@@ -212,6 +213,8 @@ export const DOC_COMPARE_EXTENSIONS: Record<DocCompareKind, string[]> = {
 export function docCompareKind(extension: string): DocCompareKind | null {
   const e = extension.toLowerCase();
   for (const [k, list] of Object.entries(DOC_COMPARE_EXTENSIONS)) if (list.includes(e)) return k as DocCompareKind;
+  // Formats a module converts to IFC (Connect: .rvt) compare like IFC: through their element index.
+  if (viewerForExtension(e).kind === "ifc") return "ifc";
   return null;
 }
 

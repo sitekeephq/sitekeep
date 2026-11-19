@@ -15,6 +15,7 @@ import {
 } from "@sitekeep/shared";
 import type { AiProvider } from "../ai/provider.js";
 import { extractJson } from "../ai/json.js";
+import { answerLanguageRule } from "../ai/language.js";
 import { modelQuerySchema, normalizeQuery } from "./query.js";
 import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
 
@@ -188,6 +189,7 @@ export async function aiCompareSummary(
   head: string,
   groups: CompareGroupDto[],
   signal?: AbortSignal,
+  lang: string = DEFAULT_LANGUAGE,
 ): Promise<{ bullets: { text: string; groupIds: string[] }[]; model: string }> {
   const shown = groups.slice(0, 20);
   const lines = shown.map((g) => `${g.id}: ${g.text}`);
@@ -197,10 +199,11 @@ export async function aiCompareSummary(
         role: "system",
         content:
           "Sen bir BIM koordinatörüsün. İki IFC model versiyonu arasındaki değişiklik grupları verilecek (id: metin). " + // i18n-ok: prompt
-          "Bunları Türkçe, en fazla 5 kısa maddede özetle; önemli olanlar (yangın, taşıyıcı, silinen ve eklenen elemanlar) önce. " + // i18n-ok: prompt
+          "Bunları en fazla 5 kısa maddede özetle; önemli olanlar (yangın, taşıyıcı, silinen ve eklenen elemanlar) önce. " + // i18n-ok: prompt
           "Benzer grupları bir maddede birleştirebilirsin. Yalnızca gruplardaki kat, sınıf, sayı ve değerleri kullan; hiçbir şey uydurma. " + // i18n-ok: prompt
           "Her maddenin refs alanına dayandığı grup id'lerini yaz. " + // i18n-ok: prompt
-          'Yalnızca JSON döndür: {"bullets":[{"text":"…","refs":["g…"]}]}', // i18n-ok: prompt
+          'Yalnızca JSON döndür: {"bullets":[{"text":"…","refs":["g…"]}]}. ' + // i18n-ok: prompt
+          answerLanguageRule(lang),
       },
       { role: "user", content: `${head}\nGruplar:\n${lines.join("\n")}` },
     ],

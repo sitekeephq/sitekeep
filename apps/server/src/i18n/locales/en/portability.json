@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "export": "Project export",
+    "import": "Project restore"
+  },
+  "errors": {
+    "busy": "An export of this project is being built. Wait until it is finished.",
+    "notReady": "The export is not ready to download.",
+    "expired": "The download period of this export is over and its file was deleted. Create a new export.",
+    "fullExportAdminOnly": "This export was made by a system administrator and holds the whole project: only a system administrator can download or delete it.",
+    "importAdminOnly": "Only a system administrator can restore a project: it creates a new project.",
+    "noFile": "Choose the export package (ZIP) to restore.",
+    "fileTooLarge": "The package is larger than the upload limit of this installation.",
+    "codeRequired": "Enter a project code for the restored project."
+  },
+  "import": {
+    "notZip": "The file is not a readable ZIP package: {{detail}}",
+    "tooManyEntries": "The package has more than {{max}} entries.",
+    "unsafePath": "The package contains an unsafe entry name: {{name}}",
+    "duplicateEntry": "The package contains the entry {{name}} twice.",
+    "missingEntry": "The package is incomplete: {{name}} is missing.",
+    "unlistedEntry": "The package contains {{name}}, which its checksum list does not name.",
+    "partTooLarge": "The part {{name}} is too large to read.",
+    "badJson": "The part {{name}} is not valid JSON.",
+    "badSums": "The checksum list (SHA256SUMS) of the package is not valid or does not agree with manifest.json.",
+    "checksumMismatch": "Checksum mismatch: {{name}} was changed or damaged after the export. Nothing was restored.",
+    "wrongSchema": "This is not a SiteKeep project export of a known version ({{schema}}; expected {{expected}}).",
+    "uploadGone": "The uploaded package is no longer available. Upload it again.",
+    "fileWithoutFolder": "{{name}}: its folder is not in the package; the file was left out.",
+    "hashDiffers": "{{path}}: the bytes differ from the SHA-256 recorded at upload in the source (already reported by the export); restored as they are.",
+    "transitionsOff": "The source project enforced the ISO 19650 state transitions. The transition table is not part of the package: set it up in Project Settings → CDE, then turn enforcement on again."
+  },
+  "notifications": {
+    "exportReady": "Project export ready",
+    "exportReadyBody": "{{files}} files ({{versions}} versions) and {{issues}} issues. Download it from Project Settings → Export.",
+    "exportFailed": "Project export failed",
+    "importReady": "Project restored",
+    "importReadyBody": "The project {{code}} was restored. People without an account here: {{unknown}}.",
+    "importFailed": "Project restore failed"
+  },
+  "readme": {
+    "title": "SiteKeep full project export",
+    "project": "Project: {{code}} {{name}}",
+    "created": "Created: {{at}} by {{user}}",
+    "scopeFull": "Scope: the whole project (exported by a system administrator).",
+    "scopeVisible": "Scope: what the person who exported it can see (folder permissions and the task team WIP rule).",
+    "counts": "{{files}} files, {{versions}} versions, {{bytes}} bytes, {{issues}} issues.",
+    "purpose": "The package holds the project's information in open formats (JSON, CSV, BCF 3.0) so that it can be restored into another SiteKeep installation or read by another CDE. Format: {{schema}}, described in docs/features/PROJECT_EXPORT.md of SiteKeep.",
+    "contents": "Contents:",
+    "manifest": "schema version, project, counts, the list of parts and the checksum of every entry",
+    "sums": "SHA-256 of every entry (sha256sum -c SHA256SUMS)",
+    "projectJson": "project, CDE settings, naming standards",
+    "folders": "folder tree with CDE states and folder permissions",
+    "filesJson": "every file with all its versions: document code, codes, state, SHA-256, approvals",
+    "files": "the bytes of every version in the folder structure (older versions as \"name (V2).ext\")",
+    "members": "members, companies, roles and task teams",
+    "reviews": "reviews, workflow steps and every reviewer's mark",
+    "transmittals": "transmittals with their files, events and receipts",
+    "supersessions": "ISO 19650 supersession links between versions",
+    "issues": "issues as BCF 3.0",
+    "audit": "the project's audit log (without IP addresses and user agents)",
+    "check": "Check the package: sha256sum -c SHA256SUMS (macOS: shasum -a 256 -c SHA256SUMS)."
+  }
+}

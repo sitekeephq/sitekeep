@@ -28,8 +28,8 @@ test("metraj inventory, group elements, grouping, version difference and Excel e
   await test.step("inventory of the current version", async () => {
     const totals = page.getByLabel("Toplamlar");
     await expect(totals.locator(".metric").filter({ hasText: "Eleman" })).toContainText("8");
-    await expect(totals.locator(".metric").filter({ hasText: "Net Alan" })).toContainText("56,89");
-    await expect(page.getByText("1 miktarsız")).toBeVisible();
+    await expect(totals.locator(".metric").filter({ hasText: "Net Alan" })).toContainText("58,89");
+    await expect(page.getByText("1 geometriden")).toBeVisible();
     const wall = row("Duvar · Zemin Kat");
     await expect(wall.locator('td[data-label="Brüt Alan (m²)"]')).toHaveText("15");
     await expect(wall.locator('td[data-label="Boşluk (m²)"]')).toHaveText("6");
@@ -58,7 +58,7 @@ test("metraj inventory, group elements, grouping, version difference and Excel e
     await expect(page).toHaveURL(new RegExp(`from=${v1.versionId}`));
     await expect(page.getByText("V1 → V2: 4 grupta metraj değişti, 5 grup aynı.")).toBeVisible();
     const totals = page.getByLabel("Fark Toplamları");
-    await expect(totals.locator(".metric").filter({ hasText: "Net Alan" })).toContainText("70,39 → 56,89");
+    await expect(totals.locator(".metric").filter({ hasText: "Net Alan" })).toContainText("72,39 → 58,89");
     await expect(totals.locator(".metric").filter({ hasText: "Net Alan" })).toContainText("-13,5");
 
     const groups = page.locator("table.qty-table").first();

@@ -307,7 +307,7 @@ function AutomationSettings() {
   const label = useLabel();
   const project = useProject();
   const { data: rows, reload } = useLoad(() => worksApi.automation(project.id), [project.id]);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const [msg, setMsg] = useState<string | null>(null);
 
   async function save(r: WorkAutomationDto, patch: Partial<WorkAutomationDto>) {
@@ -409,7 +409,7 @@ function AutomationSettings() {
 function NumberingPresets({ onDone }: { onDone(): void }) {
   const { t } = useTranslation("projectSettings");
   const presetLabel = (k: BuildNumberingPreset) =>
-    k === "standart" ? t("numbering.presets.standart") : BUILD_NUMBERING_PRESETS[k].label;
+    k === "zavm" ? BUILD_NUMBERING_PRESETS[k].label : t(`numbering.presets.${k}`);
   const project = useProject();
   const [msg, setMsg] = useState<string | null>(null);
   async function apply(preset: BuildNumberingPreset) {
@@ -436,7 +436,11 @@ function NumberingPresets({ onDone }: { onDone(): void }) {
         <Trans
           t={t}
           i18nKey="numbering.hint"
-          values={{ standard: BUILD_NUMBERING_PRESETS.standart.patterns.rfi, zavm: BUILD_NUMBERING_PRESETS.zavm.patterns.rfi }}
+          values={{
+            standard: BUILD_NUMBERING_PRESETS.standart.patterns.rfi,
+            project: BUILD_NUMBERING_PRESETS.proje.patterns.rfi,
+            zavm: BUILD_NUMBERING_PRESETS.zavm.patterns.rfi,
+          }}
           components={{ code: <span className="mono" /> }}
         />
       </p>

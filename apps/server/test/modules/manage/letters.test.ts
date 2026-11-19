@@ -159,6 +159,8 @@ describe("yazışmalar (official letters on works)", () => {
       ids[key] = (await admin.post("/users", { email: `${key}@yz.test`, name, password: PW, companyId: ids[company] })).body.id;
       expect((await admin.post(`${P()}/members`, { email: `${key}@yz.test` })).status).toBe(200);
     }
+    // NOM has no member here: letters may address it once it is on the project (docs/features/COMPANIES.md).
+    expect((await admin.post(`${P()}/companies`, { companyId: ids.NOM })).status).toBe(200);
     murat = api(await login("murat@yz.test"));
     eve = api(await login("eve@yz.test"));
     semih = api(await login("semih@yz.test"));

@@ -20,7 +20,8 @@ import { msg } from "../i18n/index.js";
 
 /**
  * Write routes a closed project still answers: reading POSTs (as for read-only tokens), bulk
- * download and previews (viewing), the close-out archive itself and its reopening, and the members
+ * download and previews (viewing), the close-out archive itself and its reopening, the full project
+ * export, and the members
  * and invitations (people who need to read the archived project, e.g. the operations team).
  */
 const OPEN_WHEN_CLOSED = new Set([
@@ -31,6 +32,9 @@ const OPEN_WHEN_CLOSED = new Set([
   "/api/v1/projects/:pid/closeout/archives",
   "/api/v1/projects/:pid/closeout/archives/:id",
   "/api/v1/projects/:pid/reopen",
+  // Full project export (docs/features/PROJECT_EXPORT.md): taking the data out of a closed project.
+  "/api/v1/projects/:pid/exports",
+  "/api/v1/projects/:pid/exports/:id",
 ]);
 const MEMBERS = /^\/api\/v1\/projects\/:pid\/(members|invitations)(\/|$)/;
 

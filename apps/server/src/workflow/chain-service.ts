@@ -145,7 +145,7 @@ export function folderPath(tree: FolderTree, folderId: string, lang: string = DE
   return tree.byId.has(folderId)
     ? tree
         .ancestry(folderId)
-        .map((id) => tree.get(id).name)
+        .map((id) => tree.displayName(id, lang))
         .join(" / ")
     : render(lang, msg("workflow:messages.deletedFolder"));
 }

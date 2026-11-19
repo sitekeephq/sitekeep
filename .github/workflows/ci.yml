@@ -42,6 +42,9 @@ jobs:
       - name: Install Playwright browsers
         timeout-minutes: 20
         run: |
+          # A timed-out attempt leaves its apt-get running with the dpkg lock: the next attempt waits for it
+          # instead of failing at once with "Could not get lock" (exit 100).
+          echo 'DPkg::Lock::Timeout "600";' | sudo tee /etc/apt/apt.conf.d/99-wait-for-lock >/dev/null
           for i in 1 2 3; do
             timeout 360 npx playwright install --with-deps chromium webkit && exit 0
             echo "::warning::playwright install attempt $i did not finish; retrying"

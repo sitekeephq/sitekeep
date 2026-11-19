@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { type CompanyDto, type MemberDto, type WorkDetailDto, type WorkFlowStepDto } from "@sitekeep/shared";
+import { type CompanyDto, type MemberDto, type WorkCategory, type WorkDetailDto, type WorkFlowStepDto } from "@sitekeep/shared";
 import { formatDate, intlLocale } from "../../../shared/api/api";
 import { buildApi } from "../../../shared/api/api-works";
 import { useAsk } from "../../../shared/ui/Ask";
@@ -19,6 +19,11 @@ const STEP_STATE: Record<WorkFlowStepDto["state"], [string, string]> = {
   returned: ["✗", "danger"],
   skipped: ["–", ""],
 };
+
+/** Label of the cancel button by type ("Cancel RFI", "Cancel Submittal"): an RFI is not a letter. */
+export function cancelLabelKey(category: WorkCategory) {
+  return category === "rfi" ? "build.actions.cancelRfi" : category === "submittal" ? "build.actions.cancelSubmittal" : "build.actions.cancel";
+}
 
 export function BuildPanel({
   w,
@@ -42,6 +47,7 @@ export function BuildPanel({
   const [comment, setComment] = useState("");
   if (!b) return null;
   const n = (id: string) => w.names[id] ?? companies.find((c) => c.id === id)?.name ?? "?";
+  const cancelLabel = cancelLabelKey(b.category);
 
   async function act(fn: () => Promise<unknown>) {
     setMsg(null);
@@ -87,16 +93,16 @@ export function BuildPanel({
               className="danger"
               onClick={() =>
                 void confirm({
-                  title: t("build.cancel.title"),
+                  title: t(cancelLabel),
                   message: t("build.cancel.confirm"),
-                  confirmLabel: t("letter.actions.cancel"),
+                  confirmLabel: t(cancelLabel),
                   danger: true,
                 }).then((ok) => {
                   if (ok) return act(() => buildApi.cancel(project.id, w.id));
                 })
               }
             >
-              {t("letter.actions.cancel")}
+              {t(cancelLabel)}
             </button>
           )}
         </div>

@@ -10,7 +10,11 @@
         "closeout_archive_downloaded": "Close-out archive downloaded",
         "closeout_archive_deleted": "Close-out archive deleted",
         "closed": "Project closed (read-only)",
-        "reopened": "Project reopened"
+        "reopened": "Project reopened",
+        "exported": "Project exported",
+        "export_downloaded": "Project export downloaded",
+        "export_deleted": "Project export deleted",
+        "imported": "Project restored from an export"
       },
       "member": {
         "added": "Member added",
@@ -43,6 +47,8 @@
         "deleted": "File deleted",
         "downloaded": "File downloaded",
         "zip_downloaded": "Bulk download (zip)",
+        "model_reconverted": "Model conversion started again",
+        "model_retry_failed": "Failed model conversions started again",
         "restored": "File restored",
         "purged": "File permanently deleted",
         "attributes_updated": "File attributes changed",
@@ -368,7 +374,7 @@
         "chooseUser": "Choose a User…"
       },
       "roleLabel": "Role",
-      "hint": "Choose a person with an account here; invite people without an account by e-mail below."
+      "hint": "Choose someone from your projects; add anyone else by e-mail below (an existing account is added at once, without an invitation)."
     },
     "pending": "Invited",
     "pendingHint": "Has not accepted the invitation yet; cannot sign in.",
@@ -656,9 +662,10 @@
     "applied": "{{preset}} applied. New numbers are given with this pattern.",
     "heading": "RFI and Submittal Numbers",
     "presets": {
-      "standart": "Standard"
+      "standart": "Standard",
+      "proje": "Project code first"
     },
-    "hint": "Standard: <code>{{standard}}</code> · ZAVM: <code>{{zavm}}</code>. The counter runs separately per discipline; {Konu} is not part of the counter."
+    "hint": "Standard: <code>{{standard}}</code> · Project code first: <code>{{project}}</code> · ZAVM: <code>{{zavm}}</code>. The counter runs separately per discipline; {Konu} is not part of the counter. {Gönderen} is the creator's company in this project; for someone without one, the project code stands in, and {Alıcı} without a recipient is X."
   },
   "locations": {
     "remove": {
@@ -936,6 +943,62 @@
       "action": "Delete File",
       "title": "Delete the archive file?",
       "confirm": "The ZIP is deleted now instead of at the end of its download period. The record of the archive stays in the list and in the audit log."
+    }
+  },
+  "companies": {
+    "heading": "Companies on This Project",
+    "hint": "Only these companies appear in the project's lists (member company, task teams, permissions, issue and record recipients). Other projects' companies are not shown here.",
+    "columns": {
+      "name": "Company",
+      "code": "Code"
+    },
+    "empty": "No companies on this project yet.",
+    "add": {
+      "label": "Company to add to the project",
+      "choose": "Choose a Company…"
+    },
+    "remove": {
+      "title": "Remove Company",
+      "confirm": "Remove {{name}} from this project? It stays in the company list.",
+      "action": "Remove"
+    }
+  },
+  "export": {
+    "heading": "Full Project Export",
+    "description": "Take the project's data out of SiteKeep in open formats: one ZIP with the folder tree, every version of every file with its attributes, document code, suitability and revision codes, CDE state and SHA-256, the issues as BCF 3.0, reviews with their approval steps, transmittals, the audit log (CSV and JSON), members, roles, task teams and folder permissions, a manifest and a checksum list. It can be restored into another SiteKeep installation. The export is built in the background and you get a notification when it is ready; it can be downloaded for {{days}} days, then its file is deleted.",
+    "scope": {
+      "full": "Scope: the whole project (you are a system administrator).",
+      "visible": "Scope: what you can see in this project (folder permissions and the task team WIP rule apply). A system administrator's export holds everything.",
+      "fullShort": "Whole project",
+      "visibleShort": "What the exporter can see"
+    },
+    "estimate": "Files: {{files}} ({{versions}} versions, {{size}}).",
+    "limit": "Limit: {{size}}.",
+    "create": "Create Export",
+    "columns": {
+      "created": "Created",
+      "contents": "Contents",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "counts": "{{files}} files, {{versions}} versions, {{topics}} issues, {{size}}",
+    "countsPending": "{{versions}} versions, {{size}}",
+    "download": "Download",
+    "expires": "Can be downloaded until {{date}}",
+    "remove": {
+      "title": "Delete Export File",
+      "confirm": "Delete the ZIP of this export now? The row stays in the list.",
+      "action": "Delete File"
+    },
+    "status": {
+      "queued": "Queued",
+      "running": "Building: {{done}} / {{total}} versions",
+      "progress": "Export progress",
+      "failed": "Failed",
+      "expired": "Expired",
+      "done": "Ready",
+      "problems_one": "Ready, {{count}} file missing or changed",
+      "problems_other": "Ready, {{count}} files missing or changed"
     }
   }
 }

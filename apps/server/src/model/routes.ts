@@ -117,7 +117,7 @@ export async function modelRoutes(api: FastifyInstance, deps: AppDeps) {
     }
     if (pending.length) throw preparing(pending);
     const candidates = indexed.flatMap(({ v, index }) =>
-      versionCandidates(index, { versionId: v.version.id, modelName: v.file.name.replace(/\.ifc$/i, "") }),
+      versionCandidates(index, { versionId: v.version.id, modelName: v.file.name.replace(/\.[^.]+$/, "") }),
     );
     return {
       v: indexed[0]!.v,

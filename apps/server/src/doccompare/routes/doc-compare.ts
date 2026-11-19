@@ -225,7 +225,8 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
     const body = z.object({ force: z.boolean().optional() }).parse(req.body ?? {});
     if (l.row.status !== "done" || !l.row.result) throw new HttpError(409, "not_ready", msg("doccompare:errors.textNotReady"));
     if (isVersionCompareKind((l.row.result as DocCompareResult).kind)) throw badRequest(msg("doccompare:versionDiff.errors.noAiSummary"));
-    const { provider, note } = await providerOrNote(db, secretKey, l.a.project.id, requestLanguage(req));
+    const lang = requestLanguage(req);
+    const { provider, note } = await providerOrNote(db, secretKey, l.a.project.id, lang);
     if (!provider) throw new HttpError(409, "ai_unavailable", note ?? msg("doccompare:errors.aiUnavailable"));
     const cached = l.row.aiStatus === "done" && !body.force;
     if (!cached && !service.isAiRunning(l.row.id)) {
@@ -242,6 +243,7 @@ export async function docCompareRoutes(api: FastifyInstance, deps: ResolvedDeps)
           result,
           regions,
           flags: compareFlags(result, regions, PROMPT_LANGUAGE),
+          lang,
         };
       });
       if (started)

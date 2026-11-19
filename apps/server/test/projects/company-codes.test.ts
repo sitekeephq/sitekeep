@@ -97,6 +97,8 @@ describe("company short codes", () => {
     expect(p.status).toBe(200);
     const P = `/projects/${p.body.id}`;
     expect((await admin.post(`${P}/members`, { email: "pelin@7d.test" })).status).toBe(200);
+    // Recipients without members here go on the project first (docs/features/COMPANIES.md).
+    for (const id of [co.HILL, co.IBB]) expect((await admin.post(`${P}/companies`, { companyId: id })).status).toBe(200);
 
     // Sender with a code, receiver without one → its code comes from the name (ASCII, no "İ").
     const a = await pelin.post(`${P}/works`, { typeKey: "giden-yazi", title: "Hilal'e", toCompanyIds: [co.HILL] });

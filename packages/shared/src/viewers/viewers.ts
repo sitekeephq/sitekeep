@@ -75,6 +75,21 @@ for (const [kind, exts] of Object.entries(VIEWER_EXTENSIONS) as [Exclude<ViewerK
   for (const e of exts) BY_EXT.set(e, kind);
 }
 
+/**
+ * Opens another extension with the model viewer: a module that converts the format to IFC on the server
+ * (Connect: "rvt"). The core and the web call it for the modules that are on; extensions the table
+ * already maps are left alone.
+ */
+export function registerModelExtension(extension: string): void {
+  const ext = extension.trim().replace(/^\.+/, "").toLowerCase();
+  if (ext && !BY_EXT.has(ext)) BY_EXT.set(ext, "ifc");
+}
+
+/** Extensions the model viewer opens: IFC and those modules registered. */
+export function modelExtensions(): string[] {
+  return [...BY_EXT].filter(([, kind]) => kind === "ifc").map(([ext]) => ext);
+}
+
 /** Derivatives built on upload, per viewer. */
 function previewsOf(kind: ViewerKind, ext: string): { previews: PreviewKind[]; onDemand: PreviewKind[] } {
   switch (kind) {

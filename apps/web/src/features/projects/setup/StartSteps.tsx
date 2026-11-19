@@ -1,7 +1,7 @@
 /** Wizard steps 1–3: project language, template (what it brings, which parts need a module), basics. */
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { TEMPLATE_PARTS, type TemplateSummaryDto } from "@sitekeep/shared";
+import { TEMPLATE_PARTS, namingUsesToken, type TemplateSummaryDto } from "@sitekeep/shared";
 import { api } from "../../../shared/api/api";
 import { useLabel } from "../../../i18n";
 import { languageMeta } from "../../../i18n/languages";
@@ -235,6 +235,26 @@ export function BasicsStep({ draft, update, base }: StepProps) {
       <input id="setup-location" value={draft.location} maxLength={200} placeholder={t("setup.basics.locationPlaceholder")} onChange={(e) => update({ location: e.target.value })} />
       <label htmlFor="setup-client">{t("setup.basics.client")}</label>
       <input id="setup-client" value={draft.client} maxLength={200} onChange={(e) => update({ client: e.target.value })} />
+      {namingUsesToken(base?.namingStandards, "EK1") && (
+        <>
+          <label htmlFor="setup-csb-code">
+            {t("setup.basics.csbProjectCode")} <span className="muted">({t("common:status.optional")})</span>
+          </label>
+          <div>
+            <input
+              id="setup-csb-code"
+              className="mono"
+              value={draft.csbProjectCode ?? ""}
+              maxLength={6}
+              aria-describedby="setup-csb-code-hint"
+              onChange={(e) => update({ csbProjectCode: e.target.value.toUpperCase() })}
+            />
+            <p className="field-hint" id="setup-csb-code-hint">
+              {t("setup.basics.csbProjectCodeHint")}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }

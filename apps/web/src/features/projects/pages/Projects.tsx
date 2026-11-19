@@ -8,6 +8,7 @@ import { useLoad } from "../../../app/context/project";
 import { Dialog } from "../../../shared/ui/Dialog";
 import { Icon } from "../../../shared/ui/Icon";
 import { NewProjectWizard } from "../components/NewProjectWizard";
+import { RestoreProjectDialog } from "../components/RestoreProjectDialog";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 
 export function ProjectsPage() {
@@ -16,6 +17,7 @@ export function ProjectsPage() {
   const navigate = useNavigate();
   const { data: projects, error, reload } = useLoad(() => api.projects(), []);
   const [creating, setCreating] = useState(false);
+  const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState<ProjectDto | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -68,10 +70,13 @@ export function ProjectsPage() {
           <p>{t("list.description")}</p>
         </div>
         {user?.isAdmin && (
-          <button className="primary" onClick={() => setCreating(true)}>
-            <Icon name="plus" size={16} />
-            {t("list.actions.new")}
-          </button>
+          <div className="row wrap" style={{ gap: 8 }}>
+            <button onClick={() => setRestoring(true)}>{t("restore.action")}</button>
+            <button className="primary" onClick={() => setCreating(true)}>
+              <Icon name="plus" size={16} />
+              {t("list.actions.new")}
+            </button>
+          </div>
         )}
       </header>
 
@@ -199,6 +204,7 @@ export function ProjectsPage() {
         </table>
       </section>
       {creating && <NewProjectWizard onClose={() => setCreating(false)} onCreated={reload} />}
+      {restoring && <RestoreProjectDialog onClose={() => setRestoring(false)} onRestored={reload} />}
       {deleting && (
         <Dialog title={t("delete.title")} onClose={() => !deleteBusy && setDeleting(null)}>
           <p>

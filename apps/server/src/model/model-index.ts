@@ -3,7 +3,7 @@
  * material and flattened properties per GlobalId, plus the field resolution used by queries.
  */
 import { foldPlain, ifcClassLabel, type ModelVocabDto, type OpeningSolid } from "@sitekeep/shared";
-import { GEOMETRY_FORMAT, MODEL_INDEX_FORMAT, OPENINGS_FORMAT, type IndexFile } from "../jobs/version-index.js";
+import { GEOMETRY_FORMAT, MESH_QUANTITIES_FORMAT, MODEL_INDEX_FORMAT, OPENINGS_FORMAT, type IndexFile } from "../jobs/version-index.js";
 
 export interface OpeningView {
   guid: string;
@@ -90,6 +90,20 @@ export class ModelIndex {
   /** Shape fingerprints are recorded (newer indexes; see GEOMETRY_FORMAT). */
   get hasGeometry(): boolean {
     return (this.file.geomV ?? 0) >= GEOMETRY_FORMAT && !!this.file.geom;
+  }
+
+  /** Volume and area measured from the mesh are recorded (newer indexes; see MESH_QUANTITIES_FORMAT). */
+  get hasMeshQuantities(): boolean {
+    return (this.file.meshQV ?? 0) >= MESH_QUANTITIES_FORMAT && !!this.file.meshQ;
+  }
+
+  /**
+   * Volume (m³) and one-side area (m²) of an element measured from its triangle mesh; null when its
+   * quantity sets have a volume or an area, it has no body geometry, or the index predates the field.
+   */
+  meshQuantities(guid: string): { volume: number | null; area: number | null } | null {
+    const q = this.file.meshQ?.[guid];
+    return q ? { volume: q[0], area: q[1] } : null;
   }
 
   /** Fingerprint of an element's shape; null without a shape or in older indexes. */

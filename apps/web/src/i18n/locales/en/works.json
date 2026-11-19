@@ -91,7 +91,8 @@
       "openOnly": "Open Work Only",
       "allStatuses": "All Statuses",
       "allDueDates": "All Due Dates",
-      "list": "List"
+      "list": "List",
+      "showCancelled": "Show Cancelled"
     },
     "fields": {
       "quickFilter": "Quick Filter",
@@ -423,7 +424,10 @@
     "actions": {
       "submitItems": "Submit Items for Approval",
       "submit": "Submit for Approval",
-      "revise": "New Revision (Rev {{rev}})"
+      "revise": "New Revision (Rev {{rev}})",
+      "cancel": "Cancel",
+      "cancelRfi": "Cancel RFI",
+      "cancelSubmittal": "Cancel Submittal"
     },
     "cancel": {
       "title": "Cancel Work Item",

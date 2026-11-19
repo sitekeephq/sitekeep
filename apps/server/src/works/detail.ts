@@ -11,7 +11,7 @@ import { DEFAULT_LANGUAGE } from "../i18n/index.js";
 import { projectMemberRows } from "../workflow/service.js";
 import { meetingDataOf } from "./meeting-data.js";
 import { participantWorkIds } from "./participants.js";
-import { isClosed, projectTypes, toSummary, viewerOf, type TypeRow, type WorkRow } from "./service.js";
+import { isClosed, projectTypes, shownType, toSummary, viewerOf, type TypeRow, type WorkRow } from "./service.js";
 import { ballInCourt, flowDto, loadFlowRows, nameBook, revisionDto, revisionsOf, runsWorkflow } from "./workflow.js";
 
 const BUILD_CATEGORIES = new Set(["rfi", "submittal", "submittal_package", "meeting", "action"]);
@@ -22,7 +22,8 @@ export function hasBuildExtras(type: TypeRow): boolean {
 
 /** Works of the project the caller sees (incl. workflow participants), with their types. */
 export async function visibleWorks(db: Db, a: ProjectAccess, filter?: (t: TypeRow) => boolean) {
-  const types = await projectTypes(db, a.project.id);
+  // Seeded type texts in the reader's language (registers, reports): output only.
+  const types = (await projectTypes(db, a.project.id)).map((t) => shownType(t));
   const rows = await db.select().from(works).where(eq(works.projectId, a.project.id)).orderBy(asc(works.createdAt));
   const viewer = viewerOf(a);
   const picked = rows.filter((w) => {

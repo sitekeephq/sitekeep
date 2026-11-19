@@ -39,7 +39,7 @@ export function WorkflowTemplates() {
   const project = useProject();
   const { data: templates, error, reload } = useLoad(() => api.workflowTemplates(project.id), [project.id]);
   const { data: members } = useLoad(() => api.members(project.id), [project.id]);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const { data: roles } = useLoad(() => api.roles(project.id), [project.id]);
   const [editing, setEditing] = useState<WorkflowTemplateDto | "new" | null>(null);
   const names = namesFrom(members, companies, roles);

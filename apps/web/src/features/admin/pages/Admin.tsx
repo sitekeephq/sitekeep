@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { NO_PROJECT, companyProjectOptions, filterCompaniesByProject } from "../company-projects";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { companyCodeInput, usersFinding, type CompanyDto, type GoogleAuthSettings } from "@sitekeep/shared";
@@ -91,6 +92,10 @@ function UsersAndCompanies() {
   const { user: me } = useAuth();
   const { data: users, reload } = useLoad(() => api.users(), []);
   const { data: companies, reload: reloadCompanies } = useLoad(() => api.companies(), []);
+  // Companies are linked to projects (docs/features/COMPANIES.md): filter the registry by project.
+  const [companyProject, setCompanyProject] = useState("");
+  const companyProjects = companyProjectOptions(companies ?? []);
+  const shownCompanies = companies && filterCompaniesByProject(companies, companyProject);
   const [newUser, setNewUser] = useState(false);
   const [personal, setPersonal] = useState<string | null>(null);
   const [company, setCompany] = useState("");
@@ -258,6 +263,18 @@ function UsersAndCompanies() {
         <p className="muted small" style={{ marginTop: 0 }}>
           {t("companies.help")}
         </p>
+        <label className="row" style={{ gap: 8, marginBottom: 8 }}>
+          <span className="small">{t("companies.projectFilter.label")}</span>
+          <select value={companyProject} onChange={(e) => setCompanyProject(e.target.value)} style={{ width: "auto" }}>
+            <option value="">{t("companies.projectFilter.all")}</option>
+            <option value={NO_PROJECT}>{t("companies.projectFilter.none")}</option>
+            {companyProjects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.code} · {p.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <table className="phone-cards">
           <thead>
             <tr>
@@ -266,10 +283,11 @@ function UsersAndCompanies() {
               <th style={{ minWidth: 220 }}>{t("companies.columns.address")}</th>
               <th style={{ minWidth: 200 }}>{t("common:fields.email")}</th>
               <th style={{ width: 80 }}>{t("companies.columns.people")}</th>
+              <th style={{ minWidth: 140 }}>{t("companies.columns.projects")}</th>
             </tr>
           </thead>
           <tbody>
-            {companies?.map((c) => (
+            {shownCompanies?.map((c) => (
               <tr key={c.id}>
                 <td className="pc-title">{c.name}</td>
                 <td data-label={t("companies.columns.shortCode")}>
@@ -295,6 +313,9 @@ function UsersAndCompanies() {
                 </td>
                 <td className="pc-inline" data-label={t("companies.columns.people")}>
                   {users?.filter((u) => u.companyId === c.id).length ?? 0}
+                </td>
+                <td className="small" data-label={t("companies.columns.projects")} title={c.projects?.map((p) => `${p.code} · ${p.name}`).join("\n")}>
+                  {c.projects?.length ? c.projects.map((p) => p.code).join(", ") : <span className="muted">{t("companies.projectFilter.none")}</span>}
                 </td>
               </tr>
             ))}

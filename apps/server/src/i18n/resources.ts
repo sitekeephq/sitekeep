@@ -26,6 +26,7 @@ import type oauth from "./locales/en/oauth.json";
 import type office from "./locales/en/office.json";
 import type opencde from "./locales/en/opencde.json";
 import type paramChange from "./locales/en/paramChange.json";
+import type portability from "./locales/en/portability.json";
 import type previews from "./locales/en/previews.json";
 import type privacy from "./locales/en/privacy.json";
 import type projects from "./locales/en/projects.json";
@@ -75,6 +76,7 @@ export interface CoreServerResources {
   office: typeof office;
   opencde: typeof opencde;
   paramChange: typeof paramChange;
+  portability: typeof portability;
   previews: typeof previews;
   privacy: typeof privacy;
   projects: typeof projects;

@@ -7,7 +7,7 @@
  *   PNG / JPEG snapshots); other entries are listed and skipped.
  */
 import yauzl from "yauzl";
-import { DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
+import { currentLanguage, msg, render, type Msg } from "../i18n/index.js";
 
 export const BCF_ZIP_LIMITS = {
   /** Compressed .bcfzip. */
@@ -22,9 +22,9 @@ export const BCF_ZIP_LIMITS = {
 };
 
 export class BcfZipError extends Error {
-  /** The text for the reader (rendered in the request's language); `message` is the installation's language. */
+  /** The text for the reader (rendered in the request's language); `message` is in the current request's language (the installation's outside a request). */
   constructor(readonly msg: Msg) {
-    super(render(DEFAULT_LANGUAGE, msg));
+    super(render(currentLanguage(), msg));
   }
 }
 

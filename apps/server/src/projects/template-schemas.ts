@@ -286,6 +286,8 @@ const detailsSchema = z.object({
   endDate: z.string().trim().max(10).optional(),
   location: z.string().trim().max(200).optional(),
   client: z.string().trim().max(200).optional(),
+  /** ÇŞB EK-1 project code; checked by checkSetupDetails. */
+  csbProjectCode: z.string().trim().toUpperCase().max(20).optional(),
 });
 
 const personSchema = z.object({

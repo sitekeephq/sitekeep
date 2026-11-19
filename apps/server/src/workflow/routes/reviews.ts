@@ -2,6 +2,7 @@ import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import {
+  shownRoleName,
   can,
   outcomeLabel,
   type OnBehalfOfDto,
@@ -27,7 +28,7 @@ import {
   workflowInstances,
 } from "../../db/schema.js";
 import { notFound } from "../../core/platform/http.js";
-import { msg, requestLanguage } from "../../i18n/index.js";
+import { currentLanguage, msg, requestLanguage } from "../../i18n/index.js";
 import { requireModule } from "../../projects/modules.js";
 import type { ActorContext } from "../../workflow/engine.js";
 import { isAssignee, onBehalfOf } from "../../workflow/engine.js";
@@ -374,7 +375,7 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
     : [];
   const groupNames = new Map<string, string>([
     ...companyRows.map((c) => [c.id, c.name] as [string, string]),
-    ...roleRows.map((x) => [x.id, x.name] as [string, string]),
+    ...roleRows.map((x) => [x.id, shownRoleName(x.name, currentLanguage())] as [string, string]),
   ]);
   const behalfDto = (list: WorkflowAssignee[]): OnBehalfOfDto[] =>
     list.map((b) => ({ type: b.type, id: b.id, name: groupNames.get(b.id) }));

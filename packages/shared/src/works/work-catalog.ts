@@ -45,6 +45,11 @@ export interface WorkFieldDef {
   required?: boolean;
   /** Choices for "list". */
   options?: string[];
+  /**
+   * Display only, never stored: option value → label in the reader's language, for the seeded
+   * options of built-in types (localizedWorkType). Values stay the stored options.
+   */
+  optionLabels?: Record<string, string>;
   help?: string;
 }
 
@@ -132,9 +137,11 @@ export const MEETING_STATUSES: WorkStatusDef[] = [
   { key: "iptal", label: "İptal", tone: "", closed: true },
 ];
 
+/** Actions can be cancelled like RFIs, submittals and meetings (existing projects get "İptal" when the types are seeded). */
 export const ACTION_STATUSES: WorkStatusDef[] = [
   { key: "acik", label: "Açık", tone: "warn" },
   { key: "kapandi", label: "Kapalı", tone: "ok", closed: true },
+  { key: "iptal", label: "İptal", tone: "", closed: true },
 ];
 
 export function defaultStatuses(category: WorkCategory): WorkStatusDef[] {

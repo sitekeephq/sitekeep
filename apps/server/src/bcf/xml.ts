@@ -7,14 +7,14 @@
  * entities beyond the five XML ones and character references anyway.
  */
 import { parseXml, type XmlNode } from "../core/formats/xml.js";
-import { DEFAULT_LANGUAGE, msg, render as renderMsg, type Msg } from "../i18n/index.js";
+import { currentLanguage, msg, render as renderMsg, type Msg } from "../i18n/index.js";
 
 export type { XmlNode };
 
 export class BcfFormatError extends Error {
-  /** The text for the reader (rendered in the request's language); `message` is the installation's language. */
+  /** The text for the reader (rendered in the request's language); `message` is in the current request's language (the installation's outside a request). */
   constructor(readonly msg: Msg) {
-    super(renderMsg(DEFAULT_LANGUAGE, msg));
+    super(renderMsg(currentLanguage(), msg));
   }
 }
 

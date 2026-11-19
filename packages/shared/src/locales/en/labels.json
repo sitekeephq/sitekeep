@@ -448,5 +448,265 @@
     "yes": "Yes",
     "no": "No",
     "na": "N/A"
+  },
+  "workTypeText": {
+    "gelen-yazi": {
+      "name": "Incoming Letter",
+      "fields": {
+        "sayi": "Sender's Reference No",
+        "tarih": "Letter Date",
+        "konu": "Subject",
+        "ozet": "Summary / Note",
+        "proje_kodu": "Project Code",
+        "seri": "Letter Series",
+        "departman": "Department",
+        "sube": "Branch"
+      },
+      "help": {
+        "sayi": "The number on the letter (e.g. E-12345678-000-1234)",
+        "proje_kodu": "The client's project code, e.g. P.87.1019",
+        "seri": "e.g. L25"
+      },
+      "statuses": {
+        "taslak": "Draft",
+        "gonderildi": "Sent",
+        "alindi": "Received",
+        "cevaplandi": "Answered",
+        "kapandi": "Closed",
+        "arsivlendi": "Archived",
+        "iptal": "Cancelled"
+      }
+    },
+    "giden-yazi": {
+      "name": "Outgoing Letter",
+      "fields": {
+        "belge_no": "Document No",
+        "tarih": "Letter Date",
+        "konu": "Subject",
+        "ozet": "Summary / Note",
+        "proje_kodu": "Project Code",
+        "seri": "Letter Series",
+        "departman": "Department",
+        "sube": "Branch"
+      },
+      "help": {
+        "belge_no": "The letter's document number; printed as Document No on the official letter PDF",
+        "proje_kodu": "The client's project code, e.g. P.87.1019",
+        "seri": "e.g. L25"
+      },
+      "statuses": {
+        "taslak": "Draft",
+        "gonderildi": "Sent",
+        "alindi": "Received",
+        "cevaplandi": "Answered",
+        "kapandi": "Closed",
+        "arsivlendi": "Archived",
+        "iptal": "Cancelled"
+      }
+    },
+    "transmittal": {
+      "name": "Transmittal",
+      "fields": {
+        "amac": "Purpose",
+        "not": "Note"
+      },
+      "help": {},
+      "statuses": {
+        "taslak": "Draft",
+        "gonderildi": "Sent",
+        "alindi": "Received",
+        "kapandi": "Closed"
+      }
+    },
+    "rfi": {
+      "name": "RFI",
+      "fields": {
+        "soru": "Question",
+        "kategori": "Category",
+        "disiplin": "Discipline",
+        "oncelik": "Priority",
+        "maliyet_etkisi": "Cost Impact",
+        "takvim_etkisi": "Schedule Impact",
+        "onerilen_cozum": "Proposed Solution",
+        "model_elemanlari": "Related Model Elements",
+        "resmi_cevap": "Official Response"
+      },
+      "help": {
+        "model_elemanlari": "Element IDs / GUIDs; link sheets as references",
+        "resmi_cevap": "Filled from the workflow when answered"
+      },
+      "statuses": {
+        "taslak": "Draft",
+        "acik": "Open",
+        "cevaplandi": "Answered",
+        "kapandi": "Closed",
+        "iptal": "Cancelled"
+      }
+    },
+    "submittal-kalemi": {
+      "name": "Submittal Item",
+      "fields": {
+        "bolum_kodu": "Spec Section Code",
+        "bolum_adi": "Spec Section Title",
+        "tur": "Type",
+        "disiplin": "Discipline",
+        "aciklama": "Description",
+        "sayfa": "Spec Page",
+        "alinti": "Spec Excerpt"
+      },
+      "help": {
+        "bolum_kodu": "Specification section, e.g. 05 12 00"
+      },
+      "statuses": {
+        "taslak": "Draft",
+        "incelemede": "Under Review",
+        "onaylandi": "Approved",
+        "notlu_onay": "Approved with Comments",
+        "goruldu": "Reviewed",
+        "revize": "Revise and Resubmit",
+        "reddedildi": "Rejected",
+        "kapandi": "Closed",
+        "iptal": "Cancelled"
+      }
+    },
+    "submittal-paketi": {
+      "name": "Submittal Package",
+      "fields": {
+        "bolum": "Section",
+        "disiplin": "Discipline",
+        "aciklama": "Description"
+      },
+      "help": {
+        "bolum": "Type code (MOS, UCZ…) or specification section code"
+      },
+      "statuses": {
+        "taslak": "Draft",
+        "incelemede": "Under Review",
+        "revize": "Awaiting Revision",
+        "kismen": "Partly Approved",
+        "onaylandi": "Approved",
+        "reddedildi": "Rejected",
+        "kapandi": "Closed"
+      }
+    },
+    "toplanti": {
+      "name": "Meeting",
+      "fields": {
+        "tur": "Meeting Type",
+        "tarih": "Date",
+        "saat": "Time",
+        "yer": "Location",
+        "cevrimici": "Online Link"
+      },
+      "help": {
+        "saat": "e.g. 10:00"
+      },
+      "statuses": {
+        "planlandi": "Scheduled",
+        "yapildi": "Minutes in Preparation",
+        "kapandi": "Minutes Published",
+        "iptal": "Cancelled"
+      }
+    },
+    "aksiyon": {
+      "name": "Action",
+      "fields": {
+        "aciklama": "Description",
+        "karar": "Decision"
+      },
+      "help": {},
+      "statuses": {
+        "acik": "Open",
+        "kapandi": "Closed",
+        "iptal": "Cancelled"
+      }
+    }
+  },
+  "workStatus": {
+    "taslak": "Draft",
+    "gonderildi": "Sent",
+    "alindi": "Received",
+    "cevaplandi": "Answered",
+    "kapandi": "Closed",
+    "arsivlendi": "Archived",
+    "iptal": "Cancelled",
+    "acik": "Open",
+    "incelemede": "Under Review",
+    "onaylandi": "Approved",
+    "notlu_onay": "Approved with Comments",
+    "goruldu": "Reviewed",
+    "revize": "Revise and Resubmit",
+    "reddedildi": "Rejected",
+    "kismen": "Partly Approved",
+    "planlandi": "Scheduled",
+    "yapildi": "Minutes in Preparation"
+  },
+  "seededText": {
+    "Proje Dosyaları": "Project Files",
+    "Gönderim formları": "Transmittal covers",
+    "Yazılar": "Letters",
+    "Gelen belgeler": "Incoming documents",
+    "Transmittaller": "Transmittals",
+    "01-WIP (Çalışmada)": "01-WIP",
+    "02-SHARED (Paylaşılan)": "02-SHARED",
+    "03-PUBLISHED (Yayınlanan)": "03-PUBLISHED",
+    "04-ARCHIVED (Arşiv)": "04-ARCHIVED",
+    "Görüntüleyici": "Viewer",
+    "Dosyaları görüntüler ve indirir; yükleme yok.": "Views and downloads files; no upload.",
+    "Düzenleyici": "Editor",
+    "Dosya yükler ve düzenler.": "Uploads and edits files.",
+    "Yönetici": "Administrator",
+    "Klasör yetkilerini yönetir ve proje ayarlarına girer.": "Manages folder permissions and opens the project settings.",
+    "G - Genel": "G - General",
+    "A - Mimari": "A - Architecture",
+    "S - Statik": "S - Structural",
+    "M - Mekanik": "M - Mechanical",
+    "E - Elektrik": "E - Electrical",
+    "I - Altyapı": "I - Infrastructure",
+    "H - Harita": "H - Survey",
+    "Z - Zemin": "Z - Geotechnical",
+    "P - Peyzaj": "P - Landscape",
+    "Tasarım Koordinasyonu": "Design Coordination",
+    "Saha Uygulaması": "Site Execution",
+    "Malzeme": "Material",
+    "Diğer": "Other",
+    "Düşük": "Low",
+    "Normal": "Normal",
+    "Yüksek": "High",
+    "Acil": "Urgent",
+    "Yok": "None",
+    "Var": "Yes",
+    "Belirsiz": "Unclear",
+    "MOS - Malzeme Onay": "MOS - Material Approval",
+    "NUM - Numune": "NUM - Sample",
+    "UCZ - Uygulama / Atölye Çizimi": "UCZ - Shop Drawing",
+    "YB - Yöntem Beyanı": "YB - Method Statement",
+    "IP - İş Programı": "IP - Work Programme",
+    "ISG - İSG": "ISG - HSE",
+    "TR - Teknik Rapor": "TR - Technical Report",
+    "PMR - Periyodik Muayene": "PMR - Periodic Inspection",
+    "KS - Kalite": "KS - Quality",
+    "IKOF - İmalat Kontrol Onay Formu": "IKOF - Work Inspection Approval Form",
+    "BAS - Bilgi Amaçlı": "BAS - For Information",
+    "MKF - Saha Malzeme Kabul": "MKF - Site Material Receipt",
+    "Malzeme Onay": "Material Approval",
+    "Numune": "Sample",
+    "Uygulama / Atölye Çizimi": "Shop Drawing",
+    "Yöntem Beyanı": "Method Statement",
+    "İş Programı": "Work Programme",
+    "İSG": "HSE",
+    "Teknik Rapor": "Technical Report",
+    "Periyodik Muayene": "Periodic Inspection",
+    "Kalite": "Quality",
+    "İmalat Kontrol Onay Formu": "Work Inspection Approval Form",
+    "Bilgi Amaçlı": "For Information",
+    "Saha Malzeme Kabul": "Site Material Receipt",
+    "Koordinasyon": "Coordination",
+    "İlerleme": "Progress",
+    "Tasarım": "Design",
+    "BIM": "BIM",
+    "bilgi": "For information",
+    "onay": "For approval",
+    "uygulama": "For construction"
   }
 }

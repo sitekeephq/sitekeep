@@ -50,8 +50,9 @@ function monthLabel(ym: string): string {
 
 /**
  * The works views of the İşler hub: Tüm İşler, the sections (?bolum=…) and Bana Düşenler
- * (?bolum=bana). Filters live in the URL (q, tip, durum, termin, acik, grup, hizli), so a view
- * can be saved and shared; the record opens in the detail pane next to the list.
+ * (?bolum=bana). Filters live in the URL (q, tip, durum, termin, acik, iptal, grup, hizli), so a
+ * view can be saved and shared; the record opens in the detail pane next to the list. Cancelled
+ * records are hidden unless "Show cancelled" (?iptal=1), the status filter or the Cancelled view asks for them.
  */
 export function WorksPage() {
   // The submittal register and RFI log views are Manage's.
@@ -75,12 +76,14 @@ export function WorksPage() {
   const dueParam = search.get("termin");
   const due: "" | "overdue" | "soon" = dueParam === "overdue" || dueParam === "soon" ? dueParam : "";
   const open = search.get("acik") === "1";
+  const showCancelled = search.get("iptal") === "1";
   const groupParam = search.get("grup") ?? "";
   const groupBy: GroupBy = GROUP_LABELS.some(([k]) => k === groupParam) ? (groupParam as GroupBy) : "";
   const quickParam = search.get("hizli") ?? "";
   const quickList = section ? QUICK.filter((x) => section.quick.includes(x.key)) : [];
   const quick = quickList.some((x) => x.key === quickParam) ? quickParam : "";
   const q0 = QUICK.find((x) => x.key === quick);
+  const hideCancelled = !showCancelled && status !== "iptal" && q0?.letters !== "cancelled";
 
   const setFilters = (patch: Record<string, string>) =>
     setSearch(
@@ -127,10 +130,11 @@ export function WorksPage() {
             open,
             category: section?.categories.join(","),
             view: q0?.letters,
+            hideCancelled,
           }),
-    [project.id, type, status, query, due, open, q0?.letters, section?.key, mineView, embedded?.refreshKey],
+    [project.id, type, status, query, due, open, hideCancelled, q0?.letters, section?.key, mineView, embedded?.refreshKey],
   );
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const cname = useMemo(() => new Map(companies?.map((c) => [c.id, c.name])), [companies]);
   const statuses = useMemo(() => {
     const list = (type ? types?.filter((t) => t.key === type) : types) ?? [];
@@ -202,6 +206,7 @@ export function WorksPage() {
     ...(status ? [{ key: "durum", label: t("list.chips.status", { status: statusName }), clear: () => setFilters({ durum: "" }) }] : []),
     ...(due ? [{ key: "termin", label: t(DUE_LABELS[due]), clear: () => setFilters({ termin: "" }) }] : []),
     ...(open ? [{ key: "acik", label: t("list.options.openOnly"), clear: () => setFilters({ acik: "" }) }] : []),
+    ...(showCancelled ? [{ key: "iptal", label: t("list.options.showCancelled"), clear: () => setFilters({ iptal: "" }) }] : []),
     ...(groupBy
       ? [{ key: "grup", label: t(GROUP_LABELS.find(([k]) => k === groupBy)![1]), clear: () => setFilters({ grup: "" }) }]
       : []),
@@ -225,7 +230,7 @@ export function WorksPage() {
           chips={chips}
           onClearAll={() => {
             setQ("");
-            setFilters({ q: "", tip: "", durum: "", termin: "", acik: "", grup: "", hizli: "" });
+            setFilters({ q: "", tip: "", durum: "", termin: "", acik: "", iptal: "", grup: "", hizli: "" });
           }}
           popover={
             <>
@@ -274,6 +279,9 @@ export function WorksPage() {
               </select>
               <label className="check" style={{ marginTop: 10 }}>
                 <input type="checkbox" checked={open} onChange={(e) => setFilters({ acik: e.target.checked ? "1" : "" })} /> {t("list.options.openOnly")}
+              </label>
+              <label className="check">
+                <input type="checkbox" checked={showCancelled} onChange={(e) => setFilters({ iptal: e.target.checked ? "1" : "" })} /> {t("list.options.showCancelled")}
               </label>
             </>
           }

@@ -3,7 +3,8 @@
     "indexNotCreated": "Index not created.",
     "indexFailed": "The index could not be created.",
     "ifcTimeout": "The IFC conversion timed out.",
-    "ifcExit": "The IFC conversion process ended with code {{code}}."
+    "ifcExit": "The IFC conversion process ended with code {{code}}.",
+    "noModelConverter": "No module that is on converts .{{ext}} files to IFC; the file is kept but has no model view."
   },
   "spatial": {
     "versionNotFound": "IFC version not found.",

@@ -222,6 +222,14 @@ export const BUILD_NUMBERING_PRESETS = {
       [BUILD_TYPE_KEYS.submittal]: "{Gönderen}_{Tür}_{Disiplin}_{0000}",
     } as Record<string, string>,
   },
+  /** The standard pattern after the project code, so numbers of several projects never collide (#139). */
+  proje: {
+    label: "Proje kodu önde",
+    patterns: {
+      [BUILD_TYPE_KEYS.rfi]: "{Proje}_{Gönderen}_{Alıcı}_{Disiplin}_BT_{000}",
+      [BUILD_TYPE_KEYS.submittal]: "{Proje}_{Gönderen}_{Tür}_{Disiplin}_{0000}",
+    } as Record<string, string>,
+  },
   zavm: {
     label: "ZAVM (PAS_CNS_{D}_RFI_{001}_{Konu})",
     patterns: {

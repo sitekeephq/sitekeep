@@ -57,8 +57,10 @@ describe("element quantities", () => {
   it("falls back to plain Area and to Revit's Dimensions set, and leaves missing values null", () => {
     expect(elementDto(v1, D1)).toMatchObject({ values: { netArea: 1.89, grossArea: null, openingArea: null }, sources: { netArea: "Qto_DoorBaseQuantities.Area" } });
     expect(elementDto(v1, B1)).toMatchObject({ values: { netVolume: 0.5, length: 4 }, sources: { netVolume: "Dimensions.Volume", length: "Dimensions.Length" } });
+    // No quantity set at all: volume and area are measured from the mesh.
     const door = elementDto(v1, D2)!;
-    expect(Object.values(door.values).every((v) => v === null)).toBe(true);
+    expect(door.values).toMatchObject({ netVolume: 0.4, netArea: 2, grossVolume: null, grossArea: null, length: null, weight: null });
+    expect(door.sources).toEqual({ netVolume: "geometry:mesh", netArea: "geometry:mesh" });
     expect(elementDto(v1, "missing")).toBeNull();
   });
 });
@@ -68,12 +70,13 @@ describe("inventory", () => {
     const r = inventory(v1, ["class", "storey"]);
     expect(r.totals).toEqual({
       count: 8,
-      withQuantities: 7,
-      netVolume: 14.56,
+      withQuantities: 8,
+      fromMesh: 1,
+      netVolume: 14.96,
       grossVolume: 3,
       grossArea: 52,
       openingArea: 4,
-      netArea: 70.39,
+      netArea: 72.39,
       length: 16,
       weight: 900,
     });
@@ -81,7 +84,7 @@ describe("inventory", () => {
     expect(walls.map((g) => g.label)).toEqual(["Duvar · Zemin Kat", "Duvar · Kat 1"]);
     expect(walls[0]).toMatchObject({ count: 1, netArea: 12, openingArea: 3, guids: [W1] });
     const doors = r.groups.find((g) => g.label === "Kapı · Kat 1")!;
-    expect(doors).toMatchObject({ count: 1, withQuantities: 0, netArea: null });
+    expect(doors).toMatchObject({ count: 1, withQuantities: 1, fromMesh: 1, netArea: 2 });
   });
 
   it("groups by material and type, naming the empty ones", () => {

@@ -113,7 +113,7 @@ describe("metraj envanteri API", () => {
     const r = await viewer.get(`${P()}/versions/${v1}/quantities?groupBy=class,storey`);
     expect(r.status, r.body?.message).toBe(200);
     expect(r.body).toMatchObject({ versionId: v1, fileName: "Kaba.ifc", version: 1, groupBy: ["class", "storey"] });
-    expect(r.body.totals).toMatchObject({ count: 8, withQuantities: 7, netVolume: 14.56, grossArea: 52, openingArea: 4, netArea: 70.39 });
+    expect(r.body.totals).toMatchObject({ count: 8, withQuantities: 8, fromMesh: 1, netVolume: 14.96, grossArea: 52, openingArea: 4, netArea: 72.39 });
     expect(r.body.groups.map((g: { label: string }) => g.label).slice(0, 2)).toEqual(["Döşeme · Zemin Kat", "Döşeme · Kat 1"]);
     expect(r.body.groups.find((g: { label: string }) => g.label === "Duvar · Zemin Kat")).toMatchObject({ netArea: 12, openingArea: 3, guids: [W1] });
     expect((await outsider.get(`${P()}/versions/${v1}/quantities`)).status).toBe(404);
@@ -177,7 +177,7 @@ describe("metraj envanteri API", () => {
     expect(def.write).toBe(false);
     const run = (args: Record<string, unknown>) => def.run(cdeParseArgs(def, args)) as Promise<any>;
     const inv = await run({ projectId: pid, versionId: v1, groupBy: ["class"] });
-    expect(inv).toMatchObject({ model: "Kaba.ifc V1", totals: { count: 8, netVolume: 14.56 } });
+    expect(inv).toMatchObject({ model: "Kaba.ifc V1", totals: { count: 8, netVolume: 14.96 } });
     expect(inv.groups.find((g: { group: string }) => g.group === "Duvar")).toEqual({ group: "Duvar", count: 2, netVolume: 4.8, grossVolume: 3, grossArea: 27, openingArea: 3, netArea: 24, length: 9 });
     const diff = await run({ projectId: pid, versionId: v2, compareWithPrevious: true, limit: 2 });
     expect(diff).toMatchObject({ model: "Kaba.ifc V1 → V2", totals: { delta: { count: 0, netArea: -13.5 } }, moreElements: 2 });

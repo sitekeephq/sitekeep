@@ -69,7 +69,8 @@
       "cde": "CDE",
       "aktivite": "Denetim Kaydı",
       "sistemDurumu": "Sistem Durumu",
-      "kapanis": "Kapanış"
+      "kapanis": "Kapanış",
+      "disaAktarma": "Dışa Aktarma"
     },
     "hub": {
       "views": "Görünümler",

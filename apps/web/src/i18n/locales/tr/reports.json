@@ -77,7 +77,7 @@
     },
     "importHint": "Dışarıda bırakılmayan satırlardan teknik onay kalemleri oluşturur",
     "jsonHint": "Teknik onay modülüne aktarım için",
-    "aiClassifyHint": "Belirsiz kalemler yerel modelle sınıflandırılır; kalem düzenlemeleri sıfırlanır.",
+    "aiClassifyHint": "Belirsiz kalemler yapay zekâ modeliyle sınıflandırılır; kalem düzenlemeleri sıfırlanır.",
     "rebuildHint": "Şartnameyi yeniden okur; kalem düzenlemeleri sıfırlanır.",
     "pages_one": "{{count}} sayfa",
     "pages_other": "{{count}} sayfa",

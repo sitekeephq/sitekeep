@@ -1,11 +1,13 @@
-import { asc, eq, isNotNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull } from "drizzle-orm";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { companyCodeProblem, normalizeCompanyCode, normalizeGoogleDomain } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { audit } from "../core/platform/audit.js";
 import { hashPassword, passwordProblem } from "../core/security/auth.js";
-import { companies, users, userTwoFactor } from "../db/schema.js";
+import { companies, projectCompanies, projects, users, userTwoFactor } from "../db/schema.js";
+import { projectAccess } from "../core/security/access.js";
+import { linkProjectCompanies, listProjectCompanies, visibleCompanyIds, visibleUserIds } from "../projects/companies.js";
 import { badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
 import { prefsForPassword, toUserDto } from "../auth/dto.js";
 import { endSessions } from "../auth/sign-in-security.js";
@@ -63,8 +65,31 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
     });
     return next;
   });
-  // Companies are visible to every signed-in user (needed for member and permission pickers).
-  api.get("/companies", async () => db.select().from(companies).orderBy(asc(companies.name)));
+  /**
+   * The company registry as the caller may see it (docs/features/COMPANIES.md): system administrators
+   * and auditors every company, with the projects each is on (`?projectId=` narrows to one project);
+   * anyone else the companies on their projects and their own. Project pickers use
+   * GET /projects/:pid/companies instead.
+   */
+  api.get<{ Querystring: { projectId?: string } }>("/companies", async (req) => {
+    const user = req.user!;
+    if (req.query.projectId) {
+      const a = await projectAccess(db, req.query.projectId, user);
+      return listProjectCompanies(db, a.project.id);
+    }
+    const visible = await visibleCompanyIds(db, user);
+    if (visible) {
+      if (!visible.size) return [];
+      return db.select().from(companies).where(inArray(companies.id, [...visible])).orderBy(asc(companies.name));
+    }
+    const rows = await db.select().from(companies).orderBy(asc(companies.name));
+    const links = await db
+      .select({ companyId: projectCompanies.companyId, id: projects.id, code: projects.code, name: projects.name })
+      .from(projectCompanies)
+      .innerJoin(projects, and(eq(projects.id, projectCompanies.projectId), eq(projects.archived, false)))
+      .orderBy(asc(projects.code));
+    return rows.map((c) => ({ ...c, projects: links.filter((l) => l.companyId === c.id).map(({ id, code, name }) => ({ id, code, name })) }));
+  });
 
   /** Optional short code: normalised (Turkish-aware, ASCII), 2–8 letters/digits, unique. */
   const codeField = z
@@ -100,15 +125,31 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
   api.post("/companies", async (req) => {
     requireAdmin(req);
     const body = z
-      .object({ name: z.string().trim().min(1).max(200), code: codeField, address: addressField, email: emailField })
+      .object({
+        name: z.string().trim().min(1).max(200),
+        code: codeField,
+        address: addressField,
+        email: emailField,
+        /** Put the new company on this project at once (project set-up, project settings). */
+        projectId: z.string().uuid().optional(),
+      })
       .parse(req.body);
+    const project = body.projectId ? (await projectAccess(db, body.projectId, req.user!)).project : null;
     await checkNameFree(body.name);
     await checkCodeFree(body.code);
     const [row] = await db
       .insert(companies)
       .values({ name: body.name, code: body.code ?? null, address: body.address ?? null, email: body.email ?? null })
       .returning();
-    await audit(db, { userId: req.user!.id, action: "company.created", targetType: "company", targetId: row!.id, details: { code: row!.code } });
+    if (project) await linkProjectCompanies(db, project.id, [row!.id]);
+    await audit(db, {
+      userId: req.user!.id,
+      ...(project ? { projectId: project.id } : {}),
+      action: "company.created",
+      targetType: "company",
+      targetId: row!.id,
+      details: { code: row!.code },
+    });
     return row;
   });
 
@@ -142,10 +183,19 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
     return row;
   });
 
+  /**
+   * The user directory (docs/features/COMPANIES.md#people): system administrators and auditors see
+   * everyone; anyone else only the active people who share an active project with them (within an
+   * API token's project limit), and themselves. Nobody gets password hashes.
+   */
   api.get("/users", async (req) => {
+    if (!canReadSecurityRecords(req.user)) {
+      const ids = await visibleUserIds(db, req.user!);
+      if (!ids.size) return [];
+      const rows = await db.select().from(users).where(inArray(users.id, [...ids])).orderBy(asc(users.name));
+      return rows.filter((u) => !u.disabled).map(toUserDto);
+    }
     const rows = await db.select().from(users).orderBy(asc(users.name));
-    // Non-admins get a directory without the disabled flag; nobody gets password hashes.
-    if (!canReadSecurityRecords(req.user)) return rows.filter((u) => !u.disabled).map(toUserDto);
     // System administrators and auditors also see who has two-factor on (reset, docs/features/SIGN_IN_SECURITY.md).
     const withTwoFactor = new Set(
       (await db.select({ id: userTwoFactor.userId }).from(userTwoFactor).where(isNotNull(userTwoFactor.enabledAt))).map((r) => r.id),

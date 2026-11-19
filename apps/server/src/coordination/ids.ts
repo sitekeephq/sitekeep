@@ -10,7 +10,7 @@
  * Texts of a parsed document (requirement texts, unsupported facets) are stored with the report:
  * they are written in the installation's language (DEFAULT_LANGUAGE) unless a language is given.
  */
-import { DEFAULT_LANGUAGE, msg, render, tFor, type Msg } from "../i18n/index.js";
+import { currentLanguage, DEFAULT_LANGUAGE, msg, render, tFor, type Msg } from "../i18n/index.js";
 
 export type IdsRestriction =
   | { simple: string }
@@ -62,7 +62,7 @@ export interface IdsDocument {
 
 export class IdsParseError extends Error {
   constructor(readonly msg: Msg) {
-    super(render(DEFAULT_LANGUAGE, msg));
+    super(render(currentLanguage(), msg));
   }
 }
 

@@ -25,9 +25,15 @@ KPIs with monthly reports, and exports to P6, MS Project, PDF, DXF, IFC and TILO
 ## Diagram
 
 - **Sloped line:** work that moves along the route and is longer than 1 km: track, catenary, earthworks,
-  signalling, drainage, electromechanical.
-- **Block (km × time):** point or short work such as bridges, tunnels and stations. Design and management
-  work that covers the whole route is a full-width block.
+  signalling, drainage, electromechanical; and tunnel drives (work type **Tunnel**) longer than 200 m, as a TBM
+  advance is usually drawn. The line runs from the start chainage at the start date to the end chainage at the
+  finish date.
+- **Block (km × time):** point or short work such as bridges, stations, cut-and-cover boxes and short tunnel work
+  (cross passages, portals). Design and management work that covers the whole route is a full-width block.
+- **Drawing style per activity:** the planner can override the automatic choice in the activity's **Chainage**
+  section: *Sloped line*, *Sloped line, towards lower chainage* (a drive from the end chainage back to the start, e.g.
+  a TBM launched at the far shaft) or *Block*. The choice is kept with the assignment (per programme series and
+  activity code) and survives a chainage table re-import; the PDF and DXF exports draw the same shape.
 - **Milestones:** diamonds on the left edge. Milestones without a chainage are laid out in lanes side by side.
 - **Data date:** dashed red line.
 - **Structure band** at the top: nodes of the **Locations** tree that have a chainage range (station,
@@ -71,6 +77,18 @@ changes until **Apply Selected**.
 
 Assignments belong to the **programme series and activity code**, so they survive a new version and a
 re-import of the programme. The source (table, rule, AI, manual), rule, evidence and confidence are stored.
+
+### Changing or Removing an Assignment
+
+- **Activity drawer → Chainage:** shows the activity's range, work type, drawing style and source. Planners set
+  or edit the range (source becomes manual), choose the work type and drawing style, or **Remove Chainage**: the
+  activity leaves the diagram (e.g. design or project management that covers the whole route and should not be
+  drawn). Assignments belong to the series, so this works on the baseline too.
+- **Wizard → Assigned tab:** lists every activity with a chainage (range, work type, source); tick and
+  **Remove Chainage** to remove several at once. The wizard's first tab can propose them again later.
+- API: `PUT /projects/:pid/schedules/:sid/locations` (with `display`: `line`, `line_reverse`, `block` or `null` for
+  automatic; left out = keep the stored choice) and `POST /projects/:pid/schedules/:sid/locations/delete`
+  (`{ codes }`, audited as `schedule.locations_deleted` with the codes).
 
 ## Programme Authoring
 

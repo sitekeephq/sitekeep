@@ -425,8 +425,14 @@ export const api = {
     post<ApiTokenDto & { token: string }>("/auth/tokens", t),
   deleteToken: (id: string) => del(`/auth/tokens/${id}`),
 
+  /** The company registry as the caller may see it (system administrators: all, with their projects). */
   companies: () => get<CompanyDto[]>("/companies"),
-  createCompany: (name: string, code?: string | null) => post<CompanyDto>("/companies", { name, ...(code ? { code } : {}) }),
+  /** The companies on a project: what every picker inside the project offers (docs/features/COMPANIES.md). */
+  projectCompanies: (projectId: string) => get<CompanyDto[]>(`/projects/${projectId}/companies`),
+  addProjectCompany: (projectId: string, companyId: string) => post<CompanyDto[]>(`/projects/${projectId}/companies`, { companyId }),
+  removeProjectCompany: (projectId: string, companyId: string) => del(`/projects/${projectId}/companies/${companyId}`),
+  createCompany: (name: string, code?: string | null, projectId?: string) =>
+    post<CompanyDto>("/companies", { name, ...(code ? { code } : {}), ...(projectId ? { projectId } : {}) }),
   updateCompany: (id: string, c: { name?: string; code?: string | null; address?: string | null; email?: string | null }) =>
     patch<CompanyDto>(`/companies/${id}`, c),
   users: () => get<UserDto[]>("/users"),
@@ -541,6 +547,7 @@ export const api = {
   issue: (pid: string, iid: string) => get<IssueDto>(`/projects/${pid}/issues/${iid}`),
   createIssue: (pid: string, i: Partial<IssueDto> & { title: string }) => post<IssueDto>(`/projects/${pid}/issues`, i),
   updateIssue: (pid: string, iid: string, i: Partial<IssueDto>) => patch<IssueDto>(`/projects/${pid}/issues/${iid}`, i),
+  deleteIssue: (pid: string, iid: string) => del(`/projects/${pid}/issues/${iid}`),
   comments: (pid: string, iid: string) => get<IssueCommentDto[]>(`/projects/${pid}/issues/${iid}/comments`),
   addComment: (pid: string, iid: string, body: string) =>
     post<IssueCommentDto>(`/projects/${pid}/issues/${iid}/comments`, { body }),

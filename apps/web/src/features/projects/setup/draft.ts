@@ -53,6 +53,8 @@ export interface SetupDraft {
   endDate: string;
   location: string;
   client: string;
+  /** ÇŞB EK-1 project code (optional; drafts saved before it was added lack it). */
+  csbProjectCode?: string;
   slotCompanies: Record<string, string>;
   slotCodes: Record<string, string>;
   parties: TemplateSlot[];
@@ -124,6 +126,7 @@ export function withTemplate(draft: SetupDraft, template: SetupTemplateChoice | 
     endDate: draft.endDate,
     location: draft.location,
     client: draft.client,
+    csbProjectCode: draft.csbProjectCode,
     people: draft.people.map((p) => ({ ...p, slot: "", roles: [] })),
     invite: draft.invite,
     inviteLanguage: draft.inviteLanguage,
@@ -204,9 +207,10 @@ export function dimensionOverrides(draft: SetupDraft, template: ProjectTemplate)
 export function toRequest(draft: SetupDraft, template: ProjectTemplate): ProjectSetupRequest {
   const ref =
     draft.template?.kind === "file" ? { template: draft.template.json as ProjectTemplate } : { templateId: draft.template?.kind === "builtin" ? draft.template.id : "" };
-  const details = Object.fromEntries(
+  const details: Record<string, string> = Object.fromEntries(
     (["startDate", "endDate", "location", "client"] as const).filter((k) => draft[k].trim()).map((k) => [k, draft[k].trim()]),
   );
+  if (draft.csbProjectCode?.trim()) details.csbProjectCode = draft.csbProjectCode.trim().toUpperCase();
   const setup = toSetup(draft, template);
   return {
     ...ref,

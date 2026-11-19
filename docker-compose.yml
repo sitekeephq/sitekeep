@@ -51,6 +51,10 @@ services:
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-}
       AUTODESK_CLIENT_ID: ${AUTODESK_CLIENT_ID:-}
       AUTODESK_CALLBACK_URL: ${AUTODESK_CALLBACK_URL:-}
+      # Revit models (Enterprise, Connect): memory cap of one conversion in MB (empty = 2048) and the converter's path
+      # (empty = the image's /usr/local/bin/rvt-ifc). docs/onprem/docker-compose.md#revit-models-enterprise
+      SITEKEEP_RVT_MEMORY_MB: ${SITEKEEP_RVT_MEMORY_MB:-}
+      SITEKEEP_RVT_IFC_PATH: ${SITEKEEP_RVT_IFC_PATH:-}
     ports:
       - "${CDE_PORT:-8080}:8080"
     volumes:

@@ -1,4 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
+import { linkProjectCompanies, requireProjectCompanies } from "../projects/companies.js";
 import {
   LETTER_ARCHIVABLE,
   LETTER_STATUS,
@@ -48,6 +49,7 @@ import {
   companyMembers,
   companyNames,
   companyRows,
+  projectCompanyIds,
   initialStatus,
   isClosed,
   projectTypes,
@@ -102,7 +104,12 @@ export async function createWork(
   const fromCompanyId = input.fromCompanyId === undefined ? (type.settings.incoming ? null : creator.companyId) : input.fromCompanyId;
   const to = [...new Set(input.toCompanyIds ?? [])];
   const cc = [...new Set(input.ccCompanyIds ?? [])].filter((c) => !to.includes(c));
-  await checkCompanies(db, [...to, ...cc, ...(fromCompanyId ? [fromCompanyId] : [])]);
+  // Companies on the project only (docs/features/COMPANIES.md). The creator's own company comes with
+  // them; internal creations (a = null: replies, transmittals) reuse companies of existing records.
+  const chosen = [...to, ...cc, ...(input.fromCompanyId ? [input.fromCompanyId] : [])];
+  if (a) await requireProjectCompanies(db, a, chosen);
+  else await checkCompanies(db, chosen);
+  await linkProjectCompanies(db, project.id, a ? [fromCompanyId] : [...chosen, fromCompanyId]);
   await checkMember(db, project.id, input.assigneeUserId);
   const links = dedupeLinks(input.links ?? []);
   if (a) for (const l of links) await checkLinkTarget(db, a, l, null);
@@ -115,7 +122,12 @@ export async function createWork(
   const data = isLetterType(type)
     ? { ...(input.data ?? {}), letter: await initialLetter(db, type, { fromCompanyId, toCompanyIds: to }, input.letter ?? null) }
     : (input.data ?? {});
-  const sender = fromCompanyId ? parties.get(fromCompanyId) : undefined;
+  // {Gönderen} of the number: a sender taken from the creator (not chosen) counts only when it is one
+  // of the project's companies; a user without a company in this project would otherwise put the code
+  // of a company from elsewhere into the number. Without one the project code stands in (fillTokens).
+  const senderCounts =
+    !!fromCompanyId && (input.fromCompanyId !== undefined || (await projectCompanyIds(db, project.id)).has(fromCompanyId));
+  const sender = fromCompanyId && senderCounts ? parties.get(fromCompanyId) : undefined;
   const receiver = to[0] ? parties.get(to[0]) : undefined;
   const now = new Date();
   const work = await db.transaction(async (tx) => {

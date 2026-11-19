@@ -2,6 +2,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import {
+  shownRoleName,
   PERMISSION_LEVELS,
   can,
   effectivePermission,
@@ -17,7 +18,8 @@ import type { Db } from "../../db/index.js";
 import { companies, fileVersions, files, folderGrants, folders, namingStandards, projectRoles } from "../../db/schema.js";
 import { HttpError, badRequest, notFound } from "../../core/platform/http.js";
 import { subjectInTeam } from "../../cde/teams.js";
-import { msg } from "../../i18n/index.js";
+import { currentLanguage, msg } from "../../i18n/index.js";
+import { requireProjectCompanies } from "../../projects/companies.js";
 import { toFileDto } from "./mapper.js";
 import { virtualFolderDtos } from "../../projects/project-templates.js";
 
@@ -219,6 +221,8 @@ export async function folderRoutes(api: FastifyInstance, { db }: AppDeps) {
         .where(and(eq(projectRoles.projectId, a.project.id), inArray(projectRoles.id, roleSubjects)));
       if (rows.length !== roleSubjects.length) throw notFound(msg("documents:entities.role"));
     }
+    // Company grants only to companies on the project (docs/features/COMPANIES.md); removing one is always allowed.
+    await requireProjectCompanies(db, a, body.entries.filter((e) => e.subjectType === "company" && e.level !== "none").map((e) => e.subjectId));
     const parentChain = folder.parentId ? tree.ancestry(folder.parentId) : [];
     const direct = new Set(
       tree.grants.filter((g) => g.folderId === folder.id).map((g) => `${g.subjectType}:${g.subjectId}`),
@@ -352,7 +356,7 @@ async function listGrants(db: Db, tree: FolderTree, folderId: string): Promise<G
   const roleRows = roleIds.length
     ? await db.select({ id: projectRoles.id, name: projectRoles.name }).from(projectRoles).where(inArray(projectRoles.id, roleIds))
     : [];
-  const rnames = new Map(roleRows.map((r) => [r.id, r.name]));
+  const rnames = new Map(roleRows.map((r) => [r.id, shownRoleName(r.name, currentLanguage())]));
   return all.map((g) => ({
     folderId: g.folderId,
     subjectType: g.subjectType,
@@ -371,7 +375,7 @@ export function toFolderDto(tree: FolderTree, principal: Principal, id: string):
     id: f.id,
     projectId: f.projectId,
     parentId: f.parentId,
-    name: f.name,
+    name: tree.displayName(id),
     description: f.description ?? null,
     state: f.state,
     stateLabel: f.stateLabel ?? null,

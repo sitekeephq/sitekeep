@@ -39,7 +39,10 @@
     "copyNeedsDownload": "Bu dosyayı kopyalamak için indirme yetkiniz olmalı.",
     "existsInTarget": "\"{{name}}\" hedef klasörde zaten var.",
     "noDownloadPermission": "Bu dosyayı indirme yetkiniz yok.",
-    "modelNotReady": "Model henüz görüntülemeye hazır değil ({{status}})."
+    "modelNotReady": "Model henüz görüntülemeye hazır değil ({{status}}).",
+    "ifcNotKept": "Bu sürüm için saklanan dönüştürülmüş IFC henüz yok. Proje yöneticisi sürümü yeniden dönüştürebilir.",
+    "notConvertible": "Bu dosya bir modül tarafından modele dönüştürülmüyor.",
+    "conversionBusy": "Bu sürümün modeli zaten dönüştürülüyor."
   },
   "messages": {
     "copiedFrom": "\"{{name}}\" dosyasından kopyalandı."

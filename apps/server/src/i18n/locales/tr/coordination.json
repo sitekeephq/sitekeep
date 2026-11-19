@@ -24,6 +24,7 @@
     "notIfcFile": "{{name}} bir IFC dosyası değil.",
     "snapshotFormat": "snapshot bir PNG/JPEG data URL olmalı",
     "issueEditRole": "Sorunu yalnızca oluşturan, atanan kişi veya proje yöneticisi değiştirebilir.",
+    "issueDeleteRole": "Sorunu yalnızca oluşturan veya proje yöneticisi silebilir.",
     "assigneeNotMember": "Atanan kişi proje üyesi değil.",
     "colourFormat": "Renk #RRGGBB biçiminde olmalı.",
     "markupFolderDenied": "Bu klasörde işaretleme yetkiniz yok.",

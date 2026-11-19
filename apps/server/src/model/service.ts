@@ -3,7 +3,6 @@
  * create or upgrade them (versions indexed before format 2 get a background re-index).
  */
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { splitExtension } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { jobs, versionIndexes, type fileVersions } from "../db/schema.js";
 import { HttpError, badRequest } from "../core/platform/http.js";
@@ -13,15 +12,16 @@ import type { Storage } from "../core/platform/storage.js";
 import { loadVersion, requireView } from "../modules/documents/files.js";
 import { ModelIndex } from "./model-index.js";
 import { msg, type Msg } from "../i18n/index.js";
+import { isModelFile } from "../files/model-formats.js";
 
 type User = Parameters<typeof loadVersion>[3];
 export type LoadedVersion = Awaited<ReturnType<typeof loadVersion>>;
 
-/** A visible IFC version (404 when hidden, 400 when not IFC). */
+/** A visible model version: IFC or a format a module converts to IFC (404 when hidden, 400 otherwise). */
 export async function ifcVersion(db: Db, pid: string, vid: string, user: User): Promise<LoadedVersion> {
   const v = await loadVersion(db, pid, vid, user);
   requireView(v.tree, v.a, v.file);
-  if (splitExtension(v.file.name).extension.toLowerCase() !== "ifc")
+  if (!isModelFile(v.file.name))
     throw badRequest(msg("model:errors.notIfc", { name: v.file.name }));
   return v;
 }
@@ -132,12 +132,13 @@ export async function versionModelIndex(
 }
 
 /**
- * Quantities need the openings read from the geometry (OPENINGS_FORMAT). An index written before
- * that is rebuilt once; true while that runs. False when it cannot (the rebuild already ran or
- * failed): the inventory then falls back to the model's own gross − net.
+ * Quantities need the openings read from the geometry (OPENINGS_FORMAT) and the volumes and areas
+ * measured from the mesh (MESH_QUANTITIES_FORMAT). An index written before that is rebuilt once;
+ * true while that runs. False when it cannot (the rebuild already ran or failed): the inventory then
+ * falls back to the model's own gross − net and leaves elements without quantity sets empty.
  */
 export async function ensureOpeningsIndex(db: Db, queue: JobQueue, versionId: string, index: ModelIndex): Promise<boolean> {
-  if (index.hasOpenings) return false;
+  if (index.hasOpenings && index.hasMeshQuantities) return false;
   const [row] = await db.select({ createdAt: versionIndexes.createdAt }).from(versionIndexes).where(eq(versionIndexes.versionId, versionId));
   return !!row && (await ensureUpgradeJob(db, queue, versionId, row.createdAt));
 }

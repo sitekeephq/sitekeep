@@ -10,6 +10,7 @@ import type { Db } from "../db/index.js";
 import type { AuthUser } from "../core/security/access.js";
 import type { DevContext } from "../dev/context.js";
 import type { JobQueue } from "../jobs/queue.js";
+import type { ModelFormat } from "../files/model-formats.js";
 
 /** "Görevlerim": open workflow steps of the module's records waiting for `user` in `projects`. */
 export type TaskSource = (db: Db, user: AuthUser, projects: { id: string; code: string; name: string }[], now: number) => Promise<MyTaskDto[]>;
@@ -52,6 +53,12 @@ export interface ServerModule {
   reminders?(db: Db, now: Date): Promise<ReminderCounts>;
   /** Contributes to the user's task list (workflow/routes/notifications.ts). */
   taskSources?: TaskSource[];
+  /**
+   * Model formats the module converts to IFC (Connect: Revit .rvt): versions of such files get a viewer
+   * derivative like IFC uploads (files/model-formats.ts, docs/features/MODEL_FORMATS.md). Only while the
+   * module is on. The web module lists the same extensions in `modelExtensions`.
+   */
+  modelFormats?: ModelFormat[];
   /** The module's tables, by export name: for developer tools (demo data, load scripts), not for features. */
   tables?: Record<string, unknown>;
 }

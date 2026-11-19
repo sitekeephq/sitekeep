@@ -731,7 +731,7 @@ function ReassignDialog({
   const { t } = useTranslation(["reviews", "common"]);
   const project = useProject();
   const { data: members } = useLoad(() => api.members(project.id), [project.id]);
-  const { data: companies } = useLoad(() => api.companies(), []);
+  const { data: companies } = useLoad(() => api.projectCompanies(project.id), [project.id]);
   const { data: roles } = useLoad(() => api.roles(project.id), [project.id]);
   const [assignees, setAssignees] = useState<WorkflowAssignee[]>(r.steps[r.stepIndex]!.assignees);
   const [error, setError] = useState<string | null>(null);
