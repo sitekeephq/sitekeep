@@ -31,6 +31,9 @@
     "esbuild": "0.28.2"
   },
   "overrides": {
-    "fast-xml-parser": "5.12.1"
+    "fast-xml-parser": "5.12.1",
+    "@esbuild-kit/core-utils": {
+      "esbuild": "0.25.12"
+    }
   }
 }
