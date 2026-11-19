@@ -36,6 +36,15 @@ Arayüz İngilizce ve Türkçedir.
 | Entegrasyonlar | REST API (`/api/v1`), OpenCDE, yapay zekâ asistanları için yerel stdio MCP sunucusu (`apps/mcp`), ofis → PDF dönüşümü (Gotenberg, ONLYOFFICE, Collabora); sunucuda MCP ucu (`/mcp`) Enterprise AI modülüyle gelir |
 | Gizlilik | Sunucu kendiliğinden dışarıya hiçbir şey göndermez; her dış bağlantı Gizlilik Merkezi'nde listelenir, kaydedilir ve kapatılabilir |
 
+## Ekran görüntüleri
+
+Kurgusal bir demo projeden (Riverside Metro Line) ekran görüntüleri.
+
+| | |
+|---|---|
+| ![Sürüm karşılaştırma](docs/images/documents-compare.jpg)<br>**Sürüm karşılaştırma:** bir çizimin iki revizyonu arasında değişen bölgeler, antet ve metin. | ![İnceleme ve onay](docs/images/review-completed.jpg)<br>**İnceleme ve onay:** dosya başına sonuç, tam zaman çizelgesi ve Shared'e kopyalanan onaylı dosyalar. |
+| ![Sorunlar ve BCF](docs/images/issues-bcf.jpg)<br>**Sorunlar ve BCF:** BCF'ten aktarılan sorunlar; görüntü, durum, öncelik ve yorumlarla. | ![DWG ve DXF görüntüleyici](docs/images/drawings-dxf-viewer.jpg)<br>**Tarayıcıda DWG ve DXF:** CAD yazılımı olmadan katmanlar, ölçümler ve yakalama. |
+
 ## Hızlı başlangıç (Docker)
 
 Docker 24+ ve Compose v2 gerekir.
