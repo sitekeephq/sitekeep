@@ -35,6 +35,15 @@ The user interface is available in English and Turkish.
 | Integrations | REST API (`/api/v1`), OpenCDE, a local stdio MCP server for AI assistants (`apps/mcp`), office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora); a hosted MCP endpoint (`/mcp`) comes with the Enterprise AI module |
 | Privacy | The server sends nothing out on its own; every outbound connection is listed in the Privacy Centre, logged and can be switched off |
 
+## Screenshots
+
+Screenshots from a fictional demo project (Riverside Metro Line).
+
+| | |
+|---|---|
+| ![Version comparison](docs/images/documents-compare.jpg)<br>**Version comparison:** changed regions, title block and text between two revisions of a drawing. | ![Review and approval](docs/images/review-completed.jpg)<br>**Review and approval:** results per file, a full timeline, and approved files copied to Shared. |
+| ![Issues and BCF](docs/images/issues-bcf.jpg)<br>**Issues and BCF:** issues imported from BCF, with snapshot, status, priority and comments. | ![DWG and DXF viewer](docs/images/drawings-dxf-viewer.jpg)<br>**DWG and DXF in the browser:** layers, measurements and snapping without CAD software. |
+
 ## Quick start (Docker)
 
 You need Docker 24+ with Compose v2.
