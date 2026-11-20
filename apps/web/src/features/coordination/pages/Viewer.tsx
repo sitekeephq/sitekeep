@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type IssueDto, type IssuePriority, type ModelSetDto, type VersionCompareDto } from "@sitekeep/shared";
-import { ViewerEngine, type SelectedItem } from "@sitekeephq/bim-viewer";
+import { ViewerEngine, setViewerLanguage, type SelectedItem } from "@sitekeephq/bim-viewer";
 import { PropertiesPanel, ViewerToolsHud, useViewerTools } from "@sitekeephq/bim-viewer/react";
 import { isToolMoreKey, toolMoreItems } from "@sitekeephq/bim-viewer/tools";
 import "@sitekeephq/bim-viewer/tools.css";
@@ -32,7 +32,9 @@ const PIN_COLORS: Record<string, string> = {
 };
 
 export function ViewerPage() {
-  const { t } = useTranslation(["coordination", "common", "modelMarkup"]);
+  const { t, i18n } = useTranslation(["coordination", "common", "modelMarkup"]);
+  // Tool rail, panels, hints, view cube and measurement numbers in the interface language (#158).
+  setViewerLanguage(i18n.language);
   const label = useLabel();
   const project = useProject();
   const [params, setParams] = useSearchParams();

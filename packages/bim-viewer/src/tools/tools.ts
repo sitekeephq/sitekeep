@@ -17,6 +17,7 @@ import { readViewpointExtras, toViewpointExtras } from "./viewpoint-extras.js";
 import { ViewCube } from "./view-cube.js";
 import { WalkController } from "./walk.js";
 import { EYE_HEIGHT, type MoveInput } from "./walk-math.js";
+import { vt } from "../i18n.js";
 
 export interface StoreyRow {
   name: string;
@@ -229,10 +230,10 @@ export class ViewerTools implements ViewpointExtrasSource {
       if (opts.walkAt) {
         await this.walk.start(opts.walkAt);
         this.walkAwaitingStart = false;
-        this.hint = matchMedia("(pointer: coarse)").matches ? "Sol alttaki kolla yürüyün, ekranı sürükleyerek bakın." : "Bakmak için tıklayın · W A S D ile yürüyün · Esc";
+        this.hint = matchMedia("(pointer: coarse)").matches ? vt("hint.walkTouch") : vt("hint.walkMouse");
       } else {
         this.walkAwaitingStart = true;
-        this.hint = "Yürümeye başlamak istediğiniz zemine tıklayın · Esc: vazgeç";
+        this.hint = vt("hint.walkPick");
       }
     } else this.hint = null;
     if (mode === "plan") await this.enterPlan();
@@ -371,7 +372,7 @@ export class ViewerTools implements ViewpointExtrasSource {
     if (on) this.setMeasureTool(null);
     this.sections.placing = on;
     this.syncHighlighter();
-    this.hint = on ? "Kesit için bir yüze çift tıklayın (Esc: bitir)." : null;
+    this.hint = on ? vt("hint.sectionPlace") : null;
     this.emit();
   }
 
@@ -388,7 +389,7 @@ export class ViewerTools implements ViewpointExtrasSource {
   setMeasureTool(tool: MeasureKindTool | null) {
     if (tool === "volume") {
       if (!this.measure.measureSelectionVolume()) {
-        this.hint = "Hacim için önce bir veya birden fazla eleman seçin.";
+        this.hint = vt("hint.volumeNeedsSelection");
         this.emit();
       }
       return;
@@ -399,10 +400,10 @@ export class ViewerTools implements ViewpointExtrasSource {
     this.hint = !tool
       ? null
       : tool === "length"
-        ? "İki noktaya tıklayın (telefonda dokunun). Köşe, kenar ve yüzeylere yapışır."
+        ? vt("hint.length")
         : tool === "area"
-          ? "Köşelere tıklayın; çift tık veya Enter alanı kapatır."
-          : "Üç noktaya tıklayın: başlangıç, köşe, bitiş.";
+          ? vt("hint.area")
+          : vt("hint.angle");
     this.emit();
   }
 
@@ -534,12 +535,12 @@ export class ViewerTools implements ViewpointExtrasSource {
       dom: this.canvas,
     });
     if (!hit || (hit.normal && Math.abs(hit.normal.y) < 0.6)) {
-      this.hint = "Başlangıç için döşeme veya zemin yüzeyine tıklayın · Esc: vazgeç";
+      this.hint = vt("hint.walkStart");
       return this.emit();
     }
     this.walkAwaitingStart = false;
     await this.walk.start(new THREE.Vector3(hit.point.x, hit.point.y + EYE_HEIGHT, hit.point.z));
-    this.hint = matchMedia("(pointer: coarse)").matches ? "Sol alttaki kolla yürüyün, ekranı sürükleyerek bakın." : "Bakmak için tıklayın · W A S D ile yürüyün · Esc";
+    this.hint = matchMedia("(pointer: coarse)").matches ? vt("hint.walkTouch") : vt("hint.walkMouse");
     this.emit();
   }
 

@@ -156,7 +156,10 @@ export class JobQueue {
       .select()
       .from(jobs)
       .where(eq(jobs.status, "queued"))
-      .orderBy(asc(jobs.createdAt))
+      // Jobs queued in bulk at start-up (payload.background: model backfill and reconversion after a
+      // converter update) wait while anything a person started is queued: a new upload does not sit
+      // behind hundreds of reconversions (#158). Within each group, oldest first.
+      .orderBy(sql`coalesce((${jobs.payload}->>'background')::boolean, false)`, asc(jobs.createdAt))
       .limit(1);
     if (!job) return false;
     const claimed = await this.db

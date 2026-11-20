@@ -28,3 +28,6 @@ export type {
 } from "./extensions/types.js";
 export { createThemeExtension } from "./extensions/themeExtension.js";
 export type { ThemeExtensionOptions } from "./extensions/themeExtension.js";
+
+export { setViewerLanguage, viewerLanguage, vt } from "./i18n.js";
+export type { ViewerLanguage, ViewerTextKey } from "./i18n.js";

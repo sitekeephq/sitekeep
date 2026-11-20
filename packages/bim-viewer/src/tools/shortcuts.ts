@@ -3,6 +3,7 @@
  * so they follow the user's layout (Turkish Q: "ı" and "i" both isolate); walking uses the
  * physical WASD keys (walk-math.ts).
  */
+import { vt } from "../i18n.js";
 
 export type NavMode = "orbit" | "walk" | "plan";
 export type MeasureTool = "length" | "area" | "angle" | "volume";
@@ -52,7 +53,28 @@ export function shortcutCommand(e: { key: string; ctrlKey?: boolean; metaKey?: b
   return BY_KEY[key] ?? null;
 }
 
-/** Rows of the "?" help popover: keys → what they do. */
+/** Rows of the "?" help popover in the viewer language (setViewerLanguage): keys → what they do. */
+export function shortcutHelp(): { keys: string; text: string }[] {
+  return [
+    { keys: "1 · 2 · 3", text: vt("help.nav") },
+    { keys: vt("help.keys.arrows"), text: vt("help.walkMove") },
+    { keys: vt("help.keys.mouse"), text: vt("help.walkLook") },
+    { keys: "Shift", text: vt("help.walkRun") },
+    { keys: "Q · E", text: vt("help.walkUpDown") },
+    { keys: vt("help.keys.doubleClick"), text: vt("help.walkHere") },
+    { keys: "F", text: vt("help.fit") },
+    { keys: "K", text: vt("help.plane") },
+    { keys: "B", text: vt("help.box") },
+    { keys: "M", text: vt("help.measure") },
+    { keys: "H · I · U", text: vt("help.visibility") },
+    { keys: "X", text: vt("help.xray") },
+    { keys: "G", text: vt("help.screenshot") },
+    { keys: "Esc", text: vt("help.escape") },
+    { keys: "?", text: vt("help.help") },
+  ];
+}
+
+/** @deprecated Turkish rows kept for hosts before 0.6.0; use shortcutHelp(). */
 export const SHORTCUT_HELP: { keys: string; text: string }[] = [
   { keys: "1 · 2 · 3", text: "Yörünge · Yürüme · Plan" },
   { keys: "W A S D · Oklar", text: "Yürüme: ileri, sola, geri, sağa" },

@@ -27,6 +27,8 @@ export async function request<T>(
     // The server answers in this language where it can (error messages, docs/architecture/i18n.md).
     headers: {
       "accept-language": currentLanguage(),
+      // Wins over the profile and the browser on the server (requestLanguage).
+      "x-sitekeep-language": currentLanguage(),
       ...(body !== undefined && !(body instanceof FormData) ? { "content-type": "application/json" } : {}),
     },
     body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),

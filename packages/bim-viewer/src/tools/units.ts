@@ -1,24 +1,29 @@
 /**
- * Measurement values in Turkish number format: "12,34 m", "1.234,50 m²", "45,00°", "0,75 m³".
+ * Measurement values in the viewer language's number format: "12,34 m" (tr) / "12.34 m" (en), "45,00°", "0,75 m³".
  * Lengths in metres with 2 decimals, areas m², angles in degrees, volumes m³.
  */
 import type { ViewpointMeasurement } from "../core/types.js";
+import { viewerLanguage, vt } from "../i18n.js";
 
 export type MeasureKind = ViewpointMeasurement["kind"];
 
-const formatters = new Map<number, Intl.NumberFormat>();
+const formatters = new Map<string, Intl.NumberFormat>();
 
-/** 1234.5 → "1.234,50" (tr-TR grouping and decimal comma). NaN / Infinity → "—". */
+/**
+ * Number in the viewer language: 1234.5 → "1.234,50" in Turkish, "1,234.50" in English
+ * (setViewerLanguage). NaN / Infinity → "—". The name stays for hosts before 0.6.0.
+ */
 export function formatNumberTr(value: number, decimals = 2): string {
   if (!Number.isFinite(value)) return "—";
-  let f = formatters.get(decimals);
+  const locale = viewerLanguage() === "tr" ? "tr-TR" : "en-GB";
+  let f = formatters.get(`${locale}:${decimals}`);
   if (!f) {
-    f = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-    formatters.set(decimals, f);
+    f = new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    formatters.set(`${locale}:${decimals}`, f);
   }
   const text = f.format(value);
   // -0,00 for tiny negative values reads like an error.
-  return /^-0(,0+)?$/.test(text) ? text.slice(1) : text;
+  return /^-0([.,]0+)?$/.test(text) ? text.slice(1) : text;
 }
 
 export const UNIT_SUFFIX: Record<MeasureKind, string> = { length: " m", area: " m²", angle: "°", volume: " m³" };
@@ -32,7 +37,12 @@ export function formatMeasure(kind: MeasureKind, value: number): string {
   return `${formatNumberTr(value)}${UNIT_SUFFIX[kind]}`;
 }
 
-/** List labels of the measurement kinds (measurement panel, phone menu). */
+/** Label of a measurement kind in the viewer language (measurement panel, phone menu). */
+export function measureKindLabel(kind: MeasureKind): string {
+  return vt(`measure.${kind}`);
+}
+
+/** @deprecated Turkish labels kept for hosts before 0.6.0; use measureKindLabel(). */
 export const MEASURE_KIND_LABELS: Record<MeasureKind, string> = {
   length: "Uzunluk",
   area: "Alan",

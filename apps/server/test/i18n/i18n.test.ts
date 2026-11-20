@@ -112,10 +112,11 @@ describe("errors and notifications per reader", () => {
     fs.rmSync(dataDir, { recursive: true, force: true });
   });
 
+  // The web app's header: wins over the profile (Accept-Language does not, see the first test).
   const get = (url: string, lang?: string) =>
-    app.inject({ method: "GET", url: `/api/v1${url}`, headers: { cookie, ...(lang ? { "accept-language": lang } : {}) } });
+    app.inject({ method: "GET", url: `/api/v1${url}`, headers: { cookie, ...(lang ? { "x-sitekeep-language": lang } : {}) } });
 
-  it("answers an error in the language the client asks for, else the profile's", async () => {
+  it("answers an error in the web app's language, else the profile's, else Accept-Language", async () => {
     const bad = (lang?: string) =>
       app.inject({ method: "PATCH", url: "/api/v1/me/prefs", headers: { cookie, ...(lang ? { "accept-language": lang } : {}) }, payload: { language: "Türkçe" } });
     expect((await bad("en")).json().message).toBe("Invalid request.");
@@ -124,6 +125,11 @@ describe("errors and notifications per reader", () => {
     expect((await bad()).json().message).toBe("Geçersiz istek.");
     await app.inject({ method: "PATCH", url: "/api/v1/me/prefs", headers: { cookie }, payload: { language: "en" } });
     expect((await bad()).json().message).toBe("Invalid request.");
+    // With a profile, a browser's Accept-Language does not override it (#158: a direct API call from a
+    // browser set to Turkish); the web app's X-SiteKeep-Language does.
+    expect((await bad("tr-TR,tr;q=0.9")).json().message).toBe("Invalid request.");
+    const explicit = await app.inject({ method: "PATCH", url: "/api/v1/me/prefs", headers: { cookie, "x-sitekeep-language": "tr" }, payload: { language: "Türkçe" } });
+    expect(explicit.json().message).toBe("Geçersiz istek.");
   });
 
   it("stores a notification as a message and lists it in the reader's language", async () => {

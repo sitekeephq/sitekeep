@@ -73,6 +73,8 @@ export interface ViewerEngineOptions {
   workerUrl?: string;
   /** Show the renderer vendor wordmark. Disabled by default in product UIs. */
   showVendorLogo?: boolean;
+  /** Zoom towards the cursor and through the orbit point (default true; see ViewerEngine.configureZoom). */
+  zoomToCursor?: boolean;
 }
 
 export interface ViewerRuntimeOptions extends ViewerEngineOptions {

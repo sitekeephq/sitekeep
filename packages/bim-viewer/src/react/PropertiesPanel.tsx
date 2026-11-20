@@ -4,6 +4,7 @@
  */
 import { useEffect, useState } from "react";
 import type { SelectedItem } from "../core/ViewerEngine.js";
+import { vt } from "../i18n.js";
 
 /** Generic fallback; hosts can inject localized IFC labels. */
 export function defaultClassLabel(category: string): string {
@@ -52,7 +53,7 @@ export function PropertiesPanel({
     void copyText(text).then((ok) => ok && setCopied(key));
   };
   const copyButton = (id: string, text: string, what: string) => (
-    <button type="button" className="ghost small vt-copy" title={`${what} kopyala`} aria-label={`${what} kopyala`} onClick={() => copy(id, text)}>
+    <button type="button" className="ghost small vt-copy" title={vt("props.copy", { what })} aria-label={vt("props.copy", { what })} onClick={() => copy(id, text)}>
       {copied === id ? "✓" : "⧉"}
     </button>
   );
@@ -60,37 +61,37 @@ export function PropertiesPanel({
   return (
     <>
       <div className="row">
-        <h3 style={{ margin: 0 }}>{selected.name ?? (selected.category ? classLabel(selected.category) : "Eleman")}</h3>
+        <h3 style={{ margin: 0 }}>{selected.name ?? (selected.category ? classLabel(selected.category) : vt("props.element"))}</h3>
         <div className="spacer" />
-        <button className="ghost small" aria-label="Seçimi kaldır" onClick={onClose}>
+        <button className="ghost small" aria-label={vt("props.clearSelection")} onClick={onClose}>
           ✕
         </button>
       </div>
       <dl className="vt-props-head">
         {selected.category && (
           <div>
-            <dt>IFC Sınıfı</dt>
+            <dt>{vt("props.ifcClass")}</dt>
             <dd>
               {classLabel(selected.category)} <span className="muted mono small">{selected.category}</span>
             </dd>
           </div>
         )}
         <div>
-          <dt>Kat</dt>
+          <dt>{vt("props.storey")}</dt>
           <dd>{selected.storey ?? <span className="muted">—</span>}</dd>
         </div>
         {selected.globalId && (
           <div>
             <dt>GlobalId</dt>
             <dd className="mono small">
-              {selected.globalId} {copyButton("gid", selected.globalId, "GlobalId'yi")}
+              {selected.globalId} {copyButton("gid", selected.globalId, vt("props.globalId"))}
             </dd>
           </div>
         )}
       </dl>
       {copied && (
         <div className="muted small" role="status">
-          Kopyalandı.
+          {vt("props.copied")}
         </div>
       )}
       {selected.groups.map((g, gi) => (
@@ -103,7 +104,7 @@ export function PropertiesPanel({
                   <td>{k}</td>
                   <td className="vt-prop-value">
                     <span>{v}</span>
-                    {copyButton(`${gi}-${i}`, v, "Değeri")}
+                    {copyButton(`${gi}-${i}`, v, vt("props.value"))}
                   </td>
                 </tr>
               ))}

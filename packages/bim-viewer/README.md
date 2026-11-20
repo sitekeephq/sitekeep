@@ -87,6 +87,26 @@ const viewerTools = useViewerTools(engine, {
 />;
 ```
 
+### Language
+
+The tool rail, panels, hints, shortcut help, view cube, phone menu, properties panel, load errors and
+measurement numbers are in English or Turkish. Set the language at start-up and whenever it changes
+(re-render the HUD afterwards; React hosts do on their own language change):
+
+```ts
+import { setViewerLanguage } from "@sitekeephq/bim-viewer";
+setViewerLanguage(i18n.language); // "tr…" → Turkish, anything else → English
+```
+
+The default is Turkish (as before 0.6.0). `SHORTCUT_HELP` and `MEASURE_KIND_LABELS` keep their Turkish
+values; use `shortcutHelp()` and `measureKindLabel()` for the current language.
+
+### Zoom
+
+The wheel and pinch zoom towards the point under the cursor and passes through the orbit point
+instead of stalling near it. `ViewerEngine.create(container, { zoomToCursor: false })` keeps the
+camera-controls defaults.
+
 `PropertiesPanel` accepts a `classLabel` function for host localization.
 `storeyLoader`, branding and about copy are optional; no product API or brand
 module is imported by this package.

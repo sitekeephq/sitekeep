@@ -186,12 +186,32 @@ export function fromAcceptLanguage(header: string | undefined): string | null {
   return null;
 }
 
+/** Header the web app sends with its current interface language (shared/api/client.ts). */
+export const LANGUAGE_HEADER = "x-sitekeep-language";
+
 /**
- * The language a request is answered in: what the client asks for (the web app sends its current
- * interface language), else the user's profile, else the default.
+ * The language a request is answered in:
+ * 1. the web app's interface language (LANGUAGE_HEADER);
+ * 2. the signed-in user's profile language;
+ * 3. the browser's Accept-Language (sign-in page, invitations, other clients without a profile);
+ * 4. the installation default.
+ * The profile comes before Accept-Language: a browser set to Turkish that calls the API directly
+ * (a download link, a script) for a user who works in English gets English (#158).
  */
+/** The language the client asks for, without the profile: the web app's header, else Accept-Language (null when neither). */
+export function clientLanguage(req: Pick<FastifyRequest, "headers">): string | null {
+  const explicit = req.headers[LANGUAGE_HEADER];
+  return supportedLanguage(Array.isArray(explicit) ? explicit[0] : explicit) ?? fromAcceptLanguage(req.headers["accept-language"]);
+}
+
 export function requestLanguage(req: Pick<FastifyRequest, "headers"> & { user?: { language?: string | null } | null }): string {
-  return fromAcceptLanguage(req.headers["accept-language"]) ?? supportedLanguage(req.user?.language) ?? DEFAULT_LANGUAGE;
+  const explicit = req.headers[LANGUAGE_HEADER];
+  return (
+    supportedLanguage(Array.isArray(explicit) ? explicit[0] : explicit) ??
+    supportedLanguage(req.user?.language) ??
+    fromAcceptLanguage(req.headers["accept-language"]) ??
+    DEFAULT_LANGUAGE
+  );
 }
 
 // ---- Language of the running request ------------------------------------------------------------

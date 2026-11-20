@@ -2,6 +2,7 @@
  * Thin wrapper around That Open Components 3.x: one world, federated Fragments models,
  * click selection, properties, pins and BCF-style viewpoints.
  */
+import { vt } from "../i18n.js";
 import * as OBC from "@thatopen/components";
 import * as OBF from "@thatopen/components-front";
 import { LodMode } from "@thatopen/fragments";
@@ -108,6 +109,24 @@ export class ViewerEngine {
     this.highlighter = this.components.get(OBF.Highlighter);
   }
 
+  /**
+   * Wheel and pinch zoom (camera-controls defaults dolly towards the orbit point and slow down
+   * near it, so zooming in on a long or large model stalls):
+   * - towards the point under the cursor or between the fingers;
+   * - past the orbit point: at the minimum distance the target moves forward with the camera;
+   * - steps proportional to the distance, a little faster than the default.
+   * `zoomToCursor: false` keeps the old behaviour.
+   */
+  private configureZoom() {
+    if (this.options.zoomToCursor === false) return;
+    const controls = this.world.camera.controls;
+    controls.dollyToCursor = true;
+    controls.infinityDolly = true;
+    controls.minDistance = 0.3;
+    controls.maxDistance = Infinity;
+    controls.dollySpeed = 1.2;
+  }
+
   static async create(
     container: HTMLElement,
     options: ViewerEngineOptions = {},
@@ -120,6 +139,7 @@ export class ViewerEngine {
   private async init() {
     // The worker is copied next to the app (scripts/copy-worker.mjs) so it works offline.
     this.fragments.init(this.options.workerUrl ?? "/fragments-worker.mjs");
+    this.configureZoom();
     this.world.camera.controls.addEventListener("rest", () => this.fragments.core.update(true));
     this.world.camera.controls.addEventListener("update", () => this.fragments.core.update());
     // Plan view switches to the orthographic camera: models must cull and pick LODs with it.
@@ -160,7 +180,7 @@ export class ViewerEngine {
   async load(modelId: string, url: string, onProgress?: (pct: number) => void): Promise<void> {
     if (this.fragments.list.has(modelId)) return;
     const res = await fetch(url, { credentials: "same-origin" });
-    if (!res.ok) throw new Error(`Model yüklenemedi (HTTP ${res.status})`);
+    if (!res.ok) throw new Error(vt("load.failed", { status: res.status }));
     const buffer = await res.arrayBuffer();
     onProgress?.(60);
     this.fragments.core.settings.graphicsQuality = SOLID_AT_ANY_DISTANCE;
@@ -169,7 +189,7 @@ export class ViewerEngine {
     } catch (error) {
       // The Fragments worker rejects with a string ("Error: Fragments: Malformed fragments data!").
       const detail = error instanceof Error ? error.message : String(error).replace(/^Error:\s*/, "");
-      throw new Error(`Model okunamadı: ${detail}`, { cause: error });
+      throw new Error(vt("load.unreadable", { detail }), { cause: error });
     }
     // After the worker has the model. On insert, setLodMode rejects with "Model not found".
     // Wires are the other way a far view draws the frame over the envelope.
@@ -942,8 +962,8 @@ function toGroups(data: Data): { name: string; rows: [string, string][] }[] {
     if (val !== null && !k.startsWith("_")) attrs.push([k, val]);
   }
   const cat = valueOf(data._category);
-  if (cat) attrs.unshift(["Sınıf", cat]);
-  groups.push({ name: "Öznitelikler", rows: attrs });
+  if (cat) attrs.unshift([vt("props.class"), cat]);
+  groups.push({ name: vt("props.attributes"), rows: attrs });
 
   for (const rel of ["IsDefinedBy", "ContainedInStructure"]) {
     const list = data[rel];

@@ -17,7 +17,7 @@ import { passwordProblem } from "../core/security/auth.js";
 import { projectAccess, requireProjectAdmin } from "../core/security/access.js";
 import { FailureLimiter } from "../oauth/rate-limit.js";
 import { publicBaseUrl } from "../oauth/config.js";
-import { fromAcceptLanguage, msg } from "../i18n/index.js";
+import { clientLanguage, msg } from "../i18n/index.js";
 import { toUserDto } from "./dto.js";
 import { googleSignInRefusal } from "./google-connection.js";
 import { OutboundBlockedError } from "../privacy/outbound.js";
@@ -261,7 +261,7 @@ export async function invitationRoutes(api: FastifyInstance, deps: ResolvedDeps)
         name: body.name,
         password: body.password,
         provider: "password",
-        language: fromAcceptLanguage(req.headers["accept-language"]),
+        language: clientLanguage(req),
       });
       await recordPrivacyNotice(db, user.id, notice.accept, "invitation");
       // Two-factor required for everyone: the person sets it up on the sign-in page before the session starts.

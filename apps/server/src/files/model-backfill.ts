@@ -43,7 +43,8 @@ export async function queueModelBackfill(db: Db, jobs: JobQueue): Promise<number
       .where(and(eq(fileVersions.id, r.id), eq(fileVersions.derivativeStatus, "none")))
       .returning({ id: fileVersions.id });
     if (!claimed) continue;
-    await jobs.enqueue("ifc_to_frag", { versionId: r.id });
+    // Background: a new upload or an administrator's "Convert again" goes first (JobQueue.runNext).
+    await jobs.enqueue("ifc_to_frag", { versionId: r.id, background: true });
     queued++;
   }
   return queued;
@@ -111,7 +112,7 @@ export async function queueModelReconversion(db: Db, jobs: JobQueue): Promise<nu
       )
       .returning({ id: fileVersions.id });
     if (!claimed) continue;
-    await jobs.enqueue("ifc_to_frag", { versionId: r.id, reconvert: true });
+    await jobs.enqueue("ifc_to_frag", { versionId: r.id, reconvert: true, background: true });
     queued++;
   }
   return queued;

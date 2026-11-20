@@ -3,6 +3,7 @@
  * model from that side around the current orbit point. It follows the camera only when the camera
  * moves (controls "update"), so it costs nothing while the view is still.
  */
+import { vt } from "../i18n.js";
 import * as THREE from "three";
 import type { ViewerEngine } from "../core/ViewerEngine.js";
 
@@ -49,7 +50,7 @@ export class ViewCube {
     this.root.className = "vt-cube";
     this.root.style.width = this.root.style.height = `${size * 1.5}px`;
     this.root.setAttribute("role", "group");
-    this.root.setAttribute("aria-label", "Görünüm küpü");
+    this.root.setAttribute("aria-label", vt("cube.label"));
     this.cube = document.createElement("div");
     this.cube.className = "vt-cube-body";
     const half = size / 2;
@@ -57,8 +58,8 @@ export class ViewCube {
       const el = document.createElement("button");
       el.type = "button";
       el.className = `vt-cube-face vt-cube-${f.face}`;
-      el.textContent = f.label;
-      el.title = `${f.label} görünüş`;
+      el.textContent = vt(`cube.${f.face}`);
+      el.title = vt("cube.view", { face: vt(`cube.${f.face}`) });
       const o = new THREE.Object3D();
       o.rotation.set(...f.rot);
       o.position.set(f.dir[0] * half, f.dir[1] * half, f.dir[2] * half);

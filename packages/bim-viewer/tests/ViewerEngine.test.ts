@@ -1,7 +1,7 @@
 import { LodMode } from "@thatopen/fragments";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as THREE from "three";
-import { CLASH_COLORS, COMPARE_COLORS, FOURD_COLORS, cssColor } from "../src/core/ViewerEngine";
+import { CLASH_COLORS, COMPARE_COLORS, FOURD_COLORS, ViewerEngine as Engine, cssColor } from "../src/core/ViewerEngine";
 import { fakeModel, makeEngineStub } from "./helpers/engine-stub";
 
 // Stubbed fetch must not leak into the next test when an assertion fails.
@@ -169,5 +169,28 @@ describe("ViewerEngine federation and queries", () => {
     const cam = engine.cameraState();
     expect(cam.projection).toBe("perspective");
     await engine.setCamera({ position: [1, 2, 3], target: [0, 0, 0] });
+  });
+});
+
+describe("zoom", () => {
+  const configure = (options: Record<string, unknown>) => {
+    const controls: Record<string, unknown> = { dollyToCursor: false, infinityDolly: false, minDistance: 0, maxDistance: Infinity, dollySpeed: 1 };
+    const self = { options, world: { camera: { controls } } };
+    (Engine.prototype as unknown as { configureZoom(this: unknown): void }).configureZoom.call(self);
+    return controls;
+  };
+
+  it("zooms towards the cursor and through the orbit point", () => {
+    const c = configure({});
+    expect(c.dollyToCursor).toBe(true);
+    expect(c.infinityDolly).toBe(true);
+    expect(c.minDistance).toBeGreaterThan(0);
+    expect(c.dollySpeed).toBeGreaterThan(1);
+  });
+
+  it("keeps camera-controls defaults with zoomToCursor: false", () => {
+    const c = configure({ zoomToCursor: false });
+    expect(c.dollyToCursor).toBe(false);
+    expect(c.infinityDolly).toBe(false);
   });
 });

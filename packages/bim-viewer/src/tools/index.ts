@@ -14,3 +14,4 @@ export * from "./sim-paint.js";
 export * from "./units.js";
 export * from "./viewpoint-extras.js";
 export * from "./tools-phone.js";
+export { setViewerLanguage, viewerLanguage } from "../i18n.js";
