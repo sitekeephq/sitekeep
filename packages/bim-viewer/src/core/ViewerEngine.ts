@@ -48,11 +48,17 @@ const SOLID_AT_ANY_DISTANCE = 4 / 3;
 /** How far the ground grid sits under the lowest model (metres). */
 const GRID_GAP = 0.1;
 
+/** That Open's camera far plane (metres); clipping only ever grows past it (fitClipping). */
+const DEFAULT_FAR = 1000;
+const _eye = new THREE.Vector3();
+
 export class ViewerEngine {
   readonly components = new OBC.Components();
   readonly world: World;
   readonly fragments: OBC.FragmentsManager;
   readonly highlighter: OBF.Highlighter;
+  /** Bounding sphere of the loaded models (placeGrid), for the far plane. */
+  private sceneSphere: THREE.Sphere | null = null;
   private readonly pins = new THREE.Group();
   private readonly clashMarker = new THREE.Group();
   /** BCF lines / points of the applied viewpoint. */
@@ -141,9 +147,13 @@ export class ViewerEngine {
     this.fragments.init(this.options.workerUrl ?? "/fragments-worker.mjs");
     this.configureZoom();
     this.world.camera.controls.addEventListener("rest", () => this.fragments.core.update(true));
-    this.world.camera.controls.addEventListener("update", () => this.fragments.core.update());
+    this.world.camera.controls.addEventListener("update", () => {
+      this.fitClipping();
+      this.fragments.core.update();
+    });
     // Plan view switches to the orthographic camera: models must cull and pick LODs with it.
     this.world.camera.projection.onChanged.add((camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) => {
+      this.fitClipping();
       for (const model of this.fragments.list.values()) model.useCamera(camera);
       this.fragments.core.update(true);
     });
@@ -219,11 +229,40 @@ export class ViewerEngine {
    */
   private placeGrid() {
     let bottom = Infinity;
+    const all = new THREE.Box3();
     for (const model of this.fragments.list.values()) {
       const box = model.box;
-      if (!box.isEmpty()) bottom = Math.min(bottom, box.min.y);
+      if (!box.isEmpty()) {
+        bottom = Math.min(bottom, box.min.y);
+        all.union(box);
+      }
     }
     this.grid.three.position.y = Number.isFinite(bottom) ? Math.min(0, bottom - GRID_GAP) : 0;
+    this.sceneSphere = all.isEmpty() ? null : all.getBoundingSphere(new THREE.Sphere());
+    if (this.sceneSphere && !Number.isFinite(this.sceneSphere.radius)) this.sceneSphere = null;
+    this.fitClipping();
+  }
+
+  /**
+   * The far plane reaches past the farthest loaded model point, from where the camera is and from
+   * where it is moving to. That Open's 1000 m far plane used to be enough because Orbit capped the
+   * distance at 300 m; with free zoom (configureZoom) Fit stands a 12 km line model ~12 km away
+   * and the far plane clipped everything, the grid included (#158).
+   */
+  private fitClipping() {
+    const camera = this.world.camera.three as THREE.PerspectiveCamera | THREE.OrthographicCamera;
+    const sphere = this.sceneSphere;
+    if (!camera) return;
+    let far = DEFAULT_FAR;
+    if (sphere) {
+      const now = camera.position.distanceTo(sphere.center);
+      const next = this.world.camera.controls.getPosition(_eye, true).distanceTo(sphere.center);
+      far = Math.max(DEFAULT_FAR, (Math.max(now, next) + sphere.radius) * 1.2);
+    }
+    // Grow at once; shrink only when the plane is well past what is needed (no churn per frame).
+    if (camera.far >= far && camera.far <= far * 2) return;
+    camera.far = far;
+    camera.updateProjectionMatrix();
   }
 
   async fit(): Promise<void> {

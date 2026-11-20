@@ -21,7 +21,7 @@ import { inTeam, type FolderTree } from "./access.js";
 export function folderPath(tree: FolderTree, id: string): string {
   return tree
     .ancestry(id)
-    .map((x) => tree.get(x).name)
+    .map((x) => tree.displayName(x))
     .join(" / ");
 }
 

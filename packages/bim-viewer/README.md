@@ -105,7 +105,8 @@ values; use `shortcutHelp()` and `measureKindLabel()` for the current language.
 
 The wheel and pinch zoom towards the point under the cursor and passes through the orbit point
 instead of stalling near it. `ViewerEngine.create(container, { zoomToCursor: false })` keeps the
-camera-controls defaults.
+camera-controls defaults. The far clipping plane grows with the loaded models and the camera's
+distance (from 0.6.1), so long models such as a 12 km line stay visible after Fit.
 
 `PropertiesPanel` accepts a `classLabel` function for host localization.
 `storeyLoader`, branding and about copy are optional; no product API or brand

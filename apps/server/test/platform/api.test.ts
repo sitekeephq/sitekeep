@@ -62,6 +62,7 @@ function api(cookie: string) {
     return { status: res.statusCode, body, raw: res };
   };
   return {
+    cookie,
     get: (u: string) => call("GET", u),
     post: (u: string, p?: unknown) => call("POST", u, p ?? {}),
     put: (u: string, p: unknown) => call("PUT", u, p),
@@ -226,6 +227,10 @@ describe("SiteKeep API", () => {
     expect(m.derivativeStatus).toBe("ready");
     expect(m.ifcSummary).toMatchObject({ schema: "IFC4", projectName: "Ornek Proje", elementCount: 2 });
     expect(m.ifcSummary.byClass).toEqual({ IfcWall: 1, IfcSlab: 1 });
+    // The built-in root folder reads in the reader's language (viewer model list, #164).
+    expect(m.folderPath.startsWith("Proje Dosyaları")).toBe(true);
+    const en = await app.inject({ method: "GET", url: `/api/v1/projects/${projectId}/models`, headers: { cookie: murat.cookie, "x-sitekeep-language": "en" } });
+    expect(en.json()[0].folderPath.startsWith("Project Files")).toBe(true);
     const frag = await murat.get(`/projects/${projectId}/versions/${m.id}/model`);
     expect(frag.status).toBe(200);
     expect(frag.raw.rawPayload.length).toBeGreaterThan(500);

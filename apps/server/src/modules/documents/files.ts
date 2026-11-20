@@ -32,6 +32,7 @@ function withLinks(s: VersionSupersessions | undefined) {
   };
 }
 import { ensureGeometryUpgrade } from "../../model/service.js";
+import { folderDisplayPath } from "./path.js";
 
 export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
   const { db, storage, jobs } = deps;
@@ -478,10 +479,7 @@ export async function fileRoutes(api: FastifyInstance, deps: AppDeps) {
         ...toVersionDto(r.file_versions, names),
         fileName: r.files.name,
         folderId: r.files.folderId,
-        folderPath: tree
-          .ancestry(r.files.folderId)
-          .map((id) => tree.get(id).name)
-          .join(" / "),
+        folderPath: folderDisplayPath(tree, r.files.folderId),
         isLatest: r.file_versions.version === r.files.currentVersion,
       }))
       .sort((x, y) => x.folderPath.localeCompare(y.folderPath, "tr") || x.fileName.localeCompare(y.fileName, "tr"));

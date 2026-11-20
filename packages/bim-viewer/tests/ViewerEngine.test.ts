@@ -194,3 +194,33 @@ describe("zoom", () => {
     expect(c.infinityDolly).toBe(false);
   });
 });
+
+describe("far plane (#158)", () => {
+  const clip = (sphere: THREE.Sphere | null, eye: [number, number, number], far = 1000) => {
+    const camera = new THREE.PerspectiveCamera(60, 1, 1, far);
+    camera.position.set(...eye);
+    const controls = { getPosition: (out: THREE.Vector3) => out.set(...eye) };
+    const self = { sceneSphere: sphere, world: { camera: { three: camera, controls } } };
+    (Engine.prototype as unknown as { fitClipping(this: unknown): void }).fitClipping.call(self);
+    return camera;
+  };
+
+  it("reaches a 12 km line model from where Fit stands", () => {
+    const sphere = new THREE.Box3(new THREE.Vector3(0, 0, -2), new THREE.Vector3(12000, 40, 300)).getBoundingSphere(new THREE.Sphere());
+    const distance = sphere.radius / Math.sin(THREE.MathUtils.degToRad(30));
+    const camera = clip(sphere, [sphere.center.x, sphere.center.y + distance, sphere.center.z]);
+    expect(camera.far).toBeGreaterThan(distance + sphere.radius);
+    expect(Number.isFinite(camera.far)).toBe(true);
+  });
+
+  it("keeps That Open's 1000 m for small models and an empty scene", () => {
+    const small = new THREE.Sphere(new THREE.Vector3(10, 0, 10), 40);
+    expect(clip(small, [10, 60, 10]).far).toBe(1000);
+    expect(clip(null, [0, 0, 0]).far).toBe(1000);
+  });
+
+  it("shrinks back once the camera is close again", () => {
+    const sphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 6000);
+    expect(clip(sphere, [0, 10, 0], 100_000).far).toBeLessThan(10_000);
+  });
+});

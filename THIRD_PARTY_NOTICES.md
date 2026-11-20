@@ -56,7 +56,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | @pdf-lib/standard-fonts | 1.0.0 | MIT | https://github.com/Hopding/standard-fonts |
 | @pdf-lib/upng | 1.0.1 | MIT | https://github.com/Hopding/upng |
 | @pinojs/redact | 0.4.0 | MIT | https://github.com/pinojs/redact |
-| @sitekeephq/bim-viewer | 0.6.0 | AGPL-3.0-only | https://github.com/sitekeephq/sitekeep/tree/main/packages/bim-viewer |
+| @sitekeephq/bim-viewer | 0.6.1 | AGPL-3.0-only | https://github.com/sitekeephq/sitekeep/tree/main/packages/bim-viewer |
 | @tanstack/query-core | 5.104.3 | MIT | https://github.com/TanStack/query/tree/HEAD/packages/query-core |
 | @tanstack/react-query | 5.104.3 | MIT | https://github.com/TanStack/query/tree/HEAD/packages/react-query |
 | @tesseract.js-data/eng | 1.0.0 | MIT | https://github.com/naptha/tessdata |

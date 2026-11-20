@@ -7,6 +7,7 @@ import { attributeDefinitions, fileVersions, files, versionTexts } from "../../d
 import { badRequest, notFound } from "../../core/platform/http.js";
 import { msg } from "../../i18n/index.js";
 import { toFileDto } from "./files.js";
+import { folderDisplayPath } from "./path.js";
 
 /** Rows read from the database before permission filtering. */
 const SCAN_LIMIT = 5000;
@@ -124,10 +125,7 @@ export async function searchRoutes(api: FastifyInstance, { db }: AppDeps) {
         .map((r) => ({
           ...toFileDto(r.files, r.file_versions, names),
           ...(snippets.has(r.file_versions.id) && { snippet: snippets.get(r.file_versions.id) }),
-          folderPath: tree
-            .ancestry(r.files.folderId)
-            .map((id) => tree.get(id).name)
-            .join(" / "),
+          folderPath: folderDisplayPath(tree, r.files.folderId),
         }))
         .sort((x, y) => x.name.localeCompare(y.name, "tr") || x.folderPath.localeCompare(y.folderPath, "tr")),
       truncated: visible.length > limit || rows.length === SCAN_LIMIT,
