@@ -9,7 +9,7 @@ installation wizard: [installation bundle](installation-bundle.md). Both use the
 | **SiteKeep Enterprise** | `SITEKEEP_IMAGE=ghcr.io/sitekeephq/sitekeep-enterprise`. Access to the image comes with a licence; the modules are enabled by the licence uploaded in Administration → Licence (lisanslama.md). |
 
 The images are published by the release workflow with every release ([installation-bundle.md](installation-bundle.md) §8, release plan B-5).
-Until the repository is opened, the Community image is private too; until then, [build from source](#building-from-source).
+The Community image is public (`docker pull ghcr.io/sitekeephq/sitekeep`, linux/amd64 and linux/arm64); you can also [build from source](#building-from-source).
 
 ## Installation
 
