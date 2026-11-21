@@ -37,9 +37,9 @@ export const DEFAULT_CIRCLE_SEGMENTS = 48;
 
 /**
  * Version of the conversion itself, for fixes that need old derivatives rebuilt:
- *   1 = CIRCLE_SEGMENTS setting (48), 2 = consistent winding of closed meshes (ifc-worker.ts).
+ *   1 = CIRCLE_SEGMENTS setting (48), 2 = consistent winding of closed meshes, 3 = colours for unstyled elements (ifc-worker.ts).
  */
-export const GEOMETRY_REVISION = 2;
+export const GEOMETRY_REVISION = 3;
 
 /** Revision a derivative was built with (missing = 1, or older when circleSegments is missing too). */
 export function derivativeRevision(summary: IfcSummary | null | undefined): number {

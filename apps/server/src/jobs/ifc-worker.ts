@@ -9,7 +9,7 @@ import { closeSync, openSync, readSync, writeFileSync } from "node:fs";
 import { parentPort, workerData } from "node:worker_threads";
 import { IfcImporter } from "@thatopen/fragments";
 import * as WebIFC from "web-ifc";
-import { consistentWinding } from "@sitekeep/shared";
+import { consistentWinding, elementColours, isUnstyledColour, type IfcLineReader } from "@sitekeep/shared";
 
 interface Input {
   inputPath: string;
@@ -907,8 +907,64 @@ function repairWindingOnRead() {
   };
 }
 
+/**
+ * Elements web-ifc found no colour for (white) get their material's or type material's colour, else
+ * a colour for their class (#168: Revit models converted by rvt-rs opened all grey). Elements with a
+ * colour of their own keep it.
+ */
+function colourUnstyledOnRead() {
+  const proto = WebIFC.IfcAPI.prototype;
+  const stream = proto.StreamMeshes;
+  const resolvers = new WeakMap<WebIFC.IfcAPI, Map<number, ReturnType<typeof elementColours>>>();
+  proto.StreamMeshes = function (this: WebIFC.IfcAPI, modelID: number, ids: number[], meshCallback: (mesh: WebIFC.FlatMesh, index: number, total: number) => void, applyLinearScalingFactor?: boolean) {
+    let perApi = resolvers.get(this);
+    if (!perApi) resolvers.set(this, (perApi = new Map()));
+    let colours = perApi.get(modelID);
+    if (!colours) {
+      const api = this;
+      const reader: IfcLineReader = {
+        idsOfType: (name) => {
+          const code = (WebIFC as unknown as Record<string, number>)[name];
+          if (typeof code !== "number") return [];
+          const v = api.GetLineIDsWithType(modelID, code);
+          const out: number[] = [];
+          for (let i = 0; i < v.size(); i++) out.push(v.get(i));
+          return out;
+        },
+        line: (id) => {
+          try {
+            return api.GetLine(modelID, id) as Record<string, unknown>;
+          } catch {
+            return null;
+          }
+        },
+        typeName: (id) => api.GetNameFromTypeCode(api.GetLineType(modelID, id)).toUpperCase(),
+      };
+      perApi.set(modelID, (colours = elementColours(reader)));
+    }
+    const resolver = colours;
+    return stream.call(this, modelID, ids, (mesh, index, total) => {
+      const count = mesh.geometries.size();
+      let unstyled = count > 0;
+      for (let i = 0; i < count && unstyled; i++) unstyled = isUnstyledColour(mesh.geometries.get(i).color);
+      const colour = unstyled ? resolver.colourOf(mesh.expressID) : null;
+      if (!colour) return meshCallback(mesh, index, total);
+      const [x, y, z, w] = colour;
+      const recoloured = {
+        expressID: mesh.expressID,
+        geometries: {
+          size: () => count,
+          get: (i: number) => ({ ...mesh.geometries.get(i), color: { x, y, z, w } }),
+        },
+      } as unknown as WebIFC.FlatMesh;
+      return meshCallback(recoloured, index, total);
+    }, applyLinearScalingFactor);
+  };
+}
+
 async function convert(outputPath: string) {
   repairWindingOnRead();
+  colourUnstyledOnRead();
   const importer = new IfcImporter();
   importer.wasm = { path: wasmDir, absolute: true };
   // web-ifc draws every circle / arc with CIRCLE_SEGMENTS straight pieces (default 12): round eaves

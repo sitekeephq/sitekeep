@@ -126,7 +126,8 @@ export interface IfcSummary {
     circleSegments: number;
     /**
      * Conversion fixes the derivative carries (GEOMETRY_REVISION on the server): 2 = winding repair
-     * (web-ifc's inside-out extrusion walls). Missing: older, rebuilt in place when opened.
+     * (web-ifc's inside-out extrusion walls), 3 = colours for unstyled elements (material, type
+     * material or class). Missing: older, rebuilt in place when opened.
      */
     revision?: number;
   };

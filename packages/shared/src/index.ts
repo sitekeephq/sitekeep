@@ -40,6 +40,7 @@ export * from "./viewers/viewers.js";
 export * from "./coordination/cad-bounds.js";
 export * from "./viewers/office.js";
 export * from "./viewers/mesh-winding.js";
+export * from "./viewers/element-colours.js";
 export * from "./platform/terms.js";
 export * from "./kernel/title-case.js";
 export * from "./core/modules.js";

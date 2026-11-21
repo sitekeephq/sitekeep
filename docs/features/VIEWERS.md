@@ -99,6 +99,12 @@ the old version stays open and the new one arrives on the next opening (if the c
 not retried). The value is changed on the server with `CDE_IFC_CIRCLE_SEGMENTS` (12–128);
 the triangle count of curved elements is proportional to it (≈ 4× at 48 compared with 12).
 
+**Colours.** An element takes the colour of the style on its geometry, or of the material linked to it (single material,
+layer set, constituent set). An element with neither, which the converter used to leave white and the viewer showed grey,
+takes the colour of its type's material, else a colour for its class (walls, slabs, roofs, glazing, doors, furniture,
+pipes and ducts…). Revit models converted by rvt-rs are mostly like that: their colours sit on family type materials,
+not on the geometry. Models converted before 21.11.2026 are reconverted the same way the first time they are opened.
+
 IFC viewer limitations:
 
 - Section fill depends on the Fragments `getSection` result; if unsupported only lines remain, and on error only the cut.
