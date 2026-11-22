@@ -2,7 +2,7 @@
 
 SiteKeep records who did what, when and from where in one append-only, tamper-evident log
 (`audit_log`). It is the audit trail ISO 19650 asks of a common data environment
-(ISO 19650-1 §12.5, ISO 19650-2 §5.1.7(d); [ISO 19650 conformance](../compliance/ISO19650.md)).
+(ISO 19650-1 §12.5, ISO 19650-2 §5.1.7(d); [ISO 19650 alignment](../compliance/ISO19650.md)).
 Part of SiteKeep Community. The CDE events it records are described with the [CDE states](CDE_STATES.md);
 rows about another task team's WIP are withheld as described in [task teams](TASK_TEAMS.md#query-paths-checked).
 
@@ -61,7 +61,7 @@ Document events that matter for ISO 19650:
 | `trash.auto_purged` | The recycle bin auto-purge deleted files / folders of the project; `details`: `before`, `trashPurgeDays`, counts, names (at most 100) |
 | `user.data_exported`, `user.data_export_downloaded` | A personal data export was built / downloaded (`target_id`: the person) |
 | `user.email_changed` | An administrator corrected a user's address: the new one in `audit_personal` (`details.emailHash`), the old one only as `previousEmailHash` |
-| `user.anonymised` | A user was anonymised ([data subject rights](DATA_SUBJECT_RIGHTS.md#anonymise)); `details`: the pseudonym and what was removed, never the old name or address |
+| `user.anonymised` | A user was erased and pseudonymised ([data subject rights](DATA_SUBJECT_RIGHTS.md#erase-and-pseudonymise-user); the action keeps its historical name); `details`: the pseudonym and what was removed, never the old name or address |
 | `privacy.disposals_exported` | The disposal record was downloaded as CSV |
 | `user.created`, `user.updated` | A user was created / changed by a system administrator (`target_id`: the user); `details` holds the changed fields, `isAdmin` and `isAuditor` when the System Administrator or [Auditor](SECURITY_LOG.md#auditor-g-10) rights are set (a password only as `***`) |
 | `privacy.kill_switch_on`, `privacy.kill_switch_off`, `privacy.connection_updated` | "Turn Off All External Connections" switched on / off; one external connection switched (`details`: `id`, `enabled`) |
@@ -140,7 +140,7 @@ from the chain (P1-5, issue #85):
 - **Erasure of one person:** `eraseAuditPersonal(db, { userId, email? })` deletes the personal
   records of rows the person wrote and of rows naming their address, and writes
   `audit.personal_erased`. Their rows stay under their user id, a pseudonym once the account is
-  anonymised (the "anonymise user" request, P1-2, will call it).
+  erased and pseudonymised (**Erase and pseudonymise user**, P1-2, calls it).
 - **Reading:** the screens and the CSV show the IP address and user agent from `audit_personal`
   while they are kept, and an administrator sees the e-mail address merged into `details`. After
   deletion they show **deleted (retention)** (the row is older than the retention period) or

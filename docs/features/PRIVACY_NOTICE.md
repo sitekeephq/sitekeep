@@ -1,8 +1,15 @@
 # Privacy notice on the sign-in page
 
 A text the system administrator writes ("aydınlatma metni", the information a data controller gives
-under GDPR Art. 13 and KVKK m.10), shown on the sign-in page and on the invitation page, with an
+under GDPR Art. 13 and 14 and KVKK m.10 with the Communiqué on the Obligation to Inform, Official
+Gazette 10.03.2018, No. 30356), shown on the sign-in page and on the invitation page, with an
 optional **I Have Read the Privacy Notice** checkbox. SiteKeep Community. Issue #85 P3.
+
+**The checkbox is not explicit consent.** Ticking "I have read" records that the person was
+informed; it is not consent to processing ("açık rıza") and must not be combined with a request for
+consent. The obligation to inform is met by showing the text; we recommend leaving **Require "I Have
+Read the Privacy Notice" Before Sign-in** off, so that reading the notice is not made a condition of
+signing in.
 
 SiteKeep does not write the text: the organisation running it is the data controller and decides what
 it says. A starting point is the [records of processing](../compliance/RECORDS_OF_PROCESSING.md) and
@@ -15,7 +22,7 @@ the [personal data inventory](../compliance/PERSONAL_DATA_INVENTORY.md).
 | Setting | Default | What it does |
 |---|---|---|
 | Show on the Sign-in and Invitation Pages | off | The text appears above the sign-in form and on the invitation page |
-| Require "I Have Read the Privacy Notice" Before Sign-in | off | The checkbox must be ticked before **Sign In**, **Continue with Google**, an [OpenID Connect](OIDC_SIGN_IN.md) provider's button, **Accept and Sign In** or **Accept with Google** |
+| Require "I Have Read the Privacy Notice" Before Sign-in | off (recommended) | The checkbox must be ticked before **Sign In**, **Continue with Google**, an [OpenID Connect](OIDC_SIGN_IN.md) provider's button, **Accept and Sign In** or **Accept with Google** |
 | Ask Again When the Text Changes | on | A new version must be accepted again; off: any earlier acceptance is enough |
 | Text (English), Text (Turkish) | empty | Up to 20 000 characters each. Each page shows the language the person chose, or the other one when that is empty |
 
@@ -56,7 +63,7 @@ With the checkbox required:
 Shown without the checkbox, nothing is recorded.
 
 **Data subject rights:** the person's acceptances are a section of the
-[personal data export](DATA_SUBJECT_RIGHTS.md#export) (`privacy_notice`). Anonymising the account keeps
+[personal data export](DATA_SUBJECT_RIGHTS.md#export) (`privacy_notice`). Erasing and pseudonymising the account keeps
 them under the pseudonym, like the audit log: they are the controller's evidence that the person was
 informed.
 

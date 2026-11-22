@@ -30,11 +30,11 @@ Arayüz İngilizce ve Türkçedir.
 | Paftalar | Antetten otomatik pafta listesi (antet şablonu, taranmış paftalar için çevrimdışı OCR), pafta setleri ve numaralı yayınlar |
 | Sorunlar | 3B iğneler, BCF bakış açıları (kamera, modeller, seçili elemanlar, ekran görüntüsü), durum, öncelik, atanan, termin, BCF içe / dışa aktarma |
 | Onaylar | Dokümanlarda inceleme ve onay zincirleri |
-| ISO 19650 | Proje bazında kurallar: durum geçişleri yalnız onayla, yayında arşivleme, uygunluk ve revizyon kodları, tekil doküman kodları, görev ekibi WIP'i; madde eşlemesi ve test paketi [ISO 19650 uyumu](docs/compliance/ISO19650.md) belgesinde |
+| ISO 19650 | Proje bazında kurallar: durum geçişleri yalnız onayla, yayında arşivleme, uygunluk ve revizyon kodları, tekil doküman kodları, görev ekibi WIP'i; madde eşlemesi ve test paketi [ISO 19650'ye göre tasarlanmış özellikler](docs/compliance/ISO19650.md) belgesinde (yazılım için ISO 19650 sertifikası yoktur) |
 | Denetim | Her yazma, görüntüleme ve indirme değiştirilemez, zincirlenmiş denetim kaydına yazılır; CSV dışa aktarma |
 | Raporlar | Her alan için (dokümanlar, sorunlar, işler, onaylar …) görenin yetkileriyle liste ve CSV; rapor panoları (şablonlar, yapay zekâ, paylaşım, versiyonlar) Enterprise Platform modülüyle gelir |
 | Entegrasyonlar | REST API (`/api/v1`), OpenCDE, yapay zekâ asistanları için yerel stdio MCP sunucusu (`apps/mcp`), ofis → PDF dönüşümü (Gotenberg, ONLYOFFICE, Collabora); sunucuda MCP ucu (`/mcp`) Enterprise AI modülüyle gelir |
-| Gizlilik | Sunucu kendiliğinden dışarıya hiçbir şey göndermez; her dış bağlantı Gizlilik Merkezi'nde listelenir, kaydedilir ve kapatılabilir |
+| Gizlilik | Bir yönetici bir entegrasyonu (yapay zekâ, e-posta, giriş, Autodesk) açmadıkça sunucu kendiliğinden dışarıya hiçbir şey göndermez; her dış bağlantı Gizlilik Merkezi'nde listelenir, kaydedilir ve kapatılabilir |
 
 ## Ekran görüntüleri
 

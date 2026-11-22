@@ -2,8 +2,8 @@
 
 ISO 19650-1 §12.1 and ISO 19650-2 §5.1.7(a) ask for a unique identifier for every information
 container, based on an agreed naming convention. SiteKeep takes it from the project's naming
-standards. Part of the [CDE states](CDE_STATES.md) work; conformance:
-[ISO 19650 conformance](../compliance/ISO19650.md).
+standards. Part of the [CDE states](CDE_STATES.md) work; clause mapping:
+[ISO 19650 alignment](../compliance/ISO19650.md).
 
 ## The code of a file
 

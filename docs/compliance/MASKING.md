@@ -8,7 +8,8 @@ What SiteKeep replaces before a prompt leaves the network, and what it does not.
 The masker is in the core: `apps/server/src/privacy/redact.ts` (`Redactor`), with project members as
 name entries from `apps/server/src/privacy/people.ts`. Modules get both through the SDK
 (`Redactor`, `projectPeople`). The **AI module** is what uses them: it masks every prompt it sends to a
-model outside the network (and to local models too with **Mask for the Local Model Too**). The
+model outside the network, including Ollama `:cloud` models on a local address (and to local models
+too with **Mask for the Local Model Too**). The
 report builder of the Platform module uses the same SDK class. Community without modules sends no
 prompts, so nothing is masked there.
 
@@ -30,7 +31,9 @@ same user sees it. The outbound log records how many items of each kind were mas
 
 ## Limits
 
-Masking is a data minimisation layer, **not anonymisation**. It does not catch:
+Masking is a data minimisation layer, **not anonymisation**: masked prompts remain personal data, and
+sending them to a cloud provider is still a transfer ([AI providers](../features/AI_PROVIDERS.md#transfers-abroad-kvkk-and-gdpr)).
+It does not catch:
 
 - **Identifiers of other countries:** non-Turkish IBANs (e.g. `DE89 3704 …`), international phone
   numbers without a Turkish prefix or area code, national IDs and passport, tax, social security or
@@ -42,7 +45,10 @@ Masking is a data minimisation layer, **not anonymisation**. It does not catch:
   dates of birth, health information in incident reports;
 - anything in **document text** quoted into a prompt beyond the patterns above (the same rules apply
   to it as to any other prompt text);
-- prompts of the **AI task queue** read by an external client (planned).
+- prompts of the **AI task queue** read by an external client (planned);
+- a local server or AI gateway that forwards prompts to a cloud service under a model name SiteKeep
+  cannot recognise: such a prompt is not masked unless **Mask for the Local Model Too** is on
+  ([AI providers](../features/AI_PROVIDERS.md#ollama-cloud-models-and-ai-gateways)).
 
 So for projects with sensitive data, prefer a **local model** inside the network, or keep AI off.
 

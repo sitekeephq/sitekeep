@@ -27,15 +27,65 @@ Model IDs are only defaults; they can be edited. Prices are not stored; only rel
 \*\* Gemini 3 tool calls require `thought_signature` to be sent back; with this preset the "Ask" assistant runs in tool-less
 (routing) mode. Other features do not use tools.
 
-### KVKK (Turkish personal data protection law)
+### Transfers abroad (KVKK and GDPR)
 
-- Cloud providers process project content on servers outside Türkiye (KVKK art. 9: transfer abroad). Explicit consent or
-  a suitable legal basis for the transfer is required. Cloud models only run when the mode is "Allow External Providers" and the project allows it.
-- **DeepSeek cloud API**: according to its privacy policy, data is collected, processed and stored in the People's Republic of China.
-  Use it only for demos or non-sensitive projects. The KVKK-safe option is to run DeepSeek or Qwen open-weight
-  models **locally with Ollama** (e.g. `deepseek-r1:8b`, `qwen3:14b`). Note: the `deepseek-v4…:cloud` tags in Ollama
-  do not run locally but in the Ollama cloud.
-- With Gemini's free quota, prompts may be used for product development; use the paid quota.
+A cloud provider processes project content on its own servers, usually outside Türkiye and often
+outside the EU/EEA: sending a prompt to it is a **transfer abroad**. Cloud models only run when the
+mode is "Allow External Providers" and the project's per-project approval allows it (an administrative
+setting, not explicit consent). Masking reduces what is sent, but **masked prompts remain personal
+data** ([masking](../compliance/MASKING.md)). Not legal advice: the organisation, as data controller,
+sets up the transfer mechanism before turning a cloud provider on.
+
+- **KVKK m.9 (as amended by Law No. 7499):** a processing condition of m.5 or m.6, plus either an
+  adequacy decision or an appropriate safeguard; for a provider acting as processor, the Board's
+  **standard contract** (controller → processor), notified to the Authority **within five working days
+  of signing** (m.9(5)). Explicit consent is only a basis for incidental transfers (m.9(6)(a)), not
+  for the regular use of an AI provider.
+- **GDPR Chapter V:** a provider in a country with an adequacy decision (Art. 45; for the USA, a
+  provider certified under the EU–US Data Privacy Framework), or Standard Contractual Clauses
+  (Art. 46(2)(c), Commission Decision (EU) 2021/914) together with a transfer impact assessment.
+  The derogations of Art. 49 are for exceptional, occasional transfers only.
+
+| Provider | Where data is processed | Notes |
+|---|---|---|
+| OpenAI, Anthropic Claude, Groq | USA | GDPR: Art. 45 if the provider is DPF-certified, otherwise SCC (Art. 46(2)(c)) + transfer impact assessment. KVKK: standard contract + notification within five working days |
+| DeepSeek (cloud API) | People's Republic of China (per its privacy policy) | **Not recommended for personal data.** Use it only for demos or projects without personal data |
+| Google Gemini, free quota | Google global | The provider may use prompts to improve its products, so it is **not acting as a processor**: do not use for personal data; use the paid quota |
+| Mistral (EU endpoint), Azure OpenAI in an EU region | EU/EEA | No transfer outside the EU/EEA (for Turkish controllers it is still a transfer abroad under KVKK m.9) |
+| OpenRouter | The provider of the chosen model | Assess the underlying provider |
+| Local models (Ollama, vLLM, LM Studio on your network) | Your server or network | No transfer |
+
+The **lower-risk option (no transfer abroad)** is to run DeepSeek or Qwen open-weight models **locally
+with Ollama** (e.g. `deepseek-r1:8b`, `qwen3:14b`).
+
+### Ollama cloud models and AI gateways
+
+Ollama's `:cloud` models (a model tag ending in `cloud`, e.g. `gpt-oss:120b-cloud`, `glm-4.6:cloud`,
+`deepseek-v4…:cloud`) do not run locally but in the Ollama cloud, although the address is the local
+Ollama server. SiteKeep therefore treats such a model as an **external provider even when the
+address is local**: masking applies, the external-AI policy (mode and per-project approval) and
+**Turn Off All External Connections** stop it, and its outbound log rows are marked external.
+
+SiteKeep checks the address and the model name only. **It cannot see whether a local server or AI
+gateway (on 127.0.0.1 or the LAN) forwards a request to a cloud service** (for example LiteLLM, an
+OpenAI-compatible proxy or an Ollama server with a cloud model under another name). If it does, the
+administrator must treat that provider as external: do not use it for projects that must stay local,
+and record it as a transfer ([processors and transfers](../compliance/SUBPROCESSORS.md)).
+
+### AI Act: transparency and AI literacy
+
+- **Art. 50(1) (transparency):** wherever AI output is shown in the interface (Today summary, Ask
+  the Model, Ask the project, the version comparison summary, AI drafts), it carries a small
+  **"AI-generated"** label ("Yapay zekâ ile üretildi" in Turkish), so people know they are dealing
+  with AI output. The label does not replace review: drafts are checked by a person before they are
+  saved or sent.
+- **Art. 4 (AI literacy):** organisations that use AI systems must take measures so that their staff
+  using them have a sufficient level of AI literacy. For SiteKeep this means people using AI features
+  should know that answers and summaries can be wrong or incomplete and must be checked against the
+  project records, which features send data to which provider (Privacy Centre → External
+  Connections), what masking does and does not cover ([masking](../compliance/MASKING.md)), and when
+  not to use a cloud provider. This page, the labels and the Privacy Centre are the material SiteKeep
+  provides; training staff and recording it is the customer's part.
 
 ## 2. Compatibility layer (apps/server/src/ai/provider.ts)
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import type { AiMode } from "../api/api";
 import { i18n } from "../../i18n";
@@ -53,6 +53,19 @@ export function isExternalUrl(url: string): boolean {
   }
   if (h === "localhost" || !h.includes(".")) return false;
   return ![".local", ".internal", ".lan", ".localhost", ".home.arpa"].some((s) => h.endsWith(s));
+}
+
+/**
+ * "AI-generated" / "Yapay zekâ ile üretildi" next to text a model wrote (EU AI Act Art. 50(1): people
+ * are told when they read AI output; docs/features/AI_PROVIDERS.md#ai-act).
+ */
+export function AiGeneratedLabel({ model, style }: { model?: string | null; style?: CSSProperties }) {
+  const { t } = useTranslation("common");
+  return (
+    <span className="badge ai-generated" data-testid="ai-generated" style={style} title={model ? t("aiLabel.titleModel", { model }) : t("aiLabel.title")}>
+      {t("aiLabel.generated")}
+    </span>
+  );
 }
 
 export function Snippet({ text }: { text: string }) {

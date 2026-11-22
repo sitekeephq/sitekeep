@@ -46,18 +46,18 @@ test("an administrator corrects the e-mail, exports the data and anonymises a us
   expect((await zip.body()).subarray(0, 2).toString()).toBe("PK");
 
   // P1-2: two steps, the second one is the address typed by hand.
-  await dialog.getByRole("button", { name: "Kullanıcıyı Anonimleştir", exact: true }).click();
+  await dialog.getByRole("button", { name: "Kullanıcıyı Sil ve Takma Adlandır", exact: true }).click();
   await page.getByRole("button", { name: "Devam Et", exact: true }).click();
-  const typed = page.getByRole("dialog", { name: "Kullanıcıyı Anonimleştir" }).getByRole("textbox");
+  const typed = page.getByRole("dialog", { name: "Kullanıcıyı Sil ve Takma Adlandır" }).getByRole("textbox");
   await typed.fill(newEmail);
   const anonymised = page.waitForResponse((r) => new URL(r.url()).pathname === `/api/v1/admin/users/${id}/anonymise`);
-  await page.getByRole("button", { name: "Anonimleştir", exact: true }).click();
+  await page.getByRole("button", { name: "Sil ve Takma Adlandır", exact: true }).click();
   expect((await anonymised).ok()).toBe(true);
   // The pseudonym is in the installation's language (CDE_DEFAULT_LANGUAGE).
   const pseudonym = new RegExp(`^(Deleted user|Silinmiş kullanıcı) #${id.slice(0, 8)}`);
   const row = userRow(page, pseudonym);
   await expect(row).toBeVisible();
-  await expect(row.getByText("Anonimleştirildi", { exact: true })).toBeVisible();
+  await expect(row.getByText("Silindi ve takma adlandırıldı", { exact: true })).toBeVisible();
   await expect(row.getByRole("button", { name: "Kişisel Veriler", exact: true })).toHaveCount(0);
   await expect(page.getByText(name, { exact: true })).toHaveCount(0);
 });

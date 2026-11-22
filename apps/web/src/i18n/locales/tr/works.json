@@ -392,7 +392,7 @@
       "confirm": "{{number}} kalıcı olarak silinsin mi?"
     },
     "messages": {
-      "suggestionApplied": "Öneri forma yazıldı; kontrol edip kaydedin."
+      "suggestionApplied": "Yapay zekâ önerisi forma yazıldı; kontrol edip kaydedin."
     },
     "tabs": {
       "general": "Genel",

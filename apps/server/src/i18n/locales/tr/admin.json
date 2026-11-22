@@ -128,6 +128,20 @@
       "payload": "Lisansın içeriği okunamıyor.",
       "other_installation": "Bu lisans başka bir kuruluma ait. Lisans isterken bu kurulumun kimliğini gönderin.",
       "build_after_support": "Bu SiteKeep sürümü destek süreniz bittikten sonra çıktı. Önceki sürüme dönün veya desteği yenileyin."
+    },
+    "online": {
+      "keyRequired": "Etkinleştirme anahtarını girin.",
+      "unreachable": "Lisans hizmetine ulaşılamadı. Sunucunun internet erişimini ve Gizlilik Merkezi'ndeki \"Lisans Etkinleştirme\" bağlantısını kontrol edin ya da lisans dosyası yükleyin.",
+      "reasons": {
+        "key_format": "Bu bir etkinleştirme anahtarı değil. Biçimi: SK-XXXX-XXXX-XXXX-XXXX.",
+        "not_found": "Bu etkinleştirme anahtarı tanınmıyor. Kontrol edin ya da 7Dimensions'a sorun.",
+        "revoked": "Bu lisans iptal edildi.",
+        "expired": "Bu lisansın süresi doldu. Önce aboneliği yenileyin.",
+        "bound_to_other_installation": "Bu anahtar başka bir kurulumda etkinleştirilmiş. Taşımak için 7Dimensions'a başvurun.",
+        "trial_used": "Bu kurulum deneme süresini daha önce kullandı.",
+        "not_online": "Bu lisans çevrimiçi etkinleştirilmedi; yenilemek için yeni lisans dosyası yükleyin.",
+        "rejected": "Lisans hizmeti isteği reddetti."
+      }
     }
   },
   "securityAlerts": {

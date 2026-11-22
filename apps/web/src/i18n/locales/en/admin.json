@@ -42,7 +42,7 @@
     },
     "passwordPrompt": "New password for {{name}} (at least 10 characters).",
     "pending": "Invited",
-    "anonymised": "Anonymised",
+    "anonymised": "Erased and pseudonymised",
     "personal": {
       "open": "Personal Data",
       "title": "Personal data: {{name}}",
@@ -67,12 +67,12 @@
         "done": "Ready",
         "failed": "Failed"
       },
-      "anonymise": "Anonymise User",
-      "anonymiseHelp": "Irreversible. The name becomes \"Deleted user #…\", the e-mail address an invalid one; the password, sessions, access keys, preferences, open invitations and the personal part of the audit and outbound logs are removed. Records the person created stay under the pseudonym; files are not changed. Personal data inside free text (comments, letters) and file contents is not removed automatically.",
-      "anonymiseWarning": "{{name}} will be anonymised. This cannot be undone and the account can no longer sign in.",
+      "anonymise": "Erase and Pseudonymise User",
+      "anonymiseHelp": "Supports GDPR Art. 17 / KVKK m.7: identifying data is erased and history pseudonymised. Irreversible. The name becomes \"Deleted user #…\", the e-mail address an invalid one; the password, sessions, access keys, preferences, open invitations and the personal part of the audit and outbound logs are removed. Records the person created stay under the pseudonym; files are not changed. Personal data inside free text (comments, letters) and file contents is not removed automatically. Pseudonymised records remain personal data and are kept only under an Art. 17(3) exception / KVKK m.5(2) condition, then deleted at the end of the retention period.",
+      "anonymiseWarning": "{{name}}'s identifying data will be erased and their history pseudonymised. This cannot be undone and the account can no longer sign in.",
       "anonymiseContinue": "Continue",
       "anonymiseType": "To confirm, type the account's e-mail address: {{email}}",
-      "anonymiseConfirm": "Anonymise",
+      "anonymiseConfirm": "Erase and Pseudonymise",
       "anonymised": "The account is now \"{{name}}\"."
     },
     "twoFactorBadge": "2FA",
@@ -441,12 +441,12 @@
         "turnOff": "Turn Off",
         "reopen": "Reopen"
       },
-      "confirmOff": "The server's connections to every address outside the network will be cut: cloud AI, external e-mail and office servers. AI switches to fully local mode and the external client queue stops.",
+      "confirmOff": "The server's connections to every address outside the network will be cut: cloud AI (including cloud models behind a local server), external e-mail and office servers. AI switches to fully local mode, the external client queue stops, and access keys and connected applications (MCP clients, scripts, OAuth) are suspended until the switch is turned off; nothing is deleted. Browser sign-ins keep working.",
       "confirmOn": "External connections will be reopened; each connection returns to its own setting.",
-      "on": "On. The server connects only to addresses on the local network; AI runs fully locally and the external client queue has stopped.",
-      "onSince": "On ({{date}}). The server connects only to addresses on the local network; AI runs fully locally and the external client queue has stopped.",
-      "onSinceBy": "On ({{date}}, {{name}}). The server connects only to addresses on the local network; AI runs fully locally and the external client queue has stopped.",
-      "off": "Off. When turned on, the server connects to no address outside the network; the local network and the internal network list keep working."
+      "on": "On. The server connects only to addresses on the local network; AI runs fully locally (cloud models behind a local server stop too), the external client queue has stopped, and access keys and connected applications (MCP, OAuth) are suspended. Browser sign-ins work.",
+      "onSince": "On ({{date}}). The server connects only to addresses on the local network; AI runs fully locally (cloud models behind a local server stop too), the external client queue has stopped, and access keys and connected applications (MCP, OAuth) are suspended. Browser sign-ins work.",
+      "onSinceBy": "On ({{date}}, {{name}}). The server connects only to addresses on the local network; AI runs fully locally (cloud models behind a local server stop too), the external client queue has stopped, and access keys and connected applications (MCP, OAuth) are suspended. Browser sign-ins work.",
+      "off": "Off. When turned on, the server connects to no address outside the network and access keys and connected applications (MCP, OAuth) are suspended; the local network, the internal network list and browser sign-ins keep working."
     },
     "summary": {
       "fields": {
@@ -898,7 +898,8 @@
       "modules": "Modules",
       "seats": "Users",
       "validUntil": "Valid Until",
-      "supportUntil": "Updates Until"
+      "supportUntil": "Updates Until",
+      "plan": "Plan"
     },
     "seatsOf": "{{used}} / {{seats}} active users",
     "seatsUnlimited": "{{used}} active users (unlimited)",
@@ -930,7 +931,37 @@
       "other_installation": "This licence belongs to another installation.",
       "build_after_support": "This SiteKeep version was released after the support period ended."
     },
-    "seatsOver": "{{count}} more active users than the licence allows: Enterprise modules are read-only until accounts are disabled or seats are added."
+    "seatsOver": "{{count}} more active users than the licence allows: Enterprise modules are read-only until accounts are disabled or seats are added.",
+    "online": {
+      "onlineTitle": "Activate Online",
+      "onlineText": "Enter the activation key you received (SK-XXXX-XXXX-XXXX-XXXX). The server fetches the licence and renews it every night; it sends only the installation id, the version and the number of active users.",
+      "keyLabel": "Activation key",
+      "activate": "Activate",
+      "activated": "Licence activated.",
+      "trial": "Start a 30-Day Trial",
+      "trialText": "Plus modules for 10 users, once per installation.",
+      "checkNow": "Check Now",
+      "checked": "Licence checked.",
+      "lastCheck": "Last check: {{date}}",
+      "lastOk": "Last answer from the licensing service: {{date}}",
+      "results": {
+        "valid": "licence received",
+        "unchanged": "no change",
+        "invalid": "refused",
+        "unreachable": "could not be reached"
+      },
+      "offlineHint": "No internet on this server? Upload the licence file from the customer portal below instead.",
+      "onlineProblems": {
+        "revoked": "The licensing service no longer accepts this licence ({{reason}}): Enterprise modules turn read-only on {{date}} unless it is resolved.",
+        "offline_too_long": "This licence must be checked online, and the licensing service has not been reached for more than 30 days: Enterprise modules turn read-only on {{date}}."
+      },
+      "plans": {
+        "standard": "Enterprise Standard",
+        "plus": "Enterprise Plus",
+        "trial": "Trial",
+        "internal": "Internal"
+      }
+    }
   },
   "invitations": {
     "title": "Invitations",

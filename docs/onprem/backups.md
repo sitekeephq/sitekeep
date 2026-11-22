@@ -76,8 +76,12 @@ Consulting does not mean "move your data to 7D". If the licence is on-prem, the 
 customer side**. 7D also uses the same backup engine in its own installation
 (validation / reference). The SaaS we host is a separate contract.
 
-If the customer wants backups in the 7D cloud, that is separate work: KVKK (Turkish data protection law), cross-border transfer, a
-"Backup" connection in the Privacy Centre. This is not the default path.
+If the customer wants backups in the 7D cloud, that is separate work and not the default path. 7D
+then becomes the customer's **processor** (as for support, remote access, migration and hosting):
+a data processing agreement (GDPR Art. 28(3)) and, for a customer in Türkiye, a transfer abroad under
+KVKK m.9 with the Board's standard contract notified to the Authority within five working days of
+signing; a "Backup" connection in the Privacy Centre. Draft templates and details:
+[7Dimensions as processor](../compliance/SUBPROCESSORS.md#7dimensions-as-processor).
 
 ---
 

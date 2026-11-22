@@ -6,15 +6,16 @@
     "unknownConnection": "Unknown connection.",
     "exportRunning": "An export of this person's data is already being prepared.",
     "exportNotReady": "The export is not ready yet.",
-    "anonymised": "This account has been anonymised.",
+    "anonymised": "This account's identifying data has been erased and its history pseudonymised.",
     "anonymiseConfirm": "Type the account's e-mail address exactly to confirm.",
-    "anonymiseSelf": "You cannot anonymise your own account.",
+    "anonymiseSelf": "You cannot erase and pseudonymise your own account.",
     "emailInUse": "Another account already uses this e-mail address.",
     "noticeRequired": "Read the privacy notice and tick “I Have Read the Privacy Notice” to continue.",
     "noticeEmpty": "Write the privacy notice in at least one language before showing it."
   },
   "outbound": {
     "killSwitch": "All external connections are off (Administration → Privacy Centre): no connection was made to {{host}}.",
+    "accessSuspended": "Access keys and connected applications (MCP, OAuth) are suspended while all external connections are off (Administration → Privacy Centre). Sign in in the browser, or ask an administrator.",
     "connectionDisabled": "This connection was turned off in the Privacy Centre ({{purpose}}, {{host}}). It can be turned on under Administration → Privacy Centre → External Connections."
   },
   "data": {
@@ -40,6 +41,9 @@
     "google": "Sign-in with Google",
     "googleSends": "Checks the sign-in code and reads the name and e-mail address; the browser itself goes to accounts.google.com",
     "googleNotConfigured": "Not configured (GOOGLE_CLIENT_ID)",
+    "license": "Licence Activation",
+    "licenseSends": "Activates and refreshes the licence nightly: sends the licence id, the installation id, the version and the number of active users; no names or project data",
+    "licenseNotUsed": "Not used: the licence was not activated online",
     "autodesk": "Autodesk (APS / ACC)",
     "autodeskSends": "Connect module: syncs Autodesk Construction Cloud records and imports files; file content comes from short-lived addresses Autodesk gives",
     "personalClaude": "Personal Claude API",
@@ -53,6 +57,7 @@
     "aiQueue": "AI Task Queue (External Clients)",
     "externalClientsAllowed": "External clients allowed even in fully local mode",
     "stoppedByKillSwitch": "Stopped because all external connections are off",
+    "suspendedByKillSwitch": "Suspended because all external connections are off",
     "oauth": "OAuth Applications (OpenCDE)",
     "oauthApps_one": "{{count}} application, {{enabled}} enabled",
     "oauthApps_other": "{{count}} applications, {{enabled}} enabled",

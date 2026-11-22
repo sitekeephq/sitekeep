@@ -126,6 +126,24 @@ export function isLanHost(host: string): boolean {
   return isPrivateHost(host) || onLanList(host);
 }
 
+/**
+ * True for a model that runs in a cloud although it is called through a local server: Ollama's cloud
+ * models carry the tag "cloud" ("gpt-oss:120b-cloud", "glm-4.6:cloud", "kimi-k2:1t-cloud"). Such a
+ * model is an external provider (masking, the external-AI policy, the kill switch, the outbound log).
+ * SiteKeep sees only the address and the model name: a local server or AI gateway that forwards
+ * requests to a cloud service under another name cannot be detected (docs/features/AI_PROVIDERS.md).
+ */
+export function isCloudModel(model: string | null | undefined): boolean {
+  const m = (model ?? "").trim().toLowerCase();
+  const tag = m.includes(":") ? m.slice(m.lastIndexOf(":") + 1) : "";
+  return tag === "cloud" || tag.endsWith("-cloud");
+}
+
+/** A provider (address and model) outside the customer's network: an external host or a cloud model. */
+export function isExternalProvider(p: { baseUrl: string; model?: string | null }): boolean {
+  return isExternalUrl(p.baseUrl) || isCloudModel(p.model);
+}
+
 /** True when the URL's host is outside the customer's network (or the URL is invalid). */
 export function isExternalUrl(url: string): boolean {
   try {

@@ -15,10 +15,10 @@ import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
 import { FolderTree } from "../../src/core/security/access.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
-import { auditLog, folders, memberRoles, projectRoles, users } from "../../src/db/schema.js";
+import { auditLog, companies, folders, memberRoles, projectRoles, systemSettings, users } from "../../src/db/schema.js";
 import { JobQueue } from "../../src/jobs/queue.js";
 import { LocalStorage } from "../../src/core/platform/storage.js";
-import { seedTaskTeams } from "../../src/cde/teams.js";
+import { seedTaskTeams, seedTaskTeamsOnce, TASK_TEAMS_BACKFILLED } from "../../src/cde/teams.js";
 import { readBcfZip } from "../../src/bcf/unzip.js";
 
 let handle: DbHandle;
@@ -330,5 +330,40 @@ describe("ISO19650-2 5.1.7(e) task team seeding", () => {
     expect((await admin.get(`/projects/${pid}/cde/settings`)).body.wipPolicy).toBe("grants");
     const owned = await handle.db.select().from(folders).where(eq(folders.projectId, pid));
     expect(owned.every((f) => f.ownerTeamId === null)).toBe(true);
+  });
+});
+
+describe("Task teams are the parties chosen, and stay deleted (#171)", () => {
+  it("does not add the creator's company as a task team when a project is made from a template", async () => {
+    const [own] = await handle.db.insert(companies).values({ name: "Kuran Danışmanlık", code: "KUR" }).returning();
+    await handle.db
+      .insert(users)
+      .values({ email: "creator@7d.test", name: "Creator", passwordHash: await hashPassword(PW), isAdmin: true, companyId: own!.id });
+    const creator = api(await login("creator@7d.test"));
+    const contractor = (await creator.post("/companies", { name: "Epsilon İnşaat", code: "EPS" })).body.id;
+    const r = await creator.post("/projects/from-template", {
+      code: "TT171",
+      name: "Creator company",
+      templateId: "iso19650-temel",
+      slotCompanies: { yuklenici: contractor },
+    });
+    expect(r.status, JSON.stringify(r.body)).toBe(200);
+    const teams = ((await creator.get(`/projects/${r.body.id}/roles`)).body as ProjectRoleDto[]).filter((t) => t.kind === "task_team");
+    expect(teams.map((t) => t.companyId)).toEqual([contractor]);
+    // The creator's company is still a project company (members), only not a task team.
+    expect((await creator.get(`/projects/${r.body.id}/members`)).body.some((m: { companyId: string | null }) => m.companyId === own!.id)).toBe(true);
+
+    // A project's last team, once deleted, is not brought back at the next start.
+    const del = await app.inject({ method: "DELETE", url: `/api/v1/projects/${r.body.id}/roles/${teams[0]!.id}`, headers: { cookie: await login("creator@7d.test") } });
+    expect(del.statusCode, del.body).toBe(200);
+    await handle.db.delete(systemSettings).where(eq(systemSettings.key, TASK_TEAMS_BACKFILLED));
+    // An installation that already has task teams was backfilled before: only the marker is written.
+    expect(await seedTaskTeamsOnce(handle.db)).toEqual({ projectsSeeded: 0, teamsCreated: 0, foldersOwned: 0 });
+    expect(await seedTaskTeamsOnce(handle.db)).toBeNull();
+    const after = await handle.db
+      .select()
+      .from(projectRoles)
+      .where(and(eq(projectRoles.projectId, r.body.id), eq(projectRoles.kind, "task_team")));
+    expect(after).toHaveLength(0);
   });
 });

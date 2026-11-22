@@ -625,8 +625,9 @@ export async function createProjectFromTemplate(
     const adminRoleId = roleIds["Yönetici"];  // i18n-ok: data (default role name)
     if (adminRoleId) await ensureProjectAdminsHoldAdminRole(txDb, projectId, adminRoleId);
     // ISO 19650 task teams (ISO-5): one per slot company (code from the slot), or per slot listed in
-    // the template's cde.taskTeams (with the lead flag), and the creator's company; WIP folders
-    // granted to one slot company belong to its team. Members of a team's company join it.
+    // the template's cde.taskTeams (with the lead flag); WIP folders granted to one slot company
+    // belong to its team. Members of a team's company join it. The creator's company gets no team of
+    // its own: the parties chosen in the template (or the wizard) are the task teams (#171).
     const teamSlots = template.cde?.taskTeams;
     const slotTeams: TeamSeedCompany[] = teamSlots
       ? teamSlots.flatMap((team) => {
@@ -634,7 +635,7 @@ export async function createProjectFromTemplate(
           return slot?.companyId ? [{ companyId: slot.companyId, code: slot.code, lead: !!team.lead }] : [];
         })
       : [...prepared.slots.values()].filter((s) => s.companyId).map((s) => ({ companyId: s.companyId!, code: s.code }));
-    const { teams } = await ensureCompanyTeams(txDb, projectId, [...slotTeams, ...(user.companyId ? [{ companyId: user.companyId }] : [])]);
+    const { teams } = await ensureCompanyTeams(txDb, projectId, slotTeams);
     await assignWipOwnerTeams(txDb, projectId, teams);
     // ISO 19650 delivery plan (ISO-7): the template's milestones, dated from the project start.
     const start = details?.startDate && /^\d{4}-\d{2}-\d{2}$/.test(details.startDate) ? new Date(`${details.startDate}T00:00:00Z`) : new Date();

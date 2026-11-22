@@ -33,6 +33,13 @@ test("Yönetim → Lisans shows the installation, installs a licence and removes
   await expect(page.getByRole("heading", { name: "Lisans", exact: true })).toBeVisible();
   await expect(page.getByText("Lisans Yok", { exact: true })).toBeVisible();
   const installation = (await page.getByTestId("installation-id").textContent())!.trim();
+
+  // Online activation card (licensing-online.md): a malformed key is refused before any call goes out.
+  await expect(page.getByRole("heading", { name: "Çevrimiçi Etkinleştir" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "30 Günlük Denemeyi Başlat" })).toBeVisible();
+  await page.getByLabel("Etkinleştirme anahtarı").fill("ABC-123");
+  await page.getByRole("button", { name: "Etkinleştir", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Bu bir etkinleştirme anahtarı değil. Biçimi: SK-XXXX-XXXX-XXXX-XXXX.");
   expect(installation).toMatch(/^inst_/);
 
   await page.getByLabel("Lisans dosyası").setInputFiles({ name: "license.json", mimeType: "application/json", buffer: Buffer.from(devLicence(installation)) });

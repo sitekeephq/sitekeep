@@ -72,7 +72,7 @@ import { auditRoutes } from "../audit/routes.js";
 import { taskTeamRoutes } from "../cde/team-routes.js";
 import { cdeCodesRoutes } from "../cde/codes-routes.js";
 import { deliveryPlanRoutes } from "../cde/delivery-plan-routes.js";
-import { loadPrivacyState } from "../privacy/settings.js";
+import { killSwitchOn, loadPrivacyState, refreshPrivacyState } from "../privacy/settings.js";
 import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
 import { licenseRoutes } from "../license/routes.js";
@@ -336,6 +336,12 @@ async function authenticate(db: Db, security: SignInSecurity, req: FastifyReques
   }
   // OAuth access tokens stop working while their client is disabled.
   if (row.kind === "oauth" && !row.oauthClientEnabled) return null;
+  // "Tüm Dış Bağlantıları Kapat" suspends access keys and OAuth access tokens (MCP clients, scripts,
+  // connected applications): refused while it is on, nothing deleted; browser sessions go on (#171).
+  if (row.kind !== "session") {
+    await refreshPrivacyState(db);
+    if (killSwitchOn()) throw new HttpError(403, "access_suspended", msg("privacy:outbound.accessSuspended"));
+  }
   // Touch at most once a minute.
   if (!row.lastUsedAt || now.getTime() - row.lastUsedAt.getTime() > 60_000) {
     await db.update(tokens).set({ lastUsedAt: now }).where(eq(tokens.id, row.tokenId));

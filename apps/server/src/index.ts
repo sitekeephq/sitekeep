@@ -12,11 +12,12 @@ import { JobQueue } from "./jobs/queue.js";
 import { Converters } from "./previews/converters.js";
 import { loadSecretKey } from "./core/platform/secrets.js";
 import { upgradeSeededLabels } from "./projects/seeded-labels.js";
-import { seedTaskTeams } from "./cde/teams.js";
+import { seedTaskTeamsOnce } from "./cde/teams.js";
 import { startDueReminders } from "./workflow/reminders.js";
 import { LocalStorage } from "./core/platform/storage.js";
 import { mailerFromEnv } from "./works/letter.js";
 import { startRetention } from "./privacy/retention.js";
+import { startLicenseRefresh } from "./license/online.js";
 import { startSecurityAlerts } from "./audit/security-alerts.js";
 import { SignInSecurity } from "./auth/sign-in-security.js";
 import { startCloseoutCleanup } from "./closeout/build.js";
@@ -92,8 +93,8 @@ await bootstrapAdmin();
 await backfillDocumentCodesAtStart(db, (m, e) => (e ? console.error(m, e) : console.log(m)));
 // Default labels templates wrote before they became Title Case ("İş sonu" → "İş Sonu").
 await upgradeSeededLabels(db);
-// ISO 19650 task teams: one per company in projects that have none yet (idempotent, batched).
-await seedTaskTeams(db).catch((e) => console.error("task team seeding failed", e));
+// ISO 19650 task teams: one per company in projects that have none yet (once per installation, batched).
+await seedTaskTeamsOnce(db).catch((e) => console.error("task team seeding failed", e));
 // ISO 19650 codes from the older free attributes (idempotent, batched; docs/features/CDE_STATES.md).
 try {
   await migrateLegacyCodes(db, { log: (line) => console.log(line) });
@@ -136,6 +137,9 @@ const stopReminders = startDueReminders(db, { log: (m, e) => console.error(m, e)
 // (default 12 months), audit log (default unlimited), recycle bin (default off), expired sessions,
 // keys and invitations, old personal data exports; writes the disposal record (privacy/retention.ts).
 const stopRetention = startRetention(db, storage, { log: (m, e) => console.error(m, e) });
+// Online licence (docs/onprem/licensing-online.md): once a day the licence is refreshed from the licensing
+// service when it was activated online; off with the kill switch or the "Licence Activation" connection.
+const stopLicenseRefresh = startLicenseRefresh(db, { log: (m, e) => console.error(m, e) });
 // Security alerts (docs/features/SECURITY_LOG.md#alerts): the audit log is scanned every minute
 // against the alert rules, the hash chain is checked daily; new alerts optionally go out by e-mail.
 const stopSecurityAlerts = startSecurityAlerts({ db, mailer, log: (m, e) => console.error(m, e) });
@@ -161,6 +165,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, async () => {
     stopReminders();
     stopRetention();
+    stopLicenseRefresh();
     stopSecurityAlerts();
     stopCloseoutCleanup();
     stopPortabilityCleanup();

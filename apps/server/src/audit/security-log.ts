@@ -44,6 +44,8 @@ export const SECURITY_LOG_ACTIONS: Record<SecurityLogCategory, CategoryRule> = {
       "invitation.settings",
       "security.alert_settings",
       "license.installed",
+      "license.activated",
+      "license.refreshed",
       "license.removed",
       "cde.settings_updated",
       "project.modules_updated",

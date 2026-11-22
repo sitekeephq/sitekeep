@@ -8,10 +8,10 @@ Date: 10.10.2026
 
 - **OpenCDE-compliant:** data is not locked in. Issues are exchanged via BCF, files via the Documents API, and identity via the Foundation API + OAuth2, all in standard formats. Customers can move their data to another CDE at any time.
 - **Privacy-first:**
-  - Data stays on the customer's server (on-prem). The application sends nothing out on its own; there is no telemetry.
+  - Data stays on the customer's server (on-prem), unless an administrator enables an integration (AI, e-mail, sign-in, Autodesk). The application sends nothing out on its own; there is no telemetry.
   - AI is local by default (`local_only`). An external provider is used only if an administrator enables it and the project allows it; outgoing data is minimised and logged.
-  - Every external connection (AI, email, office editor, MCP, OAuth application) is visible under Administration and can be switched off in one place.
-  - Permissions, approvals and access are checked on every operation and logged (KVKK, the Turkish data protection law).
+  - Every external connection (AI, email, office editor, MCP, OAuth application) is visible under Administration and can be switched off there; **Turn Off All External Connections** stops all outbound calls outside the network and suspends API access keys and OAuth access tokens.
+  - Permissions, approvals and access are checked on every operation and logged, supporting the controller's KVKK m.12 duties (KVKK, the Turkish data protection law).
 
 ## Problem
 

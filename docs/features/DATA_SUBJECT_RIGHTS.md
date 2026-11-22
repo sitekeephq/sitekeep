@@ -1,17 +1,19 @@
 # Data subject rights and retention
 
-What SiteKeep offers when a person asks about their data (GDPR Art. 15–20, KVKK m.11, LGPD Art. 18 and
+What SiteKeep offers when a person asks about their data (GDPR Art. 15–21, KVKK m.11, LGPD Art. 18 and
 similar laws), and how long data is kept (GDPR Art. 5(1)(e), KVKK m.7 and the destruction regulation).
 All of it is part of SiteKeep Community. Issue #85 (P1-1 … P1-4, retention).
 
 The organisation running SiteKeep is the data controller. SiteKeep gives it the tools; deciding on a
-request, and on what free text and file contents hold, stays with the controller.
+request, and on what free text and file contents hold, stays with the controller. Requests are answered
+within 30 days (KVKK m.13(2)); an erasure request under KVKK is concluded within 30 days as well
+(Regulation on the Deletion, Destruction or Anonymisation of Personal Data, Art. 12).
 
 | Right | Where | Audit |
 |---|---|---|
 | Access and portability | Administration → Users → **Personal Data** → **Prepare Export**; My account → **My data** | `user.data_exported`, `user.data_export_downloaded` |
 | Rectification | Administration → Users (name, company); **Personal Data** → **Change E-mail** | `user.updated`, `user.email_changed` |
-| Erasure | **Personal Data** → **Anonymise User** | `user.anonymised`, `audit.personal_erased` |
+| Erasure | **Personal Data** → **Erase and pseudonymise user** | `user.anonymised`, `audit.personal_erased` |
 | Restriction | Disable the account | `user.updated` |
 | Storage limitation | Administration → Privacy Centre → **Retention** | `retention.completed`, disposal record |
 
@@ -24,7 +26,7 @@ at a time. The ZIP is stored under `exports/personal/` and listed by
 A person can request the same export of their own data: `POST /api/v1/me/data-exports`,
 `GET /me/data-exports`, `GET /me/data-exports/:eid/download` (My account → My data). Exports are
 deleted, with their ZIP, 7 days after they were built (`PERSONAL_EXPORT_KEEP_DAYS`), and at once when
-the person is anonymised.
+the person is erased and pseudonymised.
 
 Every section is in the ZIP twice, `json/<section>.json` and `csv/<section>.csv` (`;`, UTF-8 with BOM),
 plus a `README.txt`:
@@ -63,11 +65,22 @@ and the old one only as `previousEmailHash`.
 of the new address; the old Google account no longer reaches it (and, with the domain allowlist on,
 would create a new account only if its domain is allowed).
 
-## Anonymise
+<a id="anonymise"></a>
+
+## Erase and pseudonymise user
 
 `POST /api/v1/admin/users/:id/anonymise` `{ confirmEmail }` (system administrators). Irreversible.
 The screen asks twice: a warning, then the account's address typed by hand; the server checks that the
-typed address is the account's. Nobody anonymises their own account.
+typed address is the account's. Nobody erases their own account this way.
+
+**Erasure, not anonymisation.** This supports GDPR Art. 17 / KVKK m.7: identifying data is erased and
+history pseudonymised. The records that stay (audit rows, documents, reviews) point to a pseudonym and
+the audit chain keeps keyed hashes: they **remain personal data** (GDPR Art. 4(5), Recital 26) and are
+kept only under an Art. 17(3) exception / KVKK m.5(2) condition (for example a legal obligation or the
+establishment, exercise or defence of legal claims), then deleted at the end of the retention period
+(audit log retention, project deletion). Record that basis and period in your
+[records of processing](../compliance/RECORDS_OF_PROCESSING.md). The API path and audit action keep
+their historical name (`anonymise`, `user.anonymised`).
 
 | Data | Result |
 |---|---|
@@ -90,7 +103,7 @@ typed address is the account's. Nobody anonymises their own account.
 **Not removed automatically, the controller's responsibility:** personal data in free text (comments,
 letters, descriptions, form answers, meeting minutes), in file contents (drawings, photos and their
 EXIF location, documents) and in older audit row details that name a person in free form (for example
-a name change written by `user.updated` before anonymisation). Review and edit or delete such records
+a name change written by `user.updated` before the erasure). Review and edit or delete such records
 where the request requires it.
 
 ## Restriction of processing
@@ -127,8 +140,14 @@ category, count, the time span of the deleted records (oldest and newest), the r
 `trashPurgeDays=90`, `expired`) and the method (deleted from the database, or also from file storage).
 Never the records themselves. `GET /api/v1/admin/privacy/disposals.csv` (`from`, `to` as `YYYY-MM-DD`,
 `lang`) downloads it; Privacy Centre → Retention → **Download CSV**. It is the basis for the KVKK
-periodic destruction report ("periyodik imha tutanağı"); the downloads are audited
+periodic destruction record ("periyodik imha kaydı"); the downloads are audited
 (`privacy.disposals_exported`).
+
+Periodic destruction must run at intervals of no more than six months (Regulation on the Deletion, Destruction or
+Anonymisation of Personal Data, Art. 11); SiteKeep's job runs daily. The record of each destruction
+operation must be kept for at least three years (Art. 7): the application never deletes
+`disposal_log` rows, so they are kept for the life of the installation. A personal data retention and
+destruction policy is mandatory for controllers that must register with VERBİS (Art. 5).
 
 ## Code and tests
 
@@ -144,4 +163,4 @@ periodic destruction report ("periyodik imha tutanağı"); the downloads are aud
   settings and bounds, the retention job (bin purge, expired keys, audit and disposal rows, CSV), audit
   log truncation and its verification.
 - e2e `e2e/specs/data-subject-rights.spec.ts`: e-mail change, export and download, two-step
-  anonymisation in Administration → Users; Privacy Centre → Retention and the disposal CSV.
+  erase and pseudonymise in Administration → Users; Privacy Centre → Retention and the disposal CSV.

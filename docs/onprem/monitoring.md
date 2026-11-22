@@ -197,9 +197,10 @@ without personal data.
 | Audit chain check failed (daily) | every time |
 
 Thresholds and rules are configurable. They give the organisation the moment it became aware of a
-possible personal data breach: GDPR Art. 33 asks for notification of the supervisory authority
-within 72 hours, KVKK Art. 12(5) for notification of the Board as soon as possible (72 hours by the
-Board's decision 2019/10). The security log (Administration → Security Log, CSV) and the chain
+possible personal data breach: GDPR Art. 33(1) asks for notification of the supervisory authority
+"without undue delay and, where feasible, within 72 hours"; KVKK Art. 12(5) for notification of the
+Board as soon as possible (72 hours by the Board's decision 2019/10, with the reasons for any delay
+and a record of the breach; notifying the data subjects: decision 2019/271). The security log (Administration → Security Log, CSV) and the chain
 check are the evidence. An external monitoring system can poll `GET /api/v1/admin/security-alerts`
 with an administrator's or auditor's read-only access key.
 

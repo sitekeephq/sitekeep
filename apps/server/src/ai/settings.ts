@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { Db } from "../db/index.js";
 import { projectAiSettings, systemSettings } from "../db/schema.js";
-import { isExternalUrl } from "./hosts.js";
+import { isExternalProvider } from "./hosts.js";
 import { killSwitchOn } from "../privacy/settings.js";
 import { msg, type Msg } from "../i18n/index.js";
 import { defaultCapabilities, findAiPreset, type AiProviderCapabilities } from "@sitekeep/shared";
@@ -60,7 +60,7 @@ export interface ProviderDto {
   embeddingModel: string | null;
   disableThinking: boolean;
   hasApiKey: boolean;
-  /** Host is outside the customer's network. */
+  /** Host is outside the customer's network, or the model is a cloud model (isCloudModel). */
   external: boolean;
   presetId: string | null;
   capabilities: AiProviderCapabilities;
@@ -129,7 +129,7 @@ export function toProviderDto(p: StoredProvider): ProviderDto {
     embeddingModel: p.embeddingModel ?? null,
     disableThinking: !!p.disableThinking,
     hasApiKey: !!p.apiKeyEnc,
-    external: isExternalUrl(p.baseUrl),
+    external: isExternalProvider(p),
     presetId: findAiPreset(p.baseUrl, p.kind, p.presetId)?.id ?? null,
     capabilities: findAiPreset(p.baseUrl, p.kind, p.presetId)?.capabilities ?? defaultCapabilities(p.kind),
   };

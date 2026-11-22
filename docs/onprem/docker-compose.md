@@ -118,7 +118,10 @@ together. The installation bundle handles the nightly backup and restore itself 
 SiteKeep encrypts its secrets (AI provider keys, two-factor secrets, OAuth tokens: AES-256-GCM with
 `CDE_SECRET_KEY`). It does **not** encrypt the database or the stored files: anyone who gets the disk,
 a disk image or a backup can read them. **Encrypting the disks and the backups is the operator's
-responsibility** (GDPR Art. 32, KVKK m.12). Encryption inside the application is planned.
+responsibility** (GDPR Art. 32, KVKK m.12). Under the Cyber Resilience Act, protecting the
+confidentiality of stored data, e.g. by encryption at rest, is one of the essential requirements the
+manufacturer addresses in its risk assessment (Regulation (EU) 2024/2847, Annex I Part I(2)(e));
+encryption inside the application is planned before 11 December 2027.
 
 - **Disks:** put the Docker data directory (`/var/lib/docker`, which holds the `pgdata` and `cdedata`
   volumes; or the directories you bind-mount instead) on an encrypted volume. Linux: LUKS

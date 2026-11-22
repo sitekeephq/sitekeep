@@ -29,11 +29,11 @@ The user interface is available in English and Turkish.
 | Models | IFC → That Open Fragments conversion on the server, federated viewer, element selection and properties, DWG and PDF previews |
 | Issues | 3D pins, BCF viewpoints (camera, models, selected elements, snapshot), status, priority, assignee, due date, BCF import / export |
 | Reviews | Review and approval chains on documents |
-| ISO 19650 | Per-project rules: state transitions only through review, archive on publication, suitability and revision codes, unique document codes, task-team WIP; clause map and test pack in [ISO 19650 conformance](docs/compliance/ISO19650.md) |
+| ISO 19650 | Per-project rules: state transitions only through review, archive on publication, suitability and revision codes, unique document codes, task-team WIP; clause map and test pack in [ISO 19650 alignment](docs/compliance/ISO19650.md) (ISO 19650-aligned; there is no ISO 19650 certification for software) |
 | Audit | Every write, view and download is recorded in an append-only, hash-chained audit log with CSV export |
 | Reports | A list per area (documents, issues, works, reviews …) with the viewer's permissions and CSV export; report dashboards (templates, AI, sharing, versions) come with the Enterprise Platform module |
 | Integrations | REST API (`/api/v1`), OpenCDE, a local stdio MCP server for AI assistants (`apps/mcp`), office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora); a hosted MCP endpoint (`/mcp`) comes with the Enterprise AI module |
-| Privacy | The server sends nothing out on its own; every outbound connection is listed in the Privacy Centre, logged and can be switched off |
+| Privacy | The server sends nothing out on its own unless an administrator enables an integration (AI, e-mail, sign-in, Autodesk); every outbound connection is listed in the Privacy Centre, logged and can be switched off |
 
 ## Screenshots
 

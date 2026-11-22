@@ -142,8 +142,8 @@ Product contract: archive §2. To wire up the engine:
 4. **Job.** `jobs` type e.g. `forma-sync`. New file → CDE upload service
    (`via: forma-sync`). New version. On rename, `external_entity_links`.
    What is deleted in Forma stays in the CDE, marked "deleted at source".
-5. **Outbound.** Published only. Goes out to the Autodesk cloud; explicit consent + Privacy
-   Centre (`entegrasyon:autodesk`).
+5. **Outbound.** Published only. Goes out to the Autodesk cloud; an administrator's approval
+   (an administrative setting, not explicit consent) + Privacy Centre (`entegrasyon:autodesk`).
 6. **Endpoints.** `GET /admin/forma-sync` drops the sample and reads real mappings and
    `integration_sync_runs`. `POST …/run` = Sync Now. Adding/deleting a
    mapping becomes persistent.

@@ -4,7 +4,7 @@ ISO 19650 expects each task team to produce its information in its own work in p
 area, hidden from the other teams until it is shared (ISO 19650-1 §12.2, ISO 19650-2 §5.1.7(e) and
 §5.6.2). In SiteKeep, a task team is a kind of project role. A WIP folder can be owned by one team,
 and a project setting closes a team's WIP folders to everyone outside that team.
-Model and settings: [CDE states](CDE_STATES.md). Conformance: [ISO 19650](../compliance/ISO19650.md) (ISO-5).
+Model and settings: [CDE states](CDE_STATES.md). ISO 19650 alignment: [ISO 19650](../compliance/ISO19650.md) (ISO-5).
 
 ## Model
 
@@ -77,16 +77,21 @@ adds the reason `task_team_wip` for members outside the team, and the explanatio
 `apps/server/src/cde/teams.ts`. Seeding is idempotent and never undoes an administrator's choice:
 
 - **New project from a template.** One team per slot company, with the slot's code (else the
-  company code), plus a team for the creator's company. A template's `cde.taskTeams`
+  company code). The creator's company gets no team of its own: the parties chosen in the template
+  or the [setup wizard](PROJECT_SETUP_WIZARD.md) are the task teams (an administrator adds more in
+  Task Teams, or with "Create Teams for Companies"). A template's `cde.taskTeams`
   (`[{ "slot": "yuklenici", "lead": true }]`, [project templates](PROJECT_TEMPLATES.md#cde-block))
   limits the teams to the listed slots and marks the lead appointed party's team (`is_lead`); the
   construction templates make the contractor's team the lead. A WIP folder whose direct grants name
   exactly one slot company is owned by that company's team; its subfolders inherit the owner.
 - **New member, or a member's company changed.** The member joins their company's team if the
   project has one.
-- **Existing projects.** These are seeded at server start (`seedTaskTeams`, in batches) and by the
-  backfill script (`DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.ts [batchSize]`).
-  Only projects that have no task team at all are seeded. A project's companies are its members'
+- **Existing projects.** These are seeded once per installation at server start
+  (`seedTaskTeamsOnce`, in batches; the marker `cde.taskTeamsBackfilled` in `system_settings`) and by
+  the backfill script (`DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.ts [batchSize]`).
+  Only projects that have no task team at all are seeded. An installation that already has task
+  teams only gets the marker, so a project whose administrator deleted its last team, or a project
+  made later without teams, is not seeded again at the next start. A project's companies are its members'
   companies and its template slot companies. Each company gets a team, its members join it, and
   owner teams are inferred from the template slots as above. A team an administrator deleted is not
   created again. The policy stays `grants`, so seeding hides nothing.
@@ -147,7 +152,9 @@ ISO19650-2 5.1.7(e) / -1 12.2 task team WIP:
   - exception grant with a reason and `cde.override`;
   - owner team route;
   - `grants` policy unchanged;
-  - seeding is idempotent.
+  - seeding is idempotent;
+  - a project made from a template gets no team for the creator's company, and a deleted last team
+    is not brought back at the next start (#171).
 - e2e `e2e/specs/task-teams.spec.ts`: a member of team B does not see team A's WIP folder. Core
   only; passes with and without modules.
 - `apps/server/test/cde/iso19650-acceptance.test.ts`: in an ISO template project with four parties,

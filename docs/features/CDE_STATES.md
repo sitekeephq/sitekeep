@@ -2,7 +2,7 @@
 
 SiteKeep runs a project's information as an ISO 19650 common data environment (CDE). This page
 describes the data model behind the four states, the project settings that control them, and what
-is switched on today. Compliance mapping: [ISO 19650 conformance](../compliance/ISO19650.md).
+is switched on today. Clause mapping: [ISO 19650 alignment](../compliance/ISO19650.md).
 
 ## ISO 19650 in SiteKeep
 
@@ -16,8 +16,8 @@ WIP ([task teams](TASK_TEAMS.md)) and a hash-chained audit log ([audit log](AUDI
 are per project: existing projects keep working as before until an administrator switches them on, and
 projects created from the ISO 19650 templates (**ISO 19650 Temel** / ISO 19650 Basic and the
 construction templates, [project templates](PROJECT_TEMPLATES.md)) start with them on. The clause-by-clause
-mapping, the steps to switch the rules on and the conformance test pack (`npm run test:iso`) are in
-[ISO 19650 conformance](../compliance/ISO19650.md).
+mapping, the steps to switch the rules on and the ISO 19650 test pack (`npm run test:iso`) are in
+[ISO 19650 alignment](../compliance/ISO19650.md).
 
 ## Model
 
@@ -300,4 +300,4 @@ migration 0042): `DATABASE_URL=… npx tsx apps/server/src/scripts/cde-backfill.
 | Task teams and WIP visibility ([task teams](TASK_TEAMS.md)) | done |
 | Delivery plan: TIDP per task team, MIDP, status from the CDE (ISO-7, [delivery plan](DELIVERY_PLAN.md)) | done |
 | Audit trail: view events, hash chain, CSV ([details](AUDIT_LOG.md)) | done |
-| Conformance pack: clause map, tagged tests, acceptance scenario ([ISO 19650 conformance](../compliance/ISO19650.md)) | done |
+| ISO 19650 test pack: clause map, tagged tests, acceptance scenario ([ISO 19650 alignment](../compliance/ISO19650.md)) | done |

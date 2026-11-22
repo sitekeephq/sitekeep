@@ -6,15 +6,16 @@
     "unknownConnection": "Bilinmeyen bağlantı.",
     "exportRunning": "Bu kişinin verileri için bir dışa aktarma zaten hazırlanıyor.",
     "exportNotReady": "Dışa aktarma henüz hazır değil.",
-    "anonymised": "Bu hesap anonimleştirildi.",
+    "anonymised": "Bu hesabın kimlik verileri silindi, geçmişi takma adla kaldı.",
     "anonymiseConfirm": "Onaylamak için hesabın e-posta adresini aynen yazın.",
-    "anonymiseSelf": "Kendi hesabınızı anonimleştiremezsiniz.",
+    "anonymiseSelf": "Kendi hesabınızı silip takma adlandıramazsınız.",
     "emailInUse": "Bu e-posta adresi başka bir hesapta kullanılıyor.",
     "noticeRequired": "Devam etmek için aydınlatma metnini okuyun ve “Aydınlatma Metnini Okudum” kutusunu işaretleyin.",
     "noticeEmpty": "Göstermeden önce aydınlatma metnini en az bir dilde yazın."
   },
   "outbound": {
     "killSwitch": "Tüm dış bağlantılar kapalı (Yönetim → Gizlilik Merkezi): {{host}} adresine bağlanılmadı.",
+    "accessSuspended": "Tüm dış bağlantılar kapalıyken erişim anahtarları ve bağlı uygulamalar (MCP, OAuth) askıdadır (Yönetim → Gizlilik Merkezi). Tarayıcıdan giriş yapın ya da bir yöneticiye başvurun.",
     "connectionDisabled": "Bu bağlantı Gizlilik Merkezi'nden kapatıldı ({{purpose}}, {{host}}). Yönetim → Gizlilik Merkezi → Dış Bağlantılar'dan açılabilir."
   },
   "data": {
@@ -40,6 +41,9 @@
     "google": "Google ile Giriş",
     "googleSends": "Giriş kodunu doğrular, ad ve e-posta adresini okur; tarayıcı accounts.google.com'a kendisi gider",
     "googleNotConfigured": "Tanımlı değil (GOOGLE_CLIENT_ID)",
+    "license": "Lisans Etkinleştirme",
+    "licenseSends": "Lisansı etkinleştirir ve her gece yeniler: lisans kimliği, kurulum kimliği, sürüm ve etkin kullanıcı sayısı gönderilir; ad ya da proje verisi gitmez",
+    "licenseNotUsed": "Kullanılmıyor: lisans çevrimiçi etkinleştirilmedi",
     "autodesk": "Autodesk (APS / ACC)",
     "autodeskSends": "Connect modülü: Autodesk Construction Cloud kayıtlarını eşitler ve dosya aktarır; dosya içeriği Autodesk'in verdiği kısa ömürlü adreslerden gelir",
     "personalClaude": "Kişisel Claude API",
@@ -53,6 +57,7 @@
     "aiQueue": "Yapay Zekâ Görev Kuyruğu (Dış İstemciler)",
     "externalClientsAllowed": "Tam yerel modda da dış istemcilere izin var",
     "stoppedByKillSwitch": "Tüm dış bağlantılar kapalı olduğu için durdu",
+    "suspendedByKillSwitch": "Tüm dış bağlantılar kapalı olduğu için askıda",
     "oauth": "OAuth Uygulamaları (OpenCDE)",
     "oauthApps_one": "{{count}} uygulama, {{enabled}} açık",
     "oauthApps_other": "{{count}} uygulama, {{enabled}} açık",

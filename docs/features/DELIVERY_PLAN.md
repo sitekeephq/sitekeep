@@ -5,7 +5,7 @@ information delivery plan (TIDP, §5.4.4). The lead appointed party aggregates t
 master information delivery plan (MIDP, §5.4.5), against the project's milestones and the
 information container breakdown structure (§5.4.3). SiteKeep Community keeps a simple delivery plan
 beside the documents and reads each planned deliverable's status from the CDE. Part of the
-[CDE states](CDE_STATES.md) work; conformance: [ISO 19650](../compliance/ISO19650.md).
+[CDE states](CDE_STATES.md) work; ISO 19650 alignment: [ISO 19650](../compliance/ISO19650.md).
 
 The plan is a feature, not a document: a project can still keep its MIDP as a spreadsheet in
 `03-BIM Execution Plan and Delivery Plans` of the construction templates; the export below gives one.
@@ -24,9 +24,13 @@ The plan is a feature, not a document: a project can still keep its MIDP as a sp
 
 The code is checked when a row is saved or imported, against the project's naming standard: the
 **Document Code Standard** (Project Settings → CDE, `container_standard_id`), else any naming standard
-of the project. A code typed in lower case is accepted when its upper-case form follows the standard;
-with `allowSuffix`, a suffix after the last field is not part of the code. A project without a naming
-standard takes any code. Two rows cannot plan the same code (409).
+of the project. The code is the name without the fields that are not part of the document code
+(`inCode: false`, e.g. Revizyon No of [ÇŞB 2026](NAMING_CSB_2026.md#revizyon-no-and-iso-19650-revision-codes)):
+`270001_00_MM_DUVA_PL_MMC_K01_01` is accepted and stored as typed, without asking for `_000`. A whole
+file name is accepted too (for example from an imported MIDP) and stored as its document code
+(`…_K01_01_000` → `…_K01_01`). A code typed in lower case is accepted when its upper-case form follows
+the standard; with `allowSuffix`, a suffix after the last field is not part of the code. A project
+without a naming standard takes any code. Two rows cannot plan the same code (409).
 
 ## Status and late
 
@@ -144,6 +148,8 @@ ISO19650-2 5.4.4 / 5.4.5:
   naming standard, lead and member rights, MIDP and TIDP views, status from WIP to Published and the
   late rule, the WIP rule on the matched document, XLSX / CSV export, import (dry run, errors, English
   and Turkish headers), audit events, template export.
+- `apps/server/test/projects/naming-csb2026.test.ts`: with the ÇŞB 2026 profile, a planned code without
+  Revizyon No is stored as typed, a whole file name gives its document code (#171).
 - `packages/shared/test/delivery-plan.test.ts`: status and late rules, date and target cells, header
   matching, the template check.
 - e2e `e2e/specs/delivery-plan.spec.ts`: plan a deliverable, see its status follow an upload, filter,

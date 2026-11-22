@@ -276,7 +276,7 @@
       "user": {
         "created": "Kullanıcı oluşturuldu",
         "updated": "Kullanıcı değişti",
-        "anonymised": "Kullanıcı anonimleştirildi",
+        "anonymised": "Kullanıcı silindi ve takma adlandırıldı",
         "email_changed": "E-posta adresi düzeltildi",
         "data_exported": "Kişisel veri dışa aktarımı hazırlandı",
         "data_export_downloaded": "Kişisel veri dışa aktarımı indirildi"
@@ -315,6 +315,8 @@
       },
       "license": {
         "installed": "Lisans yüklendi",
+        "activated": "Lisans çevrimiçi etkinleştirildi",
+        "refreshed": "Lisans çevrimiçi yenilendi",
         "removed": "Lisans kaldırıldı"
       },
       "retention": {

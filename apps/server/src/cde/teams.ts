@@ -5,11 +5,12 @@
  * FolderTree closes it to everyone outside the team.
  *
  * Seeding is idempotent and never undoes an administrator's choice: teams are created only for
- * companies that have none, and only projects without any task team are seeded at server start.
+ * companies that have none, and the backfill of projects without any task team runs once per
+ * installation (seedTaskTeamsOnce).
  */
 import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import type { Db } from "../db/index.js";
-import { companies, folders, memberRoles, projectMembers, projectRoles, projectSlots, projects, users } from "../db/schema.js";
+import { companies, folders, memberRoles, projectMembers, projectRoles, projectSlots, projects, systemSettings, users } from "../db/schema.js";
 import { FolderTree } from "../core/security/access.js";
 import { cdeStateOf } from "./state.js";
 
@@ -205,6 +206,32 @@ export async function seedTaskTeams(
     }
     log(`task teams: ${Math.min(i + batchSize, pending.length)}/${pending.length} projects`);
   }
+  return report;
+}
+
+/** system_settings key: the one-time task team backfill of existing projects has run. */
+export const TASK_TEAMS_BACKFILLED = "cde.taskTeamsBackfilled";
+
+/**
+ * The backfill at server start, once per installation: seedTaskTeams the first time, never again.
+ * Without this, a project whose administrator deleted every task team (or a project made after the
+ * backfill without teams) would get its companies' teams back at the next start (#171). An
+ * installation that already has task teams was backfilled by an earlier version: only the marker
+ * is written. Later projects get their teams from the template or the wizard, or from
+ * "Create Teams for Companies".
+ */
+export async function seedTaskTeamsOnce(
+  db: Db,
+  opts: { batchSize?: number; log?: (line: string) => void } = {},
+): Promise<TaskTeamSeedReport | null> {
+  const [done] = await db.select({ key: systemSettings.key }).from(systemSettings).where(eq(systemSettings.key, TASK_TEAMS_BACKFILLED));
+  if (done) return null;
+  const [anyTeam] = await db.select({ id: projectRoles.id }).from(projectRoles).where(eq(projectRoles.kind, "task_team")).limit(1);
+  const report = anyTeam ? { projectsSeeded: 0, teamsCreated: 0, foldersOwned: 0 } : await seedTaskTeams(db, opts);
+  await db
+    .insert(systemSettings)
+    .values({ key: TASK_TEAMS_BACKFILLED, value: { at: new Date().toISOString(), ...report } })
+    .onConflictDoNothing();
   return report;
 }
 

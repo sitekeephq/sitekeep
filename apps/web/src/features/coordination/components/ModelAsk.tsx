@@ -18,6 +18,7 @@ import { ApiError, api, formatNumber, type AiProviderSelection, type ProjectAiDt
 import type { ViewerEngine } from "@sitekeephq/bim-viewer";
 import { useLabel } from "../../../i18n";
 import { AiTaskButton } from "../../../shared/ai/AiTaskButton";
+import { AiGeneratedLabel } from "../../../shared/ai/AiBits";
 import { webModules } from "../../../app/modules";
 import { webCapability } from "../../../sdk/capabilities";
 
@@ -419,11 +420,14 @@ export function ModelAskPanel({
         <div className="mq-result">
           <div className="row wrap small">
             {result.source === "ai" ? (
-              <span className="badge info">
-                {t("modelAsk.badges.ai")}
-                {result.model ? ` · ${result.model}` : ""}
-                {result.cached ? ` · ${t("modelAsk.cached")}` : ""}
-              </span>
+              <>
+                <span className="badge info">
+                  {t("modelAsk.badges.ai")}
+                  {result.model ? ` · ${result.model}` : ""}
+                  {result.cached ? ` · ${t("modelAsk.cached")}` : ""}
+                </span>
+                <AiGeneratedLabel model={result.model} />
+              </>
             ) : result.source === "rules" ? (
               <span className="badge">{t("modelAsk.badges.quick")}</span>
             ) : (

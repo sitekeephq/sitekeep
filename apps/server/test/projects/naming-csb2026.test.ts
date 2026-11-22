@@ -120,6 +120,28 @@ describe("ÇŞB 2026 (EK-2) naming profile", () => {
     expect(check.body.results[4].errors[0]).toBe("The name is 36 characters long; at most 35 are allowed (without the extension).");
   });
 
+  it("the delivery plan takes the document code without Revizyon No and stores it as typed (#171)", async () => {
+    const api = await admin();
+    const team = await api.post(`/projects/${pid}/roles`, { name: "Tasarım Ekibi", kind: "task_team" });
+    expect(team.status, JSON.stringify(team.body)).toBe(200);
+    const plan = `/projects/${pid}/delivery-plan/deliverables`;
+    const typed = await api.post(plan, { teamId: team.body.id, code: "270001_00_MM_DUVA_PL_MMC_K01_01", title: "Duvar planı" });
+    expect(typed.status, JSON.stringify(typed.body)).toBe(200);
+    expect(typed.body.code).toBe("270001_00_MM_DUVA_PL_MMC_K01_01");
+    // Lower case is accepted and upper-cased like the register.
+    const lower = await api.post(plan, { teamId: team.body.id, code: "270001_00_st_beto_hs_shr_nnn_01", title: "Kesit" });
+    expect(lower.status, JSON.stringify(lower.body)).toBe(200);
+    expect(lower.body.code).toBe("270001_00_ST_BETO_HS_SHR_NNN_01");
+    // A whole file name (e.g. from an imported MIDP) still gives its document code.
+    const named = await api.post(plan, { teamId: team.body.id, code: "270001_00_MM_DUVA_PL_MMC_K02_01_000", title: "Kat 2" });
+    expect(named.status, JSON.stringify(named.body)).toBe(200);
+    expect(named.body.code).toBe("270001_00_MM_DUVA_PL_MMC_K02_01");
+    // An incomplete code is refused without asking for Revizyon No.
+    const bad = await api.post(plan, { teamId: team.body.id, code: "270001_00_MM_DUVA_PL_MMC_K03", title: "Eksik" });
+    expect(bad.status).toBe(400);
+    expect(JSON.stringify(bad.body)).not.toContain("Revizyon");
+  });
+
   it("without the EK-1 code Proje Kodu takes any six letters or digits; an invalid code is refused", async () => {
     const api = await admin();
     const res = await api.post("/projects/from-template", { templateId: TEMPLATE, language: "tr", code: "CSB2", name: "ÇŞB 2", setup: { containerStandard: CSB_2026_STANDARD_NAME } });

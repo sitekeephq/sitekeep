@@ -77,7 +77,7 @@ authenticator app works (Microsoft Authenticator, Google Authenticator, 1Passwor
   `twoFactor: "totp"` or `"recovery"`.
 - **Turn off:** with a current code or a recovery code (`auth.two_factor_disabled`); not possible while
   the administrator requires it for the account.
-- **Anonymising a user** ([data subject rights](DATA_SUBJECT_RIGHTS.md)) deletes their secret and
+- **Erasing and pseudonymising a user** ([data subject rights](DATA_SUBJECT_RIGHTS.md#erase-and-pseudonymise-user)) deletes their secret and
   recovery codes in the same transaction (`registerAnonymiseHook` in `auth/two-factor.ts`).
 - **Lost phone:** a system administrator uses **Reset Two-Factor** on the user (Administration →
   Users): the secret and recovery codes are removed and the user's sessions end

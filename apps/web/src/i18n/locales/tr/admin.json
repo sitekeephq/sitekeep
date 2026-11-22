@@ -42,7 +42,7 @@
     },
     "passwordPrompt": "{{name}} için yeni şifre (en az 10 karakter).",
     "pending": "Davetli",
-    "anonymised": "Anonimleştirildi",
+    "anonymised": "Silindi ve takma adlandırıldı",
     "personal": {
       "open": "Kişisel Veriler",
       "title": "Kişisel veriler: {{name}}",
@@ -67,12 +67,12 @@
         "done": "Hazır",
         "failed": "Başarısız"
       },
-      "anonymise": "Kullanıcıyı Anonimleştir",
-      "anonymiseHelp": "Geri alınamaz. Ad \"Silinmiş kullanıcı #…\", e-posta geçersiz bir adres olur; şifre, oturumlar, erişim anahtarları, tercihler, açık davetler ile denetim ve dış bağlantı kayıtlarının kişisel kısmı silinir. Kişinin oluşturduğu kayıtlar takma adla kalır; dosyalar değişmez. Serbest metinlerdeki (yorum, yazışma) ve dosya içeriklerindeki kişisel veriler otomatik silinmez.",
-      "anonymiseWarning": "{{name}} anonimleştirilecek. Bu işlem geri alınamaz ve hesap artık giriş yapamaz.",
+      "anonymise": "Kullanıcıyı Sil ve Takma Adlandır",
+      "anonymiseHelp": "GDPR md. 17 / KVKK m.7'yi destekler: kimliği belirleyen veriler silinir, geçmiş takma adla kalır. Geri alınamaz. Ad \"Silinmiş kullanıcı #…\", e-posta geçersiz bir adres olur; şifre, oturumlar, erişim anahtarları, tercihler, açık davetler ile denetim ve dış bağlantı kayıtlarının kişisel kısmı silinir. Kişinin oluşturduğu kayıtlar takma adla kalır; dosyalar değişmez. Serbest metinlerdeki (yorum, yazışma) ve dosya içeriklerindeki kişisel veriler otomatik silinmez. Takma adlı kayıtlar kişisel veri olmaya devam eder; yalnız md. 17(3) istisnası / KVKK m.5(2) şartıyla saklanır ve saklama süresi sonunda silinir.",
+      "anonymiseWarning": "{{name}} adlı kişinin kimliğini belirleyen veriler silinecek ve geçmişi takma adla kalacak. Bu işlem geri alınamaz ve hesap artık giriş yapamaz.",
       "anonymiseContinue": "Devam Et",
       "anonymiseType": "Onaylamak için hesabın e-posta adresini yazın: {{email}}",
-      "anonymiseConfirm": "Anonimleştir",
+      "anonymiseConfirm": "Sil ve Takma Adlandır",
       "anonymised": "Hesap artık \"{{name}}\"."
     },
     "twoFactorBadge": "2FA",
@@ -441,12 +441,12 @@
         "turnOff": "Kapat",
         "reopen": "Yeniden Aç"
       },
-      "confirmOff": "Sunucunun ağ dışındaki bütün adreslere bağlantısı kesilecek: bulut yapay zekâ, dış e-posta ve ofis sunucuları. Yapay zekâ tam yerel moda geçer, dış istemci kuyruğu durur.",
+      "confirmOff": "Sunucunun ağ dışındaki bütün adreslere bağlantısı kesilecek: bulut yapay zekâ (yerel sunucu üzerinden çalışan bulut modelleri dahil), dış e-posta ve ofis sunucuları. Yapay zekâ tam yerel moda geçer, dış istemci kuyruğu durur; erişim anahtarları ve bağlı uygulamalar (MCP istemcileri, betikler, OAuth) düğme kapanana kadar askıya alınır, hiçbir şey silinmez. Tarayıcıdan giriş çalışmaya devam eder.",
       "confirmOn": "Dış bağlantılar yeniden açılacak; her bağlantı kendi ayarına döner.",
-      "on": "Açık. Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır, dış istemci kuyruğu durdu.",
-      "onSince": "Açık ({{date}}). Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır, dış istemci kuyruğu durdu.",
-      "onSinceBy": "Açık ({{date}}, {{name}}). Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır, dış istemci kuyruğu durdu.",
-      "off": "Kapalı. Açıldığında sunucu ağ dışındaki hiçbir adrese bağlanmaz; yerel ağ ve iç ağ listesi çalışmaya devam eder."
+      "on": "Açık. Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır (yerel sunucu üzerinden çalışan bulut modelleri de durur), dış istemci kuyruğu durdu, erişim anahtarları ve bağlı uygulamalar (MCP, OAuth) askıda. Tarayıcıdan giriş çalışır.",
+      "onSince": "Açık ({{date}}). Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır (yerel sunucu üzerinden çalışan bulut modelleri de durur), dış istemci kuyruğu durdu, erişim anahtarları ve bağlı uygulamalar (MCP, OAuth) askıda. Tarayıcıdan giriş çalışır.",
+      "onSinceBy": "Açık ({{date}}, {{name}}). Sunucu yalnız yerel ağdaki adreslere bağlanır; yapay zekâ tam yerel çalışır (yerel sunucu üzerinden çalışan bulut modelleri de durur), dış istemci kuyruğu durdu, erişim anahtarları ve bağlı uygulamalar (MCP, OAuth) askıda. Tarayıcıdan giriş çalışır.",
+      "off": "Kapalı. Açıldığında sunucu ağ dışındaki hiçbir adrese bağlanmaz, erişim anahtarları ve bağlı uygulamalar (MCP, OAuth) askıya alınır; yerel ağ, iç ağ listesi ve tarayıcıdan giriş çalışmaya devam eder."
     },
     "summary": {
       "fields": {
@@ -898,7 +898,8 @@
       "modules": "Modüller",
       "seats": "Kullanıcılar",
       "validUntil": "Geçerlilik Sonu",
-      "supportUntil": "Güncelleme Sonu"
+      "supportUntil": "Güncelleme Sonu",
+      "plan": "Paket"
     },
     "seatsOf": "{{used}} / {{seats}} etkin kullanıcı",
     "seatsUnlimited": "{{used}} etkin kullanıcı (sınırsız)",
@@ -930,7 +931,37 @@
       "other_installation": "Bu lisans başka bir kuruluma ait.",
       "build_after_support": "Bu SiteKeep sürümü destek süresi bittikten sonra çıktı."
     },
-    "seatsOver": "Lisansın izin verdiğinden {{count}} fazla etkin kullanıcı var: hesaplar kapatılana ya da koltuk eklenene kadar Enterprise modülleri salt okunur."
+    "seatsOver": "Lisansın izin verdiğinden {{count}} fazla etkin kullanıcı var: hesaplar kapatılana ya da koltuk eklenene kadar Enterprise modülleri salt okunur.",
+    "online": {
+      "onlineTitle": "Çevrimiçi Etkinleştir",
+      "onlineText": "Size gönderilen etkinleştirme anahtarını girin (SK-XXXX-XXXX-XXXX-XXXX). Sunucu lisansı alır ve her gece yeniler; yalnızca kurulum kimliği, sürüm ve etkin kullanıcı sayısı gönderilir.",
+      "keyLabel": "Etkinleştirme anahtarı",
+      "activate": "Etkinleştir",
+      "activated": "Lisans etkinleştirildi.",
+      "trial": "30 Günlük Denemeyi Başlat",
+      "trialText": "10 kullanıcı için Plus modülleri, kurulum başına bir kez.",
+      "checkNow": "Şimdi Kontrol Et",
+      "checked": "Lisans kontrol edildi.",
+      "lastCheck": "Son kontrol: {{date}}",
+      "lastOk": "Lisans hizmetinden son cevap: {{date}}",
+      "results": {
+        "valid": "lisans alındı",
+        "unchanged": "değişiklik yok",
+        "invalid": "reddedildi",
+        "unreachable": "ulaşılamadı"
+      },
+      "offlineHint": "Bu sunucunun internet erişimi yok mu? Aşağıdan müşteri portalındaki lisans dosyasını yükleyin.",
+      "onlineProblems": {
+        "revoked": "Lisans hizmeti bu lisansı artık kabul etmiyor ({{reason}}): sorun çözülmezse Enterprise modülleri {{date}} tarihinde salt okunur olur.",
+        "offline_too_long": "Bu lisansın çevrimiçi kontrol edilmesi gerekiyor ve lisans hizmetine 30 günden uzun süredir ulaşılamadı: Enterprise modülleri {{date}} tarihinde salt okunur olur."
+      },
+      "plans": {
+        "standard": "Enterprise Standard",
+        "plus": "Enterprise Plus",
+        "trial": "Deneme",
+        "internal": "İç Kullanım"
+      }
+    }
   },
   "invitations": {
     "title": "Davetler",

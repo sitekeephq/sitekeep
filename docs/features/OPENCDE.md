@@ -217,6 +217,9 @@ versions are reached through `document_versions`).
 - If an old refresh token arrives again, the whole family (access + refresh) is revoked and recorded in the audit log.
 - When an application is disabled, its tokens stop working immediately. Re-enabling brings them back.
   Deleting it also deletes the consents and tokens.
+- While **Turn Off All External Connections** (Privacy Centre) is on, OAuth access tokens and API
+  access tokens are suspended: requests with them get `403 access_suspended`. Nothing is deleted; they
+  work again when the switch is turned off ([privacy](PRIVACY.md#turn-off-all-external-connections)).
 - Failed requests to `/oauth2/token` and `/oauth2/revoke` are limited per IP: 20 errors in 10 minutes, then `429` + `Retry-After`.
   The counter is in memory, per server process. Behind a reverse proxy (nginx, IIS) all requests come from the proxy's IP;
   in that case the limit is shared by everyone. If needed, the Fastify `trustProxy` setting must be enabled separately.

@@ -12,18 +12,18 @@ published as a versioned package and pulled into the application at a pinned ver
 
 | Module | Repository | Package | Version in this repository | Status |
 |---|---|---|---|---|
-| **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/sitekeephq/sitekeep-cost) (private) | `@sitekeephq/sitekeep-ee-cost` | `0.7.0` | Separate repository, GitHub Packages. [Details](cost.md) |
-| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private) | `@sitekeephq/sitekeep-ee-field` | `0.5.0` | Separate repository, GitHub Packages. [Details](field.md) |
-| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private) | `@sitekeephq/sitekeep-ee-coordinate` | `0.4.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
-| **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private) | `@sitekeephq/sitekeep-ee-planning` | `0.5.0` | Separate repository, GitHub Packages. [Details](planning.md) |
-| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private) | `@sitekeephq/sitekeep-ee-ai` | `0.5.0` | Separate repository, GitHub Packages. [Details](ai.md) |
-| **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private) | `@sitekeephq/sitekeep-ee-manage` | `0.5.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
-| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private) | `@sitekeephq/sitekeep-ee-connect` | `0.5.1` | Separate repository; Office conversion is in the core. [Details](connect.md) |
-| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | [sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private) | `@sitekeephq/sitekeep-ee-platform` | `0.2.0` | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
+| **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/sitekeephq/sitekeep-cost) (private) | `@sitekeephq/sitekeep-ee-cost` | `0.8.0` | Separate repository, GitHub Packages. [Details](cost.md) |
+| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private) | `@sitekeephq/sitekeep-ee-field` | `0.6.0` | Separate repository, GitHub Packages. [Details](field.md) |
+| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private) | `@sitekeephq/sitekeep-ee-coordinate` | `0.5.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
+| **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private) | `@sitekeephq/sitekeep-ee-planning` | `0.6.0` | Separate repository, GitHub Packages. [Details](planning.md) |
+| **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private) | `@sitekeephq/sitekeep-ee-ai` | `0.6.2` | Separate repository, GitHub Packages. [Details](ai.md) |
+| **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private) | `@sitekeephq/sitekeep-ee-manage` | `0.6.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
+| **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private) | `@sitekeephq/sitekeep-ee-connect` | `0.5.2` | Separate repository; Office conversion is in the core. [Details](connect.md) |
+| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | [sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private) | `@sitekeephq/sitekeep-ee-platform` | `0.3.1` | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
 
 | Package | Source | Version |
 |---|---|---|
-| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.16.0` |
+| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.18.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 

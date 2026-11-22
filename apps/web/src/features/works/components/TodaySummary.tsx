@@ -7,6 +7,7 @@ import { hubApi } from "../../../shared/api/api-hub";
 import { useLoad } from "../../../app/context/project";
 import { shownSummary, summaryPending, summarySegments } from "../today-summary";
 import { AiTaskButton } from "../../../shared/ai/AiTaskButton";
+import { AiGeneratedLabel } from "../../../shared/ai/AiBits";
 
 /**
  * "Günün Özeti" at the top of the project Bugün page: the automatic summary at once, replaced by
@@ -114,6 +115,7 @@ export function TodaySummary({
               </li>
             ))}
           </ul>
+          {shown.ai && <AiGeneratedLabel model={summary.ai?.model} />}
           {summary.ai && !summary.ai.fresh && <p className="muted small today-summary-note">{t("summary.stale")}</p>}
           {(error ?? summary.error) && <p className="small error today-summary-note">{error ?? summary.error}</p>}
         </div>

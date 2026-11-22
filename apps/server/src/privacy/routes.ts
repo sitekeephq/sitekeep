@@ -19,7 +19,7 @@ import { z } from "zod";
 import { AUDIT_LOG_RETENTION, AUDIT_PERSONAL_RETENTION, TRASH_PURGE_DAYS, privacyStatement, type DisposalCategory, type OutboundLogRowDto, type PrivacyConnectionDto, type PrivacySummaryDto } from "@sitekeep/shared";
 import type { ResolvedDeps } from "../app/deps.js";
 import { audit } from "../core/platform/audit.js";
-import { isExternalUrl, lanEntryProblem } from "../ai/hosts.js";
+import { isExternalProvider, isExternalUrl, lanEntryProblem } from "../ai/hosts.js";
 import {
   getAiMode,
   getDefaultProviderId,
@@ -40,6 +40,8 @@ import { disposalRows } from "./retention.js";
 import { AI_PROVIDER_CONNECTION, OIDC_PROVIDER_CONNECTION, knownConnectionId, privacyConnections } from "./connections.js";
 import { getOidcProviders } from "../auth/oidc-settings.js";
 import { GOOGLE_HOSTS } from "../auth/google-connection.js";
+import { LICENSE_CONNECTION, licensingUrls } from "../license/online.js";
+import { onlineState } from "../license/state.js";
 import { DEFAULT_LANGUAGE, msg, render, requestLanguage, tFor, tReq } from "../i18n/index.js";
 import { connectionDisabled, killSwitchOn, privacyState, savePrivacySettings, setConnectionEnabled, setKillSwitch } from "./settings.js";
 
@@ -175,7 +177,8 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
         kind: "ai",
         name: p.name,
         host: hostOf(p.baseUrl),
-        location: loc(p.baseUrl),
+        // A cloud model (Ollama ":cloud") is external although its address is local.
+        location: isExternalProvider(p) ? "external" : "local",
         enabled: !connectionDisabled(id),
         toggleable: true,
         lastUsedAt: last.get(id) ?? null,
@@ -248,6 +251,20 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       notes: deps.googleAuth ? [t("privacy:connections.googleSends")] : [t("privacy:connections.googleNotConfigured")],
     });
 
+    // Online licence activation and nightly refresh (license/online.ts); only once a licence came online.
+    const online = onlineState();
+    out.push({
+      id: LICENSE_CONNECTION,
+      kind: "license",
+      name: t("privacy:connections.license"),
+      host: licensingUrls().map(hostOf).join(", "),
+      location: "external",
+      enabled: !connectionDisabled(LICENSE_CONNECTION),
+      toggleable: true,
+      lastUsedAt: last.get(LICENSE_CONNECTION) ?? null,
+      notes: [t(online.activated ? "privacy:connections.licenseSends" : "privacy:connections.licenseNotUsed")],
+    });
+
     // One connection per OpenID Connect provider (Administration → Sign-in Security, auth/oidc.ts).
     for (const p of await getOidcProviders(db)) {
       const id = `oidc:${p.id}`;
@@ -294,7 +311,11 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       enabled: mcp.enabled,
       toggleable: true,
       lastUsedAt: null,
-      notes: [mcp.allowWriteTokens ? t("privacy:connections.writeTokensOn") : t("privacy:connections.readOnly"), t("privacy:connections.accessTokens", { count: Number(tokenCount?.n ?? 0) })],
+      notes: [
+        mcp.allowWriteTokens ? t("privacy:connections.writeTokensOn") : t("privacy:connections.readOnly"),
+        t("privacy:connections.accessTokens", { count: Number(tokenCount?.n ?? 0) }),
+        ...(killSwitchOn() ? [t("privacy:connections.suspendedByKillSwitch")] : []),
+      ],
     });
     out.push({
       id: "ai_queue",
@@ -323,7 +344,11 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
         enabled: Number(o?.on ?? 0) > 0,
         toggleable: false,
         lastUsedAt: null,
-        notes: [t("privacy:connections.oauthApps", { count: Number(o?.n ?? 0), enabled: Number(o?.on ?? 0) }), t("privacy:connections.oauthManaged")],
+        notes: [
+          t("privacy:connections.oauthApps", { count: Number(o?.n ?? 0), enabled: Number(o?.on ?? 0) }),
+          t("privacy:connections.oauthManaged"),
+          ...(killSwitchOn() ? [t("privacy:connections.suspendedByKillSwitch")] : []),
+        ],
       });
     } catch {
       out.push({ id: "oauth", kind: "oauth", name: t("privacy:connections.oauth"), host: null, location: "inbound", enabled: false, toggleable: false, lastUsedAt: null, notes: [t("privacy:connections.comingSoon")] });

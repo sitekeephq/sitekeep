@@ -138,16 +138,16 @@ npm run e2e -- e2e/specs/<area>.spec.ts
 The full e2e run comes after `npm run build`. If the port is taken, set `E2E_PORT` to a free port.
 The default is `18080`.
 
-### ISO 19650 conformance pack
+### ISO 19650 test pack
 
 Tests of an ISO 19650 requirement carry the tag `ISO19650` with the part and the clause in their
 describe or test name, e.g. `describe("ISO19650-2 5.1.7(a) unique container id: …")` or
 `test("ISO19650-2 5.1.7(c) / -1 12.2-12.5 state transition: …")`. Put the tag on the describe so that
 setup tests inside it run with the pack. Every tagged file must be named in
-[ISO 19650 conformance](../compliance/ISO19650.md).
+[ISO 19650 alignment](../compliance/ISO19650.md).
 
 ```bash
-npm run iso:check   # the conformance document names only existing, tagged tests, and every tagged file
+npm run iso:check   # the ISO 19650 document names only existing, tagged tests, and every tagged file
 npm run test:iso    # iso:check + the tagged vitest tests of shared, server and web
 npm run e2e:iso     # the tagged e2e specs (after npm run build)
 ```

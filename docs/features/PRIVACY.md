@@ -4,11 +4,11 @@ SiteKeep is a privacy-first CDE. This document describes what leaves the server,
 
 ## Principle
 
-- Data stays on the customer's server.
+- Data stays on the customer's server, unless an administrator enables an integration (AI, e-mail, sign-in, Autodesk).
 - The server does not send data out on its own. There is no telemetry, no usage statistics and no update check.
 - Every external connection is turned on by an administrator. All of them are visible in **Administration → Privacy Centre**.
 - Every external call is logged. The log never holds content.
-- A single switch cuts all external connections.
+- One switch, **Turn Off All External Connections**, stops every outbound call to a server outside the network, stops the AI task queue for external clients and suspends API access keys and OAuth access tokens ([what it covers](#turn-off-all-external-connections)).
 
 ## Data flows
 
@@ -16,7 +16,7 @@ In the default installation, the server makes no connections outside the network
 
 | Connection (id) | When | What is sent | Purpose in the log |
 |---|---|---|---|
-| AI provider (Ollama, vLLM, DeepSeek, Claude…) (`ai:<providerId>`) | When an AI feature is used | Prompt: the question, summaries of related records. Personal data is masked in prompts that leave the network. | `yapay_zeka:<sağlayıcı>` |
+| AI provider (Ollama, vLLM, DeepSeek, Claude…) (`ai:<providerId>`) | When an AI feature is used | Prompt: the question, summaries of related records. Personal data is masked in prompts that leave the network (also for Ollama `:cloud` models on a local address, [below](#ollama-cloud-models-and-ai-gateways)); masked prompts remain personal data. | `yapay_zeka:<sağlayıcı>` |
 | Report model (`AI_BASE_URL`) (`ai:env`) | When the report builder is used | Dataset schema and the request | `yapay_zeka:rapor` |
 | Personal Claude API / Cursor (`ai:personal:anthropic`, `ai:personal:cursor`; AI module) | When a user runs an AI feature with their own key | As for an AI provider | `yapay_zeka:anthropic`, `yapay_zeka:cursor` |
 | Email server (SMTP) (`smtp`) | When an official letter is sent with "Send"; when a person without an account is [invited](INVITATIONS.md) (or the invitation is sent again); when a [security alert](SECURITY_LOG.md#e-mail) is raised and alert recipients are set | Letter text and PDF attachment, recipients; for an invitation: the invited address, the inviter's and the project's name and the single-use link; for a security alert: the alert's name, text and time to the configured addresses, no personal data | `eposta` (invitations: detail `kind: invitation`; alerts: `kind: security_alert`) |
@@ -24,6 +24,7 @@ In the default installation, the server makes no connections outside the network
 | Office → PDF converter (ONLYOFFICE, Collabora, Gotenberg) (`office:converter`) | Office file preview | The file to convert | `ofis:<dönüştürücü>` |
 | Sign in with Google (`google`) | When a user chooses Google sign-in | OAuth code to `oauth2.googleapis.com`; the verified email information is then read from `openidconnect.googleapis.com` | `giris:google` — [Sign in with Google](GOOGLE_SIGN_IN.md) |
 | Sign in with an OpenID Connect provider (Entra ID, Keycloak, Okta…) (`oidc:<providerId>`, one per provider) | When a user chooses the provider's button | Discovery document and signing keys (JWKS) are read from the provider; the sign-in code and PKCE verifier (with the client secret, if any) go to its token endpoint; the userinfo endpoint is asked only when the ID token has no e-mail address | `giris:oidc` — [Sign in with OpenID Connect](OIDC_SIGN_IN.md) |
+| Licence activation (`license`) | When an administrator activates a licence key, presses "Check Now", and once a day while the licence was activated online | Activation key or licence id, installation id, a random nonce, version and build date, CPU count and RAM size, number of active users; no names, e-mail addresses or project data. Replies are signed; an unsigned reply changes nothing | `lisans` |
 | Autodesk APS / ACC (`autodesk`; Connect module) | When a project administrator sets up the connection and when sync runs | OAuth code and read-only project API requests to `developer.api.autodesk.com`; file content is downloaded from the short-lived signed addresses Autodesk gives. ACC records are brought into the CDE | `entegrasyon:autodesk` |
 
 Switching **Email server (SMTP)** off in External Connections (or the kill switch, for a server outside
@@ -33,9 +34,9 @@ carries the token in the URL fragment, so it does not appear in request logs.
 
 Inbound connections (the server does not connect out; the client connects to the CDE):
 
-- **MCP server:** clients such as Claude and ChatGPT connect with an access key. They read as much data as the key permits.
+- **MCP server:** clients such as Claude and ChatGPT connect with an access key. They read as much data as the key permits. Access keys are suspended while **Turn Off All External Connections** is on.
 - **AI task queue:** a connected client picks up the prompt of a pending task. The client is an external AI.
-- **OAuth applications (OpenCDE):** an application the user has consented to receives data within the approved scope.
+- **OAuth applications (OpenCDE):** an application the user has authorised receives data within the approved scope. OAuth access tokens are suspended while **Turn Off All External Connections** is on.
 
 Browser side: pages are served with a strict content security policy (CSP). The browser loads no scripts, fonts or images from other sites. The only exception is the address of the configured office editor.
 
@@ -80,7 +81,7 @@ to one.
   the chain check still passes after either deletion. Screens and CSV then show "deleted (retention)".
 - **Erasure:** one person's personal audit data (rows they wrote, rows naming their e-mail address)
   can be deleted on its own (`eraseAuditPersonal`, `audit.personal_erased`); their rows stay under
-  their user id. **Anonymise user** ([data subject rights](DATA_SUBJECT_RIGHTS.md#anonymise)) uses it,
+  their user id. **Erase and pseudonymise user** ([data subject rights](DATA_SUBJECT_RIGHTS.md#erase-and-pseudonymise-user)) uses it,
   including the addresses the account had before an e-mail correction.
 - **Rows from before this split** (migration 0049): rows from before the hash chain had theirs moved
   by the migration. Rows chained between migrations 0043 and 0049 still hold their IP address and
@@ -117,7 +118,7 @@ shows the IP address and user agent only while the audit log keeps them (retenti
   concerned (failed sign-ins of an account, bulk downloads, a new administrator), who handled it and
   when; never an IP address or an e-mail address (an unknown address typed at sign-in is identified
   by its keyed hash only). Alerts are kept like the audit log. The person's user id becomes a
-  pseudonym when the account is [anonymised](DATA_SUBJECT_RIGHTS.md#anonymise).
+  pseudonym when the account is [erased and pseudonymised](DATA_SUBJECT_RIGHTS.md#erase-and-pseudonymise-user).
 - **Alert e-mail:** the recipient addresses are stored in `system_settings` (the audit row records
   how many, not which); the e-mail carries no personal data. It goes out only over SMTP allowed in
   External Connections.
@@ -140,15 +141,37 @@ The mapping is kept in memory only for the duration of that call. Placeholders i
 
 Masking is off by default for local models. If **Mask for the Local Model Too** is turned on, the local model also receives a masked prompt.
 
+Masking is data minimisation, not anonymisation: **masked prompts remain personal data**, and sending
+them to a cloud provider is still a transfer ([AI providers](AI_PROVIDERS.md#transfers-abroad-kvkk-and-gdpr)).
+
+### Ollama cloud models and AI gateways
+
+A model whose tag ends in `cloud` (Ollama's `:cloud` models, e.g. `gpt-oss:120b-cloud`,
+`glm-4.6:cloud`) runs in the Ollama cloud although its address is the local Ollama server. SiteKeep
+treats it as an **external provider even when the address is local**: its prompts are masked, the
+external-AI policy (mode and per-project approval) and the kill switch stop it, and its outbound log
+rows are marked external (not "internal").
+
+SiteKeep checks the address and the model name only. **It cannot see whether a local server or AI
+gateway (on 127.0.0.1 or the LAN) forwards a request to a cloud service.** If one does, the
+administrator must treat it as external and record the transfer ([AI providers](AI_PROVIDERS.md#ollama-cloud-models-and-ai-gateways)).
+
 ## Turn off all external connections
 
 When the **Turn Off All External Connections** switch in the Privacy Centre is turned on:
 
-- The server does not connect to any address outside the network. The call stops with a clear Turkish error and is logged as "Blocked".
+- The server does not connect to any address outside the network. The call stops with a clear error in the user's language and is logged as "Blocked". Ollama `:cloud` models count as outside the network although their address is local ([above](#ollama-cloud-models-and-ai-gateways)).
 - The AI mode becomes fully local (`local_only`). The selected mode is kept and comes back when the switch is turned off.
 - The task queue for external AI clients stops.
-- Scheduled Autodesk sync stops; new OAuth and API calls are blocked.
+- **API access keys** (MCP clients, scripts) and **OAuth access tokens** (OpenCDE applications) are
+  suspended: requests that use them are refused with `403 access_suspended`. Nothing is deleted; they
+  work again when the switch is turned off. Browser sign-ins are not affected.
+- Scheduled Autodesk sync stops.
 - Administrators see a warning banner at the top of every page.
+
+What it does **not** cover: a local server or gateway that itself forwards requests to the internet
+(SiteKeep cannot see this, [above](#ollama-cloud-models-and-ai-gateways)), people signed in with the
+browser, and connections the operator runs outside SiteKeep (backups, remote administration).
 
 The local network is defined as:
 
@@ -211,9 +234,11 @@ Requests of a person about their data, and how long data is kept, are described 
   CSV, built in the background); each person can also export their own data from My account.
 - **Rectification:** names and companies are edited in Administration → Users; the e-mail address with
   **Change E-mail** (unique, audited, sessions end).
-- **Erasure:** **Anonymise User**: irreversible pseudonymisation; history stays under "Deleted user
-  #…". Personal data inside free text (comments, letters, descriptions) and inside file contents is
-  not removed automatically; that is the data controller's decision.
+- **Erasure:** **Erase and pseudonymise user** supports GDPR Art. 17 / KVKK m.7: identifying data is
+  erased and history pseudonymised (under "Deleted user #…"). Pseudonymised records remain personal
+  data and are kept only under an Art. 17(3) exception / KVKK m.5(2) condition, then deleted at the end
+  of the retention period. Personal data inside free text (comments, letters, descriptions) and inside
+  file contents is not removed automatically; that is the data controller's decision.
 - **Restriction of processing:** disabling an account (`PATCH /api/v1/users/:id` with
   `{ "disabled": true }`, system administrators; audited `user.updated`) is the restriction: the person cannot sign in and no API key, OAuth token or session of theirs is accepted
   (`apps/server/src/app/build-app.ts`), while their data stays unchanged and is not used further by
@@ -235,11 +260,15 @@ Requests of a person about their data, and how long data is kept, are described 
 KVKK is the Turkish Personal Data Protection Law.
 
 - The organisation is the data controller. SiteKeep processes the data on the organisation's server.
-- Using a cloud AI provider may count as a transfer of data abroad. Therefore:
-  - the system administrator turns on an external provider, and each project gives separate permission;
-  - personal data is masked;
+- Using a cloud AI provider is a transfer of data abroad (KVKK m.9 as amended by Law No. 7499: a
+  m.5/m.6 condition plus an adequacy decision or the Board's standard contract, notified to the
+  Authority within five working days of signing, m.9(5); explicit consent only for incidental
+  transfers, m.9(6)(a); [AI providers](AI_PROVIDERS.md#transfers-abroad-kvkk-and-gdpr)). Therefore:
+  - the system administrator turns on an external provider, and each project needs per-project
+    approval (an administrative setting, not explicit consent);
+  - personal data is masked (masked prompts remain personal data);
   - every call is logged.
-- The organisation should assess the provider's data processing agreement and the legal basis for the transfer.
+- The organisation should assess the provider's data processing agreement and the transfer mechanism.
 - The outbound connection log can be used as evidence for the transfer inventory and for audits.
 - The audit log keeps IP addresses, user agents and e-mail addresses for the retention period set in
   the Privacy Centre (default 12 months; KVKK m.4(2)(d), GDPR Art. 5(1)(e)) and the event rows for the
@@ -248,13 +277,17 @@ KVKK is the Turkish Personal Data Protection Law.
   not anonymous data, while the installation's secret key exists.
 - Security alerts (Administration, [security log](SECURITY_LOG.md#breach-notification-gdpr--kvkk))
   mark when the organisation may have become aware of a breach: KVKK m.12(5) asks for notification of
-  the Board as soon as possible (72 hours by the Board's decision 2019/10), GDPR Art. 33 within 72
-  hours. A read-only **auditor** (the DPO, internal audit) can follow the security log and the
+  the Board as soon as possible (72 hours by the Board's decision 2019/10, with the reasons for any
+  delay and a record of the breach; notification of the data subjects: decision 2019/271); GDPR
+  Art. 33(1) "without undue delay and, where feasible, within 72 hours". A read-only **auditor** (the DPO, internal audit) can follow the security log and the
   Privacy Centre without administrator rights.
 - The disposal record (Privacy Centre → Retention → CSV) lists what the retention job deleted, by
-  category, with counts and dates: a basis for the periodic destruction report of the Regulation on
-  the Deletion, Destruction or Anonymisation of Personal Data. The organisation's own retention and
-  destruction policy decides the periods.
+  category, with counts and dates: a basis for the periodic destruction record of the Regulation on
+  the Deletion, Destruction or Anonymisation of Personal Data. Periodic destruction must run at
+  intervals of no more than six months (Art. 11) and each operation's record is kept for at least three years (Art. 7);
+  SiteKeep's job runs daily and the application never deletes `disposal_log` rows (kept for the life
+  of the installation). A retention and destruction policy is mandatory for controllers that must
+  register with VERBİS (Art. 5); the organisation's own policy decides the periods.
 - Masking is a security layer, not full anonymisation. Indirect identifiers in free text (e.g. address, job title) are not masked.
 
 ## Security headers

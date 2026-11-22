@@ -15,10 +15,26 @@ export interface AdminLicenseDto {
   seatsUsed: number;
   /** Active accounts beyond the licence's seats: Enterprise modules read-only. */
   seatsOver: number;
+  /** The dates were brought forward: revoked by the licensing service, or offline too long (`online: required`). */
+  onlineProblem: "revoked" | "offline_too_long" | null;
+  /** Online activation (docs/onprem/licensing-online.md). */
+  online: {
+    activated: boolean;
+    /** A nightly refresh applies (activated online and the licence allows checks). */
+    refreshes: boolean;
+    lastCheckAt: string | null;
+    lastOkAt: string | null;
+    lastResult: "valid" | "unchanged" | "invalid" | "unreachable" | null;
+    lastReason: string | null;
+    revokedAt: string | null;
+    service: string;
+  };
   license: {
     lid: string;
     customer: string;
     edition: "enterprise" | "trial";
+    plan: "standard" | "plus" | "trial" | "internal" | null;
+    onlineMode: "optional" | "required" | "off";
     seats: number | null;
     modules: string[];
     validFrom: string;
@@ -32,4 +48,6 @@ export const licenseApi = {
   get: () => request<AdminLicenseDto>("GET", "/admin/license"),
   install: (file: string) => request<AdminLicenseDto>("PUT", "/admin/license", { file }),
   remove: () => request<AdminLicenseDto>("DELETE", "/admin/license"),
+  activate: (key: string) => request<AdminLicenseDto>("POST", "/admin/license/activate", { key }),
+  refresh: () => request<AdminLicenseDto>("POST", "/admin/license/refresh"),
 };

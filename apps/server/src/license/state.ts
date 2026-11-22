@@ -8,7 +8,8 @@
  *   packages as before.
  *
  * Stored in system_settings: the installation id, the licence file as uploaded and the latest time seen
- * (clock rollback guard, §4.4). Status is computed on read from the cached payload.
+ * (clock rollback guard, §4.4), and the state of online activation (licensing-online.md): whether the
+ * licence came online, the last check and its result. Status is computed on read from the cached payload.
  */
 import { randomBytes } from "node:crypto";
 import { count, eq } from "drizzle-orm";
@@ -34,7 +35,31 @@ export interface LicenseView {
   enforced: boolean;
   /** Active user accounts beyond the licence's seats (0 when within or unlimited). */
   seatsOver: number;
+  /**
+   * Why the dates were brought forward: the licensing service revoked the licence (grace from that day),
+   * or a licence that requires online checks has not reached the service for 30 days.
+   */
+  onlineProblem: "revoked" | "offline_too_long" | null;
 }
+
+/** Online activation state (licensing-online.md §4, lisanslama.md §6.3). */
+export interface LicenseOnlineState {
+  /** The stored licence came from the licensing service (activate): nightly refresh applies. */
+  activated: boolean;
+  lastCheckAt: string | null;
+  /** Last answer the service gave (valid or unchanged); the 30-day clock of `online: required` counts from it. */
+  lastOkAt: string | null;
+  lastResult: "valid" | "unchanged" | "invalid" | "unreachable" | null;
+  /** Reason of the last `invalid` reply, or the information next to a valid one. */
+  lastReason: string | null;
+  /** First `invalid` reply on a refresh: the grace period starts here (cleared by a later valid reply). */
+  revokedAt: string | null;
+}
+
+export const NO_ONLINE: LicenseOnlineState = { activated: false, lastCheckAt: null, lastOkAt: null, lastResult: null, lastReason: null, revokedAt: null };
+/** `online: required`: grace after 30 days without an answer, read-only 14 days later (lisanslama.md §6.3). */
+const REQUIRED_OFFLINE_DAYS = 30;
+const REQUIRED_OFFLINE_GRACE_DAYS = 14;
 export type ParsedLicenseProblem = Extract<ParsedLicense, { ok: false }>["reason"] | "other_installation" | "build_after_support";
 
 const DAY = 86_400_000;
@@ -42,6 +67,7 @@ const EXPIRING_DAYS = 30;
 const KEY_INSTALLATION = "license.installation";
 const KEY_FILE = "license.file";
 const KEY_MAX_SEEN = "license.maxSeenAt";
+const KEY_ONLINE = "license.online";
 
 /** Licences decide the modules: SITEKEEP_LICENSE_ENFORCE=1, or the Enterprise image (SITEKEEP_EDITION=enterprise) unless =0. */
 export const licenseEnforced = (): boolean =>
@@ -52,7 +78,7 @@ export const licenseEnforced = (): boolean =>
  */
 const production = (): boolean => process.env.NODE_ENV === "production" || !!process.env.SITEKEEP_EDITION;
 
-let state: { installationId: string; file: string | null; parsed: ParsedLicense | null; maxSeenAt: number } | null = null;
+let state: { installationId: string; file: string | null; parsed: ParsedLicense | null; maxSeenAt: number; online: LicenseOnlineState } | null = null;
 /** Active (not disabled) user accounts, refreshed at start and whenever accounts change (refreshSeats). */
 let activeUsers = 0;
 
@@ -72,7 +98,8 @@ export async function initLicense(db: Db): Promise<void> {
   }
   const file = await getSetting<string | null>(db, KEY_FILE, null);
   const maxSeenAt = Date.parse(await getSetting<string>(db, KEY_MAX_SEEN, new Date(0).toISOString())) || 0;
-  state = { installationId, file, parsed: file ? parseLicense(file, { production: production() }) : null, maxSeenAt };
+  const online = { ...NO_ONLINE, ...(await getSetting<Partial<LicenseOnlineState> | null>(db, KEY_ONLINE, null)) };
+  state = { installationId, file, parsed: file ? parseLicense(file, { production: production() }) : null, maxSeenAt, online };
   await touchClock(db);
   await refreshSeats(db);
 }
@@ -84,8 +111,40 @@ export async function touchClock(db: Db, now = Date.now()): Promise<void> {
   await putSetting(db, KEY_MAX_SEEN, new Date(now).toISOString(), null);
 }
 
-/** Stores a new licence after checking it; refuses one that does not verify or is for another installation. */
-export async function installLicense(db: Db, text: string, userId: string): Promise<{ ok: true } | { ok: false; problem: ParsedLicenseProblem }> {
+/** The installation id (after initLicense). */
+export function installationId(): string {
+  if (!state) throw new Error("licence state not initialised");
+  return state.installationId;
+}
+
+/** The stored licence's payload when it verifies, else null. */
+export function storedLicense(): LicensePayload | null {
+  return state?.parsed?.ok ? state.parsed.payload : null;
+}
+
+export function onlineState(): LicenseOnlineState {
+  return state ? { ...state.online } : { ...NO_ONLINE };
+}
+
+/** Merges into the online state and stores it. */
+export async function saveOnlineState(db: Db, patch: Partial<LicenseOnlineState>, userId: string | null = null): Promise<LicenseOnlineState> {
+  if (!state) throw new Error("licence state not initialised");
+  state.online = { ...state.online, ...patch };
+  await putSetting(db, KEY_ONLINE, state.online, userId);
+  return { ...state.online };
+}
+
+/**
+ * Stores a new licence after checking it; refuses one that does not verify or is for another installation.
+ * `online`: it came from the licensing service (activation / refresh), so nightly refresh applies; a file
+ * uploaded by hand ends online activation.
+ */
+export async function installLicense(
+  db: Db,
+  text: string,
+  userId: string | null,
+  online = false,
+): Promise<{ ok: true } | { ok: false; problem: ParsedLicenseProblem }> {
   if (!state) throw new Error("licence state not initialised");
   const parsed = parseLicense(text, { production: production() });
   if (!parsed.ok) return { ok: false, problem: parsed.reason };
@@ -93,14 +152,17 @@ export async function installLicense(db: Db, text: string, userId: string): Prom
   await putSetting(db, KEY_FILE, text, userId);
   state.file = text;
   state.parsed = parsed;
+  if (!online && state.online.activated) await saveOnlineState(db, { ...NO_ONLINE }, userId);
   return { ok: true };
 }
 
 export async function removeLicense(db: Db, userId: string): Promise<void> {
   await putSetting(db, KEY_FILE, null, userId);
+  await putSetting(db, KEY_ONLINE, null, userId);
   if (state) {
     state.file = null;
     state.parsed = null;
+    state.online = { ...NO_ONLINE };
   }
 }
 
@@ -108,7 +170,7 @@ const appliesHere = (p: LicensePayload, installationId: string) => p.installatio
 
 /** The status at `now` (pure; exported for tests). */
 export function computeLicense(
-  input: { installationId: string; parsed: ParsedLicense | null; maxSeenAt: number },
+  input: { installationId: string; parsed: ParsedLicense | null; maxSeenAt: number; online?: LicenseOnlineState },
   now: number,
   buildDate: string | undefined = process.env.SITEKEEP_BUILD_DATE,
   usersActive: number = activeUsers,
@@ -117,17 +179,35 @@ export function computeLicense(
   const at = clockBehind ? input.maxSeenAt : now;
   const seats = input.parsed?.ok ? input.parsed.payload.seats : null;
   const seatsOver = seats === null ? 0 : Math.max(0, usersActive - seats);
-  const base = { installationId: input.installationId, enforced: licenseEnforced(), clockBehind, daysLeft: null, readOnlyAt: null, seatsOver };
+  const base = { installationId: input.installationId, enforced: licenseEnforced(), clockBehind, daysLeft: null, readOnlyAt: null, seatsOver, onlineProblem: null };
   if (!input.parsed) return { ...base, status: "none", problem: null, payload: null };
   if (!input.parsed.ok) return { ...base, status: "invalid", problem: input.parsed.reason, payload: null };
   const p = input.parsed.payload;
   if (!appliesHere(p, input.installationId)) return { ...base, status: "invalid", problem: "other_installation", payload: p };
   if (buildDate && Date.parse(buildDate) > Date.parse(p.supportUntil)) return { ...base, status: "invalid", problem: "build_after_support", payload: p };
   if (at < Date.parse(p.validFrom)) return { ...base, status: "not_yet", problem: null, payload: p };
-  if (p.validUntil === null) return { ...base, status: "active", problem: null, payload: p };
-  const until = Date.parse(p.validUntil);
-  const readOnlyAt = until + p.graceDays * DAY;
-  const view = { ...base, problem: null, payload: p, daysLeft: Math.ceil((until - at) / DAY), readOnlyAt: new Date(readOnlyAt).toISOString() };
+  // The licence's own dates, brought forward by the online state (lisanslama.md §6.3).
+  let until = p.validUntil === null ? Infinity : Date.parse(p.validUntil);
+  let readOnlyAt = until + p.graceDays * DAY;
+  let onlineProblem: LicenseView["onlineProblem"] = null;
+  const online = input.online ?? NO_ONLINE;
+  const revokedAt = online.revokedAt ? Date.parse(online.revokedAt) : NaN;
+  if (Number.isFinite(revokedAt) && revokedAt < until) {
+    until = revokedAt;
+    readOnlyAt = revokedAt + p.graceDays * DAY;
+    onlineProblem = "revoked";
+  }
+  if (p.online === "required") {
+    const lastOk = Math.max(online.lastOkAt ? Date.parse(online.lastOkAt) || 0 : 0, Date.parse(p.issuedAt) || 0);
+    const offlineUntil = lastOk + REQUIRED_OFFLINE_DAYS * DAY;
+    if (offlineUntil < until) {
+      until = offlineUntil;
+      readOnlyAt = Math.min(readOnlyAt, offlineUntil + REQUIRED_OFFLINE_GRACE_DAYS * DAY);
+      if (at >= offlineUntil) onlineProblem = "offline_too_long";
+    }
+  }
+  if (until === Infinity) return { ...base, status: "active", problem: null, payload: p };
+  const view = { ...base, problem: null, payload: p, onlineProblem, daysLeft: Math.ceil((until - at) / DAY), readOnlyAt: new Date(readOnlyAt).toISOString() };
   if (at >= readOnlyAt) return { ...view, status: "read_only" };
   if (at >= until) return { ...view, status: "grace" };
   if (until - at <= EXPIRING_DAYS * DAY) return { ...view, status: "expiring" };
@@ -136,7 +216,7 @@ export function computeLicense(
 
 /** The current licence view (Community defaults before initLicense, e.g. in tools). */
 export function currentLicense(now = Date.now()): LicenseView {
-  if (!state) return computeLicense({ installationId: "inst_unset", parsed: null, maxSeenAt: 0 }, now);
+  if (!state) return computeLicense({ installationId: "inst_unset", parsed: null, maxSeenAt: 0, online: NO_ONLINE }, now);
   return computeLicense(state, now);
 }
 

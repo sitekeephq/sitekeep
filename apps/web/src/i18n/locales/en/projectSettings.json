@@ -276,7 +276,7 @@
       "user": {
         "created": "User created",
         "updated": "User changed",
-        "anonymised": "User anonymised",
+        "anonymised": "User erased and pseudonymised",
         "email_changed": "E-mail address corrected",
         "data_exported": "Personal data export prepared",
         "data_export_downloaded": "Personal data export downloaded"
@@ -315,6 +315,8 @@
       },
       "license": {
         "installed": "Licence installed",
+        "activated": "Licence activated online",
+        "refreshed": "Licence renewed online",
         "removed": "Licence removed"
       },
       "retention": {

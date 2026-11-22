@@ -13,7 +13,7 @@ import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import { buildApp } from "../../src/app/build-app.js";
 import { hashPassword } from "../../src/core/security/auth.js";
-import { isExternalUrl } from "../../src/ai/hosts.js";
+import { isCloudModel, isExternalProvider, isExternalUrl } from "../../src/ai/hosts.js";
 import { AiError, resolveProvider } from "../../src/ai/provider.js";
 // The AI module's internals load only when it is installed (a Community install has none).
 const AI_PROVIDER = "@sitekeephq/sitekeep-ee-ai/internal/provider.js";
@@ -377,6 +377,10 @@ describe.skipIf(!hasAi)("AI data minimisation and Gizlilik Merkezi", () => {
 
   it("the kill switch blocks cloud AI and external hosts, forces local_only and stops the queue for external clients", async () => {
     expect((await call("PUT", "/admin/settings/ai", { taskQueue: { enabled: true, allowExternalClients: true } })).status).toBe(200);
+    const created = await call("POST", "/auth/tokens", { name: "MCP", scope: "read" });
+    expect(created.status, created.raw).toBe(200);
+    const bearer = (url: string) => app.inject({ method: "GET", url: `/api/v1${url}`, headers: { authorization: `Bearer ${created.body.token}` } });
+    expect((await bearer("/projects")).statusCode).toBe(200);
     const on = await call("PUT", "/admin/privacy/kill-switch", { on: true });
     expect(on.status).toBe(200);
     expect(on.body.killSwitch).toMatchObject({ on: true, byName: "Ayşe Demir" });
@@ -409,10 +413,43 @@ describe.skipIf(!hasAi)("AI data minimisation and Gizlilik Merkezi", () => {
     const rows = await logRows();
     expect(rows.some((r) => r.blocked && r.host === "convert.example.com" && r.error === "blocked")).toBe(true);
 
+    // An Ollama cloud model behind a local address leaves the network: stopped like a cloud host (#171).
+    const cloudModel = await outboundFetch("yapay_zeka:ollama", "http://127.0.0.1:11434/v1/chat/completions", {
+      method: "POST",
+      body: JSON.stringify({ model: "gpt-oss:120b-cloud", messages: [] }),
+    }).catch((e) => e);
+    expect(cloudModel).toBeInstanceOf(OutboundBlockedError);
+    expect(spy).toHaveBeenCalledTimes(4);
+    expect((await logRows()).some((r) => r.blocked && r.host === "127.0.0.1:11434" && r.local === false)).toBe(true);
+
+    // Access keys (MCP clients, scripts) and OAuth access tokens are suspended; the browser session goes on (#171).
+    const suspended = await bearer("/projects");
+    expect(suspended.statusCode).toBe(403);
+    expect(suspended.json()).toMatchObject({ error: "access_suspended" });
+    expect((await call("GET", "/projects")).status).toBe(200);
+    const mcp = (await call("GET", "/admin/privacy/connections")).body.find((c: { id: string }) => c.id === "mcp");
+    expect(mcp.notes.join(" ")).toMatch(/askıda|Suspended/);
+
     const off = await call("PUT", "/admin/privacy/kill-switch", { on: false });
+    expect((await bearer("/projects")).statusCode).toBe(200);
     expect(off.body.ai.mode).toBe("allow_external");
     expect(await getAiTaskQueueSettings(handle.db)).toMatchObject({ enabled: true, allowExternalClients: true });
     await call("PUT", "/admin/privacy/settings", { lanHosts: [] });
+  });
+
+  it("an Ollama cloud model is an external provider although its address is local (#171)", async () => {
+    for (const m of ["gpt-oss:120b-cloud", "glm-4.6:cloud", "kimi-k2:1t-cloud", "DeepSeek-V3.1:671B-Cloud"]) expect(isCloudModel(m), m).toBe(true);
+    for (const m of ["qwen3:8b", "cloud", "cloudy:7b", "llama3.1:8b-instruct", "", null]) expect(isCloudModel(m), String(m)).toBe(false);
+    expect(isExternalProvider({ baseUrl: "http://127.0.0.1:11434/v1", model: "gpt-oss:20b-cloud" })).toBe(true);
+    expect(isExternalProvider({ baseUrl: "http://ollama:11434/v1", model: "qwen3:8b" })).toBe(false);
+    // Logged as external even while the kill switch is off.
+    mockFetch("ok");
+    await outboundFetch("yapay_zeka:ollama", "http://ollama:11434/v1/chat/completions", { method: "POST", body: JSON.stringify({ model: "glm-4.6:cloud" }) });
+    await outboundFetch("ofis:collabora", "http://ollama:11434/x", { method: "POST", body: JSON.stringify({ model: "glm-4.6:cloud" }) });
+    const rows = (await logRows()).filter((r) => r.host === "ollama:11434");
+    expect(rows.find((r) => r.purpose === "yapay_zeka:ollama")).toMatchObject({ local: false, blocked: false });
+    // Only AI requests are read for a model name.
+    expect(rows.find((r) => r.purpose === "ofis:collabora")).toMatchObject({ local: true });
   });
 
   it("only system administrators reach Gizlilik Merkezi", async () => {

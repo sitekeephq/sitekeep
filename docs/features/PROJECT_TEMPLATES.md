@@ -11,7 +11,7 @@ as a template (Project Settings → **Export as Template**).
 
 Templates are Community ([map](../MAP.md#2-community-or-enterprise)): ISO 19650 requirements that are
 documents (BEP, information requirements, delivery plans) are delivered as template folders, not as
-features ([ISO 19650 conformance](../compliance/ISO19650.md#covered-by-documents-and-templates)).
+features ([ISO 19650 alignment](../compliance/ISO19650.md#covered-by-documents-and-templates)).
 
 ## Built-in templates
 

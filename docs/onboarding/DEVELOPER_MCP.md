@@ -190,6 +190,8 @@ If a scenario fails, the exit code is 1 (for CI).
 - Every developer tool call is written to the audit log as `dev.tool`, every MCP call as `mcp.tool`.
 - No tool sends email or KEP (Turkish registered email), or connects to an external address. Sample letters are recorded with the "by hand" or "within the CDE" channel.
 - Access tokens are masked in the server logs.
+- While **Turn Off All External Connections** (Privacy Centre) is on, every access token is suspended
+  (`403 access_suspended`) and MCP clients cannot connect; the tokens work again when it is turned off.
 
 ## 10. Limitations
 

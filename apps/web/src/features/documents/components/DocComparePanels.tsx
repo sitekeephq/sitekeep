@@ -5,6 +5,7 @@ import { useLabel } from "../../../i18n";
 import { api } from "../../../shared/api/api";
 import { useProject } from "../../../app/context/project";
 import { AiTaskButton } from "../../../shared/ai/AiTaskButton";
+import { AiGeneratedLabel } from "../../../shared/ai/AiBits";
 
 export function AiComparePanel({
   dto,
@@ -52,7 +53,9 @@ export function AiComparePanel({
       {bullets && (
         <>
           {list(bullets)}
-          <p className="muted small" style={{ margin: "6px 0 0" }}>{t("compare.ai.disclaimer", { model: ai.model })}</p>
+          <p className="muted small" style={{ margin: "6px 0 0" }}>
+            <AiGeneratedLabel model={ai.model} /> {t("compare.ai.disclaimer", { model: ai.model })}
+          </p>
         </>
       )}
       {!bullets && dto.status === "done" && (

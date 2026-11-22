@@ -325,7 +325,7 @@
       "edit": "Edit Deliverable",
       "delete": "Delete",
       "deleteConfirm": "Delete the planned deliverable {{code}}?",
-      "codeHint": "Follows the project's naming standard, e.g. the code the document will be uploaded with.",
+      "codeHint": "The document code under the project's naming standard, without fields that are not part of the code (e.g. ÇŞB Revizyon No).",
       "targets": "Planned Suitability and Revision per Milestone",
       "suitability": "Suitability",
       "revision": "Revision",

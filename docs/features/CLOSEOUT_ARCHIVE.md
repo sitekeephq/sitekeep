@@ -4,7 +4,7 @@ At project close-out ISO 19650-2 §5.8.1 asks the appointing party to archive th
 model: the information containers that were published and the record of how they got there. SiteKeep
 builds this as one ZIP package, with a metadata manifest, the project's audit log and the result of the
 audit chain check, and can then close the project so that nothing changes any more. Part of SiteKeep
-Community ([ISO 19650 conformance](../compliance/ISO19650.md#related-iso-19650-2-clauses)).
+Community ([ISO 19650 alignment](../compliance/ISO19650.md#related-iso-19650-2-clauses)).
 
 The [full project export](PROJECT_EXPORT.md) is built on the same parts (version planning, manifest
 metadata, streaming, limits); it holds the whole project rather than the published record and can be

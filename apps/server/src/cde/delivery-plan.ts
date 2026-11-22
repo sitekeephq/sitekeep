@@ -129,22 +129,43 @@ export async function codeChecker(db: Db, projectId: string, lang: string): Prom
     .where(eq(projectCdeSettings.projectId, projectId));
   const container = rows.find((r) => r.id === settings?.id);
   const candidates: NamingStandard[] = (container ? [container] : rows).map((r) => r.definition);
+  const codes = candidates.map(codeStandard);
   return (raw: string) => {
     const input = raw.trim();
     if (!input) return { ok: false, message: t("cde:deliveryPlan.errors.codeRequired") };
     if (!candidates.length) return { ok: true, code: input, norm: normalizeDocumentCode(input) };
     // As typed, then upper-cased: the register compares codes case-insensitively.
-    for (const text of new Set([input, input.toUpperCase()]))
+    const texts = [...new Set([input, input.toUpperCase()])];
+    // The document code itself (without the fields that are not part of it, e.g. ÇŞB Revizyon No):
+    // stored as typed (#171).
+    for (const text of texts)
+      for (const standard of codes) {
+        if (standard && validateName(standard, text, lang).ok) return { ok: true, code: text, norm: normalizeDocumentCode(text) };
+      }
+    // A whole file name (imports of MIDPs that list names): its document code.
+    for (const text of texts)
       for (const standard of candidates) {
         if (validateName(standard, text, lang).ok) {
           const code = documentCodeOf(standard, text) ?? text;
           return { ok: true, code, norm: normalizeDocumentCode(code) };
         }
       }
-    const first = candidates[0]!;
+    const first = codes[0] ?? candidates[0]!;
     const errors = validateName(first, input, lang).errors.join(" ");
     return { ok: false, message: t("cde:deliveryPlan.errors.codeNaming", { code: input, standard: first.name, errors }) };
   };
+}
+
+/**
+ * The standard of the document code alone: the name fields that are part of the code (`inCode`), so a
+ * planned code is not asked for fields such as ÇŞB Revizyon No. Null when every field is in the code
+ * (the standard itself applies, with its suffix rule).
+ */
+function codeStandard(standard: NamingStandard): NamingStandard | null {
+  const fields = standard.fields.filter((f) => f.inCode !== false);
+  if (fields.length === standard.fields.length || !fields.some((f) => f.inName !== false)) return null;
+  // The code is followed by nothing: no suffix, no extension check beyond the name's.
+  return { ...standard, fields, allowSuffix: false };
 }
 
 // ---- Targets ----------------------------------------------------------------------------------

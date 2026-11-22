@@ -82,7 +82,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [Subprocessors and transfers](compliance/SUBPROCESSORS.md)
 - [Data protection laws and SiteKeep features](compliance/LAW_MAPPING.md)
 - [Masking in AI prompts](compliance/MASKING.md)
-- [ISO 19650 conformance](compliance/ISO19650.md)
+- [ISO 19650 alignment](compliance/ISO19650.md)
 - [Security policy (supported versions, vulnerability reporting, SBOM)](../SECURITY.md)
 
 ## Review notes

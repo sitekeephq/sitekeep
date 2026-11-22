@@ -1,6 +1,7 @@
 /**
  * Yönetim → Lisans (docs/onprem/lisanslama.md, top section): the edition, the licence status, the
- * installation id to send when asking for a licence, the licence details and installing / removing it.
+ * installation id to send when asking for a licence, online activation with a key and the nightly check
+ * (docs/onprem/licensing-online.md), the licence details and installing / removing a licence file.
  * Without a licence the installation is SiteKeep Community and nothing is limited.
  */
 import { useRef, useState } from "react";
@@ -29,6 +30,7 @@ export function AdminLicenseSection() {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [key, setKey] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
 
   if (error) return <p className="error">{error}</p>;
@@ -46,6 +48,20 @@ export function AdminLicenseSection() {
     } finally {
       setBusy(false);
       if (fileInput.current) fileInput.current.value = "";
+    }
+  }
+
+  async function online(action: () => Promise<AdminLicenseDto>, done: string) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      setData(await action());
+      setMsg(done);
+      setKey("");
+    } catch (e) {
+      setMsg((e as Error).message);
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -86,6 +102,14 @@ export function AdminLicenseSection() {
         {data.problem && <p className="error">{t(`admin:license.problems.${data.problem}`)}</p>}
         {data.clockBehind && <p className="error">{t("admin:license.clockBehind")}</p>}
         {data.seatsOver > 0 && <p className="error">{t("admin:license.seatsOver", { count: data.seatsOver })}</p>}
+        {data.onlineProblem && (
+          <p className="error">
+            {t(`admin:license.online.onlineProblems.${data.onlineProblem}`, {
+              reason: data.online.lastReason ?? "—",
+              date: data.readOnlyAt ? formatDate(data.readOnlyAt) : "",
+            })}
+          </p>
+        )}
         {!data.enforced && <p className="muted">{t("admin:license.notEnforced")}</p>}
       </section>
 
@@ -100,6 +124,50 @@ export function AdminLicenseSection() {
         </div>
       </section>
 
+      <section className="card stack">
+        <h3 style={{ margin: 0 }}>{t("admin:license.online.onlineTitle")}</h3>
+        <p className="muted" style={{ margin: 0 }}>{t("admin:license.online.onlineText")}</p>
+        <form
+          className="row wrap"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (key.trim()) void online(() => licenseApi.activate(key), t("admin:license.online.activated"));
+          }}
+        >
+          <input
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            placeholder="SK-XXXX-XXXX-XXXX-XXXX"
+            aria-label={t("admin:license.online.keyLabel")}
+            autoComplete="off"
+            spellCheck={false}
+            disabled={busy}
+          />
+          <button type="submit" className="primary" disabled={busy || !key.trim()}>
+            {t("admin:license.online.activate")}
+          </button>
+          {!lic && (
+            <button type="button" disabled={busy} title={t("admin:license.online.trialText")} onClick={() => void online(() => licenseApi.activate("TRIAL"), t("admin:license.online.activated"))}>
+              {t("admin:license.online.trial")}
+            </button>
+          )}
+        </form>
+        {data.online.refreshes && (
+          <div className="row wrap">
+            <button type="button" disabled={busy} onClick={() => void online(() => licenseApi.refresh(), t("admin:license.online.checked"))}>
+              {t("admin:license.online.checkNow")}
+            </button>
+            {data.online.lastCheckAt && (
+              <span className="muted" data-testid="license-last-check">
+                {t("admin:license.online.lastCheck", { date: formatDate(data.online.lastCheckAt) })}
+                {data.online.lastResult ? ` · ${t(`admin:license.online.results.${data.online.lastResult}`)}` : ""}
+              </span>
+            )}
+          </div>
+        )}
+        <p className="muted" style={{ margin: 0 }}>{t("admin:license.online.offlineHint")}</p>
+      </section>
+
       {lic && (
         <section className="card stack">
           <h3 style={{ margin: 0 }}>{t("admin:license.detailsTitle")}</h3>
@@ -108,6 +176,12 @@ export function AdminLicenseSection() {
             <dd>{lic.customer}</dd>
             <dt>{t("admin:license.fields.lid")}</dt>
             <dd>{lic.lid}</dd>
+            {lic.plan && (
+              <>
+                <dt>{t("admin:license.fields.plan")}</dt>
+                <dd>{t(`admin:license.online.plans.${lic.plan}`)}</dd>
+              </>
+            )}
             <dt>{t("admin:license.fields.modules")}</dt>
             <dd>{lic.modules.length ? lic.modules.map((m) => t(`admin:license.moduleNames.${m}`, { defaultValue: m })).join(", ") : "—"}</dd>
             <dt>{t("admin:license.fields.seats")}</dt>

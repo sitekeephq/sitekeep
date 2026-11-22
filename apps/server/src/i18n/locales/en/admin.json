@@ -128,6 +128,20 @@
       "payload": "The licence content cannot be read.",
       "other_installation": "This licence belongs to another installation. Send this installation's id when you ask for a licence.",
       "build_after_support": "This SiteKeep version was released after your support period ended. Go back to an earlier version or renew support."
+    },
+    "online": {
+      "keyRequired": "Enter the activation key.",
+      "unreachable": "The licensing service could not be reached. Check the server's internet access and the \"Licence Activation\" connection in the Privacy Centre, or upload a licence file.",
+      "reasons": {
+        "key_format": "This is not an activation key. It looks like SK-XXXX-XXXX-XXXX-XXXX.",
+        "not_found": "This activation key is not known. Check it, or ask 7Dimensions.",
+        "revoked": "This licence was cancelled.",
+        "expired": "This licence has ended. Renew the subscription first.",
+        "bound_to_other_installation": "This key is already activated on another installation. To move it, ask 7Dimensions.",
+        "trial_used": "This installation has already had a trial.",
+        "not_online": "This licence was not activated online; upload a new licence file to renew it.",
+        "rejected": "The licensing service refused the request."
+      }
     }
   },
   "securityAlerts": {

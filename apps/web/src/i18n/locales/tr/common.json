@@ -88,5 +88,10 @@
     "network": "Sunucuya ulaşılamadı.",
     "notAllowed": "Bu işlem için yetkiniz yok."
   },
-  "dash": "—"
+  "dash": "—",
+  "aiLabel": {
+    "generated": "Yapay zekâ ile üretildi",
+    "title": "Bir yapay zekâ modeli yazdı. Güvenmeden önce kontrol edin.",
+    "titleModel": "Bir yapay zekâ modeli yazdı ({{model}}). Güvenmeden önce kontrol edin."
+  }
 }

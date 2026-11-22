@@ -325,7 +325,7 @@
       "edit": "Teslimi Düzenle",
       "delete": "Sil",
       "deleteConfirm": "{{code}} planlanan teslimi silinsin mi?",
-      "codeHint": "Projenin isimlendirme standardına uyar; dokümanın yükleneceği kod.",
+      "codeHint": "Projenin isimlendirme standardına göre doküman kodu; koda dahil olmayan alanlar (ör. ÇŞB Revizyon No) yazılmaz.",
       "targets": "Kilometre Taşına Göre Planlanan Uygunluk ve Revizyon",
       "suitability": "Uygunluk",
       "revision": "Revizyon",

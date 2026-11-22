@@ -88,5 +88,10 @@
     "network": "The server could not be reached.",
     "notAllowed": "You do not have permission to do this."
   },
-  "dash": "—"
+  "dash": "—",
+  "aiLabel": {
+    "generated": "AI-generated",
+    "title": "Written by an AI model. Check it before you rely on it.",
+    "titleModel": "Written by an AI model ({{model}}). Check it before you rely on it."
+  }
 }

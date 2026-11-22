@@ -5,7 +5,9 @@
  *
  * Each call:
  *   1. is refused when "Tüm Dış Bağlantıları Kapat" is on and the host is outside the network
- *      (private ranges + the "iç ağ" list), or when its connection is switched off in
+ *      (private ranges + the "iç ağ" list) or the call is marked external (a cloud model behind a
+ *      local server: meta.external, or an AI request whose JSON body names a cloud model,
+ *      ai/hosts.ts isCloudModel), or when its connection is switched off in
  *      Gizlilik Merkezi → Dış Bağlantılar;
  *   2. is written to outbound_log: time, purpose, host, method, bytes out/in, status, duration,
  *      user and project when known (request context), and non-content details. NEVER content.
@@ -24,7 +26,7 @@ import type { Db } from "../db/index.js";
 import { outboundLog } from "../db/schema.js";
 import { HttpError } from "../core/platform/http.js";
 import { currentLanguage, DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
-import { isLanHost } from "../ai/hosts.js";
+import { isCloudModel, isLanHost } from "../ai/hosts.js";
 import { connectionDisabled, privacyState, refreshPrivacyState } from "./settings.js";
 
 export interface OutboundContext {
@@ -42,6 +44,11 @@ export interface OutboundMeta {
   details?: Record<string, unknown>;
   userId?: string | null;
   projectId?: string | null;
+  /**
+   * The data leaves the network although the host is local: a cloud model behind a local server or
+   * gateway (Ollama ":cloud"). Logged as external and stopped by the kill switch.
+   */
+  external?: boolean;
 }
 
 /** The call was refused before connecting (kill switch or a disabled connection). */
@@ -136,7 +143,7 @@ function baseRow(purpose: string, target: string | URL, method: string, meta: Ou
     connection: meta.connection ?? null,
     host: hostOf(target).slice(0, 255),
     method: method.toUpperCase(),
-    local: isLanHost(hostnameOf(target)),
+    local: !meta.external && isLanHost(hostnameOf(target)),
     blocked: false,
     bytesOut: null,
     bytesIn: null,
@@ -170,9 +177,9 @@ function update(id: string | null, db: Db | null, patch: Partial<Row>): void {
 }
 
 /** Why a call to this target is refused right now (kill switch, disabled connection), or null. */
-export function outboundRefusalMsg(target: string | URL, connection?: string | null, purpose?: string): Msg | null {
+export function outboundRefusalMsg(target: string | URL, connection?: string | null, purpose?: string, external = false): Msg | null {
   const host = hostOf(target);
-  if (!isLanHost(hostnameOf(target)) && privacyState().killSwitch.on) return msg("privacy:outbound.killSwitch", { host });
+  if ((external || !isLanHost(hostnameOf(target))) && privacyState().killSwitch.on) return msg("privacy:outbound.killSwitch", { host });
   if (connectionDisabled(connection)) return msg("privacy:outbound.connectionDisabled", { purpose: purpose ?? connection, host });
   return null;
 }
@@ -187,7 +194,7 @@ export function outboundRefusal(target: string | URL, connection?: string | null
 async function guard(purpose: string, target: string | URL, method: string, meta: OutboundMeta): Promise<Row> {
   await refreshPrivacyState(logDb());
   const row = baseRow(purpose, target, method, meta);
-  const message = outboundRefusalMsg(target, row.connection, row.purpose);
+  const message = outboundRefusalMsg(target, row.connection, row.purpose, !!meta.external);
   if (message) {
     await insert({ ...row, blocked: true, error: "blocked", durationMs: 0, bytesOut: 0 });
     throw new OutboundBlockedError(message);
@@ -204,9 +211,22 @@ function errorCode(err: unknown): string {
 
 const NULL_BODY = new Set([101, 103, 204, 205, 304]);
 
+/** The "model" of an AI request's JSON body (OpenAI-compatible, Anthropic, Ollama), or null. */
+export function requestModel(body: unknown): string | null {
+  if (typeof body !== "string" || !body.includes('"model"')) return null;
+  try {
+    const model = (JSON.parse(body) as { model?: unknown }).model;
+    return typeof model === "string" ? model : null;
+  } catch {
+    return null;
+  }
+}
+
 /** fetch() through the registry. purpose: "yapay_zeka:deepseek", "ofis:onlyoffice"… */
 export async function outboundFetch(purpose: string, url: string | URL, init: RequestInit = {}, meta: OutboundMeta = {}): Promise<Response> {
   const method = init.method ?? "GET";
+  // A cloud model behind a local server is external, whichever module sends the request.
+  if (!meta.external && purpose.startsWith("yapay_zeka") && isCloudModel(requestModel(init.body))) meta = { ...meta, external: true };
   const row = await guard(purpose, url, method, meta);
   row.bytesOut = bodySize(init.body);
   const db = logDb();
