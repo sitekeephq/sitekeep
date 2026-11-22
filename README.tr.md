@@ -45,6 +45,12 @@ Kurgusal bir demo projeden (Riverside Metro Line) ekran görüntüleri.
 | ![Sürüm karşılaştırma](docs/images/documents-compare.jpg)<br>**Sürüm karşılaştırma:** bir çizimin iki revizyonu arasında değişen bölgeler, antet ve metin. | ![İnceleme ve onay](docs/images/review-completed.jpg)<br>**İnceleme ve onay:** dosya başına sonuç, tam zaman çizelgesi ve Shared'e kopyalanan onaylı dosyalar. |
 | ![Sorunlar ve BCF](docs/images/issues-bcf.jpg)<br>**Sorunlar ve BCF:** BCF'ten aktarılan sorunlar; görüntü, durum, öncelik ve yorumlarla. | ![DWG ve DXF görüntüleyici](docs/images/drawings-dxf-viewer.jpg)<br>**Tarayıcıda DWG ve DXF:** CAD yazılımı olmadan katmanlar, ölçümler ve yakalama. |
 
+## İndirme
+
+**SiteKeep Community'yi [sitekeep.org/download](https://sitekeep.org/download) adresinden indirin** (ücretsiz
+hesap): Linux sunucular için kurulum paketi ve SHA-256 özeti. Aynı dosyalar ileri düzey kullanım ve otomasyon için
+[GitHub sürümler](https://github.com/sitekeephq/sitekeep/releases) sayfasında da var.
+
 ## Hızlı başlangıç (Docker)
 
 Docker 24+ ve Compose v2 gerekir.
@@ -65,7 +71,8 @@ docker compose exec db pg_dump -U cde cde | gzip > yedek-$(date +%F).sql.gz
 ```
 
 İnternete kapalı sunucular için HTTPS, gece yedeği, güncelleme ve geri alma içeren tek dosyalık bir kurulum paketi
-var; [sürümler](https://github.com/sitekeephq/sitekeep/releases) sayfasından indirin.
+var; [sitekeep.org/download](https://sitekeep.org/download) adresinden indirin
+([sürümler](https://github.com/sitekeephq/sitekeep/releases) sayfasında da var).
 
 ## Geliştirme
 

@@ -1,3 +1,5 @@
+**Recommended: download from https://sitekeep.org/download**
+
 ## SiteKeep {{VERSION}}
 
 commit `{{COMMIT}}`

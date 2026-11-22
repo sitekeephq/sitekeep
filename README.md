@@ -44,6 +44,12 @@ Screenshots from a fictional demo project (Riverside Metro Line).
 | ![Version comparison](docs/images/documents-compare.jpg)<br>**Version comparison:** changed regions, title block and text between two revisions of a drawing. | ![Review and approval](docs/images/review-completed.jpg)<br>**Review and approval:** results per file, a full timeline, and approved files copied to Shared. |
 | ![Issues and BCF](docs/images/issues-bcf.jpg)<br>**Issues and BCF:** issues imported from BCF, with snapshot, status, priority and comments. | ![DWG and DXF viewer](docs/images/drawings-dxf-viewer.jpg)<br>**DWG and DXF in the browser:** layers, measurements and snapping without CAD software. |
 
+## Download
+
+**Download SiteKeep Community from [sitekeep.org/download](https://sitekeep.org/download)** (free account): the
+installation package for Linux servers, with its SHA-256 checksum. The same files are on the
+[GitHub releases](https://github.com/sitekeephq/sitekeep/releases) page for advanced use and automation.
+
 ## Quick start (Docker)
 
 You need Docker 24+ with Compose v2.
@@ -64,7 +70,8 @@ docker compose exec db pg_dump -U cde cde | gzip > backup-$(date +%F).sql.gz
 ```
 
 For servers without internet access there is a single-file installation bundle with HTTPS, nightly backups,
-upgrades and rollback; download it from the [releases](https://github.com/sitekeephq/sitekeep/releases).
+upgrades and rollback; download it from [sitekeep.org/download](https://sitekeep.org/download)
+(also on the [releases](https://github.com/sitekeephq/sitekeep/releases) page).
 
 ## Development
 

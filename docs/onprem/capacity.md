@@ -95,7 +95,31 @@ required data disk ≈ (uploaded files) × 1.6   // Fragments + preview derivati
 | Office editing (ONLYOFFICE / Collabora) | separate process with its own RAM | separate machine recommended; +8 GB on the same machine |
 | AI (local model) | depends on the GPU | reported separately; not part of this table |
 
-### 3.3 How to operate it (written for the customer in the Guide)
+### 3.3 Managed Hosting: compute units
+
+Managed Hosting is sold in **compute units** (agreed 22.11.2026):
+
+- **1 unit = 1 vCPU + 4 GB RAM**, enough for about 10–12 registered users;
+- the smallest installation is **2 units**.
+
+The price calculator on sitekeep.org proposes the size from the number of users (the customer does not pick units):
+
+| Registered users | Units | Server | Data disk |
+|---|---|---|---|
+| up to 10 | 2 | 2 vCPU / 8 GB | 100 GB |
+| 11–50 | 4 | 4 vCPU / 16 GB | 500 GB |
+| 51–100 | 9 | 9 vCPU / 36 GB | 1000 GB |
+| over 100 | quote | | |
+
+The first two rows are the Trial and Small tiers of §3.1. The 51–100 row sits inside the Medium tier (8 vCPU /
+32 GB) plus the 4 GB headroom for large IFC conversions of §3.2; its 1000 GB is the lower end of Medium's 1–2 TB.
+Over 100 users the Medium and Large tiers apply and the size is quoted. If `CAPACITY_TIERS` changes, this table and
+the website calculator change with it.
+
+Each Managed Hosting customer gets a server of their own on Google Cloud (decision of 22.11.2026; moving to an EU
+provider is not planned for now). Choose a machine type with dedicated cores (§3.1, not `e2`).
+
+### 3.4 How to operate it (written for the customer in the Guide)
 
 - Run the capacity test **at first installation**, **when the hardware changes** and **after a
   major version upgrade**. A test older than 90 days shows yellow.

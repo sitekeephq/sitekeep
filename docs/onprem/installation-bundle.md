@@ -30,6 +30,9 @@ check). The Enterprise bundle is delivered to the customer through a download li
 C-3); no per-customer registry access is needed. Our own production server is built without an edition
 (all modules enabled, no licence check).
 
+**Where people download it:** Community from **https://sitekeep.org/download** (free account; GitHub releases as the
+alternative), Enterprise from the Odoo customer portal (§8.3).
+
 **What is delivered:** a single file `sitekeep-<edition>-<version>-linux-amd64.tar.gz` (`community` or `enterprise`, see below) (≈ 400 MB) and its `.sha256`;
 via a download link or, for an organisation without internet access, via USB / file share. The source repository
 is not delivered. The bundle contains only the installation scripts, a Turkish README and pre-built images (minified application,
@@ -242,7 +245,16 @@ Today delivery to the customer is manual: sharing from the company Google Drive 
 or USB for an organisation without internet access. The SHA-256 value is provided separately (email / delivery note); the customer
 verifies it with `sha256sum -c`.
 
-### 8.3 The right customer channel (later)
+### 8.3 The customer channel
+
+**Community (since 22.11.2026):** people download from **https://sitekeep.org/download** after signing in with a free
+account. The page's links go through `/website/action/sk-download?arch=amd64|arm64[&sha=1]`, which tags the person
+"SiteKeep Community" in the CRM, notes the download on their record and redirects to the file on the public GitHub
+release. The version comes from the Odoo system parameter `sitekeep.release`, so each new release is announced to the
+website team (releasing.md step 3). The GitHub release stays public (AGPL) as the alternative for
+advanced use; the README and every release's notes point to sitekeep.org/download first.
+
+**Enterprise:**
 
 The GitHub Release is an internal channel: the repository is private, there are no customer accounts, and there is no record of who downloaded which release.
 The target, in two steps:
