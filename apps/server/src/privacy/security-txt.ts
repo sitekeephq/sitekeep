@@ -9,7 +9,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ResolvedDeps } from "../app/deps.js";
 
-export const SECURITY_CONTACT_EMAIL = "sitekeep@7dimensions.eu";
+export const SECURITY_CONTACT_EMAIL = "support@sitekeep.org";
 export const SECURITY_POLICY_URL = "https://github.com/sitekeephq/sitekeep/blob/main/SECURITY.md";
 export const SECURITY_ADVISORY_URL = "https://github.com/sitekeephq/sitekeep/security/advisories/new";
 

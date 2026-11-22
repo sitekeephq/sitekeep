@@ -10,4 +10,7 @@ export const LICENSE_KEYS: Record<string, { spki: string; devOnly?: boolean }> =
   // Production (12.11.2026). Private key: the issuer's ~/.sitekeep/license-signing-2026-11.pem and the company
   // vault; licences: tools/license/issue.mjs.
   "2026-11": { spki: "MCowBQYDK2VwAyEAdh72zJ5O7MqbKOrnNPOlcw6Bq/RB5Z07u7qgmBzHU+k=" },
+  // The licensing service (22.11.2026, docs/onprem/licensing-online.md §6): signs online replies and the
+  // licences in them. Private key: the sk-licensing Worker secret and the company vault.
+  "worker-2026-12": { spki: "MCowBQYDK2VwAyEATiGb23fTfNyahE8zTNNfTe4RBGwM7ZiEGRvLtLgWX7o=" },
 };

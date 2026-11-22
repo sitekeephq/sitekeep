@@ -229,7 +229,7 @@ describe("security.txt (RFC 9116)", () => {
       .filter((l) => l && !l.startsWith("#"))
       .map((l) => [l.slice(0, l.indexOf(":")), l.slice(l.indexOf(":") + 1).trim()]);
     expect(fields).toEqual([
-      ["Contact", "mailto:sitekeep@7dimensions.eu"],
+      ["Contact", "mailto:support@sitekeep.org"],
       ["Contact", "https://github.com/sitekeephq/sitekeep/security/advisories/new"],
       ["Expires", expect.stringMatching(/^\d{4}-\d{2}-\d{2}T00:00:00\.000Z$/)],
       ["Policy", "https://github.com/sitekeephq/sitekeep/blob/main/SECURITY.md"],

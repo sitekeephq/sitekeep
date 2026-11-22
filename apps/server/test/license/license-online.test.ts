@@ -67,12 +67,27 @@ describe("activation key", () => {
   });
 
   it("uses the licensing service and its fallback unless SITEKEEP_LICENSING_URL replaces them", () => {
-    expect(licensingUrls(undefined)).toEqual(["https://licensing.aecpilot.com", "https://aec-licensing.aecpilot.workers.dev"]);
+    expect(licensingUrls(undefined)).toEqual(["https://licensing.sitekeep.org", "https://sk-licensing.aecpilot.workers.dev"]);
     expect(licensingUrls("http://127.0.0.1:9/, http://b.test")).toEqual(["http://127.0.0.1:9", "http://b.test"]);
   });
 });
 
 describe("signed reply", () => {
+  it("accepts a reply recorded from the live service (worker-2026-12, 22.11.2026)", () => {
+    // POST https://licensing.sitekeep.org/cde/v1/refresh for an unknown licence.
+    const live = JSON.stringify({
+      format: "sitekeep-licence-reply",
+      version: 1,
+      kid: "worker-2026-12",
+      payload:
+        "eyJzdGF0dXMiOiJpbnZhbGlkIiwicmVhc29uIjoibm90X2ZvdW5kIiwibm9uY2UiOiJlMDBkOTNjNzljYTVhZTYxZjE1M2I0ZTIiLCJpbnN0YWxsYXRpb24iOiJpbnN0X3Byb2JlX2I0YzA5MjQxY2NiNSIsInNlcnZlclRpbWUiOiIyMDI2LTExLTIyVDExOjEyOjAzWiIsImxpY2VuY2UiOm51bGx9",
+      signature: "HY_2lil2gUIO6jpV55QY1_p6WinmP8mFE984TxDKNAVS4aFvmuM24YS8gWE01SVnGyvSlfKxah9TacSBOjCOAQ",
+    });
+    const expected = { nonce: "e00d93c79ca5ae61f153b4e2", installation: "inst_probe_b4c09241ccb5" };
+    expect(parseLicenceReply(live, expected, { production: true })).toMatchObject({ ok: true, status: "invalid", reason: "not_found" });
+    expect(parseLicenceReply(live, { ...expected, nonce: "other" }, { production: true })).toEqual({ ok: false, reason: "mismatch" });
+  });
+
   const expectFor = { nonce: "n1", installation: "inst_a" };
   const reply = (p: Record<string, unknown>, kid?: string) => JSON.stringify(signed("sitekeep-licence-reply", { nonce: "n1", installation: "inst_a", reason: null, licence: null, ...p }, kid));
 

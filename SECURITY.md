@@ -4,7 +4,7 @@
 
 Please do not open a public issue for security problems. Report them privately through GitHub:
 **Security → Report a vulnerability** on this repository (private vulnerability reporting).
-If you cannot use GitHub, write to sitekeep@7dimensions.eu. We read reports in English and Turkish.
+If you cannot use GitHub, write to support@sitekeep.org. We read reports in English and Turkish.
 
 Include what is affected (version, edition, configuration), how to reproduce it and the impact you
 expect. Every installation also answers `/.well-known/security.txt` (RFC 9116) with these contacts.

@@ -28,7 +28,7 @@ import {
 export const LICENSE_CONNECTION = "license";
 
 /** The service and its fallback (some networks block *.workers.dev, others the custom domain). */
-const DEFAULT_URLS = ["https://licensing.aecpilot.com", "https://aec-licensing.aecpilot.workers.dev"];
+const DEFAULT_URLS = ["https://licensing.sitekeep.org", "https://sk-licensing.aecpilot.workers.dev"];
 const TIMEOUT_MS = 20_000;
 const DAY = 86_400_000;
 
