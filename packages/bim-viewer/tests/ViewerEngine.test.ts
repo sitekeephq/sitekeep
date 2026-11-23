@@ -219,6 +219,30 @@ describe("far plane (#158)", () => {
     expect(clip(null, [0, 0, 0]).far).toBe(1000);
   });
 
+  it("keeps a 0.4 m model clear of the near plane (QA 1.0.1)", () => {
+    const sphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 0.25);
+    const camera = clip(sphere, [0, 0.5, 0]);
+    expect(camera.near).toBeLessThan(0.05);
+    expect(camera.near).toBeGreaterThanOrEqual(0.001);
+    expect(camera.far / camera.near).toBeLessThanOrEqual(1e6 + 1);
+  });
+
+  it("never raises near past 1 m and keeps the depth ratio for a 12 km model", () => {
+    const sphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 6000);
+    const camera = clip(sphere, [0, 9000, 0]);
+    expect(camera.near).toBeLessThanOrEqual(1);
+    expect(camera.far / camera.near).toBeLessThanOrEqual(1e6 + 1);
+  });
+
+  it("covers the orthographic camera too", () => {
+    const sphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 0.25);
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+    camera.position.set(0, 0.5, 0);
+    const controls = { getPosition: (out: THREE.Vector3) => out.set(0, 0.5, 0) };
+    (Engine.prototype as unknown as { fitClipping(this: unknown): void }).fitClipping.call({ sceneSphere: sphere, world: { camera: { three: camera, controls } } });
+    expect(camera.near).toBeLessThan(0.1);
+  });
+
   it("shrinks back once the camera is close again", () => {
     const sphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 6000);
     expect(clip(sphere, [0, 10, 0], 100_000).far).toBeLessThan(10_000);

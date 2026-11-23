@@ -7,6 +7,7 @@
  * - local: soffice on this server (last resort, only when a binary exists)
  */
 import { randomUUID } from "node:crypto";
+import { trimTrailingSlashes } from "@sitekeep/shared";
 import { openAsBlob } from "node:fs";
 import { readFile, rm, stat } from "node:fs/promises";
 import os from "node:os";
@@ -111,7 +112,7 @@ abstract class HttpConverter implements OfficeConverter {
   protected readonly base: string;
 
   constructor(protected readonly opts: HttpConverterOptions) {
-    this.base = opts.baseUrl.replace(/\/+$/, "");
+    this.base = trimTrailingSlashes(opts.baseUrl);
   }
 
   abstract available(): Promise<ConverterAvailability>;

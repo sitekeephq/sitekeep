@@ -142,7 +142,7 @@ and the end of a test call the same function. The user check is also exported se
 | `memory` RAM / required tier | below, ≥ 75% of it | below 75% | "Increase RAM to at least 32 GB." |
 | `cpu` vCPU / required tier | below | below half | "Increase the processor to at least 8 vCPU." |
 | `disk` free space on data disk | < 20% | < 5% | "Enlarge the data disk or clean up derivatives under Maintenance." |
-| `test` last capacity test | none / older than 90 days | — | "Measure with Run Live Test." |
+| `test` last capacity test | older than 90 days (no test yet is informational, shown green with the hint) | — | "Measure with Run Live Test." |
 | `measured` measured registered / active | measured < active × 1.2 | measured < active | "The measured capacity is not enough for the active users." |
 
 The operating system reports slightly less than the installed RAM (16 GB → ~15.6 GB); the

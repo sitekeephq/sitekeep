@@ -157,10 +157,19 @@ const GROUP_LOCAL_PARTS = new Set([
   "noreply", "office", "sales", "satis", "support", "destek", "team", "ekip", "proje", "project", "projects",
 ]);
 
+/** "proje2" → "proje", "info_01" → "info" (linear: a regex ending in \d+$ backtracks quadratically). */
+function withoutTrailingNumber(local: string): string {
+  let end = local.length;
+  while (end > 0 && local.charCodeAt(end - 1) >= 48 && local.charCodeAt(end - 1) <= 57) end--;
+  if (end === local.length) return local;
+  if (end > 0 && "._-".includes(local[end - 1]!)) end--;
+  return local.slice(0, end);
+}
+
 /** A shared mailbox (info@, noreply@, proje@ …): group addresses are not added as people (design §3). */
 export function isGroupAddress(email: string): boolean {
   const local = email.trim().toLowerCase().split("@")[0] ?? "";
-  return GROUP_LOCAL_PARTS.has(local) || GROUP_LOCAL_PARTS.has(local.replace(/[._-]?\d+$/, ""));
+  return GROUP_LOCAL_PARTS.has(local) || GROUP_LOCAL_PARTS.has(withoutTrailingNumber(local));
 }
 
 /** Folder path → the declared folder and its parent list (before skeleton expansion). */
@@ -379,7 +388,7 @@ export function checkSetupPeople(
   const roles = new Set((template.roles ?? []).map((r) => r.key));
   for (const person of people) {
     const email = person.email.trim().toLowerCase();
-    if (!EMAIL.test(email)) errors.push(sharedText(lang, "setup.emailInvalid", { email: person.email }));
+    if (email.length > 254 || !EMAIL.test(email)) errors.push(sharedText(lang, "setup.emailInvalid", { email: person.email }));
     else if (seen.has(email)) errors.push(sharedText(lang, "setup.emailDuplicate", { email }));
     seen.add(email);
     if ((person.name ?? "").length > 200) errors.push(sharedText(lang, "setup.tooLong", { field: email, max: 200 }));

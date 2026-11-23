@@ -132,6 +132,22 @@ describe("errors and notifications per reader", () => {
     expect(explicit.json().message).toBe("Geçersiz istek.");
   });
 
+  it("keeps the language chosen in the switcher across sign-out and sign-in (QA 1.0.1)", async () => {
+    const signIn = async () => {
+      const res = await app.inject({ method: "POST", url: "/api/v1/auth/login", payload: { email: "uye@i18n.test", password: PW } });
+      expect(res.statusCode, res.body).toBe(200);
+      return { user: res.json(), cookie: `cde_session=${res.cookies.find((c) => c.name === "cde_session")!.value}` };
+    };
+    for (const lang of ["en", "tr", "en"]) {
+      const patched = await app.inject({ method: "PATCH", url: "/api/v1/me/prefs", headers: { cookie }, payload: { language: lang } });
+      expect(patched.statusCode, patched.body).toBe(200);
+      await app.inject({ method: "POST", url: "/api/v1/auth/logout", headers: { cookie } });
+      const next = await signIn();
+      expect(next.user.language).toBe(lang);
+      cookie = next.cookie;
+    }
+  });
+
   it("stores a notification as a message and lists it in the reader's language", async () => {
     await notify(handle.db, [userId], { projectId: null, kind: "test", title: msg("errors:notFound", { what: msg("errors:entities.record") }) });
     const [row] = await handle.db.select().from(notifications).where(eq(notifications.userId, userId));

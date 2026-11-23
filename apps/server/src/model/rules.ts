@@ -78,7 +78,7 @@ export function findStorey(q: string, vocab: Pick<Vocab, "storeys">): string | n
     const g = storeys.indexOf(ground());
     return g > 0 ? storeys[g - 1]!.name : null;
   }
-  const m = /(-?\d+)\s*\.?\s*(?:kat|normal kat|floor|level)|\b(?:kat|floor|level)\s*(-?\d+)/.exec(q);
+  const m = /(?<!\d)(-?\d{1,4})[\s.]*(?:kat|normal kat|floor|level)|\b(?:kat|floor|level)\s*(-?\d+)/.exec(q);
   if (!m) return null;
   const n = Number(m[1] ?? m[2]);
   // A storey whose name carries the number ("Kat 2", "2. Kat", "Level 02", "+2").

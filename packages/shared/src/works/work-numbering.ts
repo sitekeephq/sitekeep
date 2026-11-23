@@ -52,8 +52,9 @@ const SCOPE_FREE_TOKENS = new Set(["konu"]);
 
 /** Code of a list value: "M - Mekanik" → "M"; other values unchanged. */
 export function listCode(value: string): string {
-  const m = /^\s*(\S.*?)\s+[-–—]\s+/.exec(value);
-  return (m ? m[1]! : value).trim();
+  const v = value.trim();
+  const sep = /\s[-–—]\s/.exec(v); // first " - " (no overlapping quantifiers, so linear)
+  return (sep ? v.slice(0, sep.index) : value).trim();
 }
 
 /** A field value as it appears in a number: no spaces or separators, upper case, at most 20 characters. */

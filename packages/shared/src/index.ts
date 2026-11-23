@@ -3,6 +3,7 @@ export * from "./kernel/naming.js";
 export * from "./kernel/naming-csb2026.js";
 export * from "./core/types.js";
 export * from "./core/paths.js";
+export * from "./core/trim.js";
 export * from "./workflow/workflow.js";
 export * from "./kernel/attributes.js";
 export * from "./documents/docs-plus.js";

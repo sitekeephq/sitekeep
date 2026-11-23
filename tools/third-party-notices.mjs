@@ -408,7 +408,7 @@ const fence = (text) => {
   const f = "`".repeat(longest + 1);
   return `${f}text\n${text}\n${f}`;
 };
-const cell = (s) => String(s ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
+const cell = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\n/g, " ");
 
 /** Components in the image that do not come from npm. */
 export function otherComponents(root = ROOT) {

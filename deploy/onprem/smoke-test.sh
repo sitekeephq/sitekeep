@@ -78,6 +78,11 @@ LIC="$(vm "$CURL -b /root/jar $API/admin/license")"
 if [ "$EDITION" = enterprise ]; then want=true; else want=false; fi
 case "$LIC" in *"\"enforced\":$want"*) ;; *) fail "licence enforcement for $EDITION: $LIC" ;; esac
 pass "$EDITION edition: no module on without a licence, licence checks $([ $want = true ] && echo on || echo off)"
+# One installation ID: the installer's (config/installation.id, sitekeep status) is the one the application binds licences to.
+IID="$(vm "cat /opt/sitekeep/config/installation.id")"
+case "$LIC" in *"\"installationId\":\"$IID\""*) ;; *) fail "installation ID $IID differs from the application's: $LIC" ;; esac
+vm "sitekeep status" | grep -q "Installation: $IID" || fail "sitekeep status does not show $IID"
+pass "installation ID $IID is the same in the installer, sitekeep status and Administration → Licence"
 PROJECT="$(vm "$CURL -b /root/jar -H 'content-type: application/json' -d '{\"code\":\"SMK\",\"name\":\"Smoke\",\"template\":\"empty\"}' $API/projects")"
 PID="$(printf '%s' "$PROJECT" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -1)"
 ROOT="$(printf '%s' "$PROJECT" | sed -n 's/.*"rootFolderId":"\([^"]*\)".*/\1/p')"

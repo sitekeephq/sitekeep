@@ -219,7 +219,8 @@ export function evaluateCapacity(input: {
   if (!run?.finishedAt || !run.result) {
     findings.push({
       key: "test",
-      level: "warn",
+      // A fresh install has not run a test yet: informational, not a warning (only a test older than 90 days is yellow).
+      level: "ok",
       title: sharedText(lang, "capacity.findings.testMissing"),
       action: sharedText(lang, "capacity.findings.testMissingAction"),
     });

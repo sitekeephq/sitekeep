@@ -378,3 +378,10 @@ describe("reports API", () => {
     expect(st.body.stamp).toMatch(/^issues:\d+,members:\d+\|\d{4}-\d{2}-\d{2}$/);
   });
 });
+
+describe("filter operators", () => {
+  it("an unknown operator that names an Object.prototype member matches nothing", () => {
+    const spec = { dataset: "documents", filters: [{ field: "size", op: "constructor", value: 1 }] } as unknown as ReportQuerySpec;
+    expect(executeSpec(ROWS, spec, SRC, OPTS)).toEqual([]);
+  });
+});

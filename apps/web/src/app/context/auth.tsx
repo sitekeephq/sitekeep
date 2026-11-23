@@ -12,7 +12,9 @@ import { isChallenge } from "../../shared/api/api-security";
  * one takes the language picked on this browser, e.g. on the sign-in page.
  */
 function syncLanguage(user: UserDto | null) {
-  if (!user) return;
+  // While the temporary password stands the server answers only the change and sign-out routes;
+  // the language is saved once the password is changed (reloadUser).
+  if (!user || user.mustChangePassword) return;
   const chosen = supportedLanguage(user.language);
   if (chosen && chosen !== currentLanguage()) void setLanguage(chosen);
   else if (!user.language) void hubApi.setPrefs({ language: currentLanguage() }).catch(() => undefined);
@@ -88,7 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const reloadUser = useCallback(async () => {
     const next = await api.me();
     setUser(next);
-    if (!next?.mustChangePassword) setPendingCurrentPassword("");
+    if (!next?.mustChangePassword) {
+      setPendingCurrentPassword("");
+      syncLanguage(next);
+    }
   }, []);
 
   return (

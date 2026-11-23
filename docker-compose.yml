@@ -36,6 +36,8 @@ services:
       DATABASE_URL: postgres://cde:${POSTGRES_PASSWORD}@db:5432/cde
       ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      # The first administrator changes the password at first sign-in; 0 turns it off.
+      ADMIN_MUST_CHANGE_PASSWORD: ${ADMIN_MUST_CHANGE_PASSWORD:-1}
       SECURE_COOKIES: ${SECURE_COOKIES:-0}
       # Office integration defaults (empty = off; the admin page overrides them).
       CDE_OFFICE_EDITOR: ${CDE_OFFICE_EDITOR:-}

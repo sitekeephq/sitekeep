@@ -12,6 +12,7 @@ import type { AdminStatusDto, StatusLevel } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { jobs } from "../db/schema.js";
 import { LocalStorage } from "../core/platform/storage.js";
+import { appVersion } from "../app/about.js";
 import { killSwitchOn } from "../privacy/settings.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -41,7 +42,10 @@ function nextNightBackup(): Date {
   return today.getTime() > Date.now() ? today : atHour(2, 0, 1);
 }
 
+/** The running version: the release build's SITEKEEP_VERSION (what /api/v1/app-info reports), else apps/server/package.json. */
 export function packageVersion(): string | null {
+  const built = appVersion();
+  if (built) return built;
   try {
     const pkg = JSON.parse(readFileSync(path.resolve(here, "../../package.json"), "utf8")) as { version?: string };
     return pkg.version ?? null;
@@ -81,10 +85,11 @@ export async function adminStatus(deps: AppDeps): Promise<AdminStatusDto> {
   const storageRoot = deps.storage instanceof LocalStorage ? deps.storage.root : process.cwd();
   const disk = await diskOf(storageRoot);
   const backup = { scheduled: false, lastSuccessAt: null, lastError: null, nextAt: null };
+  // No backup schedule on a fresh install is not a warning: the backup job is not wired to the queue yet.
   const kill = killSwitchOn();
   let level: StatusLevel = "ok";
   if (!databaseOk || (disk && disk.usedRatio >= 0.95)) level = "danger";
-  else if ((disk && disk.usedRatio >= 0.8) || kill || tallies.failed > 0 || !backup.scheduled) level = "warn";
+  else if ((disk && disk.usedRatio >= 0.8) || kill || tallies.failed > 0) level = "warn";
 
   const live: AdminStatusDto = {
     level,

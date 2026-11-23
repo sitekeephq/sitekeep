@@ -12,6 +12,44 @@ import { i18n } from "../../../i18n";
 import { ConfirmDialog, Dialog } from "../../../shared/ui/Dialog";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 import { CapacityCard } from "./AdminCapacity";
+import { licenseApi, type AdminLicenseDto } from "../../../shared/api/api-license";
+
+const LICENCE_TONE: Record<AdminLicenseDto["status"], string> = {
+  none: "",
+  not_yet: "info",
+  active: "ok",
+  expiring: "warn",
+  grace: "warn",
+  read_only: "danger",
+  invalid: "danger",
+};
+
+/** The licence line follows the Licence tab: Community and installs without enforcement never claim a valid licence. */
+function LicenceRow() {
+  const { t } = useTranslation("admin");
+  const { data } = useLoad(() => licenseApi.get(), []);
+  return (
+    <tr>
+      <td className="pc-title">{t("systemStatus.health.licence")}</td>
+      <td>
+        {data ? (
+          <>
+            <span className={`badge ${LICENCE_TONE[data.status]}`}>{t(`license.status.${data.status}`)}</span>
+            <span className="muted small" style={{ marginLeft: 8 }}>
+              {data.status === "none"
+                ? t(data.enforced ? "license.statusText.none" : "license.notEnforced")
+                : data.enforced && data.daysLeft !== null && data.status === "active"
+                  ? t("systemStatus.health.daysLeft", { count: data.daysLeft })
+                  : t(`license.statusText.${data.status}`, { days: data.daysLeft ?? 0, date: data.readOnlyAt ? formatDate(data.readOnlyAt) : "" })}
+            </span>
+          </>
+        ) : (
+          <span className="muted small">{t("systemStatus.health.licenceLoading")}</span>
+        )}
+      </td>
+    </tr>
+  );
+}
 
 const LEVEL_BADGE: Record<StatusLevel, string> = {
   ok: "ok",
@@ -251,15 +289,7 @@ function StatusCards({
                   : t("systemStatus.health.databaseDown")
               }
             />
-            <tr>
-              <td className="pc-title">{t("systemStatus.health.licence")}</td>
-              <td>
-                <span className="badge ok">{t("systemStatus.badges.valid")}</span>
-                <span className="muted small" style={{ marginLeft: 8 }}>
-                  {t("systemStatus.health.monthsLeft", { count: 14 })}
-                </span>
-              </td>
-            </tr>
+            <LicenceRow />
           </tbody>
         </table>
       </div>

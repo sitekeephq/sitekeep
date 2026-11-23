@@ -59,6 +59,23 @@ describe("GET /admin/status", () => {
   });
 });
 
+describe("application version", () => {
+  it("reports the release build's version, the same as /api/v1/app-info", async () => {
+    const before = process.env.SITEKEEP_VERSION;
+    process.env.SITEKEEP_VERSION = "v9.8.7";
+    try {
+      const admin = await login("admin@7d.test");
+      const status = (await app.inject({ method: "GET", url: "/api/v1/admin/status", headers: { cookie: admin } })).json();
+      const info = (await app.inject({ method: "GET", url: "/api/v1/app-info" })).json();
+      expect(info.version).toBe("9.8.7");
+      expect(status.app.version).toBe(info.version);
+    } finally {
+      if (before === undefined) delete process.env.SITEKEEP_VERSION;
+      else process.env.SITEKEEP_VERSION = before;
+    }
+  });
+});
+
 describe.skipIf(!hasConnect)("GET /admin/forma-sync", () => {
   it("is only for system administrators and returns the sample file-sync overlay", async () => {
     const member = await login("uye@7d.test");

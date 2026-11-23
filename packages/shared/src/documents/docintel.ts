@@ -344,7 +344,8 @@ export function compareRevisions(a: string | null | undefined, b: string | null 
  * "…_rev3.pdf". Only explicit forms are recognised; a bare "02" is not a revision.
  */
 export function revisionFromFileName(fileName: string): { value: string; raw: string } | null {
-  const base = fileName.replace(/\.[^.]+$/, "");
+  const dot = fileName.lastIndexOf(".");
+  const base = (dot >= 0 && dot < fileName.length - 1 ? fileName.slice(0, dot) : fileName).slice(0, 512);
   const explicit = /(?:^|[\s_\-.(\[])(rev(?:izyon|ision)?\.?\s*[-_]?\s*([a-z]?\d{1,3}|[a-z]))(?=$|[\s_\-.)\]])/i.exec(base);
   if (explicit) {
     const v = normalizeRevision(explicit[2]!);

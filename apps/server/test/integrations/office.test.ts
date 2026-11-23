@@ -516,6 +516,9 @@ describe("converter selection", () => {
     const r = await b.converterFor(await b.config());
     expect(r.converter).toBeNull();
     expect(r.reason).toContain("Gotenberg");
+    // The hint is in the reader's language, not the installation's (QA 1.0.1).
+    expect(r.reason).toMatch(/dönüştürücü/);
+    expect((await b.converterFor(await b.config(), "en")).reason).toContain("There is no converter");
     await expect(b.officeToPdf(input, "docx", out)).rejects.toBeInstanceOf(ConverterUnavailableError);
     const st = await b.status();
     expect(st.converter).toMatchObject({ kind: null, available: false, auto: true });

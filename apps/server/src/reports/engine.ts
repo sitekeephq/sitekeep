@@ -317,9 +317,10 @@ function makePredicate(f: ReportFilter, info: FieldInfo, o: ExecOptions): (row: 
     }
     default: {
       const arg = toArg(val as ReportScalar);
-      const test = { gt: (c: number) => c > 0, gte: (c: number) => c >= 0, lt: (c: number) => c < 0, lte: (c: number) => c <= 0 }[
-        f.op as "gt" | "gte" | "lt" | "lte"
-      ];
+      const tests: Record<string, (c: number) => boolean> = { gt: (c) => c > 0, gte: (c) => c >= 0, lt: (c) => c < 0, lte: (c) => c <= 0 };
+      // Own keys only: an operator like "constructor" must not reach Object.prototype.
+      const test = Object.hasOwn(tests, f.op) ? tests[f.op]! : null;
+      if (!test) return () => false;
       return (row) => {
         const v = toRow(get(row));
         if (v === null || arg === null || typeof v === "boolean" || typeof arg === "boolean") return false;

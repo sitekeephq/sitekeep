@@ -8,6 +8,7 @@
  * - Collabora Online: apps named by MIME type (ext="") and apps "writer", "calc", "impress"
  *   with per-extension actions; urlsrc ends with "cool.html?" and needs WOPISrc appended.
  */
+import { trimTrailingSlashes } from "@sitekeep/shared";
 import { proofKeysFrom, type ProofKeyAttributes, type ProofKeys } from "./proof.js";
 import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
 
@@ -170,8 +171,8 @@ export function buildActionUrl(urlsrc: string, wopiSrc: string, opts: ActionUrlO
 /** Swaps the internal editor address for the public one in a URL from the discovery. */
 export function toPublicUrl(url: string, internalBase: string | null, publicBase: string | null): string {
   if (!publicBase || !internalBase) return url;
-  const i = internalBase.replace(/\/+$/, "");
-  const p = publicBase.replace(/\/+$/, "");
+  const i = trimTrailingSlashes(internalBase);
+  const p = trimTrailingSlashes(publicBase);
   if (url === i || url.startsWith(`${i}/`) || url.startsWith(`${i}?`)) return p + url.slice(i.length);
   try {
     // The editor may report its own host name (e.g. http://localhost:9980): same path, public origin.

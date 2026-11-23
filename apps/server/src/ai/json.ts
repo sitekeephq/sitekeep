@@ -4,9 +4,11 @@
  * through the SDK (`extractJson`).
  */
 
+import { removeThinkBlocks } from "./think.js";
+
 /** Removes Qwen3-style reasoning blocks before the answer is parsed. */
 function withoutReasoning(text: string): string {
-  return text.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/^[\s\S]*?<\/think>/i, "").trim();
+  return removeThinkBlocks(text, true, false).replace(/^[\s\S]*?<\/think>/i, "").trim();
 }
 
 /** The first JSON object in a model answer (handles ``` fences and surrounding prose). */

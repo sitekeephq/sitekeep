@@ -105,15 +105,17 @@ describe("evaluateCapacity", () => {
     expect(e.findings.find((f) => f.key === "memory")!.action).toBe("RAM'i en az 8 GB yapın.");
   });
 
-  it("asks for a test when there is none or it is older than 90 days", () => {
+  it("a missing test is informational (fresh install stays green); one older than 90 days is yellow", () => {
     const none = evaluateCapacity({ hardware: machine(8, 32), counts: { registered: 20, active: 10 }, now });
-    expect(none.findings.find((f) => f.key === "test")!.level).toBe("warn");
+    expect(none.findings.find((f) => f.key === "test")!.level).toBe("ok");
+    expect(none.level).toBe("ok");
     const old = evaluateCapacity({
       hardware: machine(8, 32),
       counts: { registered: 20, active: 10 },
       lastRun: { ...recent, finishedAt: "2026-06-01T00:00:00Z" },
       now,
     });
+    expect(old.findings.find((f) => f.key === "test")!.level).toBe("warn");
     expect(old.findings.find((f) => f.key === "test")!.title).toMatch(/^Son test \d+ gün önce$/);
   });
 

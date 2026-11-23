@@ -128,7 +128,16 @@ A new password (account, invitation, administrator, `ADMIN_PASSWORD` of the firs
 - not contain the person's name or e-mail address (any part of 4 characters or more).
 
 The provisioning password (`1234567890`, "change at first sign-in") can still be set by an
-administrator; nobody can choose it as their own.
+administrator for a new user; nobody can choose it as their own, and `ADMIN_PASSWORD` may not be it
+(the server refuses to start without creating the first administrator, and says why in its log).
+
+**Change at first sign-in is enforced by the server.** While a user's account carries it (temporary
+password, "must change" ticked by an administrator, or the first administrator), every API request
+of that user answers `403 password_change_required` except `GET /auth/me`, `POST /auth/password`,
+`POST /auth/logout` and the public `GET /app-info` / `GET /health`. API access keys and OAuth tokens
+get no exception: they are refused too, so nothing created with the temporary password keeps working.
+The first administrator must change the password unless `ADMIN_MUST_CHANGE_PASSWORD=0` (development, e2e,
+and the installer when the person typed the password themselves).
 
 ## API
 

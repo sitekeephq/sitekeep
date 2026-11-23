@@ -9,6 +9,7 @@
  * `draftFromSentence`); its result has the same shape, so the dialog does not change.
  */
 import { foldTr } from "../kernel/attributes.js";
+import { trimChars } from "../core/trim.js";
 import type { ProjectModule } from "../core/modules.js";
 
 export const NEW_RECORD_KINDS = [
@@ -262,7 +263,7 @@ export function guessNewRecord(text: string, companies: readonly IntentCompany[]
     const to = from + m[0].length;
     const strip = r.strip ? [...folded.matchAll(r.strip)].map((x): [number, number] => [x.index, x.index + x[0].length]) : [[from, to] as [number, number]];
     tokens.forEach((t, i) => {
-      if (t.start < to && t.end > from) matched.push(t.raw.replace(/[^\p{L}\p{N}'’ ]+$/gu, ""));
+      if (t.start < to && t.end > from) matched.push(trimChars(t.raw, null, (c) => !/^[\p{L}\p{N}'’ ]$/u.test(c)));
       if (strip.some(([a, b]) => t.start < b && t.end > a)) drop.add(i);
     });
     break;
@@ -296,10 +297,11 @@ export function guessNewRecord(text: string, companies: readonly IntentCompany[]
   while (rest.length && (CONNECTORS.has(rest[0]!.word) || !rest[0]!.word)) rest = rest.slice(1);
   while (rest.length && (CONNECTORS.has(rest[rest.length - 1]!.word) || !rest[rest.length - 1]!.word)) rest = rest.slice(0, -1);
   const title = upperFirstTr(
-    rest
-      .map((t) => t.raw)
-      .join(" ")
-      .replace(/^[\s:;,.–-]+|[\s:;,–-]+$/g, ""),
+    trimChars(
+      rest.map((t) => t.raw).join(" "),
+      (c) => /^[\s:;,.–-]$/.test(c),
+      (c) => /^[\s:;,–-]$/.test(c),
+    ),
   );
 
   return { kind, title, companyId, companyRole, matched };

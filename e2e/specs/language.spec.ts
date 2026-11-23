@@ -32,6 +32,16 @@ test("English by default, switches to Turkish from the top bar and remembers it"
   await page.reload();
   await expect(page.getByRole("link", { name: "My Tasks" })).toBeVisible();
 
+  // Sign out and in again: the profile keeps the choice (QA 1.0.1).
+  await page.locator("button.topbar-account").click();
+  await page.getByRole("menuitem", { name: "Sign Out" }).click();
+  await expect(page.getByRole("heading", { name: "Sign In to Your Account" })).toBeVisible();
+  await page.getByPlaceholder("first.last@company.com").fill(ADMIN_EMAIL);
+  await page.getByPlaceholder("Enter your password").fill(ADMIN_PASSWORD);
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page.getByRole("link", { name: "My Tasks" })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+
   // Back to Turkish for the specs that follow (same admin profile).
   await page.getByRole("button", { name: "Language: English" }).click();
   await page.getByRole("menuitemradio", { name: /Türkçe/ }).click();

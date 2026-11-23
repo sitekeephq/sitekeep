@@ -95,5 +95,11 @@ export function shownRoleName(name: string, lang: string): string {
 export function shownFolderName(name: string, place: "root" | "rootChild" | "other", lang: string): string {
   if (place === "root" && name === SEEDED_FOLDER_NAMES.root) return seededText(name, lang);
   if (place === "rootChild" && ROOT_CHILD_FOLDERS.includes(name)) return seededText(name, lang);
+  // The root and the ISO state folders are written in the creator's language (docs/architecture/i18n.md §8.2):
+  // one created in English ("Project Files", "01-WIP") is still the seeded default for a Turkish reader.
+  const seeded = place === "root" ? [SEEDED_FOLDER_NAMES.root] : place === "rootChild" ? ISO_FOLDER_NAMES_TR : [];
+  for (const key of seeded) {
+    if (labelText("en", "seededText", key) === name) return seededText(key, lang);
+  }
   return name;
 }

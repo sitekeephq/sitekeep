@@ -107,7 +107,7 @@ function Findings({ findings }: { findings: AdminCapacityDto["findings"] }) {
               <span style={{ marginLeft: 8 }}>{f.title}</span>
             </td>
             <td className="muted small" data-label={t("capacity.findingAction")}>
-              {f.level === "ok" ? "" : f.action}
+              {f.level === "ok" && f.key !== "test" ? "" : f.action}
             </td>
           </tr>
         ))}

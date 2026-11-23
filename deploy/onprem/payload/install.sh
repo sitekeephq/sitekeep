@@ -163,6 +163,7 @@ ask_secret ADMIN_PASSWORD "First administrator's password (at least 10 character
 GENERATED_PASSWORD=0
 if [ -z "${ADMIN_PASSWORD:-}" ]; then ADMIN_PASSWORD="SK-$(rand_hex 8)"; GENERATED_PASSWORD=1; fi
 [ "${#ADMIN_PASSWORD}" -ge 10 ] || die "The password must be at least 10 characters."
+[ "$ADMIN_PASSWORD" != "1234567890" ] || die "1234567890 is the temporary password of new users; choose another one."
 ask CDE_LANGUAGE "Default language (en / tr)" "$CDE_LANGUAGE"
 ask CDE_BACKUP_TIME "Nightly backup time (HH:MM)" "$CDE_BACKUP_TIME"
 ask CDE_BACKUP_KEEP "Number of backups to keep" "$CDE_BACKUP_KEEP"
@@ -236,6 +237,10 @@ CDE_DEFAULT_LANGUAGE=$CDE_LANGUAGE
 TZ=${TZ:-$(cat /etc/timezone 2>/dev/null || echo UTC)}
 ADMIN_EMAIL=$ADMIN_EMAIL
 ADMIN_PASSWORD=$ADMIN_PASSWORD
+# The installation ID licences are bound to (also in config/installation.id); the application stores it on first start
+SITEKEEP_INSTALLATION_ID=$INSTALLATION_ID
+# 1 = the first administrator must change the password at first sign-in (set for a generated password).
+ADMIN_MUST_CHANGE_PASSWORD=$GENERATED_PASSWORD
 # Optional integrations (docs/features/FORMA_SYNC.md, docs/features/GOOGLE_SIGN_IN.md):
 # AUTODESK_CLIENT_ID=
 # AUTODESK_CLIENT_SECRET=

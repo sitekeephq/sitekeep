@@ -13,6 +13,7 @@ import {
   type OfficeStatusDto,
   type OfficeTestResultDto,
 } from "@sitekeep/shared";
+import { trimTrailingSlashes } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { ConverterTimeoutError, ConverterUnavailableError, type Converters } from "../previews/converters.js";
 import {
@@ -26,12 +27,11 @@ import {
 import { extensionsWith, parseDiscovery, toPublicUrl, type Discovery } from "./discovery.js";
 import { getStoredOfficeSettings, resolveOfficeConfig, type OfficeConfig } from "./settings.js";
 import { outboundFetch, outboundRefusal } from "../privacy/outbound.js";
-import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
+import { DEFAULT_LANGUAGE, currentLanguage, tFor } from "../i18n/index.js";
 
 /** Converter and editor texts reach errors and previews: the installation's language. */
 const t = tFor(DEFAULT_LANGUAGE);
 
-export const OFFICE_CONVERTER_HINT = t("office:service.converterHint");
 
 /** Conversion source tickets live this long (ONLYOFFICE downloads the file once). */
 const SOURCE_TTL_MS = 10 * 60 * 1000;
@@ -103,7 +103,9 @@ export class OfficeIntegration implements OfficePdf {
   // ---- Converter -----------------------------------------------------------------------------
 
   /** Resolves the converter for the settings; null with a reason when there is none. */
-  async converterFor(cfg: OfficeConfig): Promise<{ converter: OfficeConverter | null; auto: boolean; reason: string }> {
+  async converterFor(cfg: OfficeConfig, lang: string = currentLanguage()): Promise<{ converter: OfficeConverter | null; auto: boolean; reason: string }> {
+    // The reason is shown to the requester (Administration → Office Integration): their language.
+    const t = tFor(lang);
     const c = cfg.converter;
     let kind = c.kind;
     let url = c.url;
@@ -116,13 +118,13 @@ export class OfficeIntegration implements OfficePdf {
         const local = new LocalSofficeConverter(this.opts.converters);
         return (await local.available()).ok
           ? { converter: local, auto, reason: "" }
-          : { converter: null, auto, reason: OFFICE_CONVERTER_HINT };
+          : { converter: null, auto, reason: t("office:service.converterHint") };
       }
     }
     if (kind === "none") return { converter: null, auto, reason: t("office:service.converterOff") };
     if (kind === "local") return { converter: new LocalSofficeConverter(this.opts.converters), auto, reason: "" };
     if (!url && kind === cfg.editor.kind) url = cfg.editor.url;
-    if (!url) return { converter: null, auto, reason: t("office:service.converterUrlMissing", { converter: officeConverterLabel(kind, DEFAULT_LANGUAGE) }) };
+    if (!url) return { converter: null, auto, reason: t("office:service.converterUrlMissing", { converter: officeConverterLabel(kind, lang) }) };
     // Gizlilik Merkezi: the converter connection is off, or the kill switch forbids its host.
     const refused = outboundRefusal(url, "office:converter", `ofis:${kind}`);
     if (refused) return { converter: null, auto, reason: refused };
@@ -184,7 +186,7 @@ export class OfficeIntegration implements OfficePdf {
     const key = createHash("sha256").update(ticket).digest("hex");
     this.sources.set(key, { path: filePath, name, expires: now + SOURCE_TTL_MS });
     return {
-      url: `${baseUrl.replace(/\/+$/, "")}/wopi/convert/${ticket}/${encodeURIComponent(name)}`,
+      url: `${trimTrailingSlashes(baseUrl)}/wopi/convert/${ticket}/${encodeURIComponent(name)}`,
       release: () => this.sources.delete(key),
     };
   }
@@ -290,7 +292,7 @@ export class OfficeIntegration implements OfficePdf {
         editor.error = (err as Error).message;
       }
     }
-    const { converter, auto, reason } = await this.converterFor(cfg);
+    const { converter, auto, reason } = await this.converterFor(cfg, lang);
     let available = false;
     let message = reason;
     if (converter) {

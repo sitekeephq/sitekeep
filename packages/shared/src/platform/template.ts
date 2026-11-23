@@ -688,7 +688,7 @@ export interface TokenContext {
 /** Replaces {PROJE}, {EK1}, {slot:key} and {firma:key}; null when a token has no value. */
 export function resolveTemplateTokens(text: string, ctx: TokenContext): string | null {
   let missing = false;
-  const out = text.replace(/\{(PROJE|EK1|slot:([^}]+)|firma:([^}]+))\}/g, (_m, all: string, slot?: string, firma?: string) => {
+  const out = text.replace(/\{(PROJE|EK1|slot:([^{}]+)|firma:([^{}]+))\}/g, (_m, all: string, slot?: string, firma?: string) => {
     let v: string | undefined;
     if (all === "PROJE") v = ctx.projectCode;
     else if (all === "EK1") v = ctx.csbProjectCode?.trim();

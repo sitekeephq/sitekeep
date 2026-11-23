@@ -111,6 +111,9 @@ readability but does not provide confidentiality. The real protection is the sig
    [Revit models](docker-compose.md#revit-models-enterprise).
 5. **Start:** `docker compose up -d`, waits up to 3 minutes for health; once the first administrator is created,
    `ADMIN_PASSWORD` is removed from the file. HTTPS through the proxy is tested.
+   A generated administrator password is written with `ADMIN_MUST_CHANGE_PASSWORD=1`: the administrator must
+   change it at first sign-in (the server refuses every other request until then). A password you typed
+   yourself does not have to be changed.
 6. **Nightly backup:** systemd timer (`sitekeep-backup.timer`), otherwise cron.
 
 | HTTPS type | Caddy | Note |

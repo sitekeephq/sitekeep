@@ -20,7 +20,8 @@ import { JobQueue } from "../../src/jobs/queue.js";
 import { LocalStorage } from "../../src/core/platform/storage.js";
 import { parseLicenceReply, type LicensePayload } from "../../src/license/format.js";
 import { licensingUrls, normaliseKey } from "../../src/license/online.js";
-import { computeLicense, NO_ONLINE } from "../../src/license/state.js";
+import { computeLicense, initLicense, installationId, NO_ONLINE, presetInstallationId, storedLicense, storedLicenceText } from "../../src/license/state.js";
+import { putSetting } from "../../src/ai/settings.js";
 import { parseLicense } from "../../src/license/format.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -217,6 +218,48 @@ class FakeService {
     return { status: "valid", reason: null, licence: this.licence(r, installation) };
   }
 }
+
+describe("after a restart", () => {
+  it("reads the stored licence whether the driver returns it as text or already parsed (node-postgres)", async () => {
+    const text = JSON.stringify(signed("sitekeep-license", licencePayload({ installation: "inst_restart_test" })));
+    expect(storedLicenceText(text)).toBe(text);
+    expect(storedLicenceText(JSON.parse(text))).toBe(text);
+    expect(storedLicenceText(null)).toBeNull();
+
+    const handle = await openDb("memory://");
+    try {
+      await putSetting(handle.db, "license.installation", "inst_restart_test", null);
+      // What drizzle hands back from Postgres: the jsonb string parsed once more into an object.
+      await putSetting(handle.db, "license.file", JSON.parse(text), null);
+      await initLicense(handle.db);
+      expect(storedLicense()).toMatchObject({ lid: "LIC-2026-0042", installation: "inst_restart_test" });
+    } finally {
+      await handle.close();
+    }
+  });
+
+  it("a new installation takes the installer's ID; a stored one never changes", async () => {
+    expect(presetInstallationId("inst_a599237bbbd1ecd254f3bb02")).toBe("inst_a599237bbbd1ecd254f3bb02");
+    expect(presetInstallationId(" inst_a599237bbbd1ecd254f3bb02\n")).toBe("inst_a599237bbbd1ecd254f3bb02");
+    expect(presetInstallationId("abc")).toBeNull();
+    expect(presetInstallationId(undefined)).toBeNull();
+
+    const before = process.env.SITEKEEP_INSTALLATION_ID;
+    process.env.SITEKEEP_INSTALLATION_ID = "inst_a599237bbbd1ecd254f3bb02";
+    const handle = await openDb("memory://");
+    try {
+      await initLicense(handle.db);
+      expect(installationId()).toBe("inst_a599237bbbd1ecd254f3bb02");
+      process.env.SITEKEEP_INSTALLATION_ID = "inst_ffffffffffffffffffffffff";
+      await initLicense(handle.db);
+      expect(installationId()).toBe("inst_a599237bbbd1ecd254f3bb02");
+    } finally {
+      if (before === undefined) delete process.env.SITEKEEP_INSTALLATION_ID;
+      else process.env.SITEKEEP_INSTALLATION_ID = before;
+      await handle.close();
+    }
+  });
+});
 
 describe("Administration → Licence online", () => {
   let dataDir: string;

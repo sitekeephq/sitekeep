@@ -50,6 +50,11 @@ const GRID_GAP = 0.1;
 
 /** That Open's camera far plane (metres); clipping only ever grows past it (fitClipping). */
 const DEFAULT_FAR = 1000;
+/** That Open's perspective near plane (metres). It cut a 0.4 m model in half after Fit (#QA 1.0.1). */
+const DEFAULT_NEAR = 1;
+const MIN_NEAR = 0.001;
+/** Largest far/near ratio kept, so the depth buffer still separates surfaces. */
+const MAX_DEPTH_RATIO = 1e6;
 const _eye = new THREE.Vector3();
 
 export class ViewerEngine {
@@ -254,14 +259,23 @@ export class ViewerEngine {
     const sphere = this.sceneSphere;
     if (!camera) return;
     let far = DEFAULT_FAR;
+    let near = DEFAULT_NEAR;
     if (sphere) {
       const now = camera.position.distanceTo(sphere.center);
       const next = this.world.camera.controls.getPosition(_eye, true).distanceTo(sphere.center);
       far = Math.max(DEFAULT_FAR, (Math.max(now, next) + sphere.radius) * 1.2);
+      // The near plane follows the closest the camera is (now or where it is moving to), so a
+      // small model or a close zoom is not cut; never beyond 1 m, and far/near stays sane.
+      near = THREE.MathUtils.clamp(Math.min(now, next) * 0.01, MIN_NEAR, DEFAULT_NEAR);
+      near = Math.max(near, far / MAX_DEPTH_RATIO);
+      if (camera instanceof THREE.OrthographicCamera) near = Math.min(near, 0.1);
     }
     // Grow at once; shrink only when the plane is well past what is needed (no churn per frame).
-    if (camera.far >= far && camera.far <= far * 2) return;
-    camera.far = far;
+    const farOk = camera.far >= far && camera.far <= far * 2;
+    const nearOk = camera.near <= near && camera.near >= near / 2;
+    if (farOk && nearOk) return;
+    if (!farOk) camera.far = far;
+    if (!nearOk) camera.near = near;
     camera.updateProjectionMatrix();
   }
 

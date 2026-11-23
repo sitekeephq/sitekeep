@@ -14,6 +14,7 @@
   "routeNotFound": "Not found.",
   "projectAdminRequired": "This action requires project administrator permission.",
   "passwordTooShort": "The password must be at least 10 characters long.",
+  "passwordChangeRequired": "You must change your temporary password before you can continue.",
   "tokenScope": {
     "consentSessionOnly": "App consent can only be given from a browser session.",
     "sessionRequired": "This action requires a browser session; it cannot be done with an API access token.",

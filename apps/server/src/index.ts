@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 import { eq } from "drizzle-orm";
 import { buildApp } from "./app/build-app.js";
 import { activeModules } from "./app/modules.js";
-import { hashPassword, passwordProblem } from "./core/security/auth.js";
+import { hashPassword } from "./core/security/auth.js";
+import { adminPasswordProblem, adminPrefs } from "./auth/bootstrap-admin.js";
 import { openDb } from "./db/index.js";
 import { migrateLegacyCodes } from "./cde/codes-migration.js";
 import { recordServerError } from "./core/platform/error-ring.js";
@@ -34,7 +35,9 @@ import { queueModelBackfill, queueModelReconversion } from "./files/model-backfi
  *   DATA_DIR           default ./data — files, derivatives and the embedded database
  *   DATABASE_URL       postgres://… ; when unset an embedded PGlite database in DATA_DIR/db is used
  *   ADMIN_EMAIL        first administrator, created when the user table is empty
- *   ADMIN_PASSWORD
+ *   ADMIN_PASSWORD     at least 10 characters, not common, not the temporary password 1234567890
+ *   ADMIN_MUST_CHANGE_PASSWORD  default on: the first administrator changes the password at first sign-in;
+ *                      0 turns it off (development, e2e, an installer password the person chose)
  *   WEB_DIST           built web app to serve (default ../web/dist)
  *   SECURE_COOKIES     "1" behind HTTPS
  *   CDE_SECRET_KEY     32-byte key (hex or base64) encrypting AI provider API keys at rest;
@@ -186,14 +189,14 @@ async function bootstrapAdmin() {
     console.error("No users yet. Set ADMIN_EMAIL and ADMIN_PASSWORD to create the first administrator.");
     process.exit(1);
   }
-  const problem = passwordProblem(password, { email });
+  const problem = adminPasswordProblem(password, email);
   if (problem) {
-    console.error(`ADMIN_PASSWORD: ${render(FALLBACK_LANGUAGE, problem)}`);
+    console.error(`ADMIN_PASSWORD: ${render(FALLBACK_LANGUAGE, problem)} The first administrator was not created; fix ADMIN_PASSWORD and restart.`);
     process.exit(1);
   }
   // The display name is data: written once in the installation's language (CDE_DEFAULT_LANGUAGE).
   const name = tFor(DEFAULT_LANGUAGE)("auth:seed.adminName");
-  await db.insert(users).values({ email, name, passwordHash: await hashPassword(password), isAdmin: true });
+  await db.insert(users).values({ email, name, passwordHash: await hashPassword(password), isAdmin: true, prefs: adminPrefs() });
   const [u] = await db.select().from(users).where(eq(users.email, email));
   console.log(`Created administrator ${u?.email}`);
 }

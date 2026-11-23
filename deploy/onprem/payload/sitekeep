@@ -47,10 +47,18 @@ wait_healthy() {
 
 latest_backup() { find "$CDE_DATA/backups" -mindepth 1 -maxdepth 1 -type d -name '20*' 2>/dev/null | sort | tail -1; }
 
+# The ID the application uses (Administration → Licence); the installer's file for an installation that has not started yet.
+installation_id() {
+  local id
+  id="$(dc exec -T db psql -U cde -d cde -tAc "select value #>> '{}' from system_settings where key = 'license.installation'" 2>/dev/null | tr -d '[:space:]')"
+  [ -n "$id" ] || id="$(cat "$CDE_HOME/config/installation.id" 2>/dev/null)"
+  echo "${id:--}"
+}
+
 cmd_status() {
   bold "SiteKeep $CDE_VERSION"
   info "Address:      $CDE_PUBLIC_URL"
-  info "Installation: $(cat "$CDE_HOME/config/installation.id" 2>/dev/null || echo -)"
+  info "Installation: $(installation_id)"
   dc ps --format 'table {{.Service}}\t{{.Status}}' | sed 's/^/  /'
   info "Health:       $(app_health)"
   local last

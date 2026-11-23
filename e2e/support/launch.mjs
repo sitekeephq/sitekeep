@@ -46,6 +46,8 @@ const child = spawn(process.execPath, [serverEntry], {
     PORT: port,
     ADMIN_EMAIL: "e2e-admin@7d-cde.localhost",
     ADMIN_PASSWORD: "E2e-Only!7D-CDE#2026",
+    // The suite signs in as the administrator with this password; first-sign-in change is covered by its own spec.
+    ADMIN_MUST_CHANGE_PASSWORD: "0",
     SECURE_COOKIES: "0",
     NODE_ENV: "test",
     AI_ENABLED: "0",

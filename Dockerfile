@@ -71,11 +71,15 @@ RUN npm run build -w @sitekeephq/bim-viewer \
 FROM debian:bookworm-slim AS libredwg
 ARG WITH_LIBREDWG=1
 ARG LIBREDWG_VERSION=0.14
+# SHA-256 of libredwg-0.14.tar.xz; the GNU .sig was also checked against the GNU keyring (signed by
+# Reini Urban, key 38A4167B0DB69E49C5F7216CB8C28866AB27A7A2). Change it together with LIBREDWG_VERSION.
+ARG LIBREDWG_SHA256=62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275
 RUN mkdir -p /opt/libredwg/bin \
  && if [ "$WITH_LIBREDWG" = "1" ]; then \
       apt-get update \
       && apt-get install -y --no-install-recommends build-essential ca-certificates curl pkg-config xz-utils \
       && curl -fsSL "https://ftp.gnu.org/gnu/libredwg/libredwg-${LIBREDWG_VERSION}.tar.xz" -o /tmp/libredwg.tar.xz \
+      && echo "${LIBREDWG_SHA256}  /tmp/libredwg.tar.xz" | sha256sum -c - \
       && tar -xJf /tmp/libredwg.tar.xz -C /tmp \
       && cd "/tmp/libredwg-${LIBREDWG_VERSION}" \
       && ./configure --prefix=/opt/libredwg --disable-bindings --disable-python --disable-shared \

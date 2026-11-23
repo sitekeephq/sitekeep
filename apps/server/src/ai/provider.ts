@@ -10,6 +10,7 @@ import { msg } from "../i18n/index.js";
 import { capability } from "../sdk/capabilities.js";
 import type { AiProviderCapabilities } from "@sitekeep/shared";
 import type { ProviderKind } from "./settings.js";
+import { removeThinkBlocks } from "./think.js";
 
 export class AiError extends HttpError {}
 
@@ -92,8 +93,9 @@ export type AiProviderSelection = "project" | "anthropic" | "cursor";
 
 /** Removes Qwen3-style reasoning blocks (<think>…</think>) from model output. */
 export function stripThinking(text: string): string {
-  return text.replace(/<think>[\s\S]*?<\/think>\s*/g, "").replace(/^\s*<think>[\s\S]*$/, "").trim();
+  return removeThinkBlocks(text, false, true).replace(/^\s*<think>[\s\S]*$/, "").trim();
 }
+
 
 /** stripThinking for a partial answer: an unfinished <think> block hides everything. */
 export function stripThinkingPartial(text: string): string {

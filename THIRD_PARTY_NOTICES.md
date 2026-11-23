@@ -18,27 +18,27 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | @aiden0z/pptx-renderer | 1.3.0 | Apache-2.0 | https://github.com/aiden0z/pptx-renderer |
 | @babel/runtime | 7.29.10 | MIT | https://github.com/babel/babel/tree/HEAD/packages/babel-runtime |
 | @dimforge/rapier3d-compat | 0.12.0 | Apache-2.0 | https://github.com/dimforge/rapier.js |
-| @electric-sql/pglite | 0.5.8 | Apache-2.0 | https://github.com/electric-sql/pglite/tree/HEAD/packages/pglite |
+| @electric-sql/pglite | 0.5.17 | Apache-2.0 | https://github.com/electric-sql/pglite/tree/HEAD/packages/pglite |
 | @fastify/accept-negotiator | 2.1.0 | MIT | https://github.com/fastify/accept-negotiator |
 | @fastify/ajv-compiler | 4.0.6 | MIT | https://github.com/fastify/ajv-compiler |
 | @fastify/busboy | 3.2.2 | MIT | https://github.com/fastify/busboy |
-| @fastify/cookie | 11.1.3 | MIT | https://github.com/fastify/fastify-cookie |
+| @fastify/cookie | 11.1.5 | MIT | https://github.com/fastify/fastify-cookie |
 | @fastify/deepmerge | 3.2.2 | MIT | https://github.com/fastify/deepmerge |
 | @fastify/error | 4.2.0 | MIT | https://github.com/fastify/fastify-error |
 | @fastify/fast-json-stringify-compiler | 5.1.0 | MIT | https://github.com/fastify/fast-json-stringify-compiler |
 | @fastify/forwarded | 3.0.2 | MIT | https://github.com/fastify/forwarded |
 | @fastify/merge-json-schemas | 0.2.1 | MIT | https://github.com/fastify/merge-json-schemas |
-| @fastify/multipart | 10.1.3 | MIT | https://github.com/fastify/fastify-multipart |
+| @fastify/multipart | 10.1.9 | MIT | https://github.com/fastify/fastify-multipart |
 | @fastify/proxy-addr | 5.1.1 | MIT | https://github.com/fastify/proxy-addr |
 | @fastify/send | 4.2.1 | MIT | https://github.com/fastify/send |
-| @fastify/static | 10.1.10 | MIT | https://github.com/fastify/fastify-static |
+| @fastify/static | 10.1.12 | MIT | https://github.com/fastify/fastify-static |
 | @fontsource-variable/inter | 5.3.0 | OFL-1.1 | https://github.com/fontsource/font-files/tree/HEAD/fonts/variable/inter |
 | @fontsource/noto-sans | 5.3.0 | OFL-1.1 | https://github.com/fontsource/font-files/tree/HEAD/fonts/google/noto-sans |
 | @hono/node-server | 2.1.8 | MIT | https://github.com/honojs/node-server |
 | @isaacs/nonrecursive-glob-match | 1.1.0 | BlueOak-1.0.0 |  |
 | @kurkle/color | 0.3.4 | MIT | https://github.com/kurkle/color |
 | @lukeed/ms | 2.0.2 | MIT | https://github.com/lukeed/ms |
-| @modelcontextprotocol/sdk | 1.32.1 | MIT | https://github.com/modelcontextprotocol/typescript-sdk |
+| @modelcontextprotocol/sdk | 1.32.2 | MIT | https://github.com/modelcontextprotocol/typescript-sdk |
 | @napi-rs/canvas | 1.0.10 | MIT | https://github.com/Brooooooklyn/canvas |
 | @napi-rs/canvas-android-arm64 | 1.0.10 | MIT | https://www.npmjs.com/package/@napi-rs/canvas-android-arm64 |
 | @napi-rs/canvas-darwin-arm64 | 1.0.10 | MIT | https://www.npmjs.com/package/@napi-rs/canvas-darwin-arm64 |
@@ -56,7 +56,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | @pdf-lib/standard-fonts | 1.0.0 | MIT | https://github.com/Hopding/standard-fonts |
 | @pdf-lib/upng | 1.0.1 | MIT | https://github.com/Hopding/upng |
 | @pinojs/redact | 0.4.0 | MIT | https://github.com/pinojs/redact |
-| @sitekeephq/bim-viewer | 0.6.1 | AGPL-3.0-only | https://github.com/sitekeephq/sitekeep/tree/main/packages/bim-viewer |
+| @sitekeephq/bim-viewer | 0.6.2 | AGPL-3.0-only | https://github.com/sitekeephq/sitekeep/tree/main/packages/bim-viewer |
 | @tanstack/query-core | 5.104.3 | MIT | https://github.com/TanStack/query/tree/HEAD/packages/query-core |
 | @tanstack/react-query | 5.104.3 | MIT | https://github.com/TanStack/query/tree/HEAD/packages/react-query |
 | @tesseract.js-data/eng | 1.0.0 | MIT | https://github.com/naptha/tessdata |
@@ -91,7 +91,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | content-type | 2.1.0 | MIT | https://github.com/jshttp/content-type |
 | cookie | 0.7.2 | MIT | https://github.com/jshttp/cookie |
 | cookie | 1.1.1 | MIT | https://github.com/jshttp/cookie |
-| cookie | 2.0.1 | MIT | https://github.com/jshttp/cookie |
+| cookie | 2.0.2 | MIT | https://github.com/jshttp/cookie |
 | cookie-signature | 1.2.2 | MIT | https://github.com/visionmedia/node-cookie-signature |
 | core-util-is | 1.0.3 | MIT | https://github.com/isaacs/core-util-is |
 | cors | 2.8.6 | MIT | https://github.com/expressjs/cors |
@@ -156,7 +156,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | is-url | 1.2.4 | MIT | https://github.com/segmentio/is-url |
 | isarray | 1.0.0 | MIT | https://github.com/juliangruber/isarray |
 | isexe | 2.0.0 | ISC | https://github.com/isaacs/isexe |
-| jose | 6.2.12 | MIT | https://github.com/panva/jose |
+| jose | 6.2.18 | MIT | https://github.com/panva/jose |
 | js-tokens | 4.0.0 | MIT | https://github.com/lydell/js-tokens |
 | json-schema-ref-resolver | 3.0.0 | MIT | https://github.com/fastify/json-schema-ref-resolver |
 | json-schema-traverse | 1.0.0 | MIT | https://github.com/epoberezkin/json-schema-traverse |
@@ -180,7 +180,7 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | mtx-decompressor | 1.8.0 | MPL-2.0 | https://github.com/ChristopherVR/mtx-decompressor |
 | negotiator | 1.1.0 | MIT | https://github.com/jshttp/negotiator |
 | node-fetch | 2.7.0 | MIT | https://github.com/bitinn/node-fetch |
-| nodemailer | 10.5.0 | MIT-0 | https://github.com/nodemailer/nodemailer |
+| nodemailer | 10.6.1 | MIT-0 | https://github.com/nodemailer/nodemailer |
 | object-assign | 4.1.1 | MIT | https://github.com/sindresorhus/object-assign |
 | object-inspect | 1.13.4 | MIT | https://github.com/inspect-js/object-inspect |
 | on-exit-leak-free | 2.1.2 | MIT | https://github.com/mcollina/on-exit-or-gc |
@@ -226,8 +226,8 @@ SiteKeep Community is free software under the GNU Affero General Public License,
 | react | 18.3.1 | MIT | https://github.com/facebook/react/tree/HEAD/packages/react |
 | react-dom | 18.3.1 | MIT | https://github.com/facebook/react/tree/HEAD/packages/react-dom |
 | react-i18next | 17.0.16 | MIT | https://github.com/i18next/react-i18next |
-| react-router | 7.18.5 | MIT | https://github.com/remix-run/react-router/tree/HEAD/packages/react-router |
-| react-router-dom | 7.18.5 | MIT | https://github.com/remix-run/react-router/tree/HEAD/packages/react-router-dom |
+| react-router | 7.18.6 | MIT | https://github.com/remix-run/react-router/tree/HEAD/packages/react-router |
+| react-router-dom | 7.18.6 | MIT | https://github.com/remix-run/react-router/tree/HEAD/packages/react-router-dom |
 | readable-stream | 2.3.8 | MIT | https://github.com/nodejs/readable-stream |
 | real-require | 1.0.0 | MIT | https://github.com/pinojs/real-require |
 | regenerator-runtime | 0.13.11 | MIT | https://github.com/facebook/regenerator/tree/main/packages/runtime |
@@ -458,19 +458,19 @@ Packages with the same licence text share one copy of it; each package's copyrig
 - @babel/runtime@7.29.10: Copyright (c) 2014-present Sebastian McKenzie and other contributors
 - @fastify/accept-negotiator@2.1.0: Copyright (c) 2022-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/ajv-compiler@4.0.6: Copyright (c) 2022-present The Fastify team <https://github.com/fastify/fastify#team>
-- @fastify/cookie@11.1.3: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
+- @fastify/cookie@11.1.5: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/deepmerge@3.2.2: Copyright (c) 2022-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/error@4.2.0: Copyright (c) 2020 Fastify
 - @fastify/fast-json-stringify-compiler@5.1.0: Copyright (c) 2022-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/forwarded@3.0.2: Copyright (c) 2014-2017 Douglas Christopher Wilson; Copyright (c) 2021-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/merge-json-schemas@0.2.1: Copyright (c) 2024 Fastify
-- @fastify/multipart@10.1.3: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
+- @fastify/multipart@10.1.9: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/proxy-addr@5.1.1: Copyright (c) 2014-2016 Douglas Christopher Wilson; Copyright (c) 2021-present The Fastify team <https://github.com/fastify/fastify#team>
 - @fastify/send@4.2.1: Copyright (c) 2012 TJ Holowaychuk; Copyright (c) 2014-2022 Douglas Christopher Wilson; Copyright (c) 2023-present The Fastify team <https://github.com/fastify/fastify#team>
-- @fastify/static@10.1.10: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
+- @fastify/static@10.1.12: Copyright (c) 2017-present The Fastify team <https://github.com/fastify/fastify#team>
 - @hono/node-server@2.1.8: Copyright (c) 2022 - present, Yusuke Wada and Hono contributors
 - @lukeed/ms@2.0.2: Copyright (c) Luke Edwards <luke.edwards05@gmail.com> (lukeed.com)
-- @modelcontextprotocol/sdk@1.32.1: Copyright (c) 2024 Anthropic, PBC
+- @modelcontextprotocol/sdk@1.32.2: Copyright (c) 2024 Anthropic, PBC
 - @napi-rs/canvas@1.0.10: Copyright (c) 2020 lynweklm@gmail.com
 - @pdf-lib/standard-fonts@1.0.0: Copyright (c) 2018 Andrew Dillon
 - @pdf-lib/upng@1.0.1: Copyright (c) 2017 Photopea
@@ -527,8 +527,8 @@ Packages with the same licence text share one copy of it; each package's copyrig
 - process-warning@5.1.0: Copyright (c) 2020-present The Fastify team <https://github.com/fastify/fastify#team>
 - react@18.3.1: Copyright (c) Facebook, Inc. and its affiliates.
 - react-dom@18.3.1: Copyright (c) Facebook, Inc. and its affiliates.
-- react-router@7.18.5: Copyright (c) React Training LLC 2015-2019; Copyright (c) Remix Software Inc. 2020-2021; Copyright (c) Shopify Inc. 2022-2023
-- react-router-dom@7.18.5: Copyright (c) React Training LLC 2015-2019; Copyright (c) Remix Software Inc. 2020-2021; Copyright (c) Shopify Inc. 2022-2023
+- react-router@7.18.6: Copyright (c) React Training LLC 2015-2019; Copyright (c) Remix Software Inc. 2020-2021; Copyright (c) Shopify Inc. 2022-2023
+- react-router-dom@7.18.6: Copyright (c) React Training LLC 2015-2019; Copyright (c) Remix Software Inc. 2020-2021; Copyright (c) Shopify Inc. 2022-2023
 - regenerator-runtime@0.13.11: Copyright (c) 2014-present, Facebook, Inc.
 - ret@0.5.1: Copyright (C) 2011 by fent
 - safe-regex2@5.1.2: Copyright (c) 2019-present The Fastify team <https://github.com/fastify/fastify#team>
@@ -586,7 +586,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 - ee-first@1.1.1: Copyright (c) 2014 Jonathan Ong me@jongleberry.com
 - http-errors@2.0.1: Copyright (c) 2014 Jonathan Ong me@jongleberry.com; Copyright (c) 2016 Douglas Christopher Wilson doug@somethingdoug.com
 - i18next@26.4.2: Copyright (c) 2011-present i18next
-- jose@6.2.12: Copyright (c) 2018 Filip Skokan
+- jose@6.2.18: Copyright (c) 2018 Filip Skokan
 - js-tokens@4.0.0: Copyright (c) 2014, 2015, 2016, 2017, 2018 Simon Lydell
 - loose-envify@1.4.0: Copyright (c) 2015 Andres Suarez <zertosh@gmail.com>
 - mime@3.0.0: Copyright (c) 2010 Benjamin Thomas, Robert Kieffer
@@ -637,7 +637,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 - content-type@2.1.0: Copyright (c) 2015 Douglas Christopher Wilson
 - cookie@0.7.2: Copyright (c) 2012-2014 Roman Shtylman <shtylman@gmail.com>; Copyright (c) 2015 Douglas Christopher Wilson <doug@somethingdoug.com>
 - cookie@1.1.1: Copyright (c) 2012-2014 Roman Shtylman <shtylman@gmail.com>; Copyright (c) 2015 Douglas Christopher Wilson <doug@somethingdoug.com>
-- cookie@2.0.1: Copyright (c) 2012-2014 Roman Shtylman <shtylman@gmail.com>; Copyright (c) 2015 Douglas Christopher Wilson <doug@somethingdoug.com>
+- cookie@2.0.2: Copyright (c) 2012-2014 Roman Shtylman <shtylman@gmail.com>; Copyright (c) 2015 Douglas Christopher Wilson <doug@somethingdoug.com>
 - cookie-signature@1.2.2: Copyright (c) 2012–2024 LearnBoost <tj@learnboost.com> and other contributors;
 - cors@2.8.6: Copyright (c) 2013 Troy Goode <troygoode@gmail.com>
 - debug@4.4.3: Copyright (c) 2014-2017 TJ Holowaychuk <tj@vision-media.ca>; Copyright (c) 2018-2021 Josh Junon
@@ -1719,7 +1719,7 @@ THE SOFTWARE.
 
 ### 3.14 Apache-2.0 (2 packages)
 
-- @electric-sql/pglite@0.5.8
+- @electric-sql/pglite@0.5.17
 - pdfjs-dist@6.3.289
 
 ```text
@@ -3860,7 +3860,7 @@ software or this license, under any kind of legal claim._**
 
 MIT No Attribution (MIT-0) does not require keeping the copyright notice or the licence text; the package is listed for completeness.
 
-- nodemailer@10.5.0: Copyright (c) 2011-2023 Andris Reinman
+- nodemailer@10.6.1: Copyright (c) 2011-2023 Andris Reinman
 
 ```text
 Permission is hereby granted, free of charge, to any person obtaining a copy

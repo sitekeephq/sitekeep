@@ -89,14 +89,34 @@ export async function refreshSeats(db: Db): Promise<number> {
   return activeUsers;
 }
 
-/** Loads (or creates) the installation id and the stored licence. Called once at start (index.ts, tests). */
+/**
+ * The stored licence file as text. The licence is stored as a JSON string, but a JSON string that is itself JSON
+ * comes back from node-postgres already parsed (drizzle parses jsonb text once more), while PGlite returns the
+ * string. Both shapes give the same text: the signature covers only the `payload` string, which survives.
+ */
+export function storedLicenceText(raw: unknown): string | null {
+  if (raw === null || raw === undefined) return null;
+  return typeof raw === "string" ? raw : JSON.stringify(raw);
+}
+
+/** SITEKEEP_INSTALLATION_ID, written by the installation bundle (install.sh), when it has the expected shape. */
+export function presetInstallationId(env: string | undefined = process.env.SITEKEEP_INSTALLATION_ID): string | null {
+  const id = env?.trim();
+  return id && /^inst_[A-Za-z0-9_-]{8,64}$/.test(id) ? id : null;
+}
+
+/**
+ * Loads (or creates) the installation id and the stored licence. Called once at start (index.ts, tests). A new
+ * installation takes the id the installer printed (SITEKEEP_INSTALLATION_ID); once stored, the id never changes,
+ * because licences are bound to it.
+ */
 export async function initLicense(db: Db): Promise<void> {
   let installationId = await getSetting<string | null>(db, KEY_INSTALLATION, null);
   if (!installationId) {
-    installationId = `inst_${randomBytes(15).toString("base64url")}`;
+    installationId = presetInstallationId() ?? `inst_${randomBytes(15).toString("base64url")}`;
     await putSetting(db, KEY_INSTALLATION, installationId, null);
   }
-  const file = await getSetting<string | null>(db, KEY_FILE, null);
+  const file = storedLicenceText(await getSetting<unknown>(db, KEY_FILE, null));
   const maxSeenAt = Date.parse(await getSetting<string>(db, KEY_MAX_SEEN, new Date(0).toISOString())) || 0;
   const online = { ...NO_ONLINE, ...(await getSetting<Partial<LicenseOnlineState> | null>(db, KEY_ONLINE, null)) };
   state = { installationId, file, parsed: file ? parseLicense(file, { production: production() }) : null, maxSeenAt, online };

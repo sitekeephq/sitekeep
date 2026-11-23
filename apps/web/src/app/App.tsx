@@ -17,10 +17,8 @@ export function App() {
     );
   }
 
-  return (
-    <>
-      <AppRoutes user={user} />
-      {user?.mustChangePassword ? <ForcePasswordChange /> : null}
-    </>
-  );
+  // While the temporary password stands, the server answers only the change and sign-out routes
+  // (403 password_change_required), so the app behind the dialog is not mounted at all.
+  if (user?.mustChangePassword) return <ForcePasswordChange />;
+  return <AppRoutes user={user} />;
 }

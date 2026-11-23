@@ -80,7 +80,7 @@ describe("GET /admin/capacity", () => {
     expect(card.counts).toEqual({ registered: 2, active: 2 });
     expect(card.neededTier).toBe("trial");
     expect(card.lastRun).toBeNull();
-    expect(card.findings.find((f) => f.key === "test")).toMatchObject({ level: "warn", title: "Kapasite testi yapılmadı" });
+    expect(card.findings.find((f) => f.key === "test")).toMatchObject({ level: "ok", title: "Kapasite testi yapılmadı" });
     expect(card.loadTestEnabled).toBe(true);
   });
 });

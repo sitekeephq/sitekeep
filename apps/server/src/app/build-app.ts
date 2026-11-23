@@ -41,6 +41,7 @@ import { AskBridge } from "../core/platform/ask-bridge.js";
 import { coordinationRoutes } from "../coordination/routes/coordination.js";
 import { idsRoutes } from "../coordination/routes/ids.js";
 import { enforceTokenScope } from "../core/security/token-scope.js";
+import { enforcePasswordChange } from "../core/security/password-change.js";
 import { enforceProjectOpen } from "../closeout/closed.js";
 import { closeoutRoutes } from "../closeout/routes.js";
 import { portabilityRoutes } from "../portability/routes.js";
@@ -169,6 +170,8 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
       api.addHook("onRequest", async (req) => {
         const open = req.routeOptions.config && (req.routeOptions.config as { public?: boolean }).public;
         if (!open && !req.user) throw new HttpError(401, "unauthorized", msg("errors:unauthorized"));
+        // A temporary password must be changed first: until then only the change and sign-out routes answer.
+        if (!open) enforcePasswordChange(req);
         enforceTokenScope(req);
         // A closed project (close-out archive, ISO 19650-2 §5.8.1) refuses uploads and edits.
         await enforceProjectOpen(deps.db, req);
@@ -252,6 +255,9 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
 
   // Modules' routes outside /api/v1 (AI: the hosted MCP endpoint for Claude Code / Desktop, Cline…).
   for (const m of loadedModules) if (m.rootRoutes) await app.register(async (scope) => {
+    scope.addHook("onRequest", async (req) => {
+      if (!(req.routeOptions.config as { public?: boolean } | undefined)?.public) enforcePasswordChange(req);
+    });
     scope.addHook("onRequest", moduleGuard(m.id));
     await m.rootRoutes!(scope, deps);
   });

@@ -15,6 +15,7 @@ import {
   type CdeTransitionDto,
   type TemplateCdeSettings,
 } from "@sitekeep/shared";
+import { trimSlashes } from "@sitekeep/shared";
 import { z } from "zod";
 import type { Db } from "../db/index.js";
 import { cdeTransitions, folders, namingStandards, projectCdeSettings, workflowTemplates } from "../db/schema.js";
@@ -221,7 +222,7 @@ export async function applyTemplateCde(
   if (cde.enforceTransitions !== undefined) input.enforceTransitions = cde.enforceTransitions;
   if (cde.wipPolicy) input.wipPolicy = cde.wipPolicy;
   if (cde.adminSeesWip !== undefined) input.adminSeesWip = cde.adminSeesWip;
-  if (cde.archiveFolder) input.archiveFolderId = folderIds.get(cde.archiveFolder.replace(/^\/+|\/+$/g, "")) ?? null;
+  if (cde.archiveFolder) input.archiveFolderId = folderIds.get(trimSlashes(cde.archiveFolder)) ?? null;
   if (cde.containerStandard) input.containerStandardId = standardIds.get(cde.containerStandard) ?? null;
   if (cde.transitions) {
     // The template check refuses duplicates; anything still invalid is dropped, not fatal.

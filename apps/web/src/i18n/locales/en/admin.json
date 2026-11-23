@@ -84,7 +84,7 @@
   },
   "companies": {
     "title": "Companies",
-    "help": "The short code (2–8 letters/digits) is used in work item numbers ({Gönderen}, {Alıcı}) and as the company code in the new project wizard. If it is empty, the code in the number is derived from the company name. The address and e-mail are suggested as recipient details in formal letters.",
+    "help": "The short code (2–8 letters/digits) is used in work item numbers (as the sender and recipient code) and as the company code in the new project wizard. If it is empty, the code in the number is derived from the company name. The address and e-mail are suggested as recipient details in formal letters.",
     "columns": {
       "shortCode": "Short Code",
       "address": "Address",
@@ -312,8 +312,9 @@
       "databaseDetail": "{{kind}} · {{size}}",
       "databaseDown": "cannot connect",
       "licence": "Licence",
-      "monthsLeft_one": "{{count}} month left",
-      "monthsLeft_other": "{{count}} months left"
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "licenceLoading": "Loading…"
     },
     "resources": {
       "title": "Resources",

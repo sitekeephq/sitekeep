@@ -48,6 +48,12 @@ describe("seeded texts", () => {
     expect(shownFolderName("01-WIP (Çalışmada)", "rootChild", "en")).toBe("01-WIP");
     expect(shownFolderName("Yazılar", "other", "en")).toBe("Yazılar");
     expect(shownFolderName("Yazılar", "rootChild", "tr")).toBe("Yazılar");
+    // Written in English by an English creator: still the seeded default, shown in the reader's language.
+    expect(shownFolderName("Project Files", "root", "tr")).toBe("Proje Dosyaları");
+    expect(shownFolderName("Project Files", "root", "en")).toBe("Project Files");
+    expect(shownFolderName("01-WIP", "rootChild", "tr")).toBe("01-WIP (Çalışmada)");
+    expect(shownFolderName("Project Files", "rootChild", "tr")).toBe("Project Files");
+    expect(shownFolderName("Letters", "rootChild", "tr")).toBe("Letters");
   });
 
   it("labels the seeded options of built-in fields, values unchanged", () => {

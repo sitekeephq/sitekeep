@@ -312,8 +312,9 @@
       "databaseDetail": "{{kind}} · {{size}}",
       "databaseDown": "bağlanılamıyor",
       "licence": "Lisans",
-      "monthsLeft_one": "{{count}} ay kaldı",
-      "monthsLeft_other": "{{count}} ay kaldı"
+      "daysLeft_one": "{{count}} gün kaldı",
+      "daysLeft_other": "{{count}} gün kaldı",
+      "licenceLoading": "Yükleniyor…"
     },
     "resources": {
       "title": "Kaynaklar",

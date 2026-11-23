@@ -14,6 +14,7 @@
   "routeNotFound": "Bulunamadı.",
   "projectAdminRequired": "Bu işlem proje yöneticisi yetkisi gerektirir.",
   "passwordTooShort": "Şifre en az 10 karakter olmalı.",
+  "passwordChangeRequired": "Devam etmeden önce geçici şifrenizi değiştirmeniz gerekiyor.",
   "tokenScope": {
     "consentSessionOnly": "Uygulama onayı yalnız tarayıcı oturumundan verilir.",
     "sessionRequired": "Bu işlem tarayıcı oturumu gerektirir; API erişim anahtarıyla yapılamaz.",
