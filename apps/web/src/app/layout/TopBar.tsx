@@ -13,6 +13,7 @@ import { LanguageMenuItems, LanguageSwitcher } from "./LanguageSwitcher";
 import { LoadingIndicator } from "../../shared/ui/LoadingIndicator";
 import { usePhoneWidth } from "../../shared/ui/RecordCards";
 import { startProductTour } from "../../features/onboarding/tour";
+import { UpdateBadge } from "./UpdateBadge";
 
 /** Closes a popover on outside click or Escape. */
 function useDismiss(ref: RefObject<HTMLElement | null>, open: boolean, close: () => void) {
@@ -66,6 +67,7 @@ export function TopBar() {
         <Icon name="check" />
         <span>{t("topbar.myTasks")}</span>
       </NavLink>
+      <UpdateBadge />
       <NotificationBell />
       <AccountMenu />
     </header>

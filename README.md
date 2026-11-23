@@ -33,7 +33,7 @@ The user interface is available in English and Turkish.
 | Audit | Every write, view and download is recorded in an append-only, hash-chained audit log with CSV export |
 | Reports | A list per area (documents, issues, works, reviews …) with the viewer's permissions and CSV export; report dashboards (templates, AI, sharing, versions) come with the Enterprise Platform module |
 | Integrations | REST API (`/api/v1`), OpenCDE, a local stdio MCP server for AI assistants (`apps/mcp`), office-to-PDF conversion (Gotenberg, ONLYOFFICE, Collabora); a hosted MCP endpoint (`/mcp`) comes with the Enterprise AI module |
-| Privacy | The server sends nothing out on its own unless an administrator enables an integration (AI, e-mail, sign-in, Autodesk); every outbound connection is listed in the Privacy Centre, logged and can be switched off |
+| Privacy | The server sends nothing out on its own unless an administrator enables an integration (AI, e-mail, sign-in, Autodesk, the update check); every outbound connection is listed in the Privacy Centre, logged and can be switched off |
 
 ## Screenshots
 

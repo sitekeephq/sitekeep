@@ -69,7 +69,7 @@ export interface PrivacySummaryDto {
 }
 
 /** "auth": sign-in with Google; "module": a connection a module declared (registerPrivacyConnection). */
-export type PrivacyConnectionKind = "ai" | "smtp" | "office" | "auth" | "module" | "mcp" | "ai_queue" | "oauth" | "license";
+export type PrivacyConnectionKind = "ai" | "smtp" | "office" | "auth" | "module" | "mcp" | "ai_queue" | "oauth" | "license" | "updates";
 
 export interface PrivacyConnectionDto {
   /** "ai:<providerId>", "ai:env", "smtp", "office:editor", "office:converter", "google", a module's ("autodesk"), "mcp", "ai_queue", "oauth". */

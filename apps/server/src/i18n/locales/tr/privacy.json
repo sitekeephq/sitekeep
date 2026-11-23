@@ -65,7 +65,10 @@
     "comingSoon": "Yakında",
     "oidc": "{{name}} ile Giriş (OpenID Connect)",
     "oidcSends": "Sağlayıcının ayarlarını ve anahtarlarını okur, giriş kodunu değiştirir ve kimlik belirtecini doğrular (e-posta adresi, ad, gruplar); tarayıcı sağlayıcıya kendisi gider",
-    "oidcProviderOff": "Sağlayıcı Giriş Güvenliği altında kapalı"
+    "oidcProviderOff": "Sağlayıcı Giriş Güvenliği altında kapalı",
+    "updates": "Güncelleme Denetimi",
+    "updatesSends": "Günde bir kez GitHub'a son sürüm numarasını sorar; bu kurulum hakkında hiçbir şey gönderilmez (kurulum kimliği ve sayılar yok)",
+    "updatesNotUsed": "Kullanılmıyor: otomatik güncelleme denetimi kapalı (yönetici yine de \"Güncellemeleri denetle\" düğmesine basabilir)"
   },
   "csv": {
     "fileName": "giden-baglanti-kaydi.csv",

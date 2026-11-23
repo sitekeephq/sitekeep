@@ -89,6 +89,13 @@ const replyFileSchema = z.object({
   signature: z.string().min(1).max(200),
 });
 
+/** `latest` of a reply (licensing-online.md §5.3): a release number and, optionally, where to read about it. */
+const latestSchema = z.object({ version: z.string().min(1).max(40), url: z.string().max(500).nullable().optional() });
+export interface ReplyLatest {
+  version: string;
+  url: string | null;
+}
+
 const replyPayloadSchema = z.object({
   status: z.enum(["valid", "unchanged", "invalid"]),
   reason: z.string().max(64).nullable().default(null),
@@ -96,13 +103,23 @@ const replyPayloadSchema = z.object({
   installation: z.string().min(1).max(100),
   serverTime: z.iso.datetime().optional(),
   licence: fileSchema.nullable().default(null),
+  /**
+   * Optional (older services omit it): the newest release, so the installation can show "new version available".
+   * Read separately (readLatest): a malformed value is ignored, it never costs the licence answer.
+   */
+  latest: z.unknown().optional(),
 });
+
+function readLatest(raw: unknown): ReplyLatest | null {
+  const parsed = latestSchema.safeParse(raw);
+  return parsed.success ? { version: parsed.data.version, url: parsed.data.url ?? null } : null;
+}
 
 export type LicenceReply =
   /** `notice`: information next to a valid licence (`seats_exceeded_contract`). */
-  | { ok: true; status: "valid"; licence: string; notice: string | null; serverTime: string | null }
-  | { ok: true; status: "unchanged"; serverTime: string | null }
-  | { ok: true; status: "invalid"; reason: string; serverTime: string | null }
+  | { ok: true; status: "valid"; licence: string; notice: string | null; serverTime: string | null; latest: ReplyLatest | null }
+  | { ok: true; status: "unchanged"; serverTime: string | null; latest: ReplyLatest | null }
+  | { ok: true; status: "invalid"; reason: string; serverTime: string | null; latest: ReplyLatest | null }
   /** Not a trustworthy answer: treated as "unreachable", the stored licence stays. */
   | { ok: false; reason: "format" | "unknown_key" | "dev_key_in_production" | "signature" | "payload" | "mismatch" };
 
@@ -132,10 +149,11 @@ export function parseLicenceReply(text: string, expect: { nonce: string; install
   }
   if (payload.nonce !== expect.nonce || payload.installation !== expect.installation) return { ok: false, reason: "mismatch" };
   const serverTime = payload.serverTime ?? null;
+  const latest = readLatest(payload.latest);
   if (payload.status === "valid") {
     if (!payload.licence) return { ok: false, reason: "payload" };
-    return { ok: true, status: "valid", licence: JSON.stringify(payload.licence), notice: payload.reason, serverTime };
+    return { ok: true, status: "valid", licence: JSON.stringify(payload.licence), notice: payload.reason, serverTime, latest };
   }
-  if (payload.status === "unchanged") return { ok: true, status: "unchanged", serverTime };
-  return { ok: true, status: "invalid", reason: payload.reason ?? "rejected", serverTime };
+  if (payload.status === "unchanged") return { ok: true, status: "unchanged", serverTime, latest };
+  return { ok: true, status: "invalid", reason: payload.reason ?? "rejected", serverTime, latest };
 }

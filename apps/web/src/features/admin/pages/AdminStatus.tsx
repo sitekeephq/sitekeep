@@ -13,6 +13,7 @@ import { ConfirmDialog, Dialog } from "../../../shared/ui/Dialog";
 import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 import { CapacityCard } from "./AdminCapacity";
 import { licenseApi, type AdminLicenseDto } from "../../../shared/api/api-license";
+import { UpdatesPanel } from "./AdminUpdates";
 
 const LICENCE_TONE: Record<AdminLicenseDto["status"], string> = {
   none: "",
@@ -270,6 +271,8 @@ function StatusCards({
           <span className={`badge ${LEVEL_BADGE[data.level]}`}>{t(`systemStatus.badges.${data.level}`)}</span>
         </div>
       </div>
+
+      <UpdatesPanel />
 
       <div className="card">
         <h2>{t("systemStatus.health.title")}</h2>

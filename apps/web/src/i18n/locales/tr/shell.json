@@ -132,7 +132,10 @@
     "accountSettings": "Hesap ayarları",
     "systemAdmin": "Sistem yönetimi",
     "signOut": "Oturumu kapat",
-    "about": "SiteKeep Hakkında"
+    "about": "SiteKeep Hakkında",
+    "update": "Güncelleme var: {{version}}",
+    "updateTitle": "SiteKeep {{version}} yayında. Sistem Durumu'nu aç.",
+    "updateDismiss": "Güncelleme uyarısını kapat"
   },
   "projectShell": {
     "navLabel": "Proje navigasyonu",

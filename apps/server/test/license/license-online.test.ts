@@ -101,6 +101,17 @@ describe("signed reply", () => {
     expect(parseLicenceReply(reply({ status: "invalid", reason: "revoked" }), expectFor, { production: false })).toMatchObject({ ok: true, status: "invalid", reason: "revoked" });
   });
 
+  it("reads the optional `latest` release; replies without it still pass", () => {
+    const licence = signed("sitekeep-license", licencePayload({ installation: "inst_a" }));
+    const withLatest = parseLicenceReply(reply({ status: "valid", licence, latest: { version: "1.2.0", url: "https://github.com/sitekeephq/sitekeep/releases/tag/v1.2.0" } }), expectFor, { production: false });
+    expect(withLatest).toMatchObject({ ok: true, status: "valid", latest: { version: "1.2.0", url: "https://github.com/sitekeephq/sitekeep/releases/tag/v1.2.0" } });
+    expect(parseLicenceReply(reply({ status: "unchanged", latest: { version: "1.2.0" } }), expectFor, { production: false })).toMatchObject({ ok: true, latest: { version: "1.2.0", url: null } });
+    expect(parseLicenceReply(reply({ status: "valid", licence }), expectFor, { production: false })).toMatchObject({ ok: true, status: "valid", latest: null });
+    // A malformed `latest` is ignored: the licence answer itself still counts.
+    expect(parseLicenceReply(reply({ status: "unchanged", latest: "1.2.0" }), expectFor, { production: false })).toMatchObject({ ok: true, status: "unchanged", latest: null });
+    expect(parseLicenceReply(reply({ status: "unchanged", latest: { url: "x" } }), expectFor, { production: false })).toMatchObject({ ok: true, latest: null });
+  });
+
   it("refuses replies for another request or installation, unsigned, changed or with an unknown key", () => {
     expect(parseLicenceReply(reply({ status: "unchanged", nonce: "other" }), expectFor, { production: false })).toEqual({ ok: false, reason: "mismatch" });
     expect(parseLicenceReply(reply({ status: "unchanged", installation: "inst_b" }), expectFor, { production: false })).toEqual({ ok: false, reason: "mismatch" });
@@ -158,6 +169,8 @@ class FakeService {
   failWith: number | null = null;
   /** Sign the reply for another nonce (replay). */
   wrongNonce = false;
+  /** Sent as `latest` in every reply (the optional release number, licensing-online.md §5.3). */
+  latest: { version: string; url?: string | null } | null = null;
   server!: Server;
   url = "";
 
@@ -179,6 +192,7 @@ class FakeService {
           nonce: this.wrongNonce ? "replayed" : body.nonce,
           installation: body.installation,
           serverTime: new Date().toISOString(),
+          ...(this.latest && { latest: this.latest }),
         });
         res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(reply));
       });
@@ -369,6 +383,22 @@ describe("Administration → Licence online", () => {
     expect(await call("POST", "/admin/license/refresh")).toMatchObject({ status: 502, body: { error: "license_unreachable" } });
     expect(service.requests.length).toBe(before);
     expect((await call("PUT", "/admin/privacy/connections/license", { enabled: true })).status).toBe(200);
+  });
+
+  it("the licence reply's `latest` becomes the known newest release (source licence); a lower or pre-release number changes nothing", async () => {
+    expect((await call("GET", "/admin/updates")).body).toMatchObject({ latest: null, updateAvailable: false, enabled: false });
+    service.latest = { version: "v9.1.0", url: "https://github.com/sitekeephq/sitekeep/releases/tag/v9.1.0" };
+    await call("POST", "/admin/license/refresh");
+    // "v9.1.0" is not a bare number: kept as 9.1.0.
+    expect((await call("GET", "/admin/updates")).body).toMatchObject({ latest: { version: "9.1.0", source: "licence", url: "https://github.com/sitekeephq/sitekeep/releases/tag/v9.1.0" } });
+    service.latest = { version: "9.2.0-rc1" };
+    await call("POST", "/admin/license/refresh");
+    service.latest = { version: "9.0.5" };
+    await call("POST", "/admin/license/refresh");
+    expect((await call("GET", "/admin/updates")).body.latest).toMatchObject({ version: "9.1.0" });
+    service.latest = null;
+    await call("POST", "/admin/license/refresh");
+    expect((await call("GET", "/admin/updates")).body.latest).toMatchObject({ version: "9.1.0" });
   });
 
   it("a licence file uploaded by hand ends online refresh; removing the licence clears the online state", async () => {

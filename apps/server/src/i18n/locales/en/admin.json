@@ -179,5 +179,10 @@
       "subject": "[SiteKeep] Security alert: {{title}}",
       "body": "SiteKeep raised a security alert.\n\n{{title}}\n{{body}}\nTime (UTC): {{time}}\n\nThe details, the person concerned and the client IP address are in Administration → Security Log. This message contains no personal data.\n\nIf this may be a personal data breach: under the GDPR (Art. 33) the supervisory authority must be notified within 72 hours of becoming aware of it, and the KVKK (Art. 12) also requires prompt notification of the Board.\n"
     }
+  },
+  "updates": {
+    "adminOnly": "Only system administrators manage update checks.",
+    "invalid": "Nothing to change: send enabled and/or promptDismissed.",
+    "unreachable": "The latest release number could not be fetched. Check the network connection and try again."
   }
 }

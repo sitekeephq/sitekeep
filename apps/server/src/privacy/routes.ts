@@ -42,6 +42,8 @@ import { getOidcProviders } from "../auth/oidc-settings.js";
 import { GOOGLE_HOSTS } from "../auth/google-connection.js";
 import { LICENSE_CONNECTION, licensingUrls } from "../license/online.js";
 import { onlineState } from "../license/state.js";
+import { UPDATES_CONNECTION, updateUrl } from "../updates/check.js";
+import { getUpdateState } from "../updates/state.js";
 import { DEFAULT_LANGUAGE, msg, render, requestLanguage, tFor, tReq } from "../i18n/index.js";
 import { connectionDisabled, killSwitchOn, privacyState, savePrivacySettings, setConnectionEnabled, setKillSwitch } from "./settings.js";
 
@@ -263,6 +265,20 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       toggleable: true,
       lastUsedAt: last.get(LICENSE_CONNECTION) ?? null,
       notes: [t(online.activated ? "privacy:connections.licenseSends" : "privacy:connections.licenseNotUsed")],
+    });
+
+    // New-version notice (updates/check.ts): one GET a day while an administrator has it on, or when "Check for updates" is pressed.
+    const updates = await getUpdateState(db);
+    out.push({
+      id: UPDATES_CONNECTION,
+      kind: "updates",
+      name: t("privacy:connections.updates"),
+      host: hostOf(updateUrl()),
+      location: loc(updateUrl()),
+      enabled: !connectionDisabled(UPDATES_CONNECTION),
+      toggleable: true,
+      lastUsedAt: last.get(UPDATES_CONNECTION) ?? null,
+      notes: [t(updates.enabled ? "privacy:connections.updatesSends" : "privacy:connections.updatesNotUsed")],
     });
 
     // One connection per OpenID Connect provider (Administration → Sign-in Security, auth/oidc.ts).

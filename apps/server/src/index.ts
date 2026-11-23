@@ -19,6 +19,7 @@ import { LocalStorage } from "./core/platform/storage.js";
 import { mailerFromEnv } from "./works/letter.js";
 import { startRetention } from "./privacy/retention.js";
 import { startLicenseRefresh } from "./license/online.js";
+import { startUpdateCheck } from "./updates/check.js";
 import { startSecurityAlerts } from "./audit/security-alerts.js";
 import { SignInSecurity } from "./auth/sign-in-security.js";
 import { startCloseoutCleanup } from "./closeout/build.js";
@@ -143,6 +144,8 @@ const stopRetention = startRetention(db, storage, { log: (m, e) => console.error
 // Online licence (docs/onprem/licensing-online.md): once a day the licence is refreshed from the licensing
 // service when it was activated online; off with the kill switch or the "Licence Activation" connection.
 const stopLicenseRefresh = startLicenseRefresh(db, { log: (m, e) => console.error(m, e) });
+// New-version notice (docs/features/PRIVACY.md → Update Check): once a day, only when an administrator turned it on.
+const stopUpdateCheck = startUpdateCheck(db, { log: (m, e) => console.error(m, e) });
 // Security alerts (docs/features/SECURITY_LOG.md#alerts): the audit log is scanned every minute
 // against the alert rules, the hash chain is checked daily; new alerts optionally go out by e-mail.
 const stopSecurityAlerts = startSecurityAlerts({ db, mailer, log: (m, e) => console.error(m, e) });
@@ -169,6 +172,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
     stopReminders();
     stopRetention();
     stopLicenseRefresh();
+    stopUpdateCheck();
     stopSecurityAlerts();
     stopCloseoutCleanup();
     stopPortabilityCleanup();

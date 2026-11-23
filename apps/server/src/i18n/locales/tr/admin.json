@@ -179,5 +179,10 @@
       "subject": "[SiteKeep] Güvenlik uyarısı: {{title}}",
       "body": "SiteKeep bir güvenlik uyarısı verdi.\n\n{{title}}\n{{body}}\nZaman (UTC): {{time}}\n\nAyrıntılar, ilgili kişi ve istemci IP adresi Yönetim → Güvenlik Kaydı ekranındadır. Bu ileti kişisel veri içermez.\n\nBu bir kişisel veri ihlali olabilirse: GDPR (m.33) denetim makamına ihlalin öğrenilmesinden sonra 72 saat içinde bildirim ister; KVKK (m.12) de Kurul'a en kısa sürede bildirim yapılmasını ister.\n"
     }
+  },
+  "updates": {
+    "adminOnly": "Güncelleme denetimini yalnız sistem yöneticileri yönetir.",
+    "invalid": "Değişecek bir şey yok: enabled ve/veya promptDismissed gönderin.",
+    "unreachable": "Son sürüm numarası alınamadı. Ağ bağlantısını denetleyip yeniden deneyin."
   }
 }

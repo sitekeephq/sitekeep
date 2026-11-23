@@ -132,7 +132,10 @@
     "accountSettings": "Account Settings",
     "systemAdmin": "System Administration",
     "signOut": "Sign Out",
-    "about": "About SiteKeep"
+    "about": "About SiteKeep",
+    "update": "Update available: {{version}}",
+    "updateTitle": "SiteKeep {{version}} is available. Open System Status.",
+    "updateDismiss": "Dismiss update notice"
   },
   "projectShell": {
     "navLabel": "Project navigation",

@@ -65,7 +65,10 @@
     "comingSoon": "Coming soon",
     "oidc": "Sign-in with {{name}} (OpenID Connect)",
     "oidcSends": "Reads the provider's settings and keys, exchanges the sign-in code and checks the ID token (e-mail address, name, groups); the browser itself goes to the provider",
-    "oidcProviderOff": "Provider turned off under Sign-in Security"
+    "oidcProviderOff": "Provider turned off under Sign-in Security",
+    "updates": "Update Check",
+    "updatesSends": "Asks GitHub once a day for the number of the latest release; nothing about this installation is sent (no installation id, no counts)",
+    "updatesNotUsed": "Not used: the automatic update check is off (an administrator can still press \"Check for updates\")"
   },
   "csv": {
     "fileName": "outbound-connection-log.csv",

@@ -59,6 +59,10 @@ const child = spawn(process.execPath, [serverEntry], {
     GOOGLE_CALLBACK_URL: `http://127.0.0.1:${port}/api/v1/auth/google/callback`,
     AUTODESK_CLIENT_ID: "",
     AUTODESK_CALLBACK_URL: "",
+    // A release build, so the update notice has something to compare; the "GitHub" it asks is the stand-in the
+    // update spec starts on the next port (e2e/specs/update-notice.spec.ts). Nothing asks it unless an administrator turns the check on.
+    SITEKEEP_VERSION: "1.0.1",
+    SITEKEEP_UPDATE_URL: `http://127.0.0.1:${Number(port) + 1}/repos/sitekeephq/sitekeep/releases/latest`,
     CDE_SMTP_URL: "",
     CDE_SMTP_FROM: "",
     // Kapasite sample engine: a load test plays in a few seconds instead of ~30.

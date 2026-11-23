@@ -1188,5 +1188,42 @@
       "trustUnverifiedEmail": "Off: the address must be verified by the provider (email_verified). Turn on only for a provider whose addresses the organisation itself assigns.",
       "trustProviderMfa": "On: when the provider reports a multi-factor sign-in (amr), SiteKeep does not ask for its own two-factor code. Off: two-factor applies as after a password."
     }
+  },
+  "updates": {
+    "title": "New Versions",
+    "running": "Running version",
+    "development": "Development build",
+    "latest": "Latest release",
+    "unknown": "Not known yet",
+    "fromGithub": "(from GitHub)",
+    "fromLicence": "(from the licensing service)",
+    "lastCheck": "Last check",
+    "never": "Never",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "automatic": "Automatic check",
+    "automaticLabel": "Check for new versions once a day",
+    "privacy": "Once a day SiteKeep asks GitHub for the latest release number. Nothing about your installation is sent. Administration → Privacy Centre lists and can stop this connection.",
+    "check": "Check for updates",
+    "upToDate": "You are up to date.",
+    "devBuild": "This is a development build, so no update is offered.",
+    "nothingFound": "No release was found.",
+    "prompt": {
+      "title": "Check for new versions automatically?",
+      "text": "Once a day SiteKeep asks GitHub for the latest release number; nothing about your installation is sent. You can turn it off any time.",
+      "turnOn": "Turn on",
+      "notNow": "Not now"
+    },
+    "available": {
+      "title": "SiteKeep {{latest}} is available — you have {{current}}",
+      "published": "Released {{date}}.",
+      "notes": "Release notes",
+      "how": "To update:",
+      "bundle": "Installation package:",
+      "bundleDir": "new bundle directory",
+      "compose": "Docker Compose: set the new version in .env, then",
+      "docs": "guide",
+      "backup": "Take a backup before updating; database migrations run automatically at startup."
+    }
   }
 }

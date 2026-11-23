@@ -151,6 +151,17 @@ and `/var/lib/docker` are covered, and encrypt each copy of a backup that leaves
 --symmetric`, `age`, restic). `config/app.env` holds `CDE_SECRET_KEY`: keep an encrypted copy apart
 from the backups. Details: [encryption at rest](docker-compose.md#encryption-at-rest).
 
+### Knowing about new releases
+
+SiteKeep can tell administrators when a newer release exists: a notice on Administration → System Status and a small badge in the
+top bar (administrators only). It is **off by default**, because the server sends nothing out on its own. System Status offers it once
+("Check for new versions automatically?", **Turn on** / **Not now**); when on, SiteKeep asks GitHub once a day for the latest release
+number and nothing else (no installation ID, no counts). **Check for updates** on the same page asks once, even while the daily check
+is off. Both go through the [Privacy Centre](../features/PRIVACY.md) (connection `updates`: it can be switched off, and the kill switch
+stops it). In a closed network, `SITEKEEP_UPDATE_URL` in `/opt/sitekeep/.env` can point to an internal mirror of that GitHub reply, or leave it off
+and watch the releases page yourself. A development build (no `SITEKEEP_VERSION`) never claims an update. When a release is
+announced, update with `sudo sitekeep upgrade <bundle directory>` (§4).
+
 ## 5. Smoke test
 
 ```bash

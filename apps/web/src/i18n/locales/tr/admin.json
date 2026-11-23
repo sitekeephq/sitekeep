@@ -1188,5 +1188,42 @@
       "trustUnverifiedEmail": "Kapalı: adres sağlayıcı tarafından doğrulanmış olmalı (email_verified). Yalnız adresleri kurumun kendisinin verdiği bir sağlayıcı için açın.",
       "trustProviderMfa": "Açık: sağlayıcı çok adımlı giriş bildirirse (amr) SiteKeep kendi iki adımlı doğrulama kodunu sormaz. Kapalı: iki adımlı doğrulama, şifreyle girişteki gibi uygulanır."
     }
+  },
+  "updates": {
+    "title": "Yeni Sürümler",
+    "running": "Çalışan sürüm",
+    "development": "Geliştirme sürümü",
+    "latest": "Son sürüm",
+    "unknown": "Henüz bilinmiyor",
+    "fromGithub": "(GitHub'dan)",
+    "fromLicence": "(lisans hizmetinden)",
+    "lastCheck": "Son denetim",
+    "never": "Hiç",
+    "succeeded": "Başarılı",
+    "failed": "Başarısız",
+    "automatic": "Otomatik denetim",
+    "automaticLabel": "Yeni sürümleri günde bir kez denetle",
+    "privacy": "SiteKeep günde bir kez GitHub'a son sürüm numarasını sorar. Kurulumunuz hakkında hiçbir şey gönderilmez. Yönetim → Gizlilik Merkezi bu bağlantıyı listeler ve durdurabilir.",
+    "check": "Güncellemeleri denetle",
+    "upToDate": "SiteKeep güncel.",
+    "devBuild": "Bu bir geliştirme sürümü, güncelleme önerilmez.",
+    "nothingFound": "Hiçbir sürüm bulunamadı.",
+    "prompt": {
+      "title": "Yeni sürümler otomatik denetlensin mi?",
+      "text": "SiteKeep günde bir kez GitHub'a son sürüm numarasını sorar; kurulumunuz hakkında hiçbir şey gönderilmez. İstediğiniz zaman kapatabilirsiniz.",
+      "turnOn": "Aç",
+      "notNow": "Şimdi değil"
+    },
+    "available": {
+      "title": "SiteKeep {{latest}} yayında — sizde {{current}} var",
+      "published": "Yayın tarihi: {{date}}.",
+      "notes": "Sürüm notları",
+      "how": "Güncellemek için:",
+      "bundle": "Kurulum paketi:",
+      "bundleDir": "yeni paket klasörü",
+      "compose": "Docker Compose: .env içinde yeni sürümü yazın, sonra",
+      "docs": "kılavuz",
+      "backup": "Güncellemeden önce yedek alın; veritabanı geçişleri başlangıçta kendiliğinden çalışır."
+    }
   }
 }

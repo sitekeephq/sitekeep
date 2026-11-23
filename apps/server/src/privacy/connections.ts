@@ -37,7 +37,7 @@ export interface RegisteredPrivacyConnection extends PrivacyConnectionDef {
 }
 
 /** Connection ids the core uses itself (listed by privacy/routes.ts with their live configuration). */
-export const CORE_CONNECTIONS = ["ai:env", "smtp", "office:editor", "office:converter", "google", "license"] as const;
+export const CORE_CONNECTIONS = ["ai:env", "smtp", "office:editor", "office:converter", "google", "license", "updates"] as const;
 
 /** "ai:<providerId>": one per AI provider configured under Administration → AI (listed per provider). */
 export const AI_PROVIDER_CONNECTION = /^ai:[^:]+$/;

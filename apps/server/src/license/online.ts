@@ -12,6 +12,7 @@ import os from "node:os";
 import type { Db } from "../db/index.js";
 import { appVersion } from "../app/about.js";
 import { outboundFetch, outboundRefusal } from "../privacy/outbound.js";
+import { noteLatest } from "../updates/state.js";
 import { parseLicenceReply, type LicenceReply } from "./format.js";
 import {
   installationId,
@@ -63,6 +64,16 @@ function hardwareHints(): string[] {
 
 /** The service could not give a trustworthy answer (network, HTTP status, signature, nonce): keep everything. */
 export class LicensingUnreachable extends Error {}
+
+/** The reply's optional `latest` is kept as the newest known release (updates/state.ts): the notice needs no GitHub call. */
+async function noteReplyLatest(db: Db, reply: Extract<LicenceReply, { ok: true }>): Promise<void> {
+  if (reply.status === "invalid" || !reply.latest) return;
+  try {
+    await noteLatest(db, { version: reply.latest.version, url: reply.latest.url }, "licence");
+  } catch {
+    // Never let the notice break a licence call.
+  }
+}
 
 /** POSTs to each URL in turn until one gives a signed reply for this request. */
 async function call(route: "activate" | "refresh", body: Record<string, unknown>, nonce: string): Promise<Extract<LicenceReply, { ok: true }>> {
@@ -135,6 +146,7 @@ export async function activateLicense(db: Db, rawKey: string, userId: string, no
     await saveOnlineState(db, { lastCheckAt: at, lastResult: "unreachable", lastReason: null }, userId);
     return { ok: false, kind: "unreachable", detail };
   }
+  await noteReplyLatest(db, reply);
   if (reply.status !== "valid") {
     const reason = reply.status === "invalid" ? reply.reason : "rejected";
     await saveOnlineState(db, { lastCheckAt: at, lastResult: "invalid", lastReason: reason }, userId);
@@ -168,6 +180,7 @@ export async function refreshLicense(db: Db, userId: string | null = null, now =
     await saveOnlineState(db, { lastCheckAt: at, lastResult: "unreachable" }, userId);
     return { ok: false, kind: "unreachable", detail: err instanceof Error ? err.message : String(err) };
   }
+  await noteReplyLatest(db, reply);
   if (reply.status === "invalid") {
     const before = onlineState();
     await saveOnlineState(db, { lastCheckAt: at, lastResult: "invalid", lastReason: reply.reason, revokedAt: before.revokedAt ?? at }, userId);

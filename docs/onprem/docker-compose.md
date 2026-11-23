@@ -103,6 +103,15 @@ docker compose pull && docker compose up -d
 
 Database migrations run automatically at startup. Take a backup before updating.
 
+### Knowing about new releases
+
+Administration → System Status can tell administrators when a newer release exists (a notice, and a badge in the top bar). It is
+**off by default**, because the server sends nothing out on its own: System Status offers it once ("Check for new versions
+automatically?"), and when on, SiteKeep asks GitHub once a day for the latest release number and nothing else (no installation ID,
+no counts). **Check for updates** asks once, even while the daily check is off. Both go through the
+[Privacy Centre](../features/PRIVACY.md) (connection `updates`; the connection switch and the kill switch stop it).
+`SITEKEEP_UPDATE_URL` points the check at an internal mirror in a closed network. To update, follow the two lines above.
+
 ## Backup
 
 ```bash

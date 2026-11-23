@@ -77,6 +77,7 @@ import { killSwitchOn, loadPrivacyState, refreshPrivacyState } from "../privacy/
 import { loadedModules } from "./modules.js";
 import { initLicense, moduleReadOnly } from "../license/state.js";
 import { licenseRoutes } from "../license/routes.js";
+import { updateRoutes } from "../updates/routes.js";
 import { editionName, moduleIds } from "./module-ids.js";
 import { aboutRoutes, sourceInfo } from "./about.js";
 import { worksCapabilities } from "../works/capabilities.js";
@@ -216,6 +217,7 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
         await m.routes!(scope, deps);
       });
       await licenseRoutes(api, deps);
+      await updateRoutes(api, deps);
       await coordinationRoutes(api, deps);
       await idsRoutes(api, deps);
       await docIntelRoutes(api, deps);

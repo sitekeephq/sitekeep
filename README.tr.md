@@ -34,7 +34,7 @@ Arayüz İngilizce ve Türkçedir.
 | Denetim | Her yazma, görüntüleme ve indirme değiştirilemez, zincirlenmiş denetim kaydına yazılır; CSV dışa aktarma |
 | Raporlar | Her alan için (dokümanlar, sorunlar, işler, onaylar …) görenin yetkileriyle liste ve CSV; rapor panoları (şablonlar, yapay zekâ, paylaşım, versiyonlar) Enterprise Platform modülüyle gelir |
 | Entegrasyonlar | REST API (`/api/v1`), OpenCDE, yapay zekâ asistanları için yerel stdio MCP sunucusu (`apps/mcp`), ofis → PDF dönüşümü (Gotenberg, ONLYOFFICE, Collabora); sunucuda MCP ucu (`/mcp`) Enterprise AI modülüyle gelir |
-| Gizlilik | Bir yönetici bir entegrasyonu (yapay zekâ, e-posta, giriş, Autodesk) açmadıkça sunucu kendiliğinden dışarıya hiçbir şey göndermez; her dış bağlantı Gizlilik Merkezi'nde listelenir, kaydedilir ve kapatılabilir |
+| Gizlilik | Bir yönetici bir entegrasyonu (yapay zekâ, e-posta, giriş, Autodesk, güncelleme denetimi) açmadıkça sunucu kendiliğinden dışarıya hiçbir şey göndermez; her dış bağlantı Gizlilik Merkezi'nde listelenir, kaydedilir ve kapatılabilir |
 
 ## Ekran görüntüleri
 

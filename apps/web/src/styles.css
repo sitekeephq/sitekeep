@@ -362,6 +362,10 @@ button.topbar-link { border: 0; background: transparent; color: var(--topbar-mut
 .menu-profile strong { font-size: 14px; }
 .menu-profile span:not(.account-avatar) { overflow: hidden; color: var(--muted); font-size: 12px; text-overflow: ellipsis; }
 
+.topbar-update { display: inline-flex; align-items: center; gap: 2px; margin-right: 4px; white-space: nowrap; }
+.topbar-update .badge { text-decoration: none; }
+.topbar-update-close { border: 0; background: transparent; color: var(--muted); font-size: 16px; line-height: 1; padding: 2px 4px; cursor: pointer; }
+.topbar-update-close:hover { color: var(--text); }
 @media (max-width: 1000px) {
   .topbar-link span, .topbar-switcher-label { display: none; }
   .topbar-switcher { max-width: 200px; }
@@ -371,6 +375,8 @@ button.topbar-link { border: 0; background: transparent; color: var(--topbar-mut
   .topbar { padding: 0 8px; }
   /* No room on phones: the tour moves into the account menu. */
   .topbar .topbar-tour { display: none; }
+  /* The update badge stays on System Status; the phone top bar has no room for it. */
+  .topbar .topbar-update { display: none; }
   .topbar .menu-item.menu-item-tour { display: flex; }
   .brand span, .topbar-sep, .topbar-search kbd { display: none; }
   .topbar-search { position: relative; flex: 0 0 34px; min-width: 34px; margin-left: 0; overflow: hidden; }
