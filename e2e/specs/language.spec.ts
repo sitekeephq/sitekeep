@@ -32,7 +32,9 @@ test("English by default, switches to Turkish from the top bar and remembers it"
   await page.reload();
   await expect(page.getByRole("link", { name: "My Tasks" })).toBeVisible();
 
-  // Sign out and in again: the profile keeps the choice (QA 1.0.1).
+  // Sign out and in again: the profile keeps the choice (QA 1.0.1). Requests of the files page that are
+  // still in flight when the session ends answer 401; that is the sign-out, not an error.
+  allowApiFailure(401, new RegExp(`^/api/v1/projects/${project.id}/`));
   await page.locator("button.topbar-account").click();
   await page.getByRole("menuitem", { name: "Sign Out" }).click();
   await expect(page.getByRole("heading", { name: "Sign In to Your Account" })).toBeVisible();

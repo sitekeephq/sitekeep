@@ -28,6 +28,11 @@ describe("reasoning blocks", () => {
     expect(fast(() => stripThinking(bad + "tail"))).toBe("");
     expect(() => fast(() => extractJson(bad))).toThrow(/JSON/);
   });
+  it("extractJson reads a fenced answer and is fast on many fences without a closer", () => {
+    expect(extractJson('Here:\n```json\n{"x":3}\n```')).toEqual({ x: 3 });
+    expect(extractJson('```\n{"x":4}\n``` trailing')).toEqual({ x: 4 });
+    expect(() => fast(() => extractJson("```json".repeat(N) + " no object"))).toThrow(/JSON/);
+  });
 });
 
 describe("storey question", () => {

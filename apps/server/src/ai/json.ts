@@ -8,14 +8,26 @@ import { removeThinkBlocks } from "./think.js";
 
 /** Removes Qwen3-style reasoning blocks before the answer is parsed. */
 function withoutReasoning(text: string): string {
-  return removeThinkBlocks(text, true, false).replace(/^[\s\S]*?<\/think>/i, "").trim();
+  const rest = removeThinkBlocks(text, true, false);
+  // A closer without an opener: the model's reasoning started before the answer we were given.
+  const close = rest.search(/<\/think>/i);
+  return (close >= 0 ? rest.slice(close + "</think>".length) : rest).trim();
+}
+
+/** The text between the first ``` fence (optionally ```json) and the next one; linear (literal searches only). */
+function fencedBlock(text: string): string | null {
+  const open = text.indexOf("```");
+  if (open < 0) return null;
+  let from = open + 3;
+  if (text.slice(from, from + 4).toLowerCase() === "json") from += 4;
+  const close = text.indexOf("```", from);
+  return close < 0 ? null : text.slice(from, close).trim();
 }
 
 /** The first JSON object in a model answer (handles ``` fences and surrounding prose). */
 export function extractJson(text: string): unknown {
   const clean = withoutReasoning(text);
-  const fenced = /```(?:json)?\s*([\s\S]*?)```/i.exec(clean);
-  const candidates = [clean, fenced?.[1] ?? ""];
+  const candidates = [clean, fencedBlock(clean) ?? ""];
   const start = clean.indexOf("{");
   const end = clean.lastIndexOf("}");
   if (start >= 0 && end > start) candidates.push(clean.slice(start, end + 1));
