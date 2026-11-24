@@ -37,11 +37,21 @@ export async function verifyNoPassword(password: string): Promise<false> {
 
 /**
  * Prefixed random secret: s = session, api = API token, oauth / refresh / code = OAuth access token,
- * refresh token and authorization code, secret = OAuth client secret, invite = invitation link. The "7dcde_" prefix lets the
- * logs redact every kind (error-ring.ts).
+ * refresh token and authorization code, secret = OAuth client secret, invite = invitation link. The "sitekeep_" prefix lets the
+ * logs redact every kind (error-ring.ts) and secret scanners recognise a leaked key. Secrets issued before 1.0.2 carry the old
+ * "7dcde_" prefix; they keep working (only their hash is stored and compared), see LEGACY_TOKEN_PREFIX.
  */
+export const TOKEN_PREFIX = "sitekeep_";
+/** Prefix of the secrets issued before 1.0.2 (the product's former name); still accepted everywhere. */
+export const LEGACY_TOKEN_PREFIX = "7dcde_";
+
+/** Whether `token` carries one of SiteKeep's secret prefixes for `kind`, the current or the legacy one. */
+export function hasTokenPrefix(token: string, kind: "s" | "api" | "oauth" | "refresh" | "code" | "secret" | "invite"): boolean {
+  return token.startsWith(`${TOKEN_PREFIX}${kind}_`) || token.startsWith(`${LEGACY_TOKEN_PREFIX}${kind}_`);
+}
+
 export function newToken(prefix: "s" | "api" | "oauth" | "refresh" | "code" | "secret" | "invite"): string {
-  return `7dcde_${prefix}_${randomBytes(32).toString("base64url")}`;
+  return `${TOKEN_PREFIX}${prefix}_${randomBytes(32).toString("base64url")}`;
 }
 
 export function hashToken(token: string): string {

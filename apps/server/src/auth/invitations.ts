@@ -25,7 +25,7 @@ import { linkProjectCompanies } from "../projects/companies.js";
 import { getSetting, putSetting } from "../ai/settings.js";
 import { audit, type AuditEvent } from "../core/platform/audit.js";
 import { HttpError } from "../core/platform/http.js";
-import { hashPassword, hashToken, newToken } from "../core/security/auth.js";
+import { hashPassword, hashToken, hasTokenPrefix, newToken } from "../core/security/auth.js";
 import { ensureDefaultProjectRoles } from "../core/security/default-roles.js";
 import { joinCompanyTeam } from "../cde/teams.js";
 import { refreshSeats } from "../license/state.js";
@@ -291,7 +291,7 @@ export async function findOpenInvitation(
   db: Db,
   token: string,
 ): Promise<{ ok: true; invitation: InvitationRow; user: UserRow } | { ok: false; problem: InvitationProblem }> {
-  if (!token.startsWith("7dcde_invite_") || token.length > 200) return { ok: false, problem: "invitation_invalid" };
+  if (!hasTokenPrefix(token, "invite") || token.length > 200) return { ok: false, problem: "invitation_invalid" };
   const [row] = await db
     .select({ invitation: invitations, user: users })
     .from(invitations)

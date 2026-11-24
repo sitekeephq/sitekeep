@@ -354,7 +354,7 @@ describe("Yönetim → OAuth Uygulamaları", () => {
       scopes: ["read", "documents"],
     });
     expect(conf.status).toBe(200);
-    expect(conf.body.clientSecret).toMatch(/^7dcde_secret_/);
+    expect(conf.body.clientSecret).toMatch(/^sitekeep_secret_/);
     expect(conf.body.client.redirectUris).toEqual([PORTAL_CB]);
     portal = { id: conf.body.client.id, clientId: conf.body.client.clientId, secret: conf.body.clientSecret };
 
@@ -391,7 +391,7 @@ describe("Yönetim → OAuth Uygulamaları", () => {
     expect(patched.status).toBe(200);
     expect(patched.body).toMatchObject({ name: "Geçici 2", scopes: ["bcf", "read"], redirectUris: ["https://t.test/cb2"] });
     const rotated = await admin.post(`/admin/oauth-clients/${id}/secret`);
-    expect(rotated.body.clientSecret).toMatch(/^7dcde_secret_/);
+    expect(rotated.body.clientSecret).toMatch(/^sitekeep_secret_/);
     expect(rotated.body.clientSecret).not.toBe(temp.body.clientSecret);
     expect((await admin.post(`/admin/oauth-clients/${solibri.id}/secret`)).status).toBe(400);
     expect((await admin.del(`/admin/oauth-clients/${id}`)).status).toBe(200);
@@ -436,7 +436,7 @@ describe("Authorization code + PKCE", () => {
     expect(back.origin + back.pathname).toBe(LOOP);
     expect(back.searchParams.get("state")).toBe("xyz");
     const code = back.searchParams.get("code")!;
-    expect(code).toMatch(/^7dcde_code_/);
+    expect(code).toMatch(/^sitekeep_code_/);
     // Stored hashed and short-lived.
     const [row] = await handle.db.select().from(oauthCodes);
     expect(row!.codeHash).not.toBe(code);
@@ -446,8 +446,8 @@ describe("Authorization code + PKCE", () => {
     expect(t.status, JSON.stringify(t.body)).toBe(200);
     expect(t.headers["cache-control"]).toBe("no-store");
     expect(t.body).toMatchObject({ token_type: "Bearer", expires_in: 3600, scope: "bcf read" });
-    expect(t.body.access_token).toMatch(/^7dcde_oauth_/);
-    expect(t.body.refresh_token).toMatch(/^7dcde_refresh_/);
+    expect(t.body.access_token).toMatch(/^sitekeep_oauth_/);
+    expect(t.body.refresh_token).toMatch(/^sitekeep_refresh_/);
     accessToken = t.body.access_token;
     refreshToken = t.body.refresh_token;
 
@@ -506,7 +506,7 @@ describe("Authorization code + PKCE", () => {
     const a = await authorize(params, aliceCookie);
     expect(a.status).toBe(302);
     const back = new URL(a.location!);
-    expect(back.searchParams.get("code")).toMatch(/^7dcde_code_/);
+    expect(back.searchParams.get("code")).toMatch(/^sitekeep_code_/);
     expect(back.searchParams.get("state")).toBe("again");
     // A scope not consented yet (write) asks again.
     const more = await authorize({ ...params, scope: "read write" }, aliceCookie);
@@ -797,7 +797,7 @@ describe("Rate limiting and log redaction", () => {
     }
     const failures = await handle.db.select().from(auditLog).where(eq(auditLog.action, "oauth.token_failed"));
     expect(failures.length).toBeGreaterThan(3);
-    expect(JSON.stringify(failures.map((f) => f.details))).not.toContain("7dcde_");
+    expect(JSON.stringify(failures.map((f) => f.details))).not.toMatch(/sitekeep_|7dcde_/);
   });
 
   it("never writes codes, tokens or client secrets to the request log", async () => {

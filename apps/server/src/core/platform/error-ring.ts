@@ -24,7 +24,8 @@ export function redactSecrets(text: string): string {
   return text
     .replace(/(bearer\s+)[A-Za-z0-9._~+/=-]{8,}/gi, "$1***")
     .replace(/(authorization["']?\s*[:=]\s*["']?basic\s+)[A-Za-z0-9+/=]+/gi, "$1***")
-    .replace(/7dcde_([a-z]+)_[A-Za-z0-9_-]+/g, "7dcde_$1_***")
+    // SiteKeep secrets, current ("sitekeep_api_…") and legacy ("7dcde_api_…") prefix.
+    .replace(/(sitekeep|7dcde)_(s|api|oauth|refresh|code|secret|invite)_[A-Za-z0-9_-]+/g, "$1_$2_***")
     .replace(/([?&](?:access_token|refresh_token|client_secret|code_verifier|code|token)=)[^&#\s"]*/gi, "$1***")
     .replace(/(\/wopi\/convert\/)[^/?#\s"]+/i, "$1***")
     .replace(/(x-api-key["']?\s*[:=]\s*["']?)[^"',\s]+/gi, "$1***");

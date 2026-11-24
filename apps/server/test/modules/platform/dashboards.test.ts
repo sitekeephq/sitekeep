@@ -54,7 +54,7 @@ describe("dashboard srcdoc builder", () => {
     const boot = JSON.parse(script.slice("window.CDE = ".length).replace(/;\s*$/, ""));
     expect(boot.data.q[0].name).toBe(evil);
     expect(Object.keys(boot).sort()).toEqual(["data", "errors", "generatedAt", "labels", "locale", "project", "texts"]);
-    expect(doc).not.toMatch(/cde_session|7dcde_|Bearer|\/api\/v1|document\.cookie\s*[^)]/);
+    expect(doc).not.toMatch(/cde_session|sitekeep_|7dcde_|Bearer|\/api\/v1|document\.cookie\s*[^)]/);
     expect(doc).not.toMatch(/http-equiv="refresh"|<base /i);
   });
 

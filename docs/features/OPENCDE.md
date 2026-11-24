@@ -227,7 +227,7 @@ versions are reached through `document_versions`).
   `oauth.token_refreshed`, `oauth.token_failed`, `oauth.code_reused`, `oauth.refresh_reused`, `oauth.revoked`,
   `oauth.client_*`. The details contain no secret values.
 - In logs, the `code`, `access_token`, `refresh_token`, `client_secret`, `code_verifier`, `token` query parameters and
-  `7dcde_…` tokens are masked with `***` (`redactUrl`, `redactSecrets`).
+  `sitekeep_…` tokens (and the `7dcde_…` ones issued before 1.0.2) are masked with `***` (`redactUrl`, `redactSecrets`).
 - In production, **HTTPS and `CDE_PUBLIC_URL` are required**. Foundation requires at least TLS 1.2. The customer's internal CA certificate
   must be trusted on the Windows machines where Solibri runs.
 

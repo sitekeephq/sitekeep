@@ -8,9 +8,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { and, eq, sql } from "drizzle-orm";
 import { buildApp } from "../../src/app/build-app.js";
-import { hashPassword } from "../../src/core/security/auth.js";
+import { hashPassword, hashToken } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
-import { auditLog, projects, users, works } from "../../src/db/schema.js";
+import { auditLog, projects, tokens, users, works } from "../../src/db/schema.js";
 import { devToolsEnabled } from "../../src/dev/flag.js";
 import { recordServerError, redactSecrets } from "../../src/core/platform/error-ring.js";
 import { JobQueue } from "../../src/jobs/queue.js";
@@ -135,6 +135,15 @@ describe("developer MCP tools (cde_dev_*)", () => {
     realProject = (await admin("POST", "/projects", { code: "GERCEK", name: "Gerçek Proje" })).body;
   });
 
+  it("issues keys as sitekeep_api_…; a key from before 1.0.2 (7dcde_api_…) keeps working", async () => {
+    expect(adminRead).toMatch(/^sitekeep_api_[A-Za-z0-9_-]{43}$/);
+    const [adminRow] = await handle.db.select({ id: users.id }).from(users).where(eq(users.email, "admin@7d.test"));
+    const legacy = "7dcde_api_" + "L".repeat(43);
+    await handle.db.insert(tokens).values({ userId: adminRow!.id, kind: "api", name: "eski anahtar", tokenHash: hashToken(legacy), scope: "read" });
+    const me = await rest(app, { token: legacy })("GET", "/auth/me");
+    expect(me.status, JSON.stringify(me.body)).toBe(200);
+  });
+
   it("is off without CDE_DEV_TOOLS and in production", async () => {
     expect(devToolsEnabled({ CDE_DEV_TOOLS: "1" })).toBe(true);
     expect(devToolsEnabled({ CDE_DEV_TOOLS: "1", NODE_ENV: "production" })).toBe(false);
@@ -176,6 +185,8 @@ describe("developer MCP tools (cde_dev_*)", () => {
     expect(h.json.converters.soffice).toBeDefined();
     expect(h.json.recentErrors[0].message).toContain("Bearer ***");
     expect(redactSecrets("anahtar 7dcde_api_abc123 sızdı")).toBe("anahtar 7dcde_api_*** sızdı");
+    expect(redactSecrets("anahtar sitekeep_api_abc-123 sızdı")).toBe("anahtar sitekeep_api_*** sızdı");
+    expect(redactSecrets("sitekeep_release_url")).toBe("sitekeep_release_url");
     expect(JSON.stringify(h.json)).not.toContain("gizlianahtar");
     expect(redactSecrets("x?access_token=abc&y=1")).toBe("x?access_token=***&y=1");
   });

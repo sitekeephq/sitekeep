@@ -122,7 +122,7 @@ describe("invitations from the project members screen (no SMTP)", () => {
     expect(res.body.status).toBe("invited");
     expect(res.body.invitation.mailed).toBe(false);
     expect(res.body.invitation.mailSkipped).toBe("smtp_not_configured");
-    expect(res.body.invitation.url).toMatch(/^https:\/\/cde\.example\.test\/invite#7dcde_invite_/);
+    expect(res.body.invitation.url).toMatch(/^https:\/\/cde\.example\.test\/invite#sitekeep_invite_/);
 
     const [user] = await c.handle.db.select().from(users).where(eq(users.email, "new.person@example.com"));
     expect(user).toMatchObject({ pending: true, disabled: true, name: "New Person", companyId });
@@ -136,7 +136,7 @@ describe("invitations from the project members screen (no SMTP)", () => {
 
     // Only the hash is stored.
     const [row] = await c.handle.db.select().from(invitations).where(eq(invitations.userId, user!.id));
-    expect(row!.tokenHash).not.toContain("7dcde_invite_");
+    expect(row!.tokenHash).not.toContain("sitekeep_invite_");
     expect(row!.language).toBe("tr");
 
     const members = (await admin.get(`/projects/${pid}/members`)).body as { email: string; pending: boolean }[];
@@ -286,7 +286,7 @@ describe("invitation e-mails", () => {
     expect(sent[0]!.to).toBe("mailed@example.com");
     expect(String(sent[0]!.subject)).toContain("Mail Project");
     expect(String(sent[0]!.subject)).toContain("davet etti");
-    expect(String(sent[0]!.text)).toMatch(/https:\/\/cde\.example\.test\/invite#7dcde_invite_/);
+    expect(String(sent[0]!.text)).toMatch(/https:\/\/cde\.example\.test\/invite#sitekeep_invite_/);
     const list = (await admin.get(`/projects/${pid}/invitations`)).body;
     expect(list.mail).toEqual({ configured: true, enabled: true });
     expect(list.invitations[0].mailedAt).toBeTruthy();
@@ -404,7 +404,7 @@ describe("set-up wizard invitations and people files", () => {
     expect(res.status, JSON.stringify(res.body)).toBe(200);
     const person = res.body.people.find((p: { email: string }) => p.email === "wizard-new@example.com");
     expect(person).toMatchObject({ status: "invited", name: "Wiz New" });
-    expect(person.invitation.url).toMatch(/\/invite#7dcde_invite_/);
+    expect(person.invitation.url).toMatch(/\/invite#sitekeep_invite_/);
     const pid = res.body.id as string;
 
     const members = (await admin.get(`/projects/${pid}/members`)).body as { email: string; companyId: string; pending?: boolean; roleIds: string[] }[];

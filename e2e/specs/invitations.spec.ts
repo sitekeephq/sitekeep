@@ -73,7 +73,7 @@ test("wizard: a new address is invited, the link is accepted and the person sees
   await expect(person).toHaveAttribute("data-status", "invited");
   await expect(person).toContainText("E-posta sunucusu ayarlı değil");
   const link = await person.getByRole("textbox").inputValue();
-  expect(link).toMatch(/\/invite#7dcde_invite_/);
+  expect(link).toMatch(/\/invite#sitekeep_invite_/);
 
   const projects = await ok<{ id: string; name: string }[]>(await request.get("/api/v1/projects"), "projects");
   const pid = projects.find((p) => p.name === projectName)!.id;

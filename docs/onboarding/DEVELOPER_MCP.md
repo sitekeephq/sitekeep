@@ -56,7 +56,7 @@ permissions.
 Make the token a persistent environment variable on Windows (PowerShell):
 
 ```powershell
-setx CDE_MCP_TOKEN "7dcde_api_..."
+setx CDE_MCP_TOKEN "sitekeep_api_..."
 # if the token is in a file:
 setx CDE_MCP_TOKEN (Get-Content "$env:USERPROFILE\.sitekeep\mcp-token.txt" -Raw).Trim()
 ```
@@ -83,7 +83,7 @@ upload/download tools.
       "args": ["C:\\path\\to\\sitekeep\\apps\\mcp\\dist\\index.js"],
       "env": {
         "CDE_URL": "http://127.0.0.1:8787",
-        "CDE_TOKEN": "7dcde_api_...",
+        "CDE_TOKEN": "sitekeep_api_...",
         "CDE_DEV_TOOLS": "1"
       }
     }
