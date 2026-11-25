@@ -162,7 +162,7 @@ export interface MinutesItemInput {
 
 export const buildApi = {
   submit: (pid: string, wid: string, comment?: string) => request<{ id: string }>("POST", `${P(pid)}/works/${wid}/submit`, { comment: comment || null }),
-  respond: (pid: string, wid: string, r: { outcome: string; comment?: string | null; response?: string | null }) =>
+  respond: (pid: string, wid: string, r: { outcome: string; comment?: string | null; response?: string | null; stepIndex?: number }) =>
     request<{ id: string }>("POST", `${P(pid)}/works/${wid}/respond`, r),
   revise: (pid: string, wid: string) => request<{ id: string }>("POST", `${P(pid)}/works/${wid}/revise`, {}),
   cancel: (pid: string, wid: string, comment?: string) => request<{ id: string }>("POST", `${P(pid)}/works/${wid}/cancel`, { comment: comment || null }),

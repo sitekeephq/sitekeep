@@ -286,6 +286,9 @@ export function WorkDetail({
         <div key={e.id} className="small" style={{ borderBottom: "1px solid var(--border)", padding: "6px 0" }}>
           <span className="muted">{formatDate(e.at)}</span> · <strong>{e.userName ?? t("today.changes.system")}</strong>{" "}
           {eventText(e, w, (k) => type.statuses.find((x) => x.key === k)?.label ?? k)}
+          {(e.details as { onBehalfOf?: { name?: string } } | null)?.onBehalfOf?.name && (
+            <span className="muted"> ({t("build.flow.delegated", { name: (e.details as { onBehalfOf: { name: string } }).onBehalfOf.name })})</span>
+          )}
           {e.kind === "comment" && <div style={{ whiteSpace: "pre-wrap" }}>{e.message}</div>}
         </div>
       ))}

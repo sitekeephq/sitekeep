@@ -82,6 +82,8 @@ export interface TodayRowDto {
   note?: string;
   /** Company that sent the work (who waits for an answer), when known. */
   party?: string;
+  /** The row is the caller's as a delegate ("vekâleten", issue #190): the person they act for. */
+  onBehalfOf?: string;
 }
 
 /** Groups of "Bana Düşenler" in display order. */

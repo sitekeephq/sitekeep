@@ -7,11 +7,12 @@ import { isUuid, type ProjectAccess } from "../core/security/access.js";
 import { isAssignee, type ActorContext } from "./engine.js";
 import { loadInstance, type InstanceRow, type ReviewRow } from "./reviews.js";
 import { actorFor, memberWithRoles } from "./service.js";
+import { wasStepDelegate } from "./delegation.js";
 
-/** Project admins, the starter and anyone assigned to any step see a review. */
+/** Project admins, the starter, anyone assigned to any step and the delegates of a step (#190) see a review. */
 export function canSee(a: ProjectAccess, actor: ActorContext, r: ReviewRow, i: InstanceRow): boolean {
   if (a.isProjectAdmin || r.createdBy === a.user.id) return true;
-  return i.template.steps.some((s) => isAssignee(s, actor));
+  return i.template.steps.some((s) => isAssignee(s, actor)) || wasStepDelegate(i, a.user.id);
 }
 
 export async function loadVisibleReview(db: Db, a: ProjectAccess, rid: string): Promise<ReviewRow> {

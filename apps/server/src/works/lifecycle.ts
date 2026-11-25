@@ -30,6 +30,7 @@ import {
 } from "../db/schema.js";
 import { requireWorkModule } from "../projects/modules.js";
 import { notify } from "../workflow/service.js";
+import { notifyDelegates, workAssigneeDelegates } from "../workflow/delegation.js";
 import { deliveryChannel } from "./delivery.js";
 import { generateCover, generateLetterPdf } from "./pdf-attachments.js";
 import {
@@ -111,6 +112,8 @@ export async function createWork(
   else await checkCompanies(db, chosen);
   await linkProjectCompanies(db, project.id, a ? [fromCompanyId] : [...chosen, fromCompanyId]);
   await checkMember(db, project.id, input.assigneeUserId);
+  // Delegates of the assignee at this moment (#190): they see and act on the work too.
+  const assigneeDelegates = await workAssigneeDelegates(db, project.id, input.assigneeUserId ?? null);
   const links = dedupeLinks(input.links ?? []);
   if (a) for (const l of links) await checkLinkTarget(db, a, l, null);
   if (input.parentWorkId) {
@@ -157,6 +160,7 @@ export async function createWork(
         toCompanyIds: to,
         ccCompanyIds: cc,
         assigneeUserId: input.assigneeUserId ?? null,
+        assigneeDelegates,
         dueDate: input.dueDate ?? null,
         replyRequired: input.replyRequired ?? false,
         parentWorkId: input.parentWorkId ?? null,
@@ -196,15 +200,18 @@ export async function createWork(
     targetId: work.id,
     details: { number: work.number, type: type.key, title: work.title },
   });
-  if (work.assigneeUserId && work.assigneeUserId !== creator.userId)
-    await notify(db, [work.assigneeUserId], {
+  if (work.assigneeUserId && work.assigneeUserId !== creator.userId) {
+    const n = {
       projectId: project.id,
       kind: "work.assigned",
       title: msg("works:notifications.assigned", { number: work.number, title: work.title }),
       link: workLink(project.id, work.id),
       due: work.dueDate,
       actorId: creator.userId,
-    });
+    };
+    await notify(db, [work.assigneeUserId], n);
+    await notifyDelegates(db, assigneeDelegates, n);
+  }
   return work;
 }
 

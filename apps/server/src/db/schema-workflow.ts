@@ -19,6 +19,7 @@ import {
 import type {
   FinalOutcomeMap,
   OutcomeCode,
+  StepDelegate,
   ReviewChainConfig,
   WorkflowActionKind,
   WorkflowKind,
@@ -84,6 +85,11 @@ export const workflowInstances = pgTable(
     startedBy: uuid("started_by")
       .notNull()
       .references(() => users.id),
+    /**
+     * Delegates of the people a step was assigned to, taken when the step became current (issue #190,
+     * workflow/delegation.ts). Empty without a delegation module.
+     */
+    stepDelegates: jsonb("step_delegates").$type<StepDelegate[]>().notNull().default([]),
     createdAt: createdAt(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
@@ -104,6 +110,8 @@ export const workflowActions = pgTable(
     stepIndex: integer("step_index").notNull(),
     kind: text("kind").$type<WorkflowActionKind>().notNull(),
     userId: uuid("user_id").references(() => users.id),
+    /** The person the user acted for under a delegation ("X adına Y": X here, Y in userId). */
+    onBehalfOfUserId: uuid("on_behalf_of_user_id").references(() => users.id),
     outcome: text("outcome").$type<OutcomeCode>(),
     comment: text("comment"),
     details: jsonb("details").$type<Record<string, unknown>>(),
@@ -193,6 +201,8 @@ export const reviewMarks = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id),
+    /** The person the reviewer answered for under a delegation (issue #190); null: their own answer. */
+    onBehalfOfUserId: uuid("on_behalf_of_user_id").references(() => users.id),
     outcome: text("outcome").$type<OutcomeCode>().notNull(),
     /** Custom outcome code picked (outcome holds its base code). */
     optionCode: text("option_code"),

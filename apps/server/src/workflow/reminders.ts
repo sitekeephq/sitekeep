@@ -8,6 +8,7 @@ import type { Db } from "../db/index.js";
 import { DEFAULT_LANGUAGE, intlLocale, msg } from "../i18n/index.js";
 import { reviewMarks, reviewFiles, reviews, workflowInstances, workflowReminders } from "../db/schema.js";
 import { notify, projectMemberRows, resolveAssigneeUsers } from "./service.js";
+import { currentStepDelegates, notifyDelegates } from "./delegation.js";
 import { SUBJECT_REVIEW, reviewLabel, reviewLink } from "./reviews.js";
 import { activeModules } from "../app/modules.js";
 import { runWorkDueReminders } from "../works/workflow.js";
@@ -47,25 +48,31 @@ export async function runDueReminders(db: Db, now: Date = new Date()): Promise<R
     const answered = await answeredUsers(db, r.id, i.stepIndex);
     const pending = resolveAssigneeUsers(step.assignees, members, i.startedBy).filter((u) => !answered.has(u));
     const date = due.toLocaleDateString(intlLocale(DEFAULT_LANGUAGE));
+    // Delegates of the people still to answer get the reminder too (#190).
+    const delegates = currentStepDelegates(i).filter((d) => pending.includes(d.forUserId));
     if (kind === "due_soon") {
-      await notify(db, pending, {
+      const n = {
         projectId: r.projectId,
         kind: "review.due_soon",
         title: msg("workflow:notifications.stepDueSoon", { review: reviewLabel(r), step: step.name }),
         body: msg("workflow:notifications.due", { date }),
         link: reviewLink(r.projectId, r.id),
         due,
-      });
+      };
+      await notify(db, pending, n);
+      await notifyDelegates(db, delegates, n);
       result.dueSoon++;
     } else {
-      await notify(db, [...pending, r.createdBy], {
+      const n = {
         projectId: r.projectId,
         kind: "review.overdue",
         title: msg("workflow:notifications.stepOverdue", { review: reviewLabel(r), step: step.name }),
         body: msg("workflow:notifications.due", { date }),
         link: reviewLink(r.projectId, r.id),
         due,
-      });
+      };
+      await notify(db, [...pending, r.createdBy], n);
+      await notifyDelegates(db, delegates, n);
       result.overdue++;
     }
   }
@@ -86,7 +93,7 @@ async function answeredUsers(db: Db, reviewId: string, stepIndex: number): Promi
   const rfs = await db.select({ id: reviewFiles.id }).from(reviewFiles).where(eq(reviewFiles.reviewId, reviewId));
   if (!rfs.length) return new Set();
   const marks = await db
-    .select({ userId: reviewMarks.userId })
+    .select({ userId: reviewMarks.userId, onBehalfOfUserId: reviewMarks.onBehalfOfUserId })
     .from(reviewMarks)
     .where(
       and(
@@ -97,7 +104,7 @@ async function answeredUsers(db: Db, reviewId: string, stepIndex: number): Promi
         eq(reviewMarks.stepIndex, stepIndex),
       ),
     );
-  return new Set(marks.map((m) => m.userId));
+  return new Set(marks.map((m) => m.onBehalfOfUserId ?? m.userId));
 }
 
 /** Runs the reminders now and then every `intervalMs` (default 15 minutes). Returns a stop function. */

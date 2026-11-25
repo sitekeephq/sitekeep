@@ -25,4 +25,6 @@ export const TOOL_MODULES: Readonly<Record<string, string>> = {
   // Platform: saved report dashboards and templates (cde_report_run and cde_report_datasets are core:
   // ad-hoc queries over the datasets; saved ones and templates only with the module)
   cde_reports_list: "platform", cde_report_save: "platform",
+  // Platform: approval delegation (vekâlet, issue #190)
+  cde_delegations_list: "platform", cde_delegation_create: "platform", cde_delegation_end: "platform",
 };

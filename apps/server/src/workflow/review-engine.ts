@@ -22,7 +22,8 @@ import {
   stopsChain,
   type ChainSubmission,
 } from "./chain.js";
-import { advance, finalOutcomes, isAssignee, isStepComplete, onBehalfOf, worstOutcome } from "./engine.js";
+import { advance, finalOutcomes, isStepComplete, onBehalfOf, worstOutcome } from "./engine.js";
+import { currentStepDelegates, enterStepDelegates, notifyDelegates, stepActing } from "./delegation.js";
 import { copyApprovedFiles } from "./review-finalization.js";
 import { applyReviewRejections } from "../cde/rejection.js";
 import {
@@ -37,7 +38,6 @@ import {
 import {
   actorFor,
   emitWorkflowEvent,
-  memberWithRoles,
   notify,
   projectMemberRows,
   resolveAssigneeUsers,
@@ -55,6 +55,8 @@ interface AttributeChange {
 
 export interface Evaluation {
   instance: InstanceRow;
+  /** The answer that led here was a delegate's for this person (#190). */
+  onBehalfOfUserId?: string | null;
   stepCompleted: boolean;
   completedStepIndex: number;
   finished: boolean;
@@ -78,28 +80,34 @@ export async function submitStep(ctx: ReviewCtx, a: ProjectAccess, review: Revie
       .for("update");
     if (!instance) throw notFound(msg("workflow:entities.review"));
     if (instance.status !== "running") throw conflict(msg("workflow:errors.reviewNotOpen"));
+    if (input.stepIndex !== undefined && input.stepIndex !== instance.stepIndex) throw conflict(msg("workflow:errors.stepMovedOn"));
     const step = instance.template.steps[instance.stepIndex]!;
-    const member = await memberWithRoles(tx, a.project.id, a.user.id);
-    const actor = actorFor(a.user, member, instance.startedBy);
-    if (!isAssignee(step, actor)) throw forbidden(msg("workflow:errors.stepNotAssigned"));
-    const behalf = onBehalfOf(step, actor);
-
     const rfs = await tx.select().from(reviewFiles).where(eq(reviewFiles.reviewId, review.id));
     const active = activeFiles(rfs);
-    const already = await tx
-      .select({ id: reviewMarks.id })
-      .from(reviewMarks)
-      .where(
-        and(
-          inArray(
-            reviewMarks.reviewFileId,
-            rfs.map((r) => r.id),
-          ),
-          eq(reviewMarks.stepIndex, instance.stepIndex),
-          eq(reviewMarks.userId, a.user.id),
-        ),
-      );
-    if (already.length) throw conflict(msg("workflow:errors.stepAlreadyAnswered"));
+    const marksNow = rfs.length
+      ? await tx
+          .select({ userId: reviewMarks.userId, onBehalfOfUserId: reviewMarks.onBehalfOfUserId })
+          .from(reviewMarks)
+          .where(
+            and(
+              inArray(
+                reviewMarks.reviewFileId,
+                rfs.map((r) => r.id),
+              ),
+              eq(reviewMarks.stepIndex, instance.stepIndex),
+            ),
+          )
+      : [];
+    // Approval delegation (#190): the user answers for themselves or, as a delegate, for a person of
+    // the step; whoever answers first for a person wins.
+    const answered = new Set(marksNow.map((m) => m.onBehalfOfUserId ?? m.userId));
+    const { acting, involved } = await stepActing(tx, { instance, user: a.user, answered });
+    if (!acting) {
+      if (!involved) throw forbidden(msg("workflow:errors.stepNotAssigned"));
+      throw conflict(await answeredMessage(tx, marksNow, a.user.id, instance));
+    }
+    if (marksNow.some((m) => m.userId === a.user.id)) throw conflict(msg("workflow:errors.stepAlreadyAnswered"));
+    const behalf = onBehalfOf(step, acting.actor);
 
     const given = new Map(input.files.map((f) => [f.reviewFileId, f]));
     const picked = new Map<string, { base: OutcomeCode; code: string }>();
@@ -177,6 +185,7 @@ export async function submitStep(ctx: ReviewCtx, a: ProjectAccess, review: Revie
         reviewFileId: rf.id,
         stepIndex: instance.stepIndex,
         userId: a.user.id,
+        onBehalfOfUserId: acting.onBehalfOfUserId,
         outcome: picked.get(rf.id)!.base,
         optionCode: picked.get(rf.id)!.code,
         comment: given.get(rf.id)!.comment?.trim() || null,
@@ -188,16 +197,19 @@ export async function submitStep(ctx: ReviewCtx, a: ProjectAccess, review: Revie
       stepIndex: instance.stepIndex,
       kind: "submit",
       userId: a.user.id,
+      onBehalfOfUserId: acting.onBehalfOfUserId,
       outcome: worstOutcome(active.map((rf) => picked.get(rf.id)!.base)),
       comment: input.comment?.trim() || null,
       details: {
         files: active.length,
+        ...(acting.delegationId ? { delegationId: acting.delegationId } : {}),
         ...(behalf.length ? { onBehalfOf: behalf } : {}),
         ...(changes.length ? { attributes: changes.length } : {}),
       },
       at: now,
     });
-    return evaluateReview(tx, review, instance, rfs, a.user.id);
+    const ev = await evaluateReview(tx, review, instance, rfs, a.user.id);
+    return { ...ev, onBehalfOfUserId: acting.onBehalfOfUserId };
   });
   for (const c of changes)
     await audit(db, {
@@ -217,6 +229,27 @@ export async function submitStep(ctx: ReviewCtx, a: ProjectAccess, review: Revie
     });
   await afterEvaluate(ctx, review, result, a.user.id);
   return result;
+}
+
+/** Why a user involved in the step may not answer it now (the first answer for a person won). */
+async function answeredMessage(
+  db: Db,
+  marks: { userId: string; onBehalfOfUserId: string | null }[],
+  userId: string,
+  instance: InstanceRow,
+) {
+  const forMe = marks.find((m) => m.onBehalfOfUserId === userId);
+  if (forMe) return msg("workflow:delegation.answeredForYou", { name: (await userName(db, forMe.userId)) ?? "?" });
+  const mine = currentStepDelegates(instance).filter((d) => d.userId === userId);
+  const done = mine.find((d) => marks.some((m) => (m.onBehalfOfUserId ?? m.userId) === d.forUserId));
+  if (done && !marks.some((m) => m.userId === userId))
+    return msg("workflow:delegation.alreadyAnsweredFor", { name: (await userName(db, done.forUserId)) ?? "?" });
+  return msg("workflow:errors.stepAlreadyAnswered");
+}
+
+export async function userName(db: Db, id: string): Promise<string | null> {
+  const [u] = await db.select({ name: users.name }).from(users).where(eq(users.id, id));
+  return u?.name ?? null;
 }
 
 /** Re-checks the current step and moves the instance forward when it is complete. */
@@ -285,6 +318,7 @@ export async function evaluateReview(
       })
       .where(eq(workflowInstances.id, instance.id))
       .returning();
+    await enterStepDelegates(tx, updated!);
     return { instance: updated!, stepCompleted: true, completedStepIndex: stepIndex, finished: false, stopped };
   }
 
@@ -455,11 +489,13 @@ async function stepSubmissions(
     );
   const byUser = new Map<string, { at: number; outcomes: Record<string, OutcomeCode>; codes: Record<string, string> }>();
   for (const m of marks) {
-    const cur = byUser.get(m.userId) ?? { at: m.at.getTime(), outcomes: {}, codes: {} };
+    // A delegate's answer counts as the answer of the person they acted for (#190).
+    const who = m.onBehalfOfUserId ?? m.userId;
+    const cur = byUser.get(who) ?? { at: m.at.getTime(), outcomes: {}, codes: {} };
     cur.at = Math.min(cur.at, m.at.getTime());
     cur.outcomes[m.reviewFileId] = m.outcome;
     cur.codes[m.reviewFileId] = m.optionCode ?? m.outcome;
-    byUser.set(m.userId, cur);
+    byUser.set(who, cur);
   }
   const ids = [...byUser.keys()];
   if (!ids.length) return [];
@@ -484,7 +520,7 @@ export async function notifyStepAssignees(db: Db, review: ReviewRow, instance: I
   const step = instance.template.steps[instance.stepIndex]!;
   const members = await projectMemberRows(db, review.projectId);
   const userIds = resolveAssigneeUsers(step.assignees, members, instance.startedBy);
-  await notify(db, userIds, {
+  const n = {
     projectId: review.projectId,
     kind: "review.assigned",
     title: msg("workflow:notifications.stepAssigned", { review: reviewLabel(review), step: step.name }),
@@ -494,7 +530,10 @@ export async function notifyStepAssignees(db: Db, review: ReviewRow, instance: I
     link: reviewLink(review.projectId, review.id),
     due: instance.stepDueAt,
     actorId,
-  });
+  };
+  await notify(db, userIds, n);
+  // Delegates of the step's people (#190) get the same, marked "vekâleten".
+  await notifyDelegates(db, currentStepDelegates(instance), n);
 }
 
 async function participantUsers(db: Db, review: ReviewRow, instance: InstanceRow): Promise<string[]> {

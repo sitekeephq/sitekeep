@@ -457,7 +457,8 @@
       },
       "actions": {
         "respond": "Yanıtla"
-      }
+      },
+      "delegated": "{{name}} adına (vekâleten)"
     }
   },
   "meeting": {
@@ -572,5 +573,9 @@
       "create_one": "{{count}} Kalemi Oluştur",
       "create_other": "{{count}} Kalemi Oluştur"
     }
+  },
+  "delegation": {
+    "badge": "Vekâleten",
+    "onBehalfOf": "{{name}} adına vekâleten"
   }
 }

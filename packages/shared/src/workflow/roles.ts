@@ -64,6 +64,11 @@ export interface OnBehalfOfDto {
   type: AssigneeType;
   id: string;
   name?: string;
+  /**
+   * A person the answer was given for under a delegation ("vekâlet", issue #190): type "user", the
+   * delegating person. The answer was given by the delegate ("A adına B").
+   */
+  delegated?: boolean;
 }
 
 // ---- Role packages (KONSEPT §4) -------------------------------------------------------------

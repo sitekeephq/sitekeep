@@ -184,6 +184,8 @@ export interface TodayWorkDto extends WorkSummaryDto {
   projectCode: string;
   projectName: string;
   link: string;
+  /** Assigned to someone the caller is the delegate of ("vekâleten", issue #190): their name. */
+  onBehalfOf?: string;
 }
 
 export interface TodayDto {

@@ -24,6 +24,7 @@ import {
 } from "./chain.js";
 import { StandardCache, folderPath, nextReviewCounter, peekReviewCounter } from "./chain-service.js";
 import { notifyStepAssignees } from "./review-engine.js";
+import { enterStepDelegates } from "./delegation.js";
 import { planReviewTransition } from "../cde/review-transition.js";
 import type { ReviewCdePlanDto } from "@sitekeep/shared";
 import { SUBJECT_REVIEW, type ReviewCtx } from "./review-types.js";
@@ -240,6 +241,7 @@ export async function startReview(ctx: ReviewCtx, a: ProjectAccess, input: Start
         ...(p.cde?.enforce && p.cde.suitabilityCode ? { targetSuitability: p.cde.suitabilityCode } : {}),
       },
     });
+    await enterStepDelegates(tx, instance!);
     return { review: review!, instance: instance! };
   });
 

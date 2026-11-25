@@ -428,6 +428,13 @@
       "when": 1795599570803,
       "tag": "0061_doc_search",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795603864792,
+      "tag": "0062_delegation",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,10 @@ by e-mail as well as in the notification list, when the installation has SMTP (`
 | `due_soon` | `review.due_soon`, `work.due_soon` (one day before the step's due date) |
 | `overdue` | `review.overdue`, `work.overdue` (assignees still to answer, and the starter) |
 | `outcome` | `review.completed`, `review.returned`, `cde.returned`, `work.decided` |
+| `delegation` | `delegation.started`, `delegation.ended`, `delegation.handed_over` (approval delegation, Platform module; the Account card shows it only with the module) |
+
+With approval delegation ([DELEGATION.md](DELEGATION.md), Platform module) the delegates of a step's people get the
+assignment and reminder notifications too, titled "Vekâleten (A adına): …", and so the e-mails.
 
 Reminders keep their de-duplication (`workflow_reminders`: once per instance, step and kind), so a step mails once per
 kind. One notification gives one mail per person. Not mailed: the actor who caused the event (`actorId`), disabled and

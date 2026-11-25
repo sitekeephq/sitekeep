@@ -55,6 +55,13 @@ Without the module: "Raporlar" shows the lists only; the "Rapor" buttons on modu
 (`reports?view=lists&module=…`); builder links (`?new=ai`, `?template=`) land on the lists; `reports/<id>` is not a route;
 "Save as report" in Modele Sor is hidden; `/reports` (dashboards) answers 404.
 
+## Approval delegation (vekâlet)
+
+From module 0.4.0 (SDK 0.20.0), issue #190: the delegations (table `delegations`, migration `0001_delegations`), the
+`/delegations` API, start / end notifications (the reminder round), the "Vekâletler" project page and the assignee
+resolver the core's workflow engine asks. MCP: `cde_delegations_list`, `cde_delegation_create`,
+`cde_delegation_end` (`TOOL_MODULES`). Details: [approval delegation](../features/DELEGATION.md).
+
 ## Follow-ups in other repositories
 
 - **AI module**: the `report_generate` / `report_repair` features call the module's routes; give them `product: "platform"` (as `form_flow` has `"field"`) so they are hidden without it. Move the evaluation fixture off the deprecated `dashboards` export.

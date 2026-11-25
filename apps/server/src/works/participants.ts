@@ -7,6 +7,7 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { ProjectAccess } from "../core/security/access.js";
 import type { Db } from "../db/index.js";
 import { workRevisions, workflowInstances, works } from "../db/schema.js";
+import { wasStepDelegate } from "../workflow/delegation.js";
 import { isAssignee } from "../workflow/engine.js";
 import { actorFor, memberWithRoles } from "../workflow/service.js";
 
@@ -36,7 +37,7 @@ export async function participantWorkIds(db: Db, a: ProjectAccess, workIds?: str
   for (const r of rows) {
     if (out.has(r.workId)) continue;
     const actor = actorFor(a.user, member, r.i.startedBy);
-    if (actor.isStarter || r.i.template.steps.some((s) => isAssignee(s, actor))) out.add(r.workId);
+    if (actor.isStarter || r.i.template.steps.some((s) => isAssignee(s, actor)) || wasStepDelegate(r.i, a.user.id)) out.add(r.workId);
   }
   return out;
 }

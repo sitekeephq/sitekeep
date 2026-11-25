@@ -88,3 +88,10 @@ Release: the handler needs SDK 0.13.0 (`TemplateApplyContext`). Publish the SDK,
 No open work (10.11.2026). The following stay in the core on purpose or are shared with other modules:
 
 - The form API client is in the package (`web/api.ts`, `formsApi`); the core's `api.ts` keeps only `formTemplates` for Works "+ New → Form". Form AI features are not listed and not queued while Field is not installed (AI module, `product`). Form helpers used only by Field (value validation, scoring, form number, template similarity, workflow rows) are in the package (`shared/forms.ts`, `shared/form-pdf.ts`); the form template and form DTOs are in the core because the core's form PDF, reports and AI parts also use them. Strings are in the module (`locales/`).
+
+## Approval delegation
+
+From module 0.7.0 (SDK 0.20.0), issue #190: form approval steps go to the delegates of their people as well
+(`enterStepDelegates`, `stepActing`, `notifyDelegates`); a delegate's answer is recorded with
+`on_behalf_of_user_id` and printed as "B (A adına, vekâleten)" in the form PDF (stamps; the generic layout lists the
+approval history). The delegations themselves are the Platform module's: [approval delegation](../features/DELEGATION.md).

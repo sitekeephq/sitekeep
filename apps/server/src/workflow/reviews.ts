@@ -21,7 +21,7 @@ export {
   type PreparedReview,
   type StartReviewInput,
 } from "./review-start.js";
-export { submitStep } from "./review-engine.js";
+export { submitStep, userName } from "./review-engine.js";
 export { copyApprovedFiles } from "./review-finalization.js";
 export { cancelReview, loadInstance, reassignStep } from "./review-lifecycle.js";
 export { approvalHistory, latestApprovals } from "./review-approvals.js";

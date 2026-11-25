@@ -352,7 +352,8 @@
         "endedAt": "Adım Bitişi",
         "days": "Süre (gün)",
         "dueAt": "Adım Termini",
-        "late": "Geç Kaldı mı"
+        "late": "Geç Kaldı mı",
+        "onBehalfOf": "Vekâleten"
       },
       "hints": {
         "subject": "inceleme adı / iş numarası / form numarası",
@@ -360,7 +361,11 @@
         "responsible": "adıma atanan kişi, firma veya ekip (virgülle)",
         "endedAt": "sürüyorsa null",
         "days": "bitişe ya da bugüne kadar, ondalıklı",
-        "late": "termini geçmiş (biten veya süren adım)"
+        "late": "termini geçmiş (biten veya süren adım)",
+        "onBehalfOf": "vekil olarak verilen yanıtlar, \"A adına B\"; boşsa vekâlet yok"
+      },
+      "values": {
+        "onBehalfOf": "{{person}} adına {{delegate}}"
       }
     },
     "locations": {

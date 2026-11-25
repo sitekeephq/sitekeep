@@ -331,7 +331,8 @@
       "person": "Kişi",
       "action": "İşlem",
       "details": "Ayrıntı"
-    }
+    },
+    "onBehalfOf": "{{name}} adına (vekâleten)"
   },
   "modules": {
     "help": {

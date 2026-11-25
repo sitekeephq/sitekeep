@@ -56,6 +56,27 @@ export {
   type NotificationEvent,
   type NotificationRecipient,
 } from "../workflow/notification-mail.js";
+// Approval delegation hook: assignee resolution, "X adına Y" (SDK 0.20.0, issue #190)
+export {
+  actorsOf,
+  currentStepDelegates,
+  dropStepDelegation,
+  enterStepDelegates,
+  handOverOpenAssignments,
+  isStepDelegate,
+  notifyDelegates,
+  openDelegateSteps,
+  registerAssigneeResolver,
+  resolveDelegates,
+  stepActing,
+  userNameMap,
+  wasStepDelegate,
+  type AssigneeResolver,
+  type DelegatesQuery,
+  type HandedOver,
+} from "../workflow/delegation.js";
+export { actingAs, type Acting, type ActorContext } from "../workflow/engine.js";
+export { delegateAccessGaps, userCanReadFolder, type DelegateAccessGaps } from "../workflow/delegation-access.js";
 
 // Models: versions, element index, query, rules, comparison
 export { ModelAiError } from "../model/ai.js";

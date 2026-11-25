@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { EMAIL_NOTIFY_TYPES, type EmailNotifyPrefs, type EmailNotifyType } from "@sitekeep/shared";
 import { hubApi } from "../../../shared/api/api-hub";
 import { useLoad } from "../../../app/context/project";
+import { webModules } from "../../../app/modules";
 
 type Choice = "inherit" | "on" | "off";
 const toChoice = (v: boolean | undefined): Choice => (v === undefined ? "inherit" : v ? "on" : "off");
@@ -49,7 +50,7 @@ export function EmailNotificationsCard({ projectId }: { projectId?: string }) {
       </p>
       {prefs && (
         <div className="stack">
-          {EMAIL_NOTIFY_TYPES.map((type) => (
+          {EMAIL_NOTIFY_TYPES.filter((type) => type !== "delegation" || webModules.some((m) => m.id === "platform")).map((type) => (
             <div key={type} className="row wrap" style={{ alignItems: "center" }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <strong>{t(`account.emailNotifications.types.${type}.label`)}</strong>

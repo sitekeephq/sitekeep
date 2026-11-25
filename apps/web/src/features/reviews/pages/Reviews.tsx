@@ -360,7 +360,11 @@ function ReviewDetail({ reviewId }: { reviewId: string }) {
 export function behalfText(list: OnBehalfOfDto[] | undefined): string | null {
   if (!list?.length) return null;
   const t = i18n.getFixedT(null, "reviews");
-  const names = list
+  // Approval delegation (#190): "A adına (vekâleten)" first, then the teams / companies.
+  const delegated = list.filter((b) => b.delegated).map((b) => t("behalf.delegated", { name: b.name ?? "?" }));
+  const groups = list.filter((b) => !b.delegated);
+  if (!groups.length) return delegated.join(" · ");
+  const names = groups
     .map((b) =>
       b.type === "company"
         ? t("behalf.company", { name: b.name ?? "?" })
@@ -369,7 +373,7 @@ export function behalfText(list: OnBehalfOfDto[] | undefined): string | null {
           : t("behalf.team", { name: b.name ?? t("behalf.deletedRole") }),
     )
     .join(", ");
-  return t("behalf.onBehalfOf", { names });
+  return [...delegated, t("behalf.onBehalfOf", { names })].join(" · ");
 }
 
 function actionText(x: WorkflowActionDto, r: ReviewDetailDto): string {
@@ -564,6 +568,8 @@ function ActForm({ review: r, onDone }: { review: ReviewDetailDto; onDone(d: Rev
     try {
       onDone(
         await api.submitReview(project.id, r.id, {
+          // The step this answer is for: refused when someone answered first (#190).
+          stepIndex: r.stepIndex,
           comment: comment || null,
           files: active.map((f) => ({
             reviewFileId: f.id,

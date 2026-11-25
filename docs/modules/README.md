@@ -13,17 +13,17 @@ published as a versioned package and pulled into the application at a pinned ver
 | Module | Repository | Package | Version in this repository | Status |
 |---|---|---|---|---|
 | **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/sitekeephq/sitekeep-cost) (private) | `@sitekeephq/sitekeep-ee-cost` | `0.8.0` | Separate repository, GitHub Packages. [Details](cost.md) |
-| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private) | `@sitekeephq/sitekeep-ee-field` | `0.6.0` | Separate repository, GitHub Packages. [Details](field.md) |
+| **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private) | `@sitekeephq/sitekeep-ee-field` | `0.7.0` | Separate repository, GitHub Packages. [Details](field.md) |
 | **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private) | `@sitekeephq/sitekeep-ee-coordinate` | `0.5.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
 | **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private) | `@sitekeephq/sitekeep-ee-planning` | `0.6.0` | Separate repository, GitHub Packages. [Details](planning.md) |
 | **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private) | `@sitekeephq/sitekeep-ee-ai` | `0.6.2` | Separate repository, GitHub Packages. [Details](ai.md) |
 | **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private) | `@sitekeephq/sitekeep-ee-manage` | `0.6.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
 | **Connect**: Autodesk Forma / ACC sync and file import, Office editing in the browser (WOPI) | [sitekeep-connect](https://github.com/sitekeephq/sitekeep-connect) (private) | `@sitekeephq/sitekeep-ee-connect` | `0.5.2` | Separate repository; Office conversion is in the core. [Details](connect.md) |
-| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots) | [sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private) | `@sitekeephq/sitekeep-ee-platform` | `0.3.1` | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
+| **Platform**: report dashboards (builder with AI, templates, HTML editor; dashboard frame and charts; sharing, versions, PDF snapshots); approval delegation (vekâlet) | [sitekeep-platform](https://github.com/sitekeephq/sitekeep-platform) (private) | `@sitekeephq/sitekeep-ee-platform` | `0.4.0` | Separate repository; the report datasets, queries, fixed lists and CSV are in the core. [Details](platform.md) |
 
 | Package | Source | Version |
 |---|---|---|
-| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.19.0` |
+| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.20.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 
@@ -148,6 +148,25 @@ the person's choice, project default applied; the actor, disabled and pending us
 `text(language)` for the title and body. A throw is logged and never breaks the workflow. A channel registered by a
 module that is off is not called. The channel makes its own outbound calls through `moduleOutboundFetch` with a
 connection declared by `registerPrivacyConnection`.
+
+### Assignee resolution: approval delegation (SDK 0.20.0)
+
+The workflow engine asks the modules who acts for the people a step or a work is assigned to
+([approval delegation](../features/DELEGATION.md), issue #190). A module registers a resolver while it loads:
+
+```ts
+registerAssigneeResolver({
+  id: "platform.delegation",
+  async delegates({ db, projectId, userIds, at }) { return [{ forUserId, userId, delegationId }]; },
+});
+```
+
+The core calls it when a step becomes current or a work is assigned and stores the answer
+(`workflow_instances.step_delegates`, `works.assignee_delegates`). A module running its own flow on the core's
+instances (Field forms) calls `enterStepDelegates` when it moves a step, `stepActing` to decide who may answer (the
+person or their delegate; the first answer for a person wins), records `onBehalfOfUserId` on the `workflow_actions`
+row and sends `notifyDelegates` with its assignment notification. Also: `openDelegateSteps` (task lists),
+`dropStepDelegation`, `delegateAccessGaps`, `actingAs` (engine). Delegation never widens folder permissions.
 
 In the core's `LEGACY_URLS` table (`app/navigation/routes-table.ts`), a module's own pages are marked with
 `module: "<id>"`; if the module is not installed, those addresses are not expected.

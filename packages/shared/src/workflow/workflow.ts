@@ -245,6 +245,27 @@ export interface MyTaskDto {
   link: string;
   /** Work tasks (RFI, submittal): the work number, e.g. "CNS_HLL_M_RFI_001". */
   code?: string | null;
+  /** The step is the caller's as a delegate ("vekâleten", issue #190): the person they act for. */
+  onBehalfOf?: { userId: string; name: string } | null;
+}
+
+/**
+ * Approval delegation (issue #190): who acts for a person a step or work is assigned to. A module
+ * (Platform) decides it through the SDK's assignee resolver; the core stores the answer on the
+ * workflow instance when a step becomes current, and on the work when it is assigned.
+ */
+export interface DelegateGrant {
+  /** The person the step / work is assigned to (the delegating person). */
+  forUserId: string;
+  /** The delegate. */
+  userId: string;
+  /** The module's delegation record. */
+  delegationId: string;
+}
+
+/** A delegate of one step of a workflow instance (workflow_instances.step_delegates). */
+export interface StepDelegate extends DelegateGrant {
+  stepIndex: number;
 }
 
 export interface FolderSettingsDto {

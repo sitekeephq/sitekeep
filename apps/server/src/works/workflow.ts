@@ -60,8 +60,9 @@ import {
 } from "../db/schema.js";
 import { badRequest, conflict, forbidden, notFound } from "../core/platform/http.js";
 import { DEFAULT_LANGUAGE, intlLocale, labelFor, msg, profileLanguage, tFor } from "../i18n/index.js";
-import { advance, isAssignee, isStepComplete, onBehalfOf, type ActorContext } from "../workflow/engine.js";
+import { advance, isStepComplete, onBehalfOf } from "../workflow/engine.js";
 import { combineChainOutcomes, enterStep, finalLabelOf, type ChainSubmission } from "../workflow/chain.js";
+import { currentStepDelegates, enterStepDelegates, notifyDelegates, stepActing, userNameMap } from "../workflow/delegation.js";
 import {
   actorFor,
   emitWorkflowEvent,
@@ -237,7 +238,9 @@ async function stepSubmissions(tx: Db, projectId: string, instance: InstanceRow)
       ),
     )
     .orderBy(asc(workflowActions.at));
-  const ids = [...new Set(acts.map((x) => x.userId).filter((x): x is string => !!x))];
+  // A delegate's answer counts as the answer of the person they acted for (#190).
+  const who = (x: ActionRow) => x.onBehalfOfUserId ?? x.userId;
+  const ids = [...new Set(acts.map(who).filter((x): x is string => !!x))];
   if (!ids.length) return [];
   const userRows = await tx.select().from(users).where(inArray(users.id, ids));
   const memberRows = await withRoleIds(
@@ -247,8 +250,8 @@ async function stepSubmissions(tx: Db, projectId: string, instance: InstanceRow)
   return acts
     .filter((x) => x.userId && x.outcome)
     .map((x) => {
-      const u = userRows.find((r) => r.id === x.userId)!;
-      const m = memberRows.find((r) => r.userId === x.userId);
+      const u = userRows.find((r) => r.id === who(x))!;
+      const m = memberRows.find((r) => r.userId === who(x));
       const code = String((x.details as { code?: string } | null)?.code ?? x.outcome);
       return { actor: actorFor(u, m, instance.startedBy), outcomes: { [ITEM]: x.outcome! }, codes: { [ITEM]: code } };
     });
@@ -338,6 +341,7 @@ export async function submitWork(db: Db, a: ProjectAccess, work: WorkRow, type: 
       .where(and(eq(works.id, work.id), inArray(works.status, ["taslak", "revize"])))
       .returning();
     if (!updated) throw conflict(msg("works:errors.changedMeanwhile"));
+    await enterStepDelegates(tx, instance!);
     return { revision: revision!, instance: instance! };
   });
   await addEvent(db, work.id, "submitted", a.user.id, comment, { rev, template: snapshot.name, revisionId: revision.id });
@@ -356,7 +360,7 @@ export async function submitWork(db: Db, a: ProjectAccess, work: WorkRow, type: 
 async function notifyStep(db: Db, work: WorkRow, instance: InstanceRow, actorId: string | null = null) {
   const step = instance.template.steps[instance.stepIndex]!;
   const members = await projectMemberRows(db, work.projectId);
-  await notify(db, resolveAssigneeUsers(step.assignees, members, instance.startedBy), {
+  const n = {
     projectId: work.projectId,
     kind: "work.assigned",
     title: msg("works:notifications.stepAssigned", { number: work.number, title: work.title, step: step.name }),
@@ -366,13 +370,17 @@ async function notifyStep(db: Db, work: WorkRow, instance: InstanceRow, actorId:
     link: workLink(work.projectId, work.id),
     due: instance.stepDueAt,
     actorId,
-  });
+  };
+  await notify(db, resolveAssigneeUsers(step.assignees, members, instance.startedBy), n);
+  await notifyDelegates(db, currentStepDelegates(instance), n);
 }
 
 // ---- Respond ------------------------------------------------------------------------------------
 
 export interface RespondInput {
   outcome: string;
+  /** The step the answer is for: refused when it has moved on meanwhile (first answer wins). */
+  stepIndex?: number;
   comment?: string | null;
   /** Official response (required for RFI answers). */
   response?: string | null;
@@ -414,42 +422,59 @@ export async function respondWork(db: Db, a: ProjectAccess, work: WorkRow, type:
       .where(eq(workflowInstances.id, revision.workflowInstanceId!))
       .for("update");
     if (!instance || instance.status !== "running") throw conflict(msg("works:errors.workflowNotOpen"));
+    if (input.stepIndex !== undefined && input.stepIndex !== instance.stepIndex) throw conflict(msg("workflow:errors.stepMovedOn"));
     const step = instance.template.steps[instance.stepIndex]!;
-    const member = await memberWithRoles(tx, a.project.id, a.user.id);
-    const actor = actorFor(a.user, member, instance.startedBy);
-    if (!isAssignee(step, actor)) throw forbidden(msg("works:errors.stepNotAssigned"));
-    const [already] = await tx
-      .select({ id: workflowActions.id })
+    const given = await tx
+      .select({ userId: workflowActions.userId, onBehalfOfUserId: workflowActions.onBehalfOfUserId })
       .from(workflowActions)
       .where(
         and(
           eq(workflowActions.instanceId, instance.id),
           eq(workflowActions.stepIndex, instance.stepIndex),
           eq(workflowActions.kind, "submit"),
-          eq(workflowActions.userId, a.user.id),
         ),
       );
-    if (already) throw conflict(msg("works:errors.stepAlreadyAnswered"));
+    // Approval delegation (#190): for themselves or, as a delegate, for a person of the step; first answer wins.
+    const answeredFor = new Set(given.map((x) => x.onBehalfOfUserId ?? x.userId).filter((x): x is string => !!x));
+    const { acting, involved } = await stepActing(tx, { instance, user: a.user, answered: answeredFor });
+    if (!acting) {
+      if (!involved) throw forbidden(msg("works:errors.stepNotAssigned"));
+      const forMe = given.find((x) => x.onBehalfOfUserId === a.user.id && x.userId);
+      throw conflict(
+        forMe
+          ? msg("workflow:delegation.answeredForYou", { name: (await userNameMap(tx, [forMe.userId])).get(forMe.userId!) ?? "?" })
+          : msg("works:errors.stepAlreadyAnswered"),
+      );
+    }
+    if (given.some((x) => x.userId === a.user.id)) throw conflict(msg("works:errors.stepAlreadyAnswered"));
     const opt = optionsFor(step, type, work).find((o) => o.code === input.outcome);
     if (!opt) throw badRequest(msg("works:errors.outcomeNotAllowed", { outcome: input.outcome }));
     if (type.category === "rfi" && (opt.kind === "approved" || opt.kind === "approved_with_comments" || opt.kind === "info") && !response)
       throw badRequest(msg("works:errors.rfiResponseRequired"));
     const base = OUTCOME_KIND_CODE[opt.kind];
-    const behalf = onBehalfOf(step, actor);
+    const behalf = onBehalfOf(step, acting.actor);
     const now = new Date();
     await tx.insert(workflowActions).values({
       instanceId: instance.id,
       stepIndex: instance.stepIndex,
       kind: "submit",
       userId: a.user.id,
+      onBehalfOfUserId: acting.onBehalfOfUserId,
       outcome: base,
       comment,
-      details: { code: opt.code, label: opt.label, response, ...(behalf.length ? { onBehalfOf: behalf } : {}) },
+      details: {
+        code: opt.code,
+        label: opt.label,
+        response,
+        ...(behalf.length ? { onBehalfOf: behalf } : {}),
+        ...(acting.delegationId ? { delegationId: acting.delegationId } : {}),
+      },
       at: now,
     });
 
     const subs = await stepSubmissions(tx, a.project.id, instance);
-    if (!isStepComplete(step, subs)) return { finished: false, moved: false, instance, label: opt.label };
+    const by = acting.onBehalfOfUserId;
+    if (!isStepComplete(step, subs)) return { finished: false, moved: false, instance, label: opt.label, by };
     const combined = combineChainOutcomes(step, subs)[ITEM]!;
     await tx.insert(workflowActions).values({
       instanceId: instance.id,
@@ -468,7 +493,8 @@ export async function respondWork(db: Db, a: ProjectAccess, work: WorkRow, type:
         .set({ stepIndex: next.stepIndex, stepStartedAt: now, stepDueAt: due.stepDueAt, stageDueAt: due.stageDueAt, updatedAt: now })
         .where(eq(workflowInstances.id, instance.id))
         .returning();
-      return { finished: false, moved: true, instance: moved!, label: opt.label };
+      await enterStepDelegates(tx, moved!);
+      return { finished: false, moved: true, instance: moved!, label: opt.label, by };
     }
 
     // Finished: final outcome → revision decided, work status from the outcome kind.
@@ -509,17 +535,19 @@ export async function respondWork(db: Db, a: ProjectAccess, work: WorkRow, type:
       .update(works)
       .set({ status, fields, closedAt: isClosed(type, status) ? now : null, updatedAt: now })
       .where(eq(works.id, work.id));
-    return { finished: true, moved: true, instance: done!, label, final, status };
+    return { finished: true, moved: true, instance: done!, label, final, status, by };
   });
 
-  await addEvent(db, work.id, "responded", a.user.id, comment, { label: result.label, rev: revision.rev, ...(response ? { response } : {}) });
+  // "X adına Y" (#190): the person the delegate answered for.
+  const behalfOfPerson = result.by ? { onBehalfOf: { userId: result.by, name: (await userNameMap(db, [result.by])).get(result.by) ?? "?" } } : {};
+  await addEvent(db, work.id, "responded", a.user.id, comment, { label: result.label, rev: revision.rev, ...(response ? { response } : {}), ...behalfOfPerson });
   await audit(db, {
     projectId: a.project.id,
     userId: a.user.id,
     action: "work.responded",
     targetType: "work",
     targetId: work.id,
-    details: { number: work.number, rev: revision.rev, outcome: input.outcome },
+    details: { number: work.number, rev: revision.rev, outcome: input.outcome, ...behalfOfPerson },
   });
   const link = workLink(work.projectId, work.id);
   if (result.finished) {
@@ -638,7 +666,11 @@ export async function nameBook(db: Db, projectId: string, instances: InstanceRow
   for (const i of instances)
     for (const s of i.template.steps)
       for (const x of s.assignees) (x.type === "user" ? userIds : x.type === "company" ? companyIds : new Set()).add(x.id);
-  for (const x of actions) if (x.userId) userIds.add(x.userId);
+  for (const x of actions) {
+    if (x.userId) userIds.add(x.userId);
+    if (x.onBehalfOfUserId) userIds.add(x.onBehalfOfUserId);
+  }
+  for (const i of instances) for (const d of i.stepDelegates ?? []) userIds.add(d.forUserId);
   for (const i of instances) userIds.add(i.startedBy);
   const u = userIds.size ? await db.select({ id: users.id, name: users.name }).from(users).where(inArray(users.id, [...userIds])) : [];
   const c = companyIds.size
@@ -681,6 +713,7 @@ export function flowSteps(instance: InstanceRow, actions: ActionRow[], n: NameBo
           comment: x.comment,
           response: d.response ?? null,
           onBehalfOf: (d.onBehalfOf ?? []).map((b) => assigneeName(b, n)),
+          delegatedFor: x.onBehalfOfUserId ? (n.users.get(x.onBehalfOfUserId) ?? "?") : null,
           at: x.at.toISOString(),
         };
       });
@@ -756,16 +789,17 @@ export async function flowDto(
   let canAct = false;
   let options: OutcomeOption[] = [];
   let actingFor: string[] = [];
+  let delegatedFor: string | null = null;
   if (instance.status === "running" && step) {
-    const member = await memberWithRoles(db, a.project.id, a.user.id);
-    const actor: ActorContext = actorFor(a.user, member, instance.startedBy);
-    const answered = actions.some(
-      (x) => x.instanceId === instance.id && x.kind === "submit" && x.stepIndex === instance.stepIndex && x.userId === a.user.id,
-    );
-    canAct = isAssignee(step, actor) && !answered;
-    if (canAct) {
+    const here = actions.filter((x) => x.instanceId === instance.id && x.kind === "submit" && x.stepIndex === instance.stepIndex);
+    const answered = here.some((x) => x.userId === a.user.id);
+    const answeredFor = new Set(here.map((x) => x.onBehalfOfUserId ?? x.userId).filter((x): x is string => !!x));
+    const acting = answered ? null : (await stepActing(db, { instance, user: a.user, answered: answeredFor })).acting;
+    canAct = !!acting;
+    if (acting) {
       options = optionsFor(step, type, work, n.lang);
-      actingFor = onBehalfOf(step, actor).map((x) => assigneeName(x, n));
+      actingFor = onBehalfOf(step, acting.actor).map((x) => assigneeName(x, n));
+      delegatedFor = acting.onBehalfOfUserId ? (n.users.get(acting.onBehalfOfUserId) ?? "?") : null;
     }
   }
   return {
@@ -779,6 +813,7 @@ export async function flowDto(
     canAct,
     options,
     actingFor,
+    delegatedFor,
     needsResponse: type.category === "rfi",
   };
 }
@@ -852,19 +887,21 @@ export async function runWorkDueReminders(db: Db, now: Date): Promise<{ dueSoon:
     const step = i.template.steps[i.stepIndex]!;
     const members = await projectMemberRows(db, w.projectId);
     const answered = await db
-      .select({ userId: workflowActions.userId })
+      .select({ userId: workflowActions.userId, onBehalfOfUserId: workflowActions.onBehalfOfUserId })
       .from(workflowActions)
       .where(and(eq(workflowActions.instanceId, i.id), eq(workflowActions.stepIndex, i.stepIndex), eq(workflowActions.kind, "submit")));
-    const done = new Set(answered.map((x) => x.userId));
+    const done = new Set(answered.flatMap((x) => [x.userId, x.onBehalfOfUserId]));
     const pending = resolveAssigneeUsers(step.assignees, members, i.startedBy).filter((u) => !done.has(u));
-    await notify(db, kind === "overdue" ? [...pending, w.createdBy] : pending, {
+    const n = {
       projectId: w.projectId,
       kind: kind === "overdue" ? "work.overdue" : "work.due_soon",
       title: msg(kind === "overdue" ? "works:notifications.stepOverdue" : "works:notifications.stepDueSoon", { number: w.number, step: step.name }),
       body: msg("works:notifications.due", { date: due.toLocaleDateString(intlLocale(DEFAULT_LANGUAGE)) }),
       link: workLink(w.projectId, w.id),
       due,
-    });
+    };
+    await notify(db, kind === "overdue" ? [...pending, w.createdBy] : pending, n);
+    await notifyDelegates(db, currentStepDelegates(i).filter((d) => pending.includes(d.forUserId)), n);
     if (kind === "overdue") out.overdue++;
     else out.dueSoon++;
   }

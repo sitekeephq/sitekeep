@@ -113,7 +113,8 @@
       "deleted": "Recycle Bin",
       "settings": "Project Settings",
       "sistemDurumu": "System Status",
-      "formaEsitleme": "Forma Sync"
+      "formaEsitleme": "Forma Sync",
+      "delegations": "Delegations"
     }
   },
   "topbar": {

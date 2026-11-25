@@ -16,6 +16,7 @@ import {
   type ReviewRow,
 } from "./review-types.js";
 import { notify, projectMemberRows, resolveAssigneeUsers } from "./service.js";
+import { currentStepDelegates, enterStepDelegates } from "./delegation.js";
 
 export async function loadInstance(db: Db, reviewId: string): Promise<InstanceRow> {
   const [instance] = await db
@@ -56,7 +57,11 @@ export async function cancelReview(ctx: ReviewCtx, a: ProjectAccess, review: Rev
   const step = instance.template.steps[instance.stepIndex]!;
   await notify(
     db,
-    [review.createdBy, ...resolveAssigneeUsers(step.assignees, members, instance.startedBy)].filter((u) => u !== a.user.id),
+    [
+      review.createdBy,
+      ...resolveAssigneeUsers(step.assignees, members, instance.startedBy),
+      ...currentStepDelegates(instance).map((d) => d.userId),
+    ].filter((u) => u !== a.user.id),
     {
       projectId: review.projectId,
       kind: "review.cancelled",
@@ -90,6 +95,7 @@ export async function reassignStep(
       .set({ template: { ...before.template, steps }, updatedAt: new Date() })
       .where(eq(workflowInstances.id, before.id))
       .returning();
+    await enterStepDelegates(tx, instance!);
     await tx.insert(workflowActions).values({
       instanceId: before.id,
       stepIndex: before.stepIndex,

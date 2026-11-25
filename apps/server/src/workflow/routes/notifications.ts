@@ -14,6 +14,7 @@ import { isAssignee } from "../../workflow/engine.js";
 import { SUBJECT_REVIEW, reviewLink } from "../../workflow/reviews.js";
 import { actorFor, withRoleIds } from "../../workflow/service.js";
 import { submittedNow } from "../review-access.js";
+import { openDelegateSteps, userNameMap } from "../delegation.js";
 import { activeModules } from "../../app/modules.js";
 
 export async function notificationRoutes(api: FastifyInstance, { db }: AppDeps) {
@@ -115,11 +116,18 @@ export async function myTasksFor(db: Db, user: AuthUser, onlyProjectId?: string)
   );
   const now = Date.now();
   const tasks: MyTaskDto[] = [];
+  // Steps the user answers as a delegate ("vekâleten", #190), with the person's name.
+  const delegated = await openDelegateSteps(db, rows.map((x) => x.i), user.id);
+  const workRowsAll = await workStepRows(db, projectRows.map((p) => p.id));
+  const delegatedWork = await openDelegateSteps(db, workRowsAll.map((x) => x.i), user.id);
+  const delegatedNames = await userNameMap(db, [...delegated.values(), ...delegatedWork.values()].map((d) => d.forUserId));
+  const behalf = (d: { forUserId: string } | undefined) => (d ? { onBehalfOf: { userId: d.forUserId, name: delegatedNames.get(d.forUserId) ?? "?" } } : {});
   for (const { i, r } of rows) {
-    if (done.has(i.id)) continue;
     const member = memberships.find((m) => m.projectId === i.projectId);
     const step = i.template.steps[i.stepIndex]!;
-    if (!isAssignee(step, actorFor(user, member, i.startedBy))) continue;
+    const own = !done.has(i.id) && isAssignee(step, actorFor(user, member, i.startedBy));
+    const d = own ? undefined : delegated.get(i.id);
+    if (!own && !d) continue;
     const p = projectRows.find((x) => x.id === i.projectId)!;
     tasks.push({
       projectId: p.id,
@@ -134,16 +142,11 @@ export async function myTasksFor(db: Db, user: AuthUser, onlyProjectId?: string)
       stepDueAt: i.stepDueAt?.toISOString() ?? null,
       overdue: !!i.stepDueAt && i.stepDueAt.getTime() < now,
       link: reviewLink(p.id, r.id),
+      ...behalf(d),
     });
   }
   // Work steps (RFI, submittal…) on the same engine.
-  const workRows = await db
-    .select({ i: workflowInstances, w: works })
-    .from(workflowInstances)
-    .innerJoin(workRevisions, and(eq(workflowInstances.subjectType, SUBJECT_WORK_REVISION), eq(workRevisions.id, workflowInstances.subjectId)))
-    .innerJoin(works, eq(works.id, workRevisions.workId))
-    .where(and(inArray(workflowInstances.projectId, projectRows.map((p) => p.id)), eq(workflowInstances.status, "running")))
-    .orderBy(asc(workflowInstances.stepDueAt));
+  const workRows = workRowsAll;
   const answered = workRows.length
     ? await db
         .select({ instanceId: workflowActions.instanceId, stepIndex: workflowActions.stepIndex })
@@ -157,10 +160,11 @@ export async function myTasksFor(db: Db, user: AuthUser, onlyProjectId?: string)
         )
     : [];
   for (const { i, w } of workRows) {
-    if (answered.some((x) => x.instanceId === i.id && x.stepIndex === i.stepIndex)) continue;
     const member = memberships.find((m) => m.projectId === i.projectId);
     const step = i.template.steps[i.stepIndex]!;
-    if (!isAssignee(step, actorFor(user, member, i.startedBy))) continue;
+    const own = !answered.some((x) => x.instanceId === i.id && x.stepIndex === i.stepIndex) && isAssignee(step, actorFor(user, member, i.startedBy));
+    const d = own ? undefined : delegatedWork.get(i.id);
+    if (!own && !d) continue;
     const p = projectRows.find((x) => x.id === i.projectId)!;
     tasks.push({
       projectId: p.id,
@@ -176,10 +180,23 @@ export async function myTasksFor(db: Db, user: AuthUser, onlyProjectId?: string)
       stepDueAt: i.stepDueAt?.toISOString() ?? null,
       overdue: !!i.stepDueAt && i.stepDueAt.getTime() < now,
       link: workLink(p.id, w.id),
+      ...behalf(d),
     });
   }
   for (const m of activeModules()) for (const source of m.taskSources ?? []) tasks.push(...(await source(db, user, projectRows, now)));
   return tasks;
+}
+
+/** Running work steps (RFI, submittal…) in the projects, earliest due first. */
+async function workStepRows(db: Db, projectIds: string[]) {
+  if (!projectIds.length) return [];
+  return db
+    .select({ i: workflowInstances, w: works })
+    .from(workflowInstances)
+    .innerJoin(workRevisions, and(eq(workflowInstances.subjectType, SUBJECT_WORK_REVISION), eq(workRevisions.id, workflowInstances.subjectId)))
+    .innerJoin(works, eq(works.id, workRevisions.workId))
+    .where(and(inArray(workflowInstances.projectId, projectIds), eq(workflowInstances.status, "running")))
+    .orderBy(asc(workflowInstances.stepDueAt));
 }
 
 /** Rows with `message` are rendered in the reader's language; older rows keep their stored text. */

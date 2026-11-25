@@ -33,6 +33,10 @@ export const MAIL_KINDS: Readonly<Record<string, EmailNotifyType>> = {
   "review.returned": "outcome",
   "cde.returned": "outcome",
   "work.decided": "outcome",
+  // Approval delegation (Platform module, issue #190): start, end, open items handed over.
+  "delegation.started": "delegation",
+  "delegation.ended": "delegation",
+  "delegation.handed_over": "delegation",
 };
 
 export function mailTypeOf(kind: string): EmailNotifyType | null {

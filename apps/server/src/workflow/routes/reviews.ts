@@ -42,6 +42,7 @@ import {
   reassignStep,
   startReview,
   submitStep,
+  userName,
   type InstanceRow,
   type ReviewRow,
 } from "../../workflow/reviews.js";
@@ -50,6 +51,7 @@ import { folderPath } from "../../workflow/chain-service.js";
 import { toDefinitionDto } from "../../modules/documents/public.js";
 import { actorFor, memberWithRoles } from "../../workflow/service.js";
 import { canSee, loadVisibleReview, submittedNow } from "../review-access.js";
+import { openDelegateSteps, stepActing } from "../delegation.js";
 import { checkSteps } from "../template-schemas.js";
 
 const assigneeSchema = z.object({ type: z.enum(["user", "company", "role"]), id: z.string().min(1).max(64) });
@@ -92,11 +94,13 @@ export async function reviewRoutes(api: FastifyInstance, deps: AppDeps) {
         visible.map((v) => v.r.id),
       );
       const submitted = await submittedNow(db, visible.map((v) => v.i), a.user.id);
+      // Steps the caller answers as a delegate (#190).
+      const delegated = await openDelegateSteps(db, visible.map((v) => v.i), a.user.id);
       const names = await userNames(db, visible.map((v) => v.r.createdBy));
       return visible
         .map(({ r, i }) => {
           const actor = actorFor(a.user, member, i.startedBy);
-          return toSummary(r, i, counts.get(r.id) ?? 0, names, myTurn(i, actor, submitted.has(i.id)));
+          return toSummary(r, i, counts.get(r.id) ?? 0, names, myTurn(i, actor, submitted.has(i.id)) || delegated.has(i.id));
         })
         .filter((s) => req.query.mine !== "1" || s.myTurn);
     },
@@ -142,17 +146,26 @@ export async function reviewRoutes(api: FastifyInstance, deps: AppDeps) {
         attributes: z
           .record(z.string().uuid(), z.record(z.string().trim().min(1).max(100), z.string().max(1000)))
           .optional(),
+        /** The step the answer is for: refused when it has moved on meanwhile (first answer wins). */
+        stepIndex: z.number().int().min(0).optional(),
       })
       .parse(req.body);
     const step = (await loadInstance(db, review.id)).stepIndex;
-    await submitStep(ctxFor(req), a, review, body);
+    const result = await submitStep(ctxFor(req), a, review, body);
+    const behalf = result.onBehalfOfUserId;
     await audit(db, {
       projectId: a.project.id,
       userId: a.user.id,
       action: "review.submitted",
       targetType: "review",
       targetId: review.id,
-      details: { number: review.number, name: review.name, stepIndex: step },
+      details: {
+        number: review.number,
+        name: review.name,
+        stepIndex: step,
+        // Approval delegation (#190): "X adına Y" (the user is Y).
+        ...(behalf ? { onBehalfOf: { userId: behalf, name: (await userName(db, behalf)) ?? "?" } } : {}),
+      },
     });
     return detail(db, a, review, requestLanguage(req));
   });
@@ -349,8 +362,8 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
 
   const userIds = [
     r.createdBy,
-    ...marks.map((m) => m.userId),
-    ...actions.map((x) => x.userId),
+    ...marks.flatMap((m) => [m.userId, m.onBehalfOfUserId]),
+    ...actions.flatMap((x) => [x.userId, x.onBehalfOfUserId]),
     ...i.template.steps.flatMap((s) => s.assignees.filter((x) => x.type === "user").map((x) => x.id)),
   ];
   const names = await userNames(db, userIds);
@@ -360,6 +373,9 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
     const x = submitted.find((y) => y.userId === userId && y.stepIndex === stepIndex);
     return x ? behalfOf(x) : [];
   };
+  // Approval delegation (#190): the person a delegate answered for comes first ("A adına B").
+  const delegatedDto = (personId: string | null | undefined): OnBehalfOfDto[] =>
+    personId ? [{ type: "user", id: personId, name: names.get(personId), delegated: true }] : [];
   // Companies / teams from the steps and from "on behalf of" records (assignees may have changed since).
   const groupRefs = [...i.template.steps.flatMap((s) => s.assignees), ...submitted.flatMap(behalfOf)];
   const companyIds = [...new Set(groupRefs.filter((x) => x.type === "company").map((x) => x.id))];
@@ -381,11 +397,15 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
     list.map((b) => ({ type: b.type, id: b.id, name: groupNames.get(b.id) }));
 
   const member = await memberRow(db, a);
-  const actor = actorFor(a.user, member, i.startedBy);
   const submittedBy = [
     ...new Set(marks.filter((m) => m.stepIndex === i.stepIndex).map((m) => m.userId)),
   ];
-  const turn = myTurn(i, actor, submittedBy.includes(a.user.id));
+  const answered = new Set(marks.filter((m) => m.stepIndex === i.stepIndex).map((m) => m.onBehalfOfUserId ?? m.userId));
+  const acting =
+    i.status === "running" && !submittedBy.includes(a.user.id)
+      ? (await stepActing(db, { instance: i, user: a.user, answered })).acting
+      : null;
+  const turn = !!acting;
 
   let targetFolderPath: string | null = null;
   const tree = r.targetFolderId ? await FolderTree.load(db, r.projectId) : null;
@@ -444,7 +464,7 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
       label: outcomeLabel(i.template.steps[m.stepIndex], m.optionCode ?? m.outcome, lang) ?? undefined,
       comment: m.comment,
       at: m.at.toISOString(),
-      onBehalfOf: behalfDto(behalfFor(m.userId, m.stepIndex)),
+      onBehalfOf: [...delegatedDto(m.onBehalfOfUserId), ...behalfDto(behalfFor(m.userId, m.stepIndex))],
     })),
     actions: actions.map((x) => ({
       id: x.id,
@@ -456,7 +476,7 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
       comment: x.comment,
       details: x.details,
       at: x.at.toISOString(),
-      ...(x.kind === "submit" ? { onBehalfOf: behalfDto(behalfOf(x)) } : {}),
+      ...(x.kind === "submit" ? { onBehalfOf: [...delegatedDto(x.onBehalfOfUserId), ...behalfDto(behalfOf(x))] } : {}),
     })),
     submittedBy,
     canAct: turn,
@@ -469,7 +489,9 @@ async function detail(db: Db, a: ProjectAccess, reviewRow: ReviewRow, lang?: str
     chain: i.template.chain ?? {},
     targetPattern: r.targetPattern,
     attributeDefinitions: defs.map(toDefinitionDto),
-    actingFor: turn ? behalfDto(onBehalfOf(i.template.steps[i.stepIndex]!, actor)) : [],
+    actingFor: acting
+      ? [...delegatedDto(acting.onBehalfOfUserId), ...behalfDto(onBehalfOf(i.template.steps[i.stepIndex]!, acting.actor))]
+      : [],
   };
 }
 

@@ -45,7 +45,8 @@
     "projectAdmins": "Project Administrators",
     "team": "{{name}} team",
     "deletedRole": "(deleted role)",
-    "onBehalfOf": "on behalf of {{names}}"
+    "onBehalfOf": "on behalf of {{names}}",
+    "delegated": "on behalf of {{name}} (as delegate)"
   },
   "actions": {
     "stepN": "step {{n}}",

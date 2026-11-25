@@ -393,6 +393,7 @@ export const {
   initialRevision,
   inkMask,
   isApprovedOutcome,
+  isAssigneeDelegate,
   isBcfGuid,
   isDowngrade,
   isGroupAddress,

@@ -14,10 +14,11 @@ import { projectAccess, userNames } from "../../core/security/access.js";
 import { audit } from "../../core/platform/audit.js";
 import { HttpError, badRequest, conflict, notFound } from "../../core/platform/http.js";
 import { msg, requestLanguage } from "../../i18n/index.js";
-import { localizedWorkType } from "@sitekeep/shared";
+import { isAssigneeDelegate, localizedWorkType } from "@sitekeep/shared";
 import { projectMembers, works } from "../../db/schema.js";
 import { requireWorkModule } from "../../projects/modules.js";
 import { notify } from "../../workflow/service.js";
+import { notifyDelegates, userNameMap, workAssigneeDelegates } from "../../workflow/delegation.js";
 import { isLetterType, isOutgoingLetter, letterOf, letterPatchSchema, mergeLetter } from "../letter.js";
 import {
   addDaysIso,
@@ -199,6 +200,14 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
     const cc = body.ccCompanyIds ? [...new Set(body.ccCompanyIds)].filter((c) => !(to ?? work.toCompanyIds).includes(c)) : undefined;
     const now = new Date();
     const closedNow = body.status !== undefined ? isClosed(type, body.status) : undefined;
+    // A new assignee: their delegates at this moment (#190); none when the assignee is removed.
+    const reassigned = body.assigneeUserId !== undefined && body.assigneeUserId !== work.assigneeUserId;
+    const assigneeDelegates = reassigned ? await workAssigneeDelegates(db, a.project.id, body.assigneeUserId ?? null, now) : undefined;
+    // "X adına Y": the caller acts on the work as the assignee's delegate.
+    const behalf =
+      work.assigneeUserId && work.assigneeUserId !== a.user.id && isAssigneeDelegate(work, a.user.id)
+        ? { onBehalfOf: { userId: work.assigneeUserId, name: (await userNameMap(db, [work.assigneeUserId])).get(work.assigneeUserId) ?? "?" } }
+        : {};
     const [updated] = await db.update(works).set({
       ...defined({
         title: body.title,
@@ -210,31 +219,35 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
         assigneeUserId: body.assigneeUserId,
         dueDate: body.dueDate,
         replyRequired: body.replyRequired,
+        assigneeDelegates,
       }),
       ...(closedNow === undefined ? {} : { closedAt: closedNow ? (work.closedAt ?? now) : null }),
       updatedAt: now,
     }).where(eq(works.id, work.id)).returning();
     const changed = Object.keys(defined(body)).filter((k) => k !== "status");
-    if (changed.length) await addEvent(db, work.id, "updated", a.user.id, null, { changed });
+    if (changed.length) await addEvent(db, work.id, "updated", a.user.id, null, { changed, ...behalf });
     if (body.status !== undefined && body.status !== work.status)
-      await addEvent(db, work.id, "status", a.user.id, null, { from: work.status, to: body.status });
+      await addEvent(db, work.id, "status", a.user.id, null, { from: work.status, to: body.status, ...behalf });
     await audit(db, {
       projectId: a.project.id,
       userId: a.user.id,
       action: "work.updated",
       targetType: "work",
       targetId: work.id,
-      details: { number: work.number, ...defined({ ...body, fields: body.fields ? Object.keys(body.fields) : undefined }) },
+      details: { number: work.number, ...defined({ ...body, fields: body.fields ? Object.keys(body.fields) : undefined }), ...behalf },
     });
-    if (body.assigneeUserId && body.assigneeUserId !== work.assigneeUserId && body.assigneeUserId !== a.user.id)
-      await notify(db, [body.assigneeUserId], {
+    if (body.assigneeUserId && body.assigneeUserId !== work.assigneeUserId && body.assigneeUserId !== a.user.id) {
+      const n = {
         projectId: a.project.id,
         kind: "work.assigned",
         title: msg("works:notifications.assigned", { number: work.number, title: updated!.title }),
         link: workLink(a.project.id, work.id),
         due: updated!.dueDate,
         actorId: a.user.id,
-      });
+      };
+      await notify(db, [body.assigneeUserId], n);
+      await notifyDelegates(db, assigneeDelegates ?? [], n);
+    }
     return r.detail(a, updated!.id, requestLanguage(req));
   });
 

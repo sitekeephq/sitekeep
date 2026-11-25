@@ -208,7 +208,7 @@ function FlowBox({ w, onChanged }: { w: WorkDetailDto; onChanged(): void }) {
   async function send() {
     setMsg(null);
     try {
-      await buildApi.respond(project.id, w.id, { outcome, comment: comment || null, response: response || null });
+      await buildApi.respond(project.id, w.id, { outcome, comment: comment || null, response: response || null, stepIndex: f.stepIndex });
       onChanged();
     } catch (e) {
       setMsg((e as Error).message);
@@ -228,6 +228,7 @@ function FlowBox({ w, onChanged }: { w: WorkDetailDto; onChanged(): void }) {
           {s.answers.map((x, i) => (
             <div key={i} style={{ marginLeft: 22 }}>
               {x.userName}
+              {x.delegatedFor && <span className="badge info"> {t("build.flow.delegated", { name: x.delegatedFor })}</span>}
               {x.onBehalfOf.length > 0 && <span className="muted"> ({t("build.flow.onBehalfOf", { names: x.onBehalfOf.join(", ") })})</span>}: <strong>{x.label}</strong>
               {x.comment && <span> — {x.comment}</span>}
               {x.response && <div style={{ whiteSpace: "pre-wrap" }}>“{x.response}”</div>}
@@ -237,7 +238,11 @@ function FlowBox({ w, onChanged }: { w: WorkDetailDto; onChanged(): void }) {
       ))}
       {f.canAct && (
         <div className="card" style={{ marginTop: 8 }}>
-          <label>{t("common:fields.result")}{f.actingFor.length > 0 && <span className="muted"> · {t("build.flow.onBehalfOf", { names: f.actingFor.join(", ") })}</span>}</label>
+          <label>
+            {t("common:fields.result")}
+            {f.delegatedFor && <span className="muted"> · {t("build.flow.delegated", { name: f.delegatedFor })}</span>}
+            {f.actingFor.length > 0 && <span className="muted"> · {t("build.flow.onBehalfOf", { names: f.actingFor.join(", ") })}</span>}
+          </label>
           <div className="row wrap">
             {f.options.map((o) => (
               <button key={o.code} className={outcome === o.code ? "primary small" : "small"} onClick={() => setOutcome(o.code)}>

@@ -457,7 +457,8 @@
       },
       "actions": {
         "respond": "Respond"
-      }
+      },
+      "delegated": "on behalf of {{name}} (as delegate)"
     }
   },
   "meeting": {
@@ -572,5 +573,9 @@
       "create_one": "Create {{count}} Item",
       "create_other": "Create {{count}} Items"
     }
+  },
+  "delegation": {
+    "badge": "As delegate",
+    "onBehalfOf": "As delegate on behalf of {{name}}"
   }
 }

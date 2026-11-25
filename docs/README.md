@@ -56,6 +56,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [Google sign-in](features/GOOGLE_SIGN_IN.md)
 - [Invitations](features/INVITATIONS.md)
 - [Workflow e-mail](features/WORKFLOW_EMAIL.md)
+- [Approval delegation (vekâlet)](features/DELEGATION.md)
 - [Companies](features/COMPANIES.md)
 - [Document search](features/DOCUMENT_SEARCH.md)
 - [Parameter Change](features/PARAMETER_CHANGE.md)

@@ -148,6 +148,7 @@ function RowList({ rows, empty, keepSearch }: { rows: TodayRowDto[]; empty?: str
 
 /** One line: number, title, type, status, due date — the whole line links to the record. */
 function TodayRow({ row, keepSearch }: { row: TodayRowDto; keepSearch?: string }) {
+  const { t } = useTranslation("works");
   // In the hub's "Bana Düşenler" a work opens in the detail pane next to the list.
   const link = keepSearch && /\/works\/[^/?]+$/.test(row.link) ? `${row.link}${keepSearch}` : row.link;
   return (
@@ -157,9 +158,11 @@ function TodayRow({ row, keepSearch }: { row: TodayRowDto; keepSearch?: string }
         <span className="muted small today-row-meta">
           <span className="mono">{row.number}</span> · {row.typeLabel}
           {row.note ? ` · ${row.note}` : ""}
+          {row.onBehalfOf ? ` · ${t("delegation.onBehalfOf", { name: row.onBehalfOf })}` : ""}
         </span>
       </span>
       <span className="today-row-side">
+        {row.onBehalfOf && <span className="badge info">{t("delegation.badge")}</span>}
         {row.statusLabel && <span className={`badge ${row.statusTone ?? ""}`}>{row.statusLabel}</span>}
         {row.dueDate && <span className={`small${row.overdue ? " error" : " muted"}`}>{formatDay(row.dueDate)}</span>}
       </span>

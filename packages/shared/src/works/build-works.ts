@@ -349,6 +349,8 @@ export interface WorkAnswerDto {
   response: string | null;
   /** Teams / companies the answer counts for. */
   onBehalfOf: string[];
+  /** Approval delegation (#190): the person the answer was given for as a delegate ("A adına"). */
+  delegatedFor?: string | null;
   at: string;
 }
 
@@ -379,6 +381,8 @@ export interface WorkFlowDto {
   options: OutcomeOption[];
   /** Teams / companies the caller's answer will count for. */
   actingFor: string[];
+  /** The caller answers as the delegate of this person (#190, "vekâleten"). */
+  delegatedFor?: string | null;
   /** RFI: an official response text is required with an answer. */
   needsResponse: boolean;
 }

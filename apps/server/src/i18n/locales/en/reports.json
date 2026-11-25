@@ -352,7 +352,8 @@
         "endedAt": "Step Finish",
         "days": "Duration (days)",
         "dueAt": "Step Due Date",
-        "late": "Is Late"
+        "late": "Is Late",
+        "onBehalfOf": "On behalf of"
       },
       "hints": {
         "subject": "review name / work item number / form number",
@@ -360,7 +361,11 @@
         "responsible": "person, company or team assigned to the step (comma-separated)",
         "endedAt": "null while running",
         "days": "to the finish or to today, with decimals",
-        "late": "past its due date (finished or running step)"
+        "late": "past its due date (finished or running step)",
+        "onBehalfOf": "answers given as a delegate, \"B on behalf of A\"; empty when none"
+      },
+      "values": {
+        "onBehalfOf": "{{delegate}} on behalf of {{person}}"
       }
     },
     "locations": {

@@ -69,7 +69,8 @@
     "editViewNotAllowed": "Only the owner or a project administrator can change this view.",
     "othersViewFilters": "The filters of someone else's view cannot be changed.",
     "deleteViewNotAllowed": "Only the owner or a project administrator can delete this view.",
-    "orderOwnViewsOnly": "You can only reorder your own views."
+    "orderOwnViewsOnly": "You can only reorder your own views.",
+    "stepMovedOn": "This step was completed or changed before your answer; reload the page."
   },
   "messages": {
     "deletedFolder": "(deleted folder)",
@@ -155,5 +156,10 @@
     "due": "Due date: {{date}}",
     "open": "Open it in SiteKeep: {{url}}",
     "footer": "You get this e-mail because of your SiteKeep notification settings. You can turn it off per type under Account > E-mail notifications."
+  },
+  "delegation": {
+    "notificationTitle": "As delegate (on behalf of {{name}}): {{title}}",
+    "answeredForYou": "{{name}} already answered this step on your behalf (as your delegate).",
+    "alreadyAnsweredFor": "{{name}} already answered this step; you cannot answer it as their delegate."
   }
 }

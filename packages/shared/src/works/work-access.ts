@@ -18,6 +18,16 @@ export interface WorkVisibilityInfo {
   fromCompanyId: string | null;
   toCompanyIds: readonly string[];
   ccCompanyIds: readonly string[];
+  /**
+   * Delegates of the assignee when the work was assigned ("vekâlet", issue #190): they see and act
+   * on the work like the assignee.
+   */
+  assigneeDelegates?: readonly { forUserId: string; userId: string }[] | null;
+}
+
+/** The viewer is the assignee's delegate on this work (assigned during a delegation). */
+export function isAssigneeDelegate(w: Pick<WorkVisibilityInfo, "assigneeUserId" | "assigneeDelegates">, userId: string): boolean {
+  return !!w.assigneeUserId && !!w.assigneeDelegates?.some((d) => d.userId === userId && d.forUserId === w.assigneeUserId);
 }
 
 /** The viewer's company created (owns) or sends the work. */
@@ -39,12 +49,14 @@ export function isWorkAddressee(w: WorkVisibilityInfo, v: WorkViewer): boolean {
  */
 export function canSeeWork(w: WorkVisibilityInfo, v: WorkViewer): boolean {
   if (v.isProjectAdmin) return true;
-  if (w.createdBy === v.userId || w.assigneeUserId === v.userId) return true;
+  if (w.createdBy === v.userId || w.assigneeUserId === v.userId || isAssigneeDelegate(w, v.userId)) return true;
   if (isWorkOwnerSide(w, v)) return true;
   return w.status !== WORK_STATUS.draft && isWorkAddressee(w, v);
 }
 
-/** Who may edit fields, links and status: admins, creator, assignee, owner/sender company members. */
+/** Who may edit fields, links and status: admins, creator, assignee (and their delegate), owner/sender company members. */
 export function canEditWork(w: WorkVisibilityInfo, v: WorkViewer): boolean {
-  return v.isProjectAdmin || w.createdBy === v.userId || w.assigneeUserId === v.userId || isWorkOwnerSide(w, v);
+  return (
+    v.isProjectAdmin || w.createdBy === v.userId || w.assigneeUserId === v.userId || isAssigneeDelegate(w, v.userId) || isWorkOwnerSide(w, v)
+  );
 }

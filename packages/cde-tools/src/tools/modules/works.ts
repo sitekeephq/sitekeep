@@ -271,12 +271,13 @@ tool(
 
 tool(
   "cde_today",
-  "My tasks across projects: works assigned to me, letters awaiting my reply, transmittals to confirm, due soon, overdue, and review steps waiting for me.",
+  "My tasks across projects: works assigned to me, letters awaiting my reply, transmittals to confirm, due soon, overdue, and review steps waiting for me. " +
+    "onBehalfOf: the row is mine as a delegate (vekâleten) of that person.",
   {},
   async () => {
     const t = await call<Any>("GET", "/me/today");
     const rows = (list: Any[]) =>
-      list.slice(0, 10).map((w) => ({ projectId: w.projectId, project: w.projectCode, ...workRow(w) }));
+      list.slice(0, 10).map((w) => clean({ projectId: w.projectId, project: w.projectCode, ...workRow(w), onBehalfOf: w.onBehalfOf }));
     return clean({
       counts: t.counts,
       assigned: rows(t.assigned ?? []),
@@ -285,7 +286,19 @@ tool(
       dueSoon: rows(t.dueSoon ?? []),
       overdue: rows(t.overdue ?? []),
       tasks: (t.tasks ?? []).slice(0, 15).map((k: Any) =>
-        clean({ projectId: k.projectId, project: k.projectCode, kind: k.kind, subjectId: k.subjectId, code: k.code ?? `#${k.number}`, name: k.name, step: k.stepName, due: day(k.stepDueAt), overdue: !!k.overdue }),
+        clean({
+          projectId: k.projectId,
+          project: k.projectCode,
+          kind: k.kind,
+          subjectId: k.subjectId,
+          code: k.code ?? `#${k.number}`,
+          name: k.name,
+          step: k.stepName,
+          due: day(k.stepDueAt),
+          overdue: !!k.overdue,
+          // "vekâleten": the caller answers this step as the delegate of this person (#190).
+          onBehalfOf: k.onBehalfOf?.name,
+        }),
       ),
     });
   },
@@ -300,7 +313,7 @@ tool(
     // ai=0: reading over MCP never starts a summary run of the caller's model.
     const t = await call<Any>("GET", `/projects/${a.projectId}/today?ai=0`);
     const row = (r: Any) =>
-      clean({ id: r.id, kind: r.kind, number: r.number, title: cut(r.title, 120), type: r.typeLabel, status: r.statusLabel, due: day(r.dueDate), overdue: !!r.overdue, note: r.note, from: r.party });
+      clean({ id: r.id, kind: r.kind, number: r.number, title: cut(r.title, 120), type: r.typeLabel, status: r.statusLabel, due: day(r.dueDate), overdue: !!r.overdue, note: r.note, from: r.party, onBehalfOf: r.onBehalfOf });
     const list = (rows: Any[] = [], n = 10) => {
       const c = capList(rows, n);
       return clean({ items: c.items.map(row), more: c.more });

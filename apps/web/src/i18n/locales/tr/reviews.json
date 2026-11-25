@@ -45,7 +45,8 @@
     "projectAdmins": "Proje Yöneticileri",
     "team": "{{name}} ekibi",
     "deletedRole": "(silinmiş rol)",
-    "onBehalfOf": "{{names}} adına"
+    "onBehalfOf": "{{names}} adına",
+    "delegated": "{{name}} adına (vekâleten)"
   },
   "actions": {
     "stepN": "{{n}}. adım",

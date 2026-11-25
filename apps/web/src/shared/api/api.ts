@@ -607,6 +607,7 @@ export const api = {
     pid: string,
     rid: string,
     body: {
+      stepIndex?: number;
       comment?: string | null;
       files: { reviewFileId: string; outcome: OutcomeCode | string; comment?: string | null }[];
       attributes?: Record<string, Record<string, string>>;

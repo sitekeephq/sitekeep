@@ -331,7 +331,8 @@
       "person": "Person",
       "action": "Action",
       "details": "Details"
-    }
+    },
+    "onBehalfOf": "on behalf of {{name}} (as delegate)"
   },
   "modules": {
     "help": {

@@ -57,6 +57,39 @@ export function onBehalfOf(step: WorkflowStep, actor: ActorContext): WorkflowAss
   );
 }
 
+/** Who a user acts as on a step (approval delegation, issue #190). */
+export interface Acting {
+  /** The engine's view of the one answering: the user, or the person they act for. */
+  actor: ActorContext;
+  /** The user who acts. */
+  userId: string;
+  /** The person the user acts for as a delegate; null when they act for themselves. */
+  onBehalfOfUserId: string | null;
+  delegationId: string | null;
+}
+
+/**
+ * The user acts for themselves when they are an assignee who has not answered yet; otherwise as the
+ * delegate of a person of the step who has not answered yet (first one in the list). `answered`
+ * holds the people answers were given for (themselves or through a delegate): the first action wins.
+ */
+export function actingAs(
+  step: WorkflowStep,
+  self: ActorContext,
+  delegates: readonly { forUserId: string; userId: string; delegationId: string }[],
+  answered: ReadonlySet<string>,
+  principal: (userId: string) => ActorContext | null,
+): Acting | null {
+  if (isAssignee(step, self) && !answered.has(self.userId))
+    return { actor: self, userId: self.userId, onBehalfOfUserId: null, delegationId: null };
+  for (const d of delegates) {
+    if (d.userId !== self.userId || answered.has(d.forUserId)) continue;
+    const p = principal(d.forUserId);
+    if (p && isAssignee(step, p)) return { actor: p, userId: self.userId, onBehalfOfUserId: d.forUserId, delegationId: d.delegationId };
+  }
+  return null;
+}
+
 export interface StepSubmission {
   actor: ActorContext;
   /** Outcome per item (e.g. review file id). */

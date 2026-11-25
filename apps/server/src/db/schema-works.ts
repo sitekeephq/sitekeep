@@ -30,6 +30,7 @@ import type {
   WorkStatusDef,
   WorkTypeSettings,
   OutcomeCode,
+  DelegateGrant,
 } from "@sitekeep/shared";
 import { companies, projects, users } from "./schema.js";
 import { workflowInstances, workflowTemplates } from "./schema-workflow.js";
@@ -114,6 +115,8 @@ export const works = pgTable(
     /** "Bilgi" (info) recipients. */
     ccCompanyIds: uuid("cc_company_ids").array().notNull().default(sql`'{}'::uuid[]`),
     assigneeUserId: uuid("assignee_user_id").references(() => users.id),
+    /** Delegates of the assignee when the work was assigned (issue #190, workflow/delegation.ts). */
+    assigneeDelegates: jsonb("assignee_delegates").$type<DelegateGrant[]>().notNull().default([]),
     dueDate: text("due_date"),
     replyRequired: boolean("reply_required").notNull().default(false),
     delivery: jsonb("delivery").$type<WorkDelivery>(),

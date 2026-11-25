@@ -69,7 +69,8 @@
     "editViewNotAllowed": "Bu görünümü yalnızca sahibi veya proje yöneticisi değiştirebilir.",
     "othersViewFilters": "Başkasının görünümünün filtreleri değiştirilemez.",
     "deleteViewNotAllowed": "Bu görünümü yalnızca sahibi veya proje yöneticisi silebilir.",
-    "orderOwnViewsOnly": "Yalnızca kendi görünümlerinizi sıralayabilirsiniz."
+    "orderOwnViewsOnly": "Yalnızca kendi görünümlerinizi sıralayabilirsiniz.",
+    "stepMovedOn": "Bu adım siz yanıtlamadan önce tamamlandı ya da değişti; sayfayı yenileyin."
   },
   "messages": {
     "deletedFolder": "(silinmiş klasör)",
@@ -155,5 +156,10 @@
     "due": "Termin: {{date}}",
     "open": "SiteKeep'te aç: {{url}}",
     "footer": "Bu e-postayı SiteKeep bildirim ayarlarınız nedeniyle alıyorsunuz. Hesap > E-posta bildirimleri bölümünden türe göre kapatabilirsiniz."
+  },
+  "delegation": {
+    "notificationTitle": "Vekâleten ({{name}} adına): {{title}}",
+    "answeredForYou": "Bu adımı {{name}} sizin adınıza (vekâleten) yanıtladı.",
+    "alreadyAnsweredFor": "{{name}} bu adımı zaten yanıtladı; vekil olarak yanıt veremezsiniz."
   }
 }

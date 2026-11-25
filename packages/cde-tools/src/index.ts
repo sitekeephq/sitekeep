@@ -7,6 +7,7 @@ import { registerBcfTools } from "./tools/bcf.js";
 import { registerWorksTools } from "./tools/modules/works.js";
 import { registerWorkWriteTools } from "./tools/modules/works-write.js";
 import { registerReviewTools } from "./tools/modules/reviews.js";
+import { registerDelegationTools } from "./tools/modules/delegations.js";
 import { registerFormTools, registerFormWriteTools } from "./tools/modules/forms.js";
 import { registerScheduleTools } from "./tools/modules/schedule.js";
 import { registerCoordinationTools } from "./tools/modules/coordination.js";
@@ -31,6 +32,6 @@ export function cdeInstructions(readOnly: boolean): string { return "Tools for S
 export function cdeToolDefinitions(call: CdeCall, options: Pick<CdeToolsOptions, "readOnly" | "localFiles" | "download" | "devTools" | "modules"> = {}): CdeToolDef[] {
   const definitions: CdeToolDef[] = [];
   const tool: ToolAdder = (name, description, shape, run, flags = {}) => { if (flags.write && options.readOnly) return; if (flags.local && !options.localFiles) return; if (flags.dev && !options.devTools) return; const module = TOOL_MODULES[name]; if (module && options.modules && !options.modules.includes(module)) return; definitions.push({ name, description, shape, write: !!flags.write, local: !!flags.local, ...(flags.dev && { dev: true }), ...(flags.destructive && { destructive: true }), run: run as CdeToolDef["run"] }); };
-  registerCoreRestTools(tool, call, options); registerBcfTools(tool, call, { localFiles: options.localFiles, download: options.download }); registerWorksTools(tool, call); registerReviewTools(tool, call); registerFormTools(tool, call); registerScheduleTools(tool, call); registerCoordinationTools(tool, call); registerDocumentTools(tool, call); registerWorkWriteTools(tool, call); registerFormWriteTools(tool, call); registerModelTools(tool, call); registerParamChangeTools(tool, call); registerReportTools(tool, call); registerAiTools(tool, call); registerDevTools(tool as never, call); return definitions;
+  registerCoreRestTools(tool, call, options); registerBcfTools(tool, call, { localFiles: options.localFiles, download: options.download }); registerWorksTools(tool, call); registerReviewTools(tool, call); registerDelegationTools(tool, call); registerFormTools(tool, call); registerScheduleTools(tool, call); registerCoordinationTools(tool, call); registerDocumentTools(tool, call); registerWorkWriteTools(tool, call); registerFormWriteTools(tool, call); registerModelTools(tool, call); registerParamChangeTools(tool, call); registerReportTools(tool, call); registerAiTools(tool, call); registerDevTools(tool as never, call); return definitions;
 }
 export function registerCdeTools(server: McpServer, call: CdeCall, options: CdeToolsOptions = {}): string[] { return registerTools(server, call, options, cdeToolDefinitions); }

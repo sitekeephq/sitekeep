@@ -28,6 +28,8 @@ export function reviewLabel(r: Pick<ReviewRow, "number" | "name" | "code">): Msg
 
 export interface SubmitInput {
   comment?: string | null;
+  /** The step the answer is for; refused (conflict) when the step has moved on meanwhile. */
+  stepIndex?: number;
   /** outcome: a base code, or a custom outcome code of the step. */
   files: { reviewFileId: string; outcome: string; comment?: string | null }[];
   /** Values for the step's required attributes, per review file id. */

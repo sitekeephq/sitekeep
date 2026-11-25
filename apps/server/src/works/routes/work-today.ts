@@ -3,6 +3,7 @@ import {
   WORK_DUE_SOON_DAYS,
   WORK_STATUS,
   canSeeWork,
+  isAssigneeDelegate,
   isWorkAddressee,
   type MyTaskDto,
   type TodayDto,
@@ -51,7 +52,7 @@ export function registerWorkTodayRoutes(r: WorksRouteContext) {
       const receipts = rows.length
         ? await db.select().from(workReceipts).where(inArray(workReceipts.workId, rows.map((x) => x.w.id)))
         : [];
-      const names = await userNames(db, rows.map((x) => x.w.createdBy));
+      const names = await userNames(db, rows.flatMap((x) => [x.w.createdBy, isAssigneeDelegate(x.w, user.id) ? x.w.assigneeUserId : null]));
       for (const { w, t } of rows) {
         const m = memberships.find((x) => x.projectId === w.projectId);
         const viewer: WorkViewer = {
@@ -69,7 +70,10 @@ export function registerWorkTodayRoutes(r: WorksRouteContext) {
         };
         const sent = w.status !== WORK_STATUS.draft;
         const actionRecipient = !!viewer.companyId && w.toCompanyIds.includes(viewer.companyId);
-        const mine = w.assigneeUserId === user.id;
+        // Assigned to someone the caller is the delegate of (#190): theirs as well, "vekâleten".
+        const delegated = w.assigneeUserId !== user.id && isAssigneeDelegate(w, user.id);
+        if (delegated) dto.onBehalfOf = names.get(w.assigneeUserId!) ?? "?";
+        const mine = w.assigneeUserId === user.id || delegated;
         const received = !!viewer.companyId && receipts.some((x) => x.workId === w.id && x.companyId === viewer.companyId);
         if (mine) out.assigned.push(dto);
         if (sent && actionRecipient && w.replyRequired && (w.status === WORK_STATUS.sent || w.status === WORK_STATUS.received))

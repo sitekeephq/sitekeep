@@ -41,6 +41,8 @@ export async function workFlowRoutes(api: FastifyInstance, deps: ResolvedDeps) {
         outcome: z.string().min(1).max(60),
         comment: z.string().trim().max(10000).nullish(),
         response: z.string().trim().max(20000).nullish(),
+        /** The step the answer is for: refused when it has moved on meanwhile (first answer wins). */
+        stepIndex: z.number().int().min(0).optional(),
       })
       .parse(req.body);
     await respondWork(db, a, work, type, body);

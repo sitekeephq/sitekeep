@@ -26,6 +26,7 @@ import {
   WORK_STATUS,
   can,
   canSeeWork,
+  isAssigneeDelegate,
   isWorkAddressee,
   type HubViewKey,
   type MyTaskDto,
@@ -311,7 +312,10 @@ export async function projectToday(db: Db, a: ProjectAccess, now = new Date(), l
   const visibleWorks = workRows.filter((w) => canSeeWork(w, viewer) || participant.has(w.id));
   const openWorks = visibleWorks.filter((w) => !isClosed(types.find((t) => t.id === w.typeId)!, w.status));
   const receipts = openWorks.length ? await db.select().from(workReceipts).where(inArray(workReceipts.workId, openWorks.map((w) => w.id))) : [];
-  const names = await userNames(db, openWorks.map((w) => w.createdBy));
+  const names = await userNames(db, [
+    ...openWorks.map((w) => w.createdBy),
+    ...openWorks.filter((w) => isAssigneeDelegate(w, a.user.id)).map((w) => w.assigneeUserId),
+  ]);
   // Sender companies: who waits for an answer ("Prota'nın 2 bilgi talebi").
   const fromIds = [...new Set(openWorks.map((w) => w.fromCompanyId).filter((x): x is string => !!x))];
   const companyNames = new Map(
@@ -337,6 +341,9 @@ export async function projectToday(db: Db, a: ProjectAccess, now = new Date(), l
     const actionRecipient = !!viewer.companyId && w.toCompanyIds.includes(viewer.companyId);
     const received = !!viewer.companyId && receipts.some((r) => r.workId === w.id && r.companyId === viewer.companyId);
     if (w.assigneeUserId === a.user.id) (t.category === "action" ? mine.actions : mine.works).push(row);
+    // Assigned to someone the caller is the delegate of (#190): "vekâleten".
+    else if (isAssigneeDelegate(w, a.user.id))
+      (t.category === "action" ? mine.actions : mine.works).push({ ...row, onBehalfOf: names.get(w.assigneeUserId!) ?? "?" });
     if (sent && actionRecipient && w.replyRequired && (w.status === WORK_STATUS.sent || w.status === WORK_STATUS.received))
       mine.replies.push({ ...row, note: tr("workflow:today.replyAwaited") });
     if (w.status === WORK_STATUS.sent && isWorkAddressee(w, viewer) && !received) mine.receipts.push({ ...row, note: tr("workflow:today.receiptAwaited") });
@@ -448,6 +455,7 @@ function taskRow(t: MyTaskDto, lang: string): TodayRowDto {
     overdue: t.overdue,
     link: t.link,
     note: `${t.stepIndex + 1}. ${t.stepName}`,
+    ...(t.onBehalfOf ? { onBehalfOf: t.onBehalfOf.name } : {}),
   };
 }
 

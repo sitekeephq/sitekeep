@@ -37,6 +37,10 @@ export function auditSummary(e: Pick<AuditEntryDto, "action" | "details" | "targ
   const parts: string[] = [];
   if (e.targetName && d?.name === undefined) parts.push(e.targetName);
   if (d) for (const k of SUMMARY_KEYS) if (d[k] !== undefined) parts.push(`${k}: ${String(d[k])}`);
+  // Approval delegation (#190): the person is the delegate, acting for this one ("X adına Y").
+  const behalf = d?.onBehalfOf as { name?: unknown } | undefined;
+  if (behalf && typeof behalf === "object" && behalf.name)
+    parts.push(i18n.t("projectSettings:activity.onBehalfOf", { name: String(behalf.name) }) as string);
   if (parts.length || !d) return parts.join(" · ");
   return JSON.stringify(d).slice(0, 200);
 }

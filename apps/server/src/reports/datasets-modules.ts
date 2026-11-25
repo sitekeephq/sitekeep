@@ -35,7 +35,7 @@ import { locationPaths } from "../locations/paths.js";
 import { SUBJECT_REVIEW, type InstanceRow, type ReviewRow } from "../workflow/reviews.js";
 import { actorFor, folderGate, memberWithRoles } from "../workflow/service.js";
 import { workBase } from "./datasets-works.js";
-import { labelFor, msg } from "../i18n/index.js";
+import { labelFor, msg, tFor } from "../i18n/index.js";
 import { fileVisibility, folderInfo, iso, labelValues, reportDatasets, type FolderInfo, type ReportContext } from "./datasets.js";
 import { dayKey } from "./engine.js";
 import { capability } from "../sdk/capabilities.js";
@@ -237,6 +237,7 @@ reportDatasets.register("workflow_steps", {
     days: { type: "number", label: msg("reports:datasets.workflowSteps.fields.days"), description: msg("reports:datasets.workflowSteps.hints.days") },
     dueAt: { type: "date", label: msg("reports:datasets.workflowSteps.fields.dueAt") },
     late: { type: "boolean", label: msg("reports:datasets.workflowSteps.fields.late"), description: msg("reports:datasets.workflowSteps.hints.late") },
+    onBehalfOf: { type: "string", label: msg("reports:datasets.workflowSteps.fields.onBehalfOf"), description: msg("reports:datasets.workflowSteps.hints.onBehalfOf") },
   },
   async load(ctx) {
     const pid = ctx.access.project.id;
@@ -286,6 +287,13 @@ reportDatasets.register("workflow_steps", {
     const roleName = new Map(roles.map((r) => [r.id, r.name]));
     const people = await ctx.people();
     await people.ensure(shown.flatMap((x) => [x.i.startedBy, ...x.i.template.steps.flatMap((s) => s.assignees.filter((a) => a.type === "user").map((a) => a.id))]));
+    await people.ensure(actions.flatMap((x) => (x.onBehalfOfUserId && x.userId ? [x.onBehalfOfUserId, x.userId] : [])));
+    // Approval delegation (#190): answers a delegate gave in the step, "A adına B".
+    const behalfText = (list: typeof actions, stepIndex: number, from: Date, to: Date | null) =>
+      list
+        .filter((x) => x.kind === "submit" && x.stepIndex === stepIndex && x.onBehalfOfUserId && x.userId && x.at >= from && (!to || x.at <= to))
+        .map((x) => tFor(ctx.lang)("reports:datasets.workflowSteps.values.onBehalfOf", { person: people.name(x.onBehalfOfUserId!) ?? "?", delegate: people.name(x.userId!) ?? "?" }))
+        .join(", ") || null;
 
     const who = (step: WorkflowStep | undefined, startedBy: string) => {
       const names: string[] = [];
@@ -332,6 +340,7 @@ reportDatasets.register("workflow_steps", {
             const d = status === "running" ? (i.stepDueAt ?? due) : due;
             return !!d && (end ?? ctx.now) > d;
           })(),
+          onBehalfOf: behalfText(mine, stepIndex, start, end),
         });
       };
       let cur = mine.find((x) => x.kind === "start")?.at ?? i.createdAt;

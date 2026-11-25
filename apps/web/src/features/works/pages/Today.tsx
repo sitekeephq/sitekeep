@@ -70,6 +70,15 @@ export function TodayPage() {
                   </td>
                   <td>
                     {task.stepIndex + 1}. {task.stepName}
+                    {task.onBehalfOf && (
+                      <>
+                        {" "}
+                        <span className="badge info" title={t("delegation.onBehalfOf", { name: task.onBehalfOf.name })}>
+                          {t("delegation.badge")}
+                        </span>
+                        <div className="muted small">{t("delegation.onBehalfOf", { name: task.onBehalfOf.name })}</div>
+                      </>
+                    )}
                   </td>
                   <td>
                     {task.stepDueAt ? (
@@ -103,6 +112,7 @@ export function TodayPage() {
 
 function WorkGroup({ title, items }: { title: string; items: TodayWorkDto[] }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("works");
   return (
     <section className="card" style={{ padding: 0 }}>
       <h2 style={{ padding: "12px 12px 0" }}>
@@ -123,7 +133,14 @@ function WorkGroup({ title, items }: { title: string; items: TodayWorkDto[] }) {
               <td className="mono" style={{ width: 230 }}>
                 {w.number}
               </td>
-              <td>{w.title}</td>
+              <td>
+                {w.title}
+                {w.onBehalfOf && (
+                  <div className="muted small">
+                    <span className="badge info">{t("delegation.badge")}</span> {t("delegation.onBehalfOf", { name: w.onBehalfOf })}
+                  </div>
+                )}
+              </td>
               <td style={{ width: 110 }}>
                 <WorkStatusBadge w={w} />
               </td>
