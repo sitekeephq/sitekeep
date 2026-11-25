@@ -148,5 +148,12 @@
     "paramChangeAuthoring_other": "sent {{count}} parameter changes to Revit",
     "paramChangeVerified_other": "{{count}} parameter changes verified in the Revit version",
     "paramChangeValuesLost_other": "{{count}} parameter changes lost in the new version"
+  },
+  "mail": {
+    "subject": "[{{code}}] {{title}}",
+    "project": "Project: {{code}}",
+    "due": "Due date: {{date}}",
+    "open": "Open it in SiteKeep: {{url}}",
+    "footer": "You get this e-mail because of your SiteKeep notification settings. You can turn it off per type under Account > E-mail notifications."
   }
 }

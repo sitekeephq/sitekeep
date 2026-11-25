@@ -38,7 +38,18 @@ export function projectModuleHelp(m: ProjectModule, lang: string = SHARED_DEFAUL
 }
 
 /** Stored in projects.settings (jsonb). Missing modules count as on. */
+/**
+ * Workflow e-mail types (docs/features/WORKFLOW_EMAIL.md): a review step or work item assigned to
+ * you / your turn, due soon, overdue, and the outcome of a review or work item.
+ */
+export const EMAIL_NOTIFY_TYPES = ["assigned", "due_soon", "overdue", "outcome"] as const;
+export type EmailNotifyType = (typeof EMAIL_NOTIFY_TYPES)[number];
+/** On/off per type; a missing type follows the next level (user -> project default -> on). */
+export type EmailNotifyPrefs = Partial<Record<EmailNotifyType, boolean>>;
+
 export interface ProjectSettings {
+  /** Default for the project's members who made no choice of their own (project administrator). */
+  emailNotifications?: EmailNotifyPrefs;
   modules?: Partial<Record<ProjectModule, boolean>>;
   /** Language the project was set up in (project template v2: picks the template's per-language values). */
   language?: string;

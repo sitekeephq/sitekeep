@@ -355,6 +355,7 @@ export async function afterEvaluate(ctx: ReviewCtx, review: ReviewRow, ev: Evalu
       title: msg("workflow:notifications.filesReturned", { review: reviewLabel(review), count: ev.stopped.length, step: step.name }),
       body: names.join(", "),
       link,
+      actorId,
     });
     await cdeRejections(db, review, ev.stopped, actorId);
   }
@@ -365,7 +366,7 @@ export async function afterEvaluate(ctx: ReviewCtx, review: ReviewRow, ev: Evalu
       title: msg("workflow:notifications.stepCompleted", { review: reviewLabel(review), step: step.name }),
       link,
     });
-    await notifyStepAssignees(db, review, ev.instance);
+    await notifyStepAssignees(db, review, ev.instance, actorId);
     return;
   }
   // Files the last step refused (not stopped earlier): returned / withdrawn (ISO-1, D-2).
@@ -396,6 +397,7 @@ export async function afterEvaluate(ctx: ReviewCtx, review: ReviewRow, ev: Evalu
       { approved: copy.approved, copied: copy.copied, failed: copy.failed },
     ),
     link,
+    actorId,
   });
   await emitWorkflowEvent(db, {
     type: "completed",
@@ -478,7 +480,7 @@ async function stepSubmissions(
     });
 }
 
-export async function notifyStepAssignees(db: Db, review: ReviewRow, instance: InstanceRow) {
+export async function notifyStepAssignees(db: Db, review: ReviewRow, instance: InstanceRow, actorId: string | null = null) {
   const step = instance.template.steps[instance.stepIndex]!;
   const members = await projectMemberRows(db, review.projectId);
   const userIds = resolveAssigneeUsers(step.assignees, members, instance.startedBy);
@@ -490,6 +492,8 @@ export async function notifyStepAssignees(db: Db, review: ReviewRow, instance: I
       ? msg("workflow:notifications.due", { date: instance.stepDueAt.toLocaleDateString(intlLocale(DEFAULT_LANGUAGE)) })
       : null,
     link: reviewLink(review.projectId, review.id),
+    due: instance.stepDueAt,
+    actorId,
   });
 }
 

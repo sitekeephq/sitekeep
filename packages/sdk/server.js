@@ -213,6 +213,7 @@ export const {
   readXlsx,
   readZip,
   registerCdeTools,
+  registerNotificationChannel,
   registerPrivacyConnection,
   render,
   reportDatasets,

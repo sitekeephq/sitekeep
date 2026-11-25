@@ -126,6 +126,7 @@ export async function applyReviewRejections(
         title: msg("cde:notifications.returned", { name: w.name, review: reviewLabel(review) }),
         body: msg(`cde:notifications.outcome.${rf.finalStatus === "rejected" ? "rejected" : "revise"}`),
         link: reviewLink(review.projectId, review.id),
+        actorId,
       });
     }
 

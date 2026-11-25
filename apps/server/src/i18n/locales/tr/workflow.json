@@ -148,5 +148,12 @@
     "paramChangeAuthoring_other": "{{count}} parametre değişikliğini Revit'e yönlendirdi",
     "paramChangeVerified_other": "{{count}} parametre değişikliği Revit versiyonunda doğrulandı",
     "paramChangeValuesLost_other": "{{count}} parametre değişikliği yeni versiyonda kayboldu"
+  },
+  "mail": {
+    "subject": "[{{code}}] {{title}}",
+    "project": "Proje: {{code}}",
+    "due": "Termin: {{date}}",
+    "open": "SiteKeep'te aç: {{url}}",
+    "footer": "Bu e-postayı SiteKeep bildirim ayarlarınız nedeniyle alıyorsunuz. Hesap > E-posta bildirimleri bölümünden türe göre kapatabilirsiniz."
   }
 }

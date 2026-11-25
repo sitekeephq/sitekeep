@@ -8,6 +8,7 @@ import { forbidden } from "../core/platform/http.js";
 import { DEFAULT_LANGUAGE, isMsg, msg, render, type Msg } from "../i18n/index.js";
 import type { ActorContext } from "./engine.js";
 import { cdeWriteGate } from "../cde/transitions.js";
+import { dispatchNotificationMail } from "./notification-mail.js";
 
 /** A project membership plus the project roles (teams) the member holds. */
 export type Member = typeof projectMembers.$inferSelect & { roleIds?: string[] };
@@ -85,8 +86,13 @@ export interface NewNotification {
   title: Msg | string;
   body?: Msg | string | null;
   link?: string | null;
+  /** Due date of the step or record: shown in the e-mail (workflow/notification-mail.ts). */
+  due?: Date | string | null;
+  /** Who caused the event: gets no e-mail (the in-app row is for the callers to filter). */
+  actorId?: string | null;
 }
 
+/** In-app notification rows; assignment, reminder and outcome kinds are e-mailed as well (notification-mail.ts). */
 export async function notify(db: Db, userIds: readonly string[], n: NewNotification): Promise<void> {
   const unique = [...new Set(userIds)];
   if (!unique.length) return;
@@ -102,6 +108,7 @@ export async function notify(db: Db, userIds: readonly string[], n: NewNotificat
       link: n.link ?? null,
     })),
   );
+  dispatchNotificationMail(unique, n);
 }
 
 // ---- Folder gate (ISO 19650 state transition) -----------------------------------------------

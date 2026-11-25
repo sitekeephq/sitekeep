@@ -259,6 +259,6 @@ export async function startReview(ctx: ReviewCtx, a: ProjectAccess, input: Start
       targetPattern: p.targetPattern,
     },
   });
-  await notifyStepAssignees(db, review, instance);
+  await notifyStepAssignees(db, review, instance, a.user.id);
   return { review, instance };
 }

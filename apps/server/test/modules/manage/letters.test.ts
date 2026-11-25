@@ -29,12 +29,13 @@ let dataDir: string;
 const PW = "Sifre-1234567";
 const YEAR = new Date().getFullYear();
 
-// Captured SMTP messages: a jsonTransport builds the message, nothing is sent.
+// Captured letter e-mails: a jsonTransport builds the message, nothing is sent. Workflow notification
+// mails (workflow/notification-mail.ts, no attachment) share the mailer and are not letters.
 const sent: SendMailOptions[] = [];
 const json = nodemailer.createTransport({ jsonTransport: true });
 const capture = {
   sendMail: async (m: SendMailOptions) => {
-    sent.push(m);
+    if (m.attachments?.length) sent.push(m);
     return json.sendMail(m);
   },
 } as unknown as Transporter;

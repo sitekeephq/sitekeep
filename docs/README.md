@@ -55,6 +55,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [Privacy notice on the sign-in page](features/PRIVACY_NOTICE.md)
 - [Google sign-in](features/GOOGLE_SIGN_IN.md)
 - [Invitations](features/INVITATIONS.md)
+- [Workflow e-mail](features/WORKFLOW_EMAIL.md)
 - [Companies](features/COMPANIES.md)
 - [Parameter Change](features/PARAMETER_CHANGE.md)
 - [Office Integration](features/OFFICE_INTEGRATION.md)

@@ -49,6 +49,13 @@ export { assigneeMatches, combineStepOutcomes, finalOutcome, isAssignee, isStepC
 export { parseTemplateBody } from "../workflow/template-schemas.js";
 export type { TemplateSnapshot } from "../db/schema-workflow.js";
 export { actorFor, notify, projectMemberRows, resolveAssigneeUsers } from "../workflow/service.js";
+// Notification channels: the events the core e-mails (SDK 0.19.0)
+export {
+  registerNotificationChannel,
+  type NotificationChannel,
+  type NotificationEvent,
+  type NotificationRecipient,
+} from "../workflow/notification-mail.js";
 
 // Models: versions, element index, query, rules, comparison
 export { ModelAiError } from "../model/ai.js";

@@ -63,6 +63,7 @@ import { oauthApiRoutes } from "../oauth/api-routes.js";
 import { documentsApiRoutes } from "../opencde/documents.js";
 import { opencdePageRoutes } from "../opencde/pages.js";
 import { newCspNonce, registerSecurityHeaders, withNonce } from "../privacy/headers.js";
+import { configureNotificationMail, settleNotificationMail } from "../workflow/notification-mail.js";
 import { configureOutbound, withOutboundContext } from "../privacy/outbound.js";
 import { privacyRoutes } from "../privacy/routes.js";
 import { privacyNoticeRoutes } from "../privacy/notice.js";
@@ -156,6 +157,9 @@ export async function buildApp(input: AppDeps): Promise<FastifyInstance> {
   // Privacy (docs/features/PRIVACY.md): settings in memory, every outbound call logged with the request's
   // user, project and route, security headers on every response.
   configureOutbound({ db: deps.db });
+  // Workflow e-mail (workflow/notification-mail.ts): links in the mail point at the public address, else the web address.
+  configureNotificationMail({ db: deps.db, mailer: deps.mailer ?? null, baseUrl: oauth.publicUrl ?? webUrl });
+  app.addHook("onClose", async () => settleNotificationMail());
   await loadPrivacyState(deps.db);
   app.addHook("preHandler", (req, _reply, done) => {
     const params = (req.params ?? {}) as Record<string, unknown>;

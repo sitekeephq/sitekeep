@@ -109,6 +109,6 @@ export async function reassignStep(
     details: { number: review.number, stepIndex: before.stepIndex, assignees },
   });
   if (result.stepCompleted) await afterEvaluate(ctx, review, result, a.user.id);
-  else await notifyStepAssignees(db, review, result.instance);
+  else await notifyStepAssignees(db, review, result.instance, a.user.id);
   return result;
 }

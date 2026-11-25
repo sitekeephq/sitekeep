@@ -36,6 +36,7 @@ import {
   type TodayMineGroup,
   type TodayRowDto,
   type UserPrefs,
+  EMAIL_NOTIFY_TYPES,
   projectPath,
 } from "@sitekeep/shared";
 import type { ResolvedDeps } from "../../app/deps.js";
@@ -182,11 +183,14 @@ export async function hubRoutes(api: FastifyInstance, deps: ResolvedDeps) {
         todaySummaryCollapsed: z.boolean().optional(),
         // BCP 47 ("en", "tr", "pt-BR"); the web app offers what it has translations for.
         language: z.string().regex(/^[a-z]{2,3}(-[A-Z]{2})?$/).optional(),
+        // Workflow e-mail per type (docs/features/WORKFLOW_EMAIL.md); merged type by type.
+        emailNotifications: z.partialRecord(z.enum(EMAIL_NOTIFY_TYPES), z.boolean()).optional(),
       })
       .strict()
       .parse(req.body);
     const [u] = await db.select({ prefs: users.prefs }).from(users).where(eq(users.id, req.user!.id));
     const prefs: UserPrefs = { ...(u?.prefs ?? {}), ...body };
+    if (body.emailNotifications) prefs.emailNotifications = { ...(u?.prefs?.emailNotifications ?? {}), ...body.emailNotifications };
     await db.update(users).set({ prefs }).where(eq(users.id, req.user!.id));
     return prefs;
   });

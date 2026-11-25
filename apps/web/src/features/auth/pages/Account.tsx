@@ -14,6 +14,7 @@ import { viewerAboutText } from "../../../shared/lib/about";
 import { useAsk } from "../../../shared/ui/Ask";
 import { useLabel } from "../../../i18n";
 import { SessionsCard, TwoFactorCard } from "../components/AccountSecurity";
+import { EmailNotificationsCard } from "../components/EmailNotificationsCard";
 
 
 export function AccountPage() {
@@ -32,6 +33,8 @@ export function AccountPage() {
         </div>
         <div className="muted">{user?.email}</div>
       </div>
+
+      <EmailNotificationsCard />
 
       <TokensCard />
 

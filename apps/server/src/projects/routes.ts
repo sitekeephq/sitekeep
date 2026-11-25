@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, isNull, lt } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { DEFAULT_PROJECT_ROLES, PROJECT_MODULES, type FolderState, type ProjectModule } from "@sitekeep/shared";
+import { DEFAULT_PROJECT_ROLES, EMAIL_NOTIFY_TYPES, PROJECT_MODULES, type EmailNotifyPrefs, type FolderState, type ProjectModule } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { FolderTree, projectAccess, requireProjectAdmin, tokenAllowsProject, userNames } from "../core/security/access.js";
 import { joinCompanyTeam } from "../cde/teams.js";
@@ -163,6 +163,32 @@ export async function projectRoutes(api: FastifyInstance, { db }: AppDeps) {
         details: { on: changed.filter((m) => modules[m]), off: changed.filter((m) => !modules[m]) },
       });
     return modules;
+  });
+
+  // ---- Workflow e-mail default (docs/features/WORKFLOW_EMAIL.md) -----------------------
+
+  /** The project's default for who gets workflow e-mail (every type on unless turned off). */
+  api.get<{ Params: { pid: string } }>("/projects/:pid/email-notifications", async (req): Promise<EmailNotifyPrefs> => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    return a.project.settings?.emailNotifications ?? {};
+  });
+
+  /** Sets the default for members without a choice of their own. Project administrators only. */
+  api.put<{ Params: { pid: string } }>("/projects/:pid/email-notifications", async (req): Promise<EmailNotifyPrefs> => {
+    const a = await projectAccess(db, req.params.pid, req.user!);
+    requireProjectAdmin(a);
+    const body = z.partialRecord(z.enum(EMAIL_NOTIFY_TYPES), z.boolean()).parse(req.body);
+    const emailNotifications = { ...(a.project.settings?.emailNotifications ?? {}), ...body };
+    await db.update(projects).set({ settings: { ...(a.project.settings ?? {}), emailNotifications } }).where(eq(projects.id, a.project.id));
+    await audit(db, {
+      projectId: a.project.id,
+      userId: a.user.id,
+      action: "project.email_notifications_updated",
+      targetType: "project",
+      targetId: a.project.id,
+      details: { emailNotifications },
+    });
+    return emailNotifications;
   });
 
   // ---- Companies on the project (docs/features/COMPANIES.md) ----------------------------

@@ -2,6 +2,7 @@
  * The simple project screen (docs/product/SIMPLIFICATION.md, 1. aşama): the "İşler" hub views, the user's
  * saved views and the project "Bugün" page.
  */
+import type { EmailNotifyPrefs } from "../core/modules.js";
 import type { MyTaskDto } from "../workflow/workflow.js";
 
 /**
@@ -193,4 +194,6 @@ export interface UserPrefs {
   mustChangePassword?: boolean;
   /** Interface language chosen in the top bar (BCP 47, "en", "tr"); missing = the browser's choice / English. */
   language?: string;
+  /** E-mail for workflow notifications, per type; a missing type follows the project default (on unless the project says off). */
+  emailNotifications?: EmailNotifyPrefs;
 }

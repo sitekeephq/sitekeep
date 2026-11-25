@@ -54,6 +54,7 @@ export async function runDueReminders(db: Db, now: Date = new Date()): Promise<R
         title: msg("workflow:notifications.stepDueSoon", { review: reviewLabel(r), step: step.name }),
         body: msg("workflow:notifications.due", { date }),
         link: reviewLink(r.projectId, r.id),
+        due,
       });
       result.dueSoon++;
     } else {
@@ -63,6 +64,7 @@ export async function runDueReminders(db: Db, now: Date = new Date()): Promise<R
         title: msg("workflow:notifications.stepOverdue", { review: reviewLabel(r), step: step.name }),
         body: msg("workflow:notifications.due", { date }),
         link: reviewLink(r.projectId, r.id),
+        due,
       });
       result.overdue++;
     }

@@ -23,7 +23,7 @@ published as a versioned package and pulled into the application at a pinned ver
 
 | Package | Source | Version |
 |---|---|---|
-| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.18.0` |
+| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.19.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 
@@ -128,6 +128,26 @@ converted to IFC by the module, then takes the IFC path unchanged (viewer deriva
 "Modele sor"). Only while the module is on; without it the file stays a plain file. The optional `version()` (SDK
 0.18.0) returns the installed converter in the same form as `toIfc`'s `tool` ("rvt-rs 0.25.0"): the core then converts
 models from another converter version again at start-up and retries failed ones once per converter version.
+
+### Notification channels (SDK 0.19.0)
+
+The core e-mails review steps and work items ([workflow e-mail](../features/WORKFLOW_EMAIL.md)). A module adds a
+channel (Teams, Slack, webhook) or a digest with `registerNotificationChannel`, called while the module loads:
+
+```ts
+const off = registerNotificationChannel({
+  id: "digest",                                   // unique
+  claims: (recipient, event) => chosenDigest(recipient.userId), // optional: true = the core sends this person no immediate e-mail
+  async deliver(event) { … },                     // every typed event, once, with all recipients
+});
+```
+
+`NotificationEvent`: `kind`, `type` (`assigned` | `due_soon` | `overdue` | `outcome`), `projectId`, `projectCode`,
+`link` and the absolute `url`, `dueDate`, `actorId`, `recipients` (`userId`, `name`, `email`, `language`, `emailEnabled`:
+the person's choice, project default applied; the actor, disabled and pending users are already left out) and
+`text(language)` for the title and body. A throw is logged and never breaks the workflow. A channel registered by a
+module that is off is not called. The channel makes its own outbound calls through `moduleOutboundFetch` with a
+connection declared by `registerPrivacyConnection`.
 
 In the core's `LEGACY_URLS` table (`app/navigation/routes-table.ts`), a module's own pages are marked with
 `module: "<id>"`; if the module is not installed, those addresses are not expected.

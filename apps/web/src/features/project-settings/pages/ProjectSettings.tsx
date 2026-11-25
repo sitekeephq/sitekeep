@@ -1,3 +1,4 @@
+import { EmailNotificationsCard } from "../../auth/components/EmailNotificationsCard";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useSearchParams } from "react-router-dom";
@@ -107,7 +108,12 @@ export function ProjectSettingsPage() {
       {tab === "sablon" && <TemplateExport />}
       {tab === "yapay-zeka" && ProjectAiSettings && <ProjectAiSettings />}
       {tab === "isimlendirme" && <Naming />}
-      {tab === "is-akislari" && <WorkflowTemplates />}
+      {tab === "is-akislari" && (
+        <div className="stack">
+          <WorkflowTemplates />
+          <EmailNotificationsCard projectId={project.id} />
+        </div>
+      )}
       {tab === "is-tipleri" && <WorkTypesSettings />}
       {tab === "oznitelikler" && <AttributeSettings />}
       {tab === "cde" && <CdeSettings />}

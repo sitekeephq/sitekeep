@@ -232,6 +232,8 @@ export function registerWorkItemRoutes(r: WorksRouteContext) {
         kind: "work.assigned",
         title: msg("works:notifications.assigned", { number: work.number, title: updated!.title }),
         link: workLink(a.project.id, work.id),
+        due: updated!.dueDate,
+        actorId: a.user.id,
       });
     return r.detail(a, updated!.id, requestLanguage(req));
   });

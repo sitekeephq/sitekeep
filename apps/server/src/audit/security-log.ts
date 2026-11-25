@@ -51,6 +51,7 @@ export const SECURITY_LOG_ACTIONS: Record<SecurityLogCategory, CategoryRule> = {
       "updates.disabled",
       "cde.settings_updated",
       "project.modules_updated",
+      "project.email_notifications_updated",
     ],
   },
   connections: { actions: ["privacy.kill_switch_on", "privacy.kill_switch_off", "privacy.connection_updated"] },

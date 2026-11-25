@@ -1,5 +1,5 @@
 /** API client of the simple project screen: project Bugün, saved views, module switches, user prefs. */
-import type { ProjectModule, ProjectModuleState, ProjectTodayDto, SavedViewDto, SavedViewInput, TodaySummaryDto, UserPrefs } from "@sitekeep/shared";
+import type { EmailNotifyPrefs, ProjectModule, ProjectModuleState, ProjectTodayDto, SavedViewDto, SavedViewInput, TodaySummaryDto, UserPrefs } from "@sitekeep/shared";
 import { request } from "./client";
 
 const P = (pid: string) => `/projects/${pid}`;
@@ -20,6 +20,9 @@ export const hubApi = {
   modules: (pid: string) => request<ProjectModuleState>("GET", `${P(pid)}/modules`),
   setModules: (pid: string, modules: Partial<Record<ProjectModule, boolean>>) =>
     request<ProjectModuleState>("PUT", `${P(pid)}/modules`, { modules }),
+
+  projectEmailDefaults: (pid: string) => request<EmailNotifyPrefs>("GET", `${P(pid)}/email-notifications`),
+  setProjectEmailDefaults: (pid: string, p: EmailNotifyPrefs) => request<EmailNotifyPrefs>("PUT", `${P(pid)}/email-notifications`, p),
 
   prefs: () => request<UserPrefs>("GET", "/me/prefs"),
   setPrefs: (p: UserPrefs) => request<UserPrefs>("PATCH", "/me/prefs", p),

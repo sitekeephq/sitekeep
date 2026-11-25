@@ -202,6 +202,8 @@ export async function createWork(
       kind: "work.assigned",
       title: msg("works:notifications.assigned", { number: work.number, title: work.title }),
       link: workLink(project.id, work.id),
+      due: work.dueDate,
+      actorId: creator.userId,
     });
   return work;
 }
@@ -316,6 +318,8 @@ export async function sendWork(
       title: `${type.name}: ${work.number} "${work.title}"`,
       body: work.replyRequired && work.dueDate ? msg("works:notifications.replyDue", { date: work.dueDate }) : null,
       link: workLink(project.id, work.id),
+      due: work.replyRequired ? work.dueDate : null,
+      actorId,
     },
   );
   return updated;

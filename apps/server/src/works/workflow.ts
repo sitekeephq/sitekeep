@@ -349,11 +349,11 @@ export async function submitWork(db: Db, a: ProjectAccess, work: WorkRow, type: 
     targetId: work.id,
     details: { number: work.number, rev, template: snapshot.name },
   });
-  await notifyStep(db, work, instance);
+  await notifyStep(db, work, instance, a.user.id);
   if (work.parentWorkId) await rollupParent(db, work.parentWorkId, a.user.id);
 }
 
-async function notifyStep(db: Db, work: WorkRow, instance: InstanceRow) {
+async function notifyStep(db: Db, work: WorkRow, instance: InstanceRow, actorId: string | null = null) {
   const step = instance.template.steps[instance.stepIndex]!;
   const members = await projectMemberRows(db, work.projectId);
   await notify(db, resolveAssigneeUsers(step.assignees, members, instance.startedBy), {
@@ -364,6 +364,8 @@ async function notifyStep(db: Db, work: WorkRow, instance: InstanceRow) {
       ? msg("works:notifications.due", { date: instance.stepDueAt.toLocaleDateString(intlLocale(DEFAULT_LANGUAGE)) })
       : null,
     link: workLink(work.projectId, work.id),
+    due: instance.stepDueAt,
+    actorId,
   });
 }
 
@@ -531,7 +533,7 @@ export async function respondWork(db: Db, a: ProjectAccess, work: WorkRow, type:
       [work.createdBy, ...(work.assigneeUserId ? [work.assigneeUserId] : []), ...actors.map((x) => x.userId!).filter(Boolean)].filter(
         (u) => u !== a.user.id,
       ),
-      { projectId: work.projectId, kind: "work.decided", title: `${work.number} "${work.title}": ${result.label}`, link },
+      { projectId: work.projectId, kind: "work.decided", title: `${work.number} "${work.title}": ${result.label}`, link, actorId: a.user.id },
     );
     await emitWorkflowEvent(db, {
       type: "completed",
@@ -545,7 +547,7 @@ export async function respondWork(db: Db, a: ProjectAccess, work: WorkRow, type:
     });
     if (work.parentWorkId) await rollupParent(db, work.parentWorkId, a.user.id);
   } else if (result.moved) {
-    await notifyStep(db, work, result.instance);
+    await notifyStep(db, work, result.instance, a.user.id);
   }
 }
 
@@ -861,6 +863,7 @@ export async function runWorkDueReminders(db: Db, now: Date): Promise<{ dueSoon:
       title: msg(kind === "overdue" ? "works:notifications.stepOverdue" : "works:notifications.stepDueSoon", { number: w.number, step: step.name }),
       body: msg("works:notifications.due", { date: due.toLocaleDateString(intlLocale(DEFAULT_LANGUAGE)) }),
       link: workLink(w.projectId, w.id),
+      due,
     });
     if (kind === "overdue") out.overdue++;
     else out.dueSoon++;
