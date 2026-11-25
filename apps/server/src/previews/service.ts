@@ -98,7 +98,8 @@ function pdfPagesText(out: Awaited<ReturnType<typeof extractPdfText>>): string {
       }
       return text;
     })
-    .join("\n\n");
+    // A form feed between pages (as pdftotext does): search shows the page of a match.
+    .join("\n\f\n");
 }
 
 // ---------------------------------------------------------------------------------------------

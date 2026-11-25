@@ -11,7 +11,8 @@
     "namingStandard": "İsimlendirme standardı",
     "modelDerivative": "Model türevi",
     "trashFile": "Çöp kutusunda dosya",
-    "trashFolder": "Çöp kutusunda klasör"
+    "trashFolder": "Çöp kutusunda klasör",
+    "savedSearch": "Kayıtlı arama"
   },
   "errors": {
     "rootFolderMove": "Kök klasör taşınamaz.",
@@ -19,6 +20,10 @@
     "rootFolderRename": "Kök klasörün adı değiştirilemez.",
     "rootFolderDelete": "Kök klasör silinemez.",
     "searchTooLong": "Arama metni çok uzun.",
+    "searchBadDate": "\"{{value}}\" bir tarih değil (YYYY-AA-GG).",
+    "searchBadVersion": "\"{{value}}\" bir sürüm numarası ya da aralığı değil (3 veya 2-5).",
+    "savedSearchNameRequired": "Aramaya bir ad verin.",
+    "savedSearchShareSubject": "Yalnız bu projenin üyeleri ve firmalarıyla paylaşılabilir.",
     "restoreFolderDeleted": "Dosyanın bulunduğu klasör de silinmiş. Önce klasörü geri yükleyin.",
     "restoreParentDeleted": "Üst klasör de silinmiş. Önce üst klasörü geri yükleyin.",
     "restoreFileExists": "\"{{folder}}\" klasöründe \"{{name}}\" adlı bir dosya zaten var. Geri yüklemek için yeni bir ad verin.",

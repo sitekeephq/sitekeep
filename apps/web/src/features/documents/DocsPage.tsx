@@ -15,11 +15,18 @@ import {
   foldTr,
   reportModuleEnabled,
   resolveModules,
+  searchFilterCount,
+  type CompanyDto,
+  type DocSearchParams,
   type FileDto,
+  type SavedSearchDto,
   type SearchResultDto,
+  type WorkTypeDto,
 } from "@sitekeep/shared";
 import { useLabel } from "../../i18n";
-import { formatDate, formatSize } from "../../shared/api/api";
+import { api, formatDate, formatSize } from "../../shared/api/api";
+import { worksApi } from "../../shared/api/api-works";
+import { CreateWorkDialog } from "../works/components/CreateWorkDialog";
 import { documentsApi } from "./api";
 import { useLoad, useProject } from "../../app/context/project";
 import { Dialog } from "../../shared/ui/Dialog";
@@ -43,7 +50,10 @@ import { docsMoreItems, type DocsMoreKey } from "./docs-phone";
 import { rememberDocsFolder } from "../../shared/lib/remember";
 import { AutodeskDocuments } from "./AutodeskDocuments";
 import { ColumnHeader, nextSort, sortFiles, sortFolders, useColumnWidths, type DocsSort, type SortKey } from "./DocsGrid";
-import { DocsSearchResults } from "./DocsSearchResults";
+import { DocsSearchResults, type ResultScope } from "./DocsSearchResults";
+import { SearchPanel, scopeOf } from "./search/SearchPanel";
+import { SavedSearchTree } from "./search/SavedSearchTree";
+import { readRecent, rememberRecent } from "./search/recent";
 import { DescriptionCell, DerivativeBadge, FilterRow, FolderRow, PhoneFilters, iconFor } from "./DocsTableParts";
 import { NewFolderDialog } from "./NewFolderDialog";
 
@@ -51,6 +61,8 @@ const DOCS_TREE_WIDTH_KEY = "cde.docs.treeWidth";
 const DOCS_TREE_COLLAPSED_KEY = "cde.docs.treeCollapsed";
 const MIN_TREE_WIDTH = 190;
 const MAX_TREE_WIDTH = 520;
+/** Search results per page. */
+const SEARCH_PAGE = 50;
 
 export function DocsPage() {
   const { t } = useTranslation(["documents", "common", "cde"]);
@@ -101,8 +113,16 @@ export function DocsPage() {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [showFilters, setShowFilters] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [searchInFolder, setSearchInFolder] = useState(false);
-  const [search, setSearch] = useState<{ q: string; folderId?: string } | null>(null);
+  // The search panel's parameters (draft) and the search shown (docs/features/DOCUMENT_SEARCH.md).
+  const [draft, setDraft] = useState<DocSearchParams>({});
+  const searchInFolder = !!draft.folderId;
+  const [search, setSearch] = useState<DocSearchParams | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelUsed, setPanelUsed] = useState(false);
+  const [panelTab, setPanelTab] = useState<"search" | "saved">("search");
+  const [recent, setRecent] = useState<DocSearchParams[]>(() => readRecent(project.id));
+  const [activeSaved, setActiveSaved] = useState<string | null>(null);
+  const [transmittal, setTransmittal] = useState<{ types: WorkTypeDto[]; companies: CompanyDto[] } | null>(null);
   const [searchResult, setSearchResult] = useState<SearchResultDto | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [zipError, setZipError] = useState<string | null>(null);
@@ -185,7 +205,10 @@ export function DocsPage() {
     setChecked(new Set());
     setFilters({});
     setSearch(null);
+    setActiveSaved(null);
     setSearchText("");
+    // "This folder" follows the folder that is open.
+    setDraft((d) => (d.folderId ? { ...d, folderId } : d));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folderId]);
 
@@ -197,7 +220,7 @@ export function DocsPage() {
     let alive = true;
     setSearchResult(null);
     setSearchError(null);
-    documentsApi.search(project.id, { q: search.q, folderId: search.folderId }).then(
+    documentsApi.search(project.id, { ...search, limit: SEARCH_PAGE }).then(
       (r) => alive && setSearchResult(r),
       (e: Error) => alive && setSearchError(e.message),
     );
@@ -205,6 +228,43 @@ export function DocsPage() {
       alive = false;
     };
   }, [project.id, search]);
+
+  // Saved searches (tree node and panel tab); people, companies and attributes once the panel is used.
+  const { data: savedSearches, reload: reloadSaved } = useLoad(() => documentsApi.savedSearches(project.id), [project.id]);
+  const { data: panelLists } = useLoad(
+    () =>
+      panelUsed
+        ? Promise.all([
+            documentsApi.attributeDefinitions(project.id),
+            api.members(project.id).catch(() => []),
+            api.projectCompanies(project.id).catch(() => []),
+          ])
+        : Promise.resolve(null),
+    [project.id, panelUsed],
+  );
+
+  /** Runs a search: shows the results, remembers it among the last five. */
+  function runSearch(params: DocSearchParams, savedId: string | null = null) {
+    const next = { ...params, offset: undefined, limit: undefined };
+    setChecked(new Set());
+    setSearch(next);
+    setDraft(next);
+    setSearchText(next.q ?? "");
+    setActiveSaved(savedId);
+    setRecent(rememberRecent(project.id, next));
+    if (phone) setPanelOpen(false);
+  }
+
+  function runSaved(s: SavedSearchDto) {
+    runSearch(s.params, s.id);
+  }
+
+  function openPanel(tab: "search" | "saved" = "search") {
+    setPanelUsed(true);
+    setPanelTab(tab);
+    setPanelOpen(true);
+    setSelected(null);
+  }
 
   const visibleFiles = useMemo(() => {
     const active = Object.entries(filters).filter(([, v]) => v.trim());
@@ -272,8 +332,9 @@ export function DocsPage() {
       setShowFilters((v) => !v);
       setFilters(searchText.trim() ? { __name: searchText } : {});
     } else if (key === "inFolder") {
-      setSearchInFolder(!searchInFolder);
-      if (search) setSearch({ q: search.q, folderId: searchInFolder ? undefined : folderId });
+      const next = { ...draft, folderId: searchInFolder ? undefined : folderId, folderIds: undefined };
+      setDraft(next);
+      if (search) runSearch({ ...search, folderId: next.folderId, folderIds: undefined });
     } else if (key === "report") navigate(reportBuilderUrl(project.id, "documents"));
     else if (key === "spec") navigate(`/projects/${project.id}/spec`);
     else setDialog(key);
@@ -403,10 +464,24 @@ export function DocsPage() {
   function closeSearch() {
     setSearch(null);
     setSearchText("");
+    setActiveSaved(null);
     setChecked(new Set());
   }
 
+  async function openTransmittal() {
+    try {
+      const [types, companies] = await Promise.all([worksApi.types(project.id), api.projectCompanies(project.id)]);
+      setTransmittal({ types: types.filter((x) => x.category === "transmittal"), companies });
+    } catch (e) {
+      setZipError((e as Error).message);
+    }
+  }
+
   function openHit(hit: FileDto) {
+    if (search?.trash) {
+      navigate(`/projects/${project.id}/deleted`);
+      return;
+    }
     closeSearch();
     if (hit.folderId === folderId) setSelected(hit.id);
     else navigate(`/projects/${project.id}/files/${hit.folderId}?file=${hit.id}`);
@@ -429,7 +504,7 @@ export function DocsPage() {
 
   return (
     <div
-      className={`docs resizable-docs${treeCollapsed ? " tree-collapsed" : ""}`}
+      className={`docs resizable-docs${treeCollapsed ? " tree-collapsed" : ""}${panelOpen && !phone ? " search-panel-open" : ""}`}
       style={{ "--docs-tree-width": treeCollapsed ? "0px" : `${treeWidth}px` } as CSSProperties}
       onDragEnter={onDragEnter}
       onDragOver={onDragOver}
@@ -444,6 +519,7 @@ export function DocsPage() {
           version={treeVersion}
           onSelect={(id) => navigate(`/projects/${project.id}/files/${id}`)}
         />
+        <SavedSearchTree saved={savedSearches} activeId={activeSaved} onRun={runSaved} />
       </aside>
       <div
         className="docs-tree-resizer"
@@ -493,18 +569,23 @@ export function DocsPage() {
               {t(`cde:${stepLabelKey(cdeStep)}`)} ({checkedFiles.length})
             </button>
           )}
-          {checkedFiles.length > 0 && modules.reviews && (
+          {checkedFiles.length > 0 && modules.reviews && !search?.trash && (
             <button className={cdeStep && !search ? undefined : "primary"} onClick={() => setDialog("review")}>
               {t("page.actions.startReview", { count: checkedFiles.length })}
             </button>
           )}
-          {checked.size > 0 && (
+          {checkedFiles.length > 0 && search && !search.trash && modules.transmittals && (
+            <button onClick={() => void openTransmittal()} data-testid="search-transmittal">
+              {t("page.actions.createTransmittal", { count: checkedFiles.length })}
+            </button>
+          )}
+          {checked.size > 0 && !search?.trash && (
             <button onClick={() => void downloadZip()} title={t("page.zipHint")}>
               <Icon name="download" size={16} />
               ZIP ({checked.size})
             </button>
           )}
-          {checkedFiles.length > 0 && (search || canEdit) && (
+          {checkedFiles.length > 0 && (search || canEdit) && !search?.trash && (
             <button
               className="danger"
               title={t("page.deleteHint")}
@@ -523,8 +604,8 @@ export function DocsPage() {
             onSubmit={(e) => {
               e.preventDefault();
               const q = searchText.trim();
-              setChecked(new Set());
-              setSearch(q ? { q, folderId: searchInFolder ? folderId : undefined } : null);
+              if (q || searchFilterCount(draft)) runSearch({ ...draft, q: q || undefined });
+              else closeSearch();
             }}
           >
             <Icon name="search" size={15} />
@@ -546,12 +627,25 @@ export function DocsPage() {
                 if (!value) setSearch(null);
               }}
             />
-            {searchText.trim() && search?.q !== searchText.trim() && (
+            {searchText.trim() && (search?.q ?? "") !== searchText.trim() && (
               <button type="submit" className="docs-search-go" title={t("page.search.goHint")}>
                 {searchInFolder ? t("page.search.goInFolder") : t("page.search.goInProject")} ↵
               </button>
             )}
           </form>
+          <button
+            type="button"
+            className={panelOpen ? "active" : undefined}
+            aria-pressed={panelOpen}
+            data-testid="search-panel-toggle"
+            aria-label={t("searchPanel.button")}
+            title={t("searchPanel.openHint")}
+            onClick={() => (panelOpen ? setPanelOpen(false) : openPanel())}
+          >
+            <Icon name="filter" size={16} />
+            {phone ? null : t("searchPanel.button")}
+            {searchFilterCount(draft) > 0 && <span className="badge info">{searchFilterCount(draft)}</span>}
+          </button>
           {canUpload && (
             <>
               <button className="primary" data-tour="files-upload" onClick={() => fileInput.current?.click()}>
@@ -602,13 +696,32 @@ export function DocsPage() {
               projectId={project.id}
               result={searchResult}
               error={searchError}
-              query={search.q}
-              inFolder={!!search.folderId}
+              query={search.q ?? ""}
+              scope={(search.trash ? "trash" : scopeOf(search)) as ResultScope}
+              sort={search.sort ?? (search.q?.trim() ? "relevance" : "name")}
+              dir={search.dir ?? ((search.sort ?? (search.q?.trim() ? "relevance" : "name")) === "name" ? "asc" : "desc")}
+              onSort={(sort, dir) => setSearch({ ...search, sort, dir, offset: undefined })}
+              onPage={(offset) => {
+                setChecked(new Set());
+                setSearch({ ...search, offset: offset || undefined });
+              }}
               checked={checked}
               onToggle={toggle}
+              onToggleAll={(on) =>
+                setChecked((c) => {
+                  const n = new Set(c);
+                  for (const h of searchResult?.results ?? []) {
+                    if (on) n.add(`file:${h.id}`);
+                    else n.delete(`file:${h.id}`);
+                  }
+                  return n;
+                })
+              }
               onOpen={openHit}
               onOpenVersion={setVersionHistoryFile}
               onClose={closeSearch}
+              onEdit={() => openPanel()}
+              filterCount={searchFilterCount(search)}
               phone={phone}
               selecting={selecting}
             />
@@ -910,6 +1023,49 @@ export function DocsPage() {
           <p className="error">{virtualError}</p>
         </Dialog>
       )}
+      {panelOpen && (
+        <SearchPanel
+          projectId={project.id}
+          rootFolderId={project.rootFolderId}
+          folderId={folderId}
+          folderName={folder?.name ?? ""}
+          params={draft}
+          onChange={(next) => {
+            setDraft(next);
+            if (next.q !== draft.q) setSearchText(next.q ?? "");
+          }}
+          onSearch={(params) => runSearch(params)}
+          onClose={() => setPanelOpen(false)}
+          recent={recent}
+          saved={savedSearches}
+          onSavedChanged={reloadSaved}
+          onRunSaved={runSaved}
+          isProjectAdmin={!!project.isProjectAdmin}
+          attributeDefs={panelLists?.[0] ?? []}
+          members={panelLists?.[1] ?? []}
+          companies={panelLists?.[2] ?? []}
+          tab={panelTab}
+          onTab={setPanelTab}
+        />
+      )}
+      {transmittal &&
+        (transmittal.types.length ? (
+          <CreateWorkDialog
+            types={transmittal.types}
+            companies={transmittal.companies}
+            initialType={transmittal.types.length === 1 ? transmittal.types[0] : undefined}
+            prefill={{ links: checkedFiles.map((f) => ({ kind: "file_version" as const, targetId: f.latest.id })) }}
+            onClose={() => setTransmittal(null)}
+            onCreated={(w) => {
+              setTransmittal(null);
+              navigate(`/projects/${project.id}/works/${w.id}`);
+            }}
+          />
+        ) : (
+          <Dialog title={t("page.actions.createTransmittal", { count: checkedFiles.length })} onClose={() => setTransmittal(null)}>
+            <p>{t("page.noTransmittalType")}</p>
+          </Dialog>
+        ))}
       {selected && (
         <FileDrawer projectId={project.id} fileId={selected} level={level} onClose={closeDrawer} onChanged={reload} />
       )}

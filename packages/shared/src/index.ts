@@ -7,6 +7,7 @@ export * from "./core/trim.js";
 export * from "./workflow/workflow.js";
 export * from "./kernel/attributes.js";
 export * from "./documents/docs-plus.js";
+export * from "./documents/search.js";
 export * from "./viewers/markup.js";
 export * from "./forms/forms.js";
 export * from "./forms/form-pdf.js";

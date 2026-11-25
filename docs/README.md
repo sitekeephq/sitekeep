@@ -57,6 +57,7 @@ the [developer MCP guide](onboarding/DEVELOPER_MCP.md) and
 - [Invitations](features/INVITATIONS.md)
 - [Workflow e-mail](features/WORKFLOW_EMAIL.md)
 - [Companies](features/COMPANIES.md)
+- [Document search](features/DOCUMENT_SEARCH.md)
 - [Parameter Change](features/PARAMETER_CHANGE.md)
 - [Office Integration](features/OFFICE_INTEGRATION.md)
 - [Viewers](features/VIEWERS.md)

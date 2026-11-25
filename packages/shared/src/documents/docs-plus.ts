@@ -36,16 +36,31 @@ export interface TrashDto {
   files: TrashFileDto[];
 }
 
+/** Where a search hit matched: the file name, an attribute value or the file's text. */
+export type SearchMatchPlace = "name" | "attribute" | "content";
+
 export interface SearchHitDto extends FileDto {
   folderPath: string;
-  /** Matched inside the file's text (office, sheet, drawing, PDF): a short excerpt around the match. */
+  /** Matched inside the file's text (office, sheet, drawing, PDF): a short clean excerpt around the match. */
   snippet?: string;
+  /** PDF page of the excerpt (1-based), when the match is in a PDF's text. */
+  page?: number;
+  /** Where the query matched (empty for a search with filters only). */
+  matchedIn?: SearchMatchPlace[];
+  /** Recycle bin search: when the file was deleted. */
+  deletedAt?: string;
 }
 
 export interface SearchResultDto {
   results: SearchHitDto[];
-  /** True when more files matched than were returned. */
+  /** True when more files matched than were returned (another page exists). */
   truncated: boolean;
+  /** Number of files that matched (all pages). */
+  total?: number;
+  offset?: number;
+  limit?: number;
+  /** Terms to highlight (the positive terms of the query). */
+  terms?: string[];
 }
 
 export interface ZipRequest {

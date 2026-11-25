@@ -18,6 +18,7 @@
     "import:autodesk": "tsx src/scripts/import-autodesk.ts",
     "seed:showcase": "tsx src/scripts/seed-project-showcase.ts",
     "seed:load": "tsx --env-file=.env.development src/scripts/seed-ui-load.ts",
+    "perf:search": "tsx src/scripts/search-perf.ts",
     "seed:load:mine": "tsx --env-file=.env.development src/scripts/assign-ui-load.ts"
   },
   "dependencies": {

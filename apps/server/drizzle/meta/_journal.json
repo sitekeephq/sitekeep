@@ -421,6 +421,13 @@
       "when": 1795119958250,
       "tag": "0060_project_companies",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1795599570803,
+      "tag": "0061_doc_search",
+      "breakpoints": true
     }
   ]
 }

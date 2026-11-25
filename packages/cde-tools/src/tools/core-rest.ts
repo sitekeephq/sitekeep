@@ -3,7 +3,7 @@ import { stat } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { PERMISSION_LEVELS } from "@sitekeep/shared";
+import { PERMISSION_LEVELS, searchParamsToQuery } from "@sitekeep/shared";
 import { z } from "zod";
 import type { CdeCall } from "../core/types.js";
 import type { ToolAdder } from "../core/define.js";
@@ -54,6 +54,83 @@ tool(
   "Lists subfolders and files (latest version, size, uploader, IFC status) of a folder. Omit folderId for the project root.",
   { projectId: pid, folderId: id("Folder id").optional() },
   async (a) => call("GET", `/projects/${a.projectId}/folders/${a.folderId ?? (await rootOf(a.projectId))}/contents`),
+);
+
+tool(
+  "cde_documents_search",
+  "Searches the project's files by name, attribute values and text content (PDF, Office, drawings), with filters. " +
+    "Query language: words are ANDed; AND / OR / NOT, parentheses, * wildcard, \"exact phrase\"; codes like DOC-01-A are split. " +
+    "Returns only files the caller can see, with folder path, where it matched (name/attribute/content), a text excerpt and the PDF page.",
+  {
+    projectId: pid,
+    q: z.string().max(200).optional().describe("Search text (see the query language)."),
+    folderId: id("Only this folder (and its subfolders).").optional(),
+    content: z.boolean().default(true).describe("Also search inside the files' text."),
+    ext: z.array(z.string().max(20)).max(20).optional().describe("File extensions without the dot, e.g. [\"pdf\", \"dwg\"]."),
+    attributes: z.record(z.string(), z.string()).optional().describe("Attribute filters: name → value."),
+    states: z.array(z.enum(["wip", "shared", "published", "archived"])).optional().describe("ISO 19650 state of the folder."),
+    suitability: z.array(z.string().max(10)).max(20).optional().describe("Suitability codes, e.g. [\"S2\"]."),
+    revision: z.string().max(40).optional().describe("Revision code; * allowed, e.g. P01*."),
+    updatedFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("Current version updated on or after (YYYY-MM-DD)."),
+    updatedTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("Current version updated on or before (YYYY-MM-DD)."),
+    review: z
+      .array(z.enum(["approved", "approved_with_comments", "reviewed", "revise_resubmit", "rejected", "pending", "none"]))
+      .optional()
+      .describe("Review result of the current version."),
+    sort: z.enum(["relevance", "name", "date", "size"]).optional(),
+    limit: z.number().int().min(1).max(200).default(25),
+    offset: z.number().int().min(0).max(10000).default(0),
+  },
+  async (a) => {
+    const qs = searchParamsToQuery({
+      q: a.q,
+      folderId: a.folderId,
+      content: a.content,
+      ext: a.ext,
+      attrs: a.attributes,
+      states: a.states,
+      suitability: a.suitability,
+      revision: a.revision,
+      updatedFrom: a.updatedFrom,
+      updatedTo: a.updatedTo,
+      review: a.review,
+      sort: a.sort,
+      limit: a.limit,
+      offset: a.offset,
+    });
+    type Hit = {
+      id: string;
+      name: string;
+      folderId: string;
+      folderPath: string;
+      currentVersion: number;
+      attributes: Record<string, string>;
+      latest: { id: string; uploadedAt: string; suitabilityCode?: string | null; revisionCode?: string | null };
+      snippet?: string;
+      page?: number;
+      matchedIn?: string[];
+    };
+    const r = await call<{ results: Hit[]; total?: number; truncated: boolean }>("GET", `/projects/${a.projectId}/search?${qs}`);
+    return {
+      total: r.total ?? r.results.length,
+      more: r.truncated,
+      results: r.results.map((h) => ({
+        id: h.id,
+        name: h.name,
+        folderId: h.folderId,
+        path: h.folderPath,
+        v: h.currentVersion,
+        versionId: h.latest.id,
+        updated: h.latest.uploadedAt.slice(0, 10),
+        ...(h.latest.suitabilityCode ? { suitability: h.latest.suitabilityCode } : {}),
+        ...(h.latest.revisionCode ? { revision: h.latest.revisionCode } : {}),
+        ...(Object.keys(h.attributes ?? {}).length ? { attributes: h.attributes } : {}),
+        ...(h.matchedIn?.length ? { matchedIn: h.matchedIn } : {}),
+        ...(h.snippet ? { excerpt: h.snippet } : {}),
+        ...(h.page ? { page: h.page } : {}),
+      })),
+    };
+  },
 );
 
 tool(

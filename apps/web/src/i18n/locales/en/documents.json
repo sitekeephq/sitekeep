@@ -537,17 +537,49 @@
     "readOnly": "Read Only"
   },
   "search": {
-    "titleInFolder": "Search results for \"{{query}}\" in this folder",
-    "titleInProject": "Search results for \"{{query}}\" in the project",
+    "title": {
+      "folder": "Search results for \"{{query}}\" in this folder",
+      "all": "Search results for \"{{query}}\" in all folders",
+      "folders": "Search results for \"{{query}}\" in the selected folders",
+      "trash": "Search results for \"{{query}}\" in the Recycle Bin"
+    },
+    "titleNoQuery": {
+      "folder": "Filtered files in this folder",
+      "all": "Filtered files in all folders",
+      "folders": "Filtered files in the selected folders",
+      "trash": "Filtered files in the Recycle Bin"
+    },
     "count_one": "{{count}} file",
     "count_other": "{{count}} files",
-    "countTruncated_one": "{{count}} file — showing the first results, narrow your search",
-    "countTruncated_other": "{{count}} files — showing the first results, narrow your search",
     "actions": {
-      "close": "Close Search"
+      "close": "Close Search",
+      "edit": "Search and Filter",
+      "editFilters_one": "Search and Filter ({{count}})",
+      "editFilters_other": "Search and Filter ({{count}})"
     },
     "searching": "Searching…",
     "foundInContent": "Found in the file content",
+    "page": "p. {{page}}",
+    "match": {
+      "name": "Name",
+      "attribute": "Attribute",
+      "content": "Content"
+    },
+    "sort": {
+      "label": "Sort",
+      "relevance": "Relevance",
+      "name": "Name",
+      "date": "Date",
+      "size": "Size",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "pager": {
+      "prev": "Previous",
+      "next": "Next",
+      "range": "{{from}}–{{to}} of {{total}}"
+    },
+    "deletedAt": "Deleted",
     "snippet": "<m>In content: </m>{{snippet}}"
   },
   "description": {
@@ -598,7 +630,9 @@
     "actions": {
       "startReview": "Start Review ({{count}})",
       "deleteCount": "Delete ({{count}})",
-      "chooseFiles": "Choose Files"
+      "chooseFiles": "Choose Files",
+      "createTransmittal_one": "Create Transmittal ({{count}})",
+      "createTransmittal_other": "Create Transmittal ({{count}})"
     },
     "zipHint": "Download the selected files and folders as a single zip",
     "deleteHint": "Move the selected files to the recycle bin",
@@ -642,7 +676,8 @@
     },
     "fileActions": "File actions",
     "fileActionsFor": "File actions for {{name}}",
-    "openVersionHistory": "Open the version history of {{name}}"
+    "openVersionHistory": "Open the version history of {{name}}",
+    "noTransmittalType": "The project has no transmittal type. A project administrator adds one in Project Settings → Work Types."
   },
   "transfer": {
     "moveTitle": "Move File",
@@ -925,6 +960,97 @@
       "storeysHeading": "By Storey",
       "noGeometry": "Shapes were not compared: the model index of a version predates shape fingerprints.",
       "notDetailed": "Property-level details are missing: the model index of a version is old and could not be rebuilt."
+    }
+  },
+  "searchPanel": {
+    "title": "Search and Filter",
+    "button": "Search and Filter",
+    "openHint": "Search panel: scope, content, filters and saved searches",
+    "tabs": {
+      "search": "Search",
+      "saved": "Saved Searches"
+    },
+    "query": "Search text",
+    "queryPlaceholder": "Name, attribute or content…",
+    "parsed": "Searching for: {{query}}",
+    "syntax": {
+      "title": "Search syntax",
+      "and": "Words are combined: kolon kiriş = both (AND also works).",
+      "or": "OR: either word — kolon OR kiriş.",
+      "not": "NOT leaves out — istasyon NOT taslak. Parentheses group: (A OR B) NOT C.",
+      "phrase": "\"Quotes\" find the exact phrase: \"zemin etüdü\".",
+      "wildcard": "* stands for any characters: rapor*, P01*. In content a word must start with the term unless it starts with *.",
+      "codes": "Codes are split at - _ . / : DOC-01-A finds files with DOC, 01 and A."
+    },
+    "scope": {
+      "title": "Where",
+      "folder": "This Folder ({{name}})",
+      "all": "All Folders",
+      "folders": "Selected Folders",
+      "subfolders": "Subfolders",
+      "selectedCount_one": "{{count}} folder selected",
+      "selectedCount_other": "{{count}} folders selected",
+      "change": "Change"
+    },
+    "content": "Content Too",
+    "contentHint": "Also search the text of the files (PDF, Office, drawings, sheets, text).",
+    "trash": "Deleted Items",
+    "trashHint": "Search the Recycle Bin instead (project administrators).",
+    "recent": "Recent searches",
+    "filtersOnly": "(filters only)",
+    "filterCount_one": "{{count}} filter",
+    "filterCount_other": "{{count}} filters",
+    "filters": {
+      "title": "Filters",
+      "fileTypes": "File types",
+      "otherTypes": "Other types (e.g. rvt, zip) + Enter",
+      "state": "ISO 19650 state",
+      "suitability": "Suitability",
+      "revision": "Revision",
+      "uploadedBy": "Uploaded by",
+      "anyone": "Anyone",
+      "company": "Uploader's company",
+      "anyCompany": "Any company",
+      "updated": "Last updated",
+      "added": "Version added",
+      "from": "From",
+      "to": "To",
+      "version": "Version no.",
+      "versionPlaceholder": "3 or 2-5",
+      "locked": "Locked for Editing",
+      "review": "Review result",
+      "review_pending": "In review",
+      "review_none": "Not reviewed",
+      "attributes": "Attributes",
+      "addAttribute": "Add attribute",
+      "noAttributes": "The project has no attributes."
+    },
+    "save": "Save Search",
+    "saveName": "Name of the search",
+    "run": "Search",
+    "saved": {
+      "empty": "No saved searches yet. Set up a search and choose Save Search.",
+      "sharedBy": "Shared by {{name}}",
+      "shared": "Shared",
+      "share": "Share",
+      "delete": "Delete \"{{name}}\"",
+      "confirmDelete": "Delete the saved search \"{{name}}\"?",
+      "shareHint": "A project administrator can share saved searches with people, companies or the whole project."
+    },
+    "share": {
+      "title": "Share \"{{name}}\"",
+      "hint": "Only the search is shared: everyone sees the files their own permissions allow.",
+      "wholeProject": "Everyone on the Project",
+      "companies": "Companies",
+      "people": "People"
+    },
+    "pickFolders": {
+      "title": "Select folders",
+      "hint": "Search these folders (and their subfolders when Subfolders is on).",
+      "apply_one": "Use {{count}} folder",
+      "apply_other": "Use {{count}} folders",
+      "expand": "Expand",
+      "collapse": "Collapse"
     }
   }
 }

@@ -537,17 +537,49 @@
     "readOnly": "Salt okunur"
   },
   "search": {
-    "titleInFolder": "\"{{query}}\" için bu klasörde arama sonuçları",
-    "titleInProject": "\"{{query}}\" için projede arama sonuçları",
+    "title": {
+      "folder": "\"{{query}}\" için bu klasörde arama sonuçları",
+      "all": "\"{{query}}\" için tüm klasörlerde arama sonuçları",
+      "folders": "\"{{query}}\" için seçili klasörlerde arama sonuçları",
+      "trash": "\"{{query}}\" için çöp kutusunda arama sonuçları"
+    },
+    "titleNoQuery": {
+      "folder": "Bu klasörde süzülen dosyalar",
+      "all": "Tüm klasörlerde süzülen dosyalar",
+      "folders": "Seçili klasörlerde süzülen dosyalar",
+      "trash": "Çöp kutusunda süzülen dosyalar"
+    },
     "count_one": "{{count}} dosya",
     "count_other": "{{count}} dosya",
-    "countTruncated_one": "{{count}} dosya — ilk sonuçlar gösteriliyor, aramayı daraltın",
-    "countTruncated_other": "{{count}} dosya — ilk sonuçlar gösteriliyor, aramayı daraltın",
     "actions": {
-      "close": "Aramayı Kapat"
+      "close": "Aramayı Kapat",
+      "edit": "Ara ve Süz",
+      "editFilters_one": "Ara ve Süz ({{count}})",
+      "editFilters_other": "Ara ve Süz ({{count}})"
     },
     "searching": "Aranıyor…",
     "foundInContent": "Dosya içeriğinde bulundu",
+    "page": "s. {{page}}",
+    "match": {
+      "name": "Ad",
+      "attribute": "Öznitelik",
+      "content": "İçerik"
+    },
+    "sort": {
+      "label": "Sırala",
+      "relevance": "Alaka",
+      "name": "Ad",
+      "date": "Tarih",
+      "size": "Boyut",
+      "asc": "Artan",
+      "desc": "Azalan"
+    },
+    "pager": {
+      "prev": "Önceki",
+      "next": "Sonraki",
+      "range": "{{from}}–{{to}} / {{total}}"
+    },
+    "deletedAt": "Silinme",
     "snippet": "<m>İçerikte: </m>{{snippet}}"
   },
   "description": {
@@ -598,7 +630,9 @@
     "actions": {
       "startReview": "İnceleme Başlat ({{count}})",
       "deleteCount": "Sil ({{count}})",
-      "chooseFiles": "Dosya Seç"
+      "chooseFiles": "Dosya Seç",
+      "createTransmittal_one": "Gönderim Formu Oluştur ({{count}})",
+      "createTransmittal_other": "Gönderim Formu Oluştur ({{count}})"
     },
     "zipHint": "Seçili dosya ve klasörleri tek zip olarak indir",
     "deleteHint": "Seçili dosyaları çöp kutusuna taşı",
@@ -642,7 +676,8 @@
     },
     "fileActions": "Dosya işlemleri",
     "fileActionsFor": "{{name}} dosya işlemleri",
-    "openVersionHistory": "{{name}} sürüm geçmişini aç"
+    "openVersionHistory": "{{name}} sürüm geçmişini aç",
+    "noTransmittalType": "Projede gönderim formu türü yok. Proje yöneticisi Proje Ayarları → İş Türleri'nden ekler."
   },
   "transfer": {
     "moveTitle": "Dosyayı taşı",
@@ -925,6 +960,97 @@
       "storeysHeading": "Kata Göre",
       "noGeometry": "Şekiller karşılaştırılmadı: bir versiyonun model dizini şekil parmak izlerinden eski.",
       "notDetailed": "Özellik düzeyinde ayrıntı yok: bir versiyonun model dizini eski ve yeniden oluşturulamadı."
+    }
+  },
+  "searchPanel": {
+    "title": "Ara ve Süz",
+    "button": "Ara ve Süz",
+    "openHint": "Arama paneli: kapsam, içerik, filtreler ve kayıtlı aramalar",
+    "tabs": {
+      "search": "Ara",
+      "saved": "Kayıtlı Aramalar"
+    },
+    "query": "Arama metni",
+    "queryPlaceholder": "Ad, öznitelik veya içerik…",
+    "parsed": "Aranan: {{query}}",
+    "syntax": {
+      "title": "Arama dili",
+      "and": "Kelimeler birlikte aranır: kolon kiriş = ikisi de (AND / VE de olur).",
+      "or": "OR (VEYA): biri yeter — kolon OR kiriş.",
+      "not": "NOT (DEĞİL) dışarıda bırakır — istasyon NOT taslak. Parantez gruplar: (A OR B) NOT C.",
+      "phrase": "\"Tırnak\" tam ifadeyi bulur: \"zemin etüdü\".",
+      "wildcard": "* herhangi karakterlerin yerini tutar: rapor*, P01*. İçerikte kelime, * ile başlamıyorsa terimle başlamalıdır.",
+      "codes": "Kodlar - _ . / işaretlerinden bölünür: DOC-01-A, içinde DOC, 01 ve A geçen dosyaları bulur."
+    },
+    "scope": {
+      "title": "Nerede",
+      "folder": "Bu Klasör ({{name}})",
+      "all": "Tüm Klasörler",
+      "folders": "Seçili Klasörler",
+      "subfolders": "Alt Klasörler",
+      "selectedCount_one": "{{count}} klasör seçili",
+      "selectedCount_other": "{{count}} klasör seçili",
+      "change": "Değiştir"
+    },
+    "content": "İçerikte de Ara",
+    "contentHint": "Dosyaların metninde de ara (PDF, Office, çizim, tablo, metin).",
+    "trash": "Silinen Öğeler",
+    "trashHint": "Bunun yerine çöp kutusunda ara (proje yöneticileri).",
+    "recent": "Son aramalar",
+    "filtersOnly": "(yalnız filtre)",
+    "filterCount_one": "{{count}} filtre",
+    "filterCount_other": "{{count}} filtre",
+    "filters": {
+      "title": "Filtreler",
+      "fileTypes": "Dosya türleri",
+      "otherTypes": "Diğer türler (ör. rvt, zip) + Enter",
+      "state": "ISO 19650 durumu",
+      "suitability": "Statü (suitability)",
+      "revision": "Revizyon",
+      "uploadedBy": "Yükleyen",
+      "anyone": "Herkes",
+      "company": "Yükleyenin firması",
+      "anyCompany": "Tüm firmalar",
+      "updated": "Son güncelleme",
+      "added": "Sürüm eklenme",
+      "from": "Başlangıç",
+      "to": "Bitiş",
+      "version": "Sürüm no",
+      "versionPlaceholder": "3 veya 2-5",
+      "locked": "Düzenleme için Kilitli",
+      "review": "İnceleme sonucu",
+      "review_pending": "İncelemede",
+      "review_none": "İncelenmemiş",
+      "attributes": "Öznitelikler",
+      "addAttribute": "Öznitelik ekle",
+      "noAttributes": "Projede öznitelik tanımlı değil."
+    },
+    "save": "Aramayı Kaydet",
+    "saveName": "Aramanın adı",
+    "run": "Ara",
+    "saved": {
+      "empty": "Henüz kayıtlı arama yok. Bir arama kurup Aramayı Kaydet'i seçin.",
+      "sharedBy": "Paylaşan: {{name}}",
+      "shared": "Paylaşıldı",
+      "share": "Paylaş",
+      "delete": "\"{{name}}\" aramasını sil",
+      "confirmDelete": "\"{{name}}\" kayıtlı araması silinsin mi?",
+      "shareHint": "Kayıtlı aramaları kişilerle, firmalarla ya da tüm projeyle proje yöneticisi paylaşabilir."
+    },
+    "share": {
+      "title": "\"{{name}}\" aramasını paylaş",
+      "hint": "Yalnız arama paylaşılır: herkes kendi yetkisinin izin verdiği dosyaları görür.",
+      "wholeProject": "Projedeki Herkes",
+      "companies": "Firmalar",
+      "people": "Kişiler"
+    },
+    "pickFolders": {
+      "title": "Klasör seçin",
+      "hint": "Bu klasörlerde ara (Alt klasörler açıksa alt klasörlerinde de).",
+      "apply_one": "{{count}} klasörü kullan",
+      "apply_other": "{{count}} klasörü kullan",
+      "expand": "Aç",
+      "collapse": "Kapat"
     }
   }
 }

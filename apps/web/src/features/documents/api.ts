@@ -2,6 +2,10 @@ import type {
   AttributeDefinition,
   CdeCodeWarningDto,
   AttributeDefinitionDto,
+  DocSearchParams,
+  SavedSearchDto,
+  SavedSearchInput,
+  SavedSearchShareDto,
   EffectiveAttributeDto,
   FileDto,
   FileVersionDto,
@@ -23,6 +27,7 @@ import type {
   VersionDocIntelDto,
   VirtualFolderDto,
 } from "@sitekeep/shared";
+import { searchParamsToQuery } from "@sitekeep/shared";
 import { ApiError, del, get, patch, post, put, request, safeJson } from "../../shared/api/client";
 
 export type FolderWithPath = FolderDto & { path: FolderDto[] };
@@ -206,20 +211,24 @@ export const documentsApi = {
       `/projects/${projectId}/folders/${folderId}/attribute-bindings`,
       { definitionIds },
     ),
+  /** Document search (docs/features/DOCUMENT_SEARCH.md). `ext` may be "pdf,dwg"; `attrs` are attribute filters. */
   search: (
     projectId: string,
-    params: { q?: string; folderId?: string; ext?: string; attrs?: Record<string, string> },
+    params: Omit<DocSearchParams, "ext"> & { ext?: string | string[] },
     signal?: AbortSignal,
   ) => {
-    const query = new URLSearchParams();
-    if (params.q) query.set("q", params.q);
-    if (params.folderId) query.set("folderId", params.folderId);
-    if (params.ext) query.set("ext", params.ext);
-    for (const [key, value] of Object.entries(params.attrs ?? {})) {
-      if (value) query.set(`attr.${key}`, value);
-    }
+    const ext = typeof params.ext === "string" ? params.ext.split(",").map((e) => e.trim()).filter(Boolean) : params.ext;
+    const query = searchParamsToQuery({ ...params, ext });
     return get<SearchResultDto>(`/projects/${projectId}/search?${query.toString()}`, { signal });
   },
+  savedSearches: (projectId: string) => get<SavedSearchDto[]>(`/projects/${projectId}/saved-searches`),
+  createSavedSearch: (projectId: string, input: SavedSearchInput) =>
+    post<SavedSearchDto>(`/projects/${projectId}/saved-searches`, input),
+  updateSavedSearch: (projectId: string, id: string, input: Partial<SavedSearchInput>) =>
+    patch<SavedSearchDto>(`/projects/${projectId}/saved-searches/${id}`, input),
+  deleteSavedSearch: (projectId: string, id: string) => del(`/projects/${projectId}/saved-searches/${id}`),
+  shareSavedSearch: (projectId: string, id: string, shares: Pick<SavedSearchShareDto, "subjectType" | "subjectId">[]) =>
+    put<SavedSearchDto>(`/projects/${projectId}/saved-searches/${id}/shares`, { shares }),
   trash: (projectId: string) => get<TrashDto>(`/projects/${projectId}/trash`),
   restoreFile: (projectId: string, fileId: string, name?: string) =>
     post<{ ok: true; name: string; folderId: string }>(

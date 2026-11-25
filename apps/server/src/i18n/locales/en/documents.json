@@ -11,7 +11,8 @@
     "namingStandard": "Naming standard",
     "modelDerivative": "Model derivative",
     "trashFile": "File in the Recycle Bin",
-    "trashFolder": "Folder in the Recycle Bin"
+    "trashFolder": "Folder in the Recycle Bin",
+    "savedSearch": "Saved search"
   },
   "errors": {
     "rootFolderMove": "The root folder cannot be moved.",
@@ -19,6 +20,10 @@
     "rootFolderRename": "The root folder cannot be renamed.",
     "rootFolderDelete": "The root folder cannot be deleted.",
     "searchTooLong": "The search text is too long.",
+    "searchBadDate": "\"{{value}}\" is not a date (YYYY-MM-DD).",
+    "searchBadVersion": "\"{{value}}\" is not a version number or range (3 or 2-5).",
+    "savedSearchNameRequired": "Give the search a name.",
+    "savedSearchShareSubject": "Can be shared only with members and companies of this project.",
     "restoreFolderDeleted": "The file's folder has been deleted too. Restore the folder first.",
     "restoreParentDeleted": "The parent folder has been deleted too. Restore the parent folder first.",
     "restoreFileExists": "A file named \"{{name}}\" already exists in the folder \"{{folder}}\". Give it a new name to restore it.",

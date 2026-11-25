@@ -283,10 +283,10 @@ triangles, it can be larger than the DXF for text-heavy drawings.
 
 ## AI hook
 
-- Preview jobs write the file's text to the `version_texts` table (at most 200 000 characters per version).
+- Preview jobs write the file's text to the `version_texts` table (at most 200 000 characters per version; PDF pages separated by a form feed).
 - For office files this job is the `text` preview: the text of docx/docm/dotx, pptx/pptm/ppsx (slides + notes), odt/ott/odp
   is read from the XML parts. **No converter needed.** Notes are also written to the preview's `meta.notes` field (slide viewer).
-- Project search (`GET /projects/:pid/search?q=`) now also searches the **content** of the current version. The result returns a short `snippet`.
+- Project search (`GET /projects/:pid/search?q=`) also searches the **content** of the current version. The result returns a short clean `snippet` and, for a PDF, its `page` ([document search](DOCUMENT_SEARCH.md)).
 - The `cde_search_files` tool of the "Ask" assistant uses the same search; it sees the matching part in the `match` field.
 - Text of legacy binary formats (.doc, .ppt, .rtf) is read from the PDF, and only if a converter exists.
 - Test: `apps/server/test/viewers.test.ts` → "works without any converter…" (docx/pptx/odt search and notes without a converter).

@@ -17,7 +17,7 @@ import {
 
 const BASE_NAMES = `
 cde_projects_list cde_members_list cde_member_add cde_companies_list cde_activity
-cde_folder_contents cde_folder_tree cde_folder_create cde_folder_update
+cde_folder_contents cde_documents_search cde_folder_tree cde_folder_create cde_folder_update
 cde_folder_permissions_get cde_folder_permissions_set cde_naming_standards_list
 cde_naming_validate cde_file_get cde_file_update cde_models_list cde_issues_list
 cde_issue_get cde_issue_create cde_issue_update cde_issue_comments_list

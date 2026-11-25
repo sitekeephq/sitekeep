@@ -1,5 +1,6 @@
 /** In-browser viewers: preview derivatives per version (office PDF, sheet JSON, DXF) and extracted text. */
-import { boolean, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { boolean, customType, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import type { PreviewKind, PreviewMeta, PreviewStatus } from "@sitekeep/shared";
 import { fileVersions, projects } from "./schema.js";
 
@@ -26,6 +27,8 @@ export const versionPreviews = pgTable(
   (t) => [primaryKey({ columns: [t.versionId, t.kind] })],
 );
 
+const tsvector = customType<{ data: string }>({ dataType: () => "tsvector" });
+
 /** Plain text of a version for search and the "Sor" assistant (office, sheets, drawings, PDF, text). */
 export const versionTexts = pgTable(
   "version_texts",
@@ -41,6 +44,14 @@ export const versionTexts = pgTable(
     content: text("content").notNull(),
     truncated: boolean("truncated").notNull().default(false),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    /**
+     * Full-text vector of the folded text (simple configuration: no stemming, Turkish I folded like
+     * foldTr) with / - _ . , ; : read as spaces, so codes such as C30/37 or DOC-01-A index their parts.
+     * Search finds words by it (GIN) and ranks with it. Kept by the database; the first 100 000 characters.
+     */
+    tsv: tsvector("tsv").generatedAlwaysAs(
+      sql`to_tsvector('simple'::regconfig, lower(translate(left(content, 100000), 'İIıŞĞÜÖÇ/-_.,;:', 'iiişğüöç       ')))`, // i18n-ok: Turkish case folding
+    ),
   },
-  (t) => [index("version_texts_project_idx").on(t.projectId)],
+  (t) => [index("version_texts_project_idx").on(t.projectId), index("version_texts_tsv_idx").using("gin", t.tsv)],
 );
