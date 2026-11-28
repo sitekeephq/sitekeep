@@ -4,7 +4,9 @@
     "indexFailed": "The index could not be created.",
     "ifcTimeout": "The IFC conversion timed out.",
     "ifcExit": "The IFC conversion process ended with code {{code}}.",
-    "noModelConverter": "No module that is on converts .{{ext}} files to IFC; the file is kept but has no model view."
+    "noModelConverter": "No module that is on converts .{{ext}} files to IFC; the file is kept but has no model view.",
+    "ifcReaderError": "The model could not be read (IFC reader error). Export it again from the authoring tool as IFC (IFC4 or IFC2x3) and upload it.",
+    "unknownError": "The job failed for an unknown reason. Details are in the server log."
   },
   "spatial": {
     "versionNotFound": "IFC version not found.",

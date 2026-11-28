@@ -425,6 +425,53 @@
     "external": {
       "title": "External Connections"
     },
+    "failedJobs": {
+      "title": "Failed Background Jobs",
+      "description": "Conversions and synchronisations that did not finish, grouped by job and error. Short network failures are retried automatically (up to 3 runs); what is listed here failed for good.",
+      "none": "No failed jobs.",
+      "summary": "{{count}} failed jobs in {{groups}} groups.",
+      "columns": {
+        "kind": "Job",
+        "error": "Error",
+        "count": "Count",
+        "last": "Last Failure",
+        "project": "Project",
+        "file": "File",
+        "created": "Created",
+        "finished": "Finished",
+        "attempts": "Attempts"
+      },
+      "details": "Show Jobs",
+      "hide": "Hide Jobs",
+      "retry": "Retry",
+      "retryGroup": "Retry All",
+      "clear": "Clear",
+      "clearGroup": "Clear All",
+      "notRetryable": "This kind of job cannot be repeated safely.",
+      "retried": "{{queued}} queued again, {{skipped}} skipped (already converted, file gone, or not repeatable).",
+      "cleared": "{{count}} failed job records cleared.",
+      "clearTitle": "Clear Failed Jobs",
+      "clearConfirm": "{{count}} failed job records will be deleted. The files stay as they are. This is recorded in the audit log.",
+      "previous": "Previous",
+      "page": "Page {{page}} of {{pages}} ({{total}} jobs)",
+      "lastFailure": "Last failure {{time}}",
+      "kinds": {
+        "ifc_to_frag": "IFC model conversion",
+        "ifc_index": "Model index",
+        "ifc_locations": "IFC locations",
+        "autodesk_sync": "Autodesk sync",
+        "autodesk_file_import": "Autodesk file import",
+        "version_preview": "Preview",
+        "version_compare": "Version comparison",
+        "docintel_extract": "Text extraction",
+        "sheets_extract": "Sheet extraction",
+        "ids_check": "Information requirements check",
+        "closeout_archive": "Close-out archive",
+        "project_export": "Project export",
+        "project_import": "Project import",
+        "personal_data_export": "Personal data export"
+      }
+    },
     "storage": {
       "driver": {
         "local": "Local disk",

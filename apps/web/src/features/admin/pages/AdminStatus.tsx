@@ -14,6 +14,7 @@ import { LoadingIndicator } from "../../../shared/ui/LoadingIndicator";
 import { CapacityCard } from "./AdminCapacity";
 import { licenseApi, type AdminLicenseDto } from "../../../shared/api/api-license";
 import { UpdatesPanel } from "./AdminUpdates";
+import { FailedJobsCard } from "./AdminFailedJobs";
 
 const LICENCE_TONE: Record<AdminLicenseDto["status"], string> = {
   none: "",
@@ -211,14 +212,14 @@ export function ProjectStatusPage() {
 
 export function AdminStatusSection() {
   const [clock, setClock] = useState(0);
-  const { data, error, setData } = useLoad(() => api.adminStatus(), []);
+  const { data, error, setData, reload } = useLoad(() => api.adminStatus(), []);
   useEffect(() => {
     const id = window.setInterval(() => setClock((n) => n + 1), 1000);
     return () => window.clearInterval(id);
   }, []);
   if (error) return <p className="error">{error}</p>;
   if (!data) return <LoadingIndicator />;
-  return <StatusCards data={data} clock={clock} onQueued={() => setData(queuedBackup(data))} />;
+  return <StatusCards data={data} clock={clock} onQueued={() => setData(queuedBackup(data))} onJobsChanged={reload} />;
 }
 
 function queuedBackup(data: AdminStatusDto): AdminStatusDto {
@@ -233,10 +234,12 @@ function StatusCards({
   data,
   clock,
   onQueued,
+  onJobsChanged,
 }: {
   data: AdminStatusDto;
   clock: number;
   onQueued: () => void;
+  onJobsChanged: () => void;
 }) {
   const { t } = useTranslation(["admin", "common"]);
   const diskRatio = data.disk?.usedRatio ?? 0;
@@ -398,7 +401,14 @@ function StatusCards({
           </div>
           <Spark values={QUEUE_24} label={t("systemStatus.queue.spark")} />
         </div>
+        {data.jobs.lastFailedAt && data.jobs.failed > 0 && (
+          <p className="error small" style={{ margin: "8px 0 0" }}>
+            {t("systemStatus.failedJobs.lastFailure", { time: ago(data.jobs.lastFailedAt) })}
+          </p>
+        )}
       </div>
+
+      <FailedJobsCard onChanged={onJobsChanged} />
 
       <div className="card">
         <div className="row wrap" style={{ gap: 12 }}>

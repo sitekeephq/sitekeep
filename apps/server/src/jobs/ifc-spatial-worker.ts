@@ -120,8 +120,13 @@ async function run(): Promise<SpatialNode[]> {
   }
 }
 
+/** Text of anything thrown, handed to the queue as a string. A WebAssembly RuntimeError keeps its type (jobs/errors.ts recognises it); a WebAssembly.Exception is not an Error, its String() is "[object WebAssembly.Exception]". */
+function thrownMessage(err: unknown): string {
+  return err instanceof Error ? (err.name === "RuntimeError" ? `RuntimeError: ${err.message}` : err.message) : String(err);
+}
+
 try {
   parentPort?.postMessage({ type: "done", nodes: await run() });
 } catch (err) {
-  parentPort?.postMessage({ type: "error", message: err instanceof Error ? err.message : String(err) });
+  parentPort?.postMessage({ type: "error", message: thrownMessage(err) });
 }

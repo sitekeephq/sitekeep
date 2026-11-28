@@ -11,6 +11,10 @@ import type {
   ModelVocabDto,
   AuditEntryDto,
   AdminStatusDto,
+  FailedJobGroupDto,
+  FailedJobPageDto,
+  FailedJobRetryResultDto,
+  FailedJobSelector,
   AdminCapacityDto,
   CapacityRunDto,
   CapacityRunMode,
@@ -442,6 +446,11 @@ export const api = {
     patch<UserDto>(`/users/${id}`, u),
 
   adminStatus: () => get<AdminStatusDto>("/admin/status"),
+  failedJobGroups: () => get<FailedJobGroupDto[]>("/admin/failed-jobs/groups"),
+  failedJobs: (q: { kind?: string; error?: string; page?: number; pageSize?: number }) =>
+    get<FailedJobPageDto>(`/admin/failed-jobs?${new URLSearchParams(Object.entries(q).flatMap(([k, v]) => (v === undefined ? [] : [[k, String(v)]])))}`),
+  retryFailedJobs: (sel: FailedJobSelector) => post<FailedJobRetryResultDto>("/admin/failed-jobs/retry", sel),
+  clearFailedJobs: (sel: FailedJobSelector) => post<{ deleted: number }>("/admin/failed-jobs/clear", sel),
   adminCapacity: () => get<AdminCapacityDto>("/admin/capacity"),
   capacityRuns: () => get<CapacityRunDto[]>("/admin/capacity/runs"),
   capacityRun: (id: string) => get<CapacityRunDto>(`/admin/capacity/runs/${id}`),

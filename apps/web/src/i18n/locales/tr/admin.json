@@ -425,6 +425,53 @@
     "external": {
       "title": "Dış Bağlantılar"
     },
+    "failedJobs": {
+      "title": "Başarısız Arka Plan İşleri",
+      "description": "Tamamlanamayan dönüşümler ve eşitlemeler; iş ve hataya göre gruplanır. Kısa ağ kesintileri otomatik yeniden denenir (en çok 3 çalıştırma); burada görünenler kalıcı olarak başarısız olmuştur.",
+      "none": "Başarısız iş yok.",
+      "summary": "{{groups}} grupta {{count}} başarısız iş.",
+      "columns": {
+        "kind": "İş",
+        "error": "Hata",
+        "count": "Adet",
+        "last": "Son Hata",
+        "project": "Proje",
+        "file": "Dosya",
+        "created": "Oluşturulma",
+        "finished": "Bitiş",
+        "attempts": "Deneme"
+      },
+      "details": "İşleri Göster",
+      "hide": "İşleri Gizle",
+      "retry": "Yeniden Dene",
+      "retryGroup": "Tümünü Yeniden Dene",
+      "clear": "Temizle",
+      "clearGroup": "Tümünü Temizle",
+      "notRetryable": "Bu tür iş güvenle tekrarlanamaz.",
+      "retried": "{{queued}} iş yeniden kuyruğa alındı, {{skipped}} atlandı (zaten dönüştürülmüş, dosya yok veya tekrarlanamaz).",
+      "cleared": "{{count}} başarısız iş kaydı temizlendi.",
+      "clearTitle": "Başarısız İşleri Temizle",
+      "clearConfirm": "{{count}} başarısız iş kaydı silinecek. Dosyalar olduğu gibi kalır. İşlem denetim kaydına yazılır.",
+      "previous": "Önceki",
+      "page": "Sayfa {{page}} / {{pages}} ({{total}} iş)",
+      "lastFailure": "Son hata {{time}}",
+      "kinds": {
+        "ifc_to_frag": "IFC model dönüşümü",
+        "ifc_index": "Model indeksi",
+        "ifc_locations": "IFC konumları",
+        "autodesk_sync": "Autodesk eşitleme",
+        "autodesk_file_import": "Autodesk dosya aktarımı",
+        "version_preview": "Önizleme",
+        "version_compare": "Sürüm karşılaştırma",
+        "docintel_extract": "Metin çıkarma",
+        "sheets_extract": "Pafta çıkarma",
+        "ids_check": "Bilgi gereksinimleri denetimi",
+        "closeout_archive": "Kapanış arşivi",
+        "project_export": "Proje dışa aktarma",
+        "project_import": "Proje içe aktarma",
+        "personal_data_export": "Kişisel veri dışa aktarma"
+      }
+    },
     "storage": {
       "driver": {
         "local": "Yerel disk",

@@ -4,7 +4,9 @@
     "indexFailed": "İndeks oluşturulamadı.",
     "ifcTimeout": "IFC dönüşümü zaman aşımına uğradı.",
     "ifcExit": "IFC dönüşüm işlemi {{code}} koduyla bitti.",
-    "noModelConverter": ".{{ext}} dosyalarını IFC'ye çeviren açık bir modül yok; dosya saklanır ama model görünümü yok."
+    "noModelConverter": ".{{ext}} dosyalarını IFC'ye çeviren açık bir modül yok; dosya saklanır ama model görünümü yok.",
+    "ifcReaderError": "Model okunamadı (IFC okuyucu hatası). Dosyayı çizim programından IFC (IFC4 veya IFC2x3) olarak yeniden dışa aktarıp yükleyin.",
+    "unknownError": "İş bilinmeyen bir nedenle başarısız oldu. Ayrıntı sunucu günlüğündedir."
   },
   "spatial": {
     "versionNotFound": "IFC versiyonu bulunamadı.",

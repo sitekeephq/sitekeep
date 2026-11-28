@@ -342,6 +342,8 @@ export const jobs = pgTable(
     createdAt: createdAt(),
     startedAt: timestamp("started_at", { withTimezone: true }),
     finishedAt: timestamp("finished_at", { withTimezone: true }),
+    /** A queued job is not started before this time (automatic retry with backoff, jobs/errors.ts). */
+    runAfter: timestamp("run_after", { withTimezone: true }),
   },
   (t) => [index("jobs_status_idx").on(t.status)],
 );

@@ -992,6 +992,11 @@ async function convert(outputPath: string) {
   }
 }
 
+/** Text of anything thrown, handed to the queue as a string. A WebAssembly RuntimeError keeps its type (jobs/errors.ts recognises it); a WebAssembly.Exception is not an Error, its String() is "[object WebAssembly.Exception]". */
+function thrownMessage(err: unknown): string {
+  return err instanceof Error ? (err.name === "RuntimeError" ? `RuntimeError: ${err.message}` : err.message) : String(err);
+}
+
 try {
   const summary = await summarize();
   let index: { elementCount: number } | { error: string } | null = null;
@@ -1000,11 +1005,11 @@ try {
       index = await buildIndex(indexPath);
     } catch (err) {
       // The viewer derivative is still useful without the comparison index.
-      index = { error: err instanceof Error ? err.message : String(err) };
+      index = { error: thrownMessage(err) };
     }
   }
   if (outputPath) await convert(outputPath);
   parentPort?.postMessage({ type: "done", summary, index });
 } catch (err) {
-  parentPort?.postMessage({ type: "error", message: err instanceof Error ? err.message : String(err) });
+  parentPort?.postMessage({ type: "error", message: thrownMessage(err) });
 }

@@ -15,6 +15,7 @@ import { canReadSecurityRecords } from "../core/security/system-roles.js";
 import { getGoogleAuthSettings, putGoogleAuthSettings } from "../auth/google-settings.js";
 import { adminSettingsRoutes } from "./settings.js";
 import { adminStatus } from "./status.js";
+import { clearFailedJobs, failedJobGroups, failedJobPage, retryFailedJobs } from "./failed-jobs.js";
 import { capacityRoutes } from "./capacity/routes.js";
 import { DEFAULT_LANGUAGE, msg, render } from "../i18n/index.js";
 import { refreshSeats } from "../license/state.js";
@@ -33,6 +34,52 @@ export async function adminRoutes(api: FastifyInstance, deps: AppDeps) {
   });
 
   capacityRoutes(api, deps, requireAdmin);
+
+  // Failed background jobs (Administration -> System Status): grouped list, paged list, retry, clear.
+  const selector = z.union([
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }),
+    z.object({ kind: z.string().min(1).max(100), error: z.string().max(5000) }),
+  ]);
+  api.get("/admin/failed-jobs/groups", async (req) => {
+    requireAdmin(req);
+    return failedJobGroups(db);
+  });
+  api.get("/admin/failed-jobs", async (req) => {
+    requireAdmin(req);
+    const q = z
+      .object({
+        kind: z.string().max(100).optional(),
+        error: z.string().max(5000).optional(),
+        page: z.coerce.number().int().min(1).default(1),
+        pageSize: z.coerce.number().int().min(1).max(100).default(25),
+      })
+      .parse(req.query);
+    return failedJobPage(db, q);
+  });
+  api.post("/admin/failed-jobs/retry", async (req) => {
+    requireAdmin(req);
+    const sel = selector.parse(req.body);
+    const { ids, ...result } = await retryFailedJobs(db, deps.jobs, sel);
+    await audit(db, {
+      userId: req.user!.id,
+      action: "jobs.failed_retried",
+      targetType: "job",
+      details: { ...("kind" in sel ? { kind: sel.kind } : {}), queued: result.queued, skipped: result.skipped, jobIds: ids.slice(0, 50) },
+    });
+    return result;
+  });
+  api.post("/admin/failed-jobs/clear", async (req) => {
+    requireAdmin(req);
+    const sel = selector.parse(req.body);
+    const { deleted, ids } = await clearFailedJobs(db, sel);
+    await audit(db, {
+      userId: req.user!.id,
+      action: "jobs.failed_cleared",
+      targetType: "job",
+      details: { ...("kind" in sel ? { kind: sel.kind, error: sel.error.slice(0, 300) } : {}), deleted, jobIds: ids.slice(0, 50) },
+    });
+    return { deleted };
+  });
 
 
   api.get("/admin/google-auth", async (req) => {

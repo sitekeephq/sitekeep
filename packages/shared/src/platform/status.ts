@@ -10,7 +10,8 @@ export interface AdminStatusDto {
   cpu: { usedRatio: number } | null;
   disk: { path: string; totalBytes: number; freeBytes: number; usedRatio: number } | null;
   memory: { totalBytes: number; freeBytes: number; processBytes: number };
-  jobs: { queued: number; running: number; failed: number; done: number };
+  /** `lastFailedAt`: when the most recent failed job finished (null without any), so new failures stand out. */
+  jobs: { queued: number; running: number; failed: number; done: number; lastFailedAt: string | null };
   /** File storage (docs/onprem/object-storage.md): local disk or a bucket, its reachability and read cache. */
   storage: {
     driver: "local" | "s3" | "gcs";
@@ -28,4 +29,43 @@ export interface AdminStatusDto {
     nextAt: string | null;
   };
   privacy: { killSwitch: boolean };
+}
+
+/** One group of failed background jobs: same kind and same error text (GET /admin/failed-jobs/groups). */
+export interface FailedJobGroupDto {
+  kind: string;
+  error: string;
+  count: number;
+  lastFinishedAt: string | null;
+  /** The kind can be run again (not every kind is safe to repeat). */
+  retryable: boolean;
+}
+
+/** One failed job (GET /admin/failed-jobs). */
+export interface FailedJobDto {
+  id: string;
+  kind: string;
+  error: string;
+  attempts: number;
+  createdAt: string;
+  finishedAt: string | null;
+  project: { id: string; code: string; name: string } | null;
+  file: { id: string; name: string; versionId: string; version: number } | null;
+  retryable: boolean;
+}
+
+export interface FailedJobPageDto {
+  total: number;
+  page: number;
+  pageSize: number;
+  items: FailedJobDto[];
+}
+
+/** Which failed jobs an action covers: listed ids, or a whole group (kind + error). */
+export type FailedJobSelector = { ids: string[] } | { kind: string; error: string };
+
+export interface FailedJobRetryResultDto {
+  queued: number;
+  /** Not queued: kind not repeatable, file or version gone, or already converted/running. */
+  skipped: number;
 }

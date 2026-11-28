@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { count, sql } from "drizzle-orm";
+import { count, max, sql } from "drizzle-orm";
 import type { AdminStatusDto, StatusLevel } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { jobs } from "../db/schema.js";
@@ -90,13 +90,14 @@ export async function adminStatus(deps: AppDeps): Promise<AdminStatusDto> {
     databaseOk = false;
   }
   const rows = await deps.db
-    .select({ status: jobs.status, n: count() })
+    .select({ status: jobs.status, n: count(), last: max(jobs.finishedAt) })
     .from(jobs)
     .groupBy(jobs.status)
-    .catch(() => [] as { status: (typeof jobs.$inferSelect)["status"]; n: number }[]);
-  const tallies = { queued: 0, running: 0, failed: 0, done: 0 };
+    .catch(() => [] as { status: (typeof jobs.$inferSelect)["status"]; n: number; last: Date | null }[]);
+  const tallies = { queued: 0, running: 0, failed: 0, done: 0, lastFailedAt: null as string | null };
   for (const r of rows) {
-    if (r.status in tallies) tallies[r.status as keyof typeof tallies] = Number(r.n);
+    if (r.status === "failed") tallies.lastFailedAt = r.last ? new Date(r.last).toISOString() : null;
+    if (r.status === "queued" || r.status === "running" || r.status === "failed" || r.status === "done") tallies[r.status] = Number(r.n);
   }
   // Object storage: the data disk (database, cache, temporary copies) is the one that fills.
   const storageRoot = deps.storage.scratchDir;
@@ -151,7 +152,7 @@ function presentationStatus(live: AdminStatusDto): AdminStatusDto {
       freeBytes: Math.round(9.4 * GiB),
       processBytes: Math.round(0.68 * GiB),
     },
-    jobs: { queued: 3, running: 1, failed: 0, done: 47 },
+    jobs: { queued: 3, running: 1, failed: 0, done: 47, lastFailedAt: null },
     backup: {
       scheduled: true,
       lastSuccessAt: lastNightBackup().toISOString(),

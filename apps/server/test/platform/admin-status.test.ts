@@ -53,7 +53,7 @@ describe("GET /admin/status", () => {
     expect(body.database.ok).toBe(true);
     expect(body.database.kind).toBe("pglite");
     expect(body.app.ok).toBe(true);
-    expect(body.jobs).toEqual({ queued: 0, running: 0, failed: 0, done: 0 });
+    expect(body.jobs).toEqual({ queued: 0, running: 0, failed: 0, done: 0, lastFailedAt: null });
     expect(body.backup.scheduled).toBe(false);
     expect(["ok", "warn", "danger"]).toContain(body.level);
   });

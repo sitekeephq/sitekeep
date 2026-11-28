@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Worker } from "node:worker_threads";
 import { randomUUID } from "node:crypto";
-import { and, asc, eq, or, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, lte, or, sql } from "drizzle-orm";
 import { splitExtension, type IfcSummary } from "@sitekeep/shared";
 import type { Db } from "../db/index.js";
 import { fileVersions, files, jobs } from "../db/schema.js";
@@ -14,9 +14,11 @@ import type { Storage } from "../core/platform/storage.js";
 import { saveVersionIndex } from "./version-index.js";
 import { converterVersion, modelFormatFor } from "../files/model-formats.js";
 import { DEFAULT_LANGUAGE, tFor } from "../i18n/index.js";
+import { formatJobError, retryDecision } from "./errors.js";
 
 /** Job errors are stored and shown later: the installation's language. */
 const t = tFor(DEFAULT_LANGUAGE);
+const errorTexts = { ifcReader: t("jobs:queue.ifcReaderError"), unknown: t("jobs:queue.unknownError") };
 
 export type JobRow = typeof jobs.$inferSelect;
 export type JobHandler = (job: JobRow) => Promise<void>;
@@ -107,7 +109,7 @@ export class JobQueue {
       try {
         await fn(versionId, ok, error);
       } catch (err) {
-        this.opts.log?.(`index listener for ${versionId} failed`, err instanceof Error ? err.message : String(err));
+        this.opts.log?.(`index listener for ${versionId} failed`, formatJobError(err, errorTexts).detail);
       }
     }
   }
@@ -117,6 +119,17 @@ export class JobQueue {
     const [row] = await this.db.insert(jobs).values({ kind, payload }).returning({ id: jobs.id });
     if (!this.stopped) setImmediate(() => void this.tick());
     return row!.id;
+  }
+
+  /** Puts a failed job back in the queue as new (the administrators' "Retry"). False when it is not failed (any more). */
+  async requeueFailed(jobId: string): Promise<boolean> {
+    const rows = await this.db
+      .update(jobs)
+      .set({ status: "queued", attempts: 0, error: null, startedAt: null, finishedAt: null, runAfter: null })
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, "failed")))
+      .returning({ id: jobs.id });
+    if (rows.length && !this.stopped) setImmediate(() => void this.tick());
+    return rows.length > 0;
   }
 
   async start(): Promise<void> {
@@ -155,7 +168,8 @@ export class JobQueue {
     const [job] = await this.db
       .select()
       .from(jobs)
-      .where(eq(jobs.status, "queued"))
+      // A job waiting for its retry (runAfter) is skipped until then.
+      .where(and(eq(jobs.status, "queued"), or(isNull(jobs.runAfter), lte(jobs.runAfter, new Date()))))
       // Jobs queued in bulk at start-up (payload.background: model backfill and reconversion after a
       // converter update) wait while anything a person started is queued: a new upload does not sit
       // behind hundreds of reconversions (#158). Within each group, oldest first.
@@ -174,12 +188,23 @@ export class JobQueue {
       await handler(claimed[0]!);
       await this.db.update(jobs).set({ status: "done", finishedAt: new Date() }).where(eq(jobs.id, job.id));
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      this.opts.log?.(`job ${job.kind} ${job.id} failed`, message);
-      await this.db
-        .update(jobs)
-        .set({ status: "failed", error: message, finishedAt: new Date() })
-        .where(eq(jobs.id, job.id));
+      // The job keeps a readable message; the technical detail goes to the server log.
+      const { message, detail } = formatJobError(err, errorTexts);
+      const decision = retryDecision(job.kind, claimed[0]!.attempts, err);
+      if (decision.retry) {
+        // A transient failure (network, 429/502/503/504): queued again after the backoff, the error stays visible meanwhile.
+        this.opts.log?.(`job ${job.kind} ${job.id} failed (attempt ${claimed[0]!.attempts}), retrying in ${Math.round(decision.delayMs / 1000)} s`, detail);
+        await this.db
+          .update(jobs)
+          .set({ status: "queued", error: message, runAfter: new Date(Date.now() + decision.delayMs) })
+          .where(eq(jobs.id, job.id));
+      } else {
+        this.opts.log?.(`job ${job.kind} ${job.id} failed`, detail);
+        await this.db
+          .update(jobs)
+          .set({ status: "failed", error: message, finishedAt: new Date() })
+          .where(eq(jobs.id, job.id));
+      }
     }
     return true;
   }
@@ -234,7 +259,7 @@ export class JobQueue {
         indexed = { ok: true };
       } else if (index) {
         this.opts.log?.(`comparison index of ${versionId} failed`, index.error);
-        indexed = { ok: false, error: index.error };
+        indexed = { ok: false, error: formatJobError(index.error, errorTexts).message };
       }
       // Keeps what only later steps add to the summary (the BCF scene offset of the same import).
       const keep = inPlace && row.v.ifcSummary?.sceneOffset ? { sceneOffset: row.v.ifcSummary.sceneOffset } : {};
@@ -251,10 +276,12 @@ export class JobQueue {
       if (keptIfc && row.v.ifcKey && row.v.ifcKey !== keptIfc) await this.dropDerivative(row.v.ifcKey, versionId);
       if (withIndex) await this.indexed(versionId, indexed.ok, indexed.error);
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
+      const { message } = formatJobError(err, errorTexts);
       // A conversion by a module records the converter it failed with: retried once per converter version.
       const converter = await converterVersion(modelFormatFor(row.name));
-      if (!inPlace) {
+      if (retryDecision(job.kind, job.attempts, err).retry) {
+        // Run again after the backoff (runNext): the version stays "processing" and the index listeners wait for the final result.
+      } else if (!inPlace) {
         await this.db
           .update(fileVersions)
           .set({ derivativeStatus: "failed", derivativeError: message.slice(0, 1000), ...(converter && { converter }) })
