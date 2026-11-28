@@ -28,7 +28,14 @@ export function redactSecrets(text: string): string {
     .replace(/(sitekeep|7dcde)_(s|api|oauth|refresh|code|secret|invite)_[A-Za-z0-9_-]+/g, "$1_$2_***")
     .replace(/([?&](?:access_token|refresh_token|client_secret|code_verifier|code|token)=)[^&#\s"]*/gi, "$1***")
     .replace(/(\/wopi\/convert\/)[^/?#\s"]+/i, "$1***")
-    .replace(/(x-api-key["']?\s*[:=]\s*["']?)[^"',\s]+/gi, "$1***");
+    .replace(/(x-api-key["']?\s*[:=]\s*["']?)[^"',\s]+/gi, "$1***")
+    // Object storage: signed URLs and headers, access key ids (AWS AKIA/ASIA, GCS HMAC GOOG1…), secrets in env-like text.
+    .replace(/(X-Amz-(?:Credential|Signature|Security-Token)=)[^&\s"]*/gi, "$1***")
+    .replace(/(X-Goog-(?:Credential|Signature)=)[^&\s"]*/gi, "$1***")
+    .replace(/(Credential=)[^,\s"]+/g, "$1***")
+    .replace(/(Signature=)[0-9a-f]{16,}/gi, "$1***")
+    .replace(/\b(AKIA|ASIA|GOOG1)[A-Z0-9]{12,}/g, "$1***")
+    .replace(/((?:CDE_S3_SECRET_ACCESS_KEY|AWS_SECRET_ACCESS_KEY|SecretAccessKey|secretAccessKey)["']?\s*[:=]\s*["']?)[^"',\s]+/g, "$1***");
 }
 
 function describe(err: unknown): { message: string; stack?: string } {

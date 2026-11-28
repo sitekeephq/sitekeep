@@ -41,7 +41,7 @@ import {
   projects,
   users,
 } from "../db/schema.js";
-import type { Storage } from "../core/platform/storage.js";
+import type { LocalCopy, Storage } from "../core/platform/storage.js";
 import type { JobQueue } from "../jobs/queue.js";
 import { audit } from "../core/platform/audit.js";
 import { projectAccess, type AuthUser } from "../core/security/access.js";
@@ -213,10 +213,12 @@ export async function runImportJob(deps: ImportJobDeps, payload: Record<string, 
     .set({ status: "running", startedAt: new Date(), phase: "verify", filesDone: 0, error: null })
     .where(eq(projectImports.id, importId));
   let pkg: PackageReader | null = null;
+  let upload: LocalCopy | null = null;
   let projectId: string | null = null;
   try {
     if (!row.uploadKey) throw new PackageError(msg("portability:import.uploadGone"));
-    pkg = await PackageReader.open(storage.localPath(row.uploadKey));
+    upload = await storage.acquireLocal(row.uploadKey);
+    pkg = await PackageReader.open(upload.path);
     const progress = throttle(async (done: number, total: number) => {
       await db.update(projectImports).set({ filesDone: done, filesTotal: total }).where(eq(projectImports.id, importId));
     });
@@ -266,6 +268,7 @@ export async function runImportJob(deps: ImportJobDeps, payload: Record<string, 
     throw err;
   } finally {
     pkg?.close();
+    await upload?.release().catch(() => {});
   }
   // The package is not needed any more once the project exists.
   if (row.uploadKey) {

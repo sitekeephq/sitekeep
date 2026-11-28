@@ -5,7 +5,6 @@
  */
 import { createHash } from "node:crypto";
 import { statfs } from "node:fs/promises";
-import path from "node:path";
 import { Transform, type Readable } from "node:stream";
 import { and, eq, inArray, isNull, lt, lte } from "drizzle-orm";
 import { ZipFile } from "yazl";
@@ -39,10 +38,11 @@ export interface CloseoutJobDeps {
 
 type ArchiveRow = typeof closeoutArchives.$inferSelect;
 
-/** Free bytes on the disk that holds the storage; null when it cannot be read (another driver). */
+/** Free bytes on the disk that holds the storage; null for object storage (the bucket has no disk to fill). */
 export async function storageFreeBytes(storage: Storage): Promise<number | null> {
+  if (storage.driver !== "local") return null;
   try {
-    const s = await statfs(path.dirname(storage.localPath("closeout")));
+    const s = await statfs(storage.scratchDir);
     return Number(s.bavail) * Number(s.bsize);
   } catch {
     return null;

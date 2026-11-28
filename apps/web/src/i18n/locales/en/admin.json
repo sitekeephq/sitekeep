@@ -325,7 +325,8 @@
       "usage": "{{percent}} used · {{free}} free / {{total}}",
       "process": "Process {{size}}",
       "unreadable": "could not be read",
-      "last24": "Last 24 hours. The machine, not project content."
+      "last24": "Last 24 hours. The machine, not project content.",
+      "storage": "File storage"
     },
     "queue": {
       "title": "Job Queue",
@@ -423,6 +424,16 @@
     },
     "external": {
       "title": "External Connections"
+    },
+    "storage": {
+      "driver": {
+        "local": "Local disk",
+        "s3": "S3 object storage",
+        "gcs": "Google Cloud Storage"
+      },
+      "reachable": "reachable ({{ms}} ms)",
+      "unreachable": "not reachable: {{error}}",
+      "cache": "Read cache: {{used}} of {{max}}, {{entries}} files ({{hits}} hits, {{misses}} misses)"
     }
   },
   "privacy": {

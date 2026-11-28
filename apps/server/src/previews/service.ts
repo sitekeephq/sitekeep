@@ -15,7 +15,7 @@ import { splitExtension, viewerFor, type CadCheck, type PreviewKind, type Previe
 import type { Db } from "../db/index.js";
 import { fileVersions, files, versionPreviews, versionTexts } from "../db/schema.js";
 import type { JobQueue, JobRow } from "../jobs/queue.js";
-import type { Storage } from "../core/platform/storage.js";
+import type { LocalCopy, Storage } from "../core/platform/storage.js";
 import { extractPdfText } from "../docintel/extract.js";
 import { ConverterTimeoutError, ConverterUnavailableError, type Converters } from "./converters.js";
 import { officeText } from "./office-text.js";
@@ -219,9 +219,12 @@ export async function runPreviewJob(deps: PreviewDeps, job: JobRow): Promise<voi
       set: { status: "processing", error: null, attempts: (prev?.attempts ?? 0) + 1, updatedAt: new Date() },
     });
   const ext = splitExtension(row.f.name).extension.toLowerCase();
-  const input = deps.storage.localPath(row.v.storageKey);
-  const ctx = { ...deps, versionId, projectId: row.f.projectId, ext, input };
+  // Workers read a local file: the stored file itself (local disk) or a temporary copy (object storage).
+  // The scene is built from the stored DXF, so it fetches its own input.
+  let copy: LocalCopy | null = null;
   try {
+    if (kind !== "scene") copy = await deps.storage.acquireLocal(row.v.storageKey);
+    const ctx = { ...deps, versionId, projectId: row.f.projectId, ext, input: copy?.path ?? "", inputKey: row.v.storageKey };
     const result = await BUILDERS[kind](ctx);
     await setPreview(db, versionId, kind, { status: "ready", storageKey: result.storageKey ?? null, meta: result.meta, error: null });
     if (prev?.storageKey && prev.storageKey !== result.storageKey) await deps.storage.remove(prev.storageKey).catch(() => undefined);
@@ -240,6 +243,8 @@ export async function runPreviewJob(deps: PreviewDeps, job: JobRow): Promise<voi
     const message = err instanceof ConverterTimeoutError ? err.message : err instanceof Error ? err.message : String(err);
     await setPreview(db, versionId, kind, { status: "failed", error: message.slice(0, 1000) });
     throw err;
+  } finally {
+    await copy?.release();
   }
 }
 
@@ -271,7 +276,9 @@ interface BuildContext extends PreviewDeps {
   versionId: string;
   projectId: string;
   ext: string;
+  /** Local path of the stored file (empty for "scene", which reads the stored DXF). */
   input: string;
+  inputKey: string;
 }
 
 type Builder = (c: BuildContext) => Promise<{ storageKey?: string; meta: PreviewMeta }>;
@@ -356,15 +363,16 @@ const BUILDERS: Record<PreviewKind, Builder> = {
       .where(and(eq(versionPreviews.versionId, c.versionId), eq(versionPreviews.kind, "dxf")));
     if (!dxf || dxf.status !== "ready") throw new Error(t("previews:jobs.dxfFirst"));
     if (!sceneWanted(dxf.meta)) throw new Error(t("previews:jobs.nothingToShow"));
-    const input = dxf.storageKey ? c.storage.localPath(dxf.storageKey) : c.input;
     const out = tmpFile(".scene.gz");
     const modelOut = tmpFile(".model.scene.gz");
     try {
       // Phase updates for the viewer's "Hazırlanıyor" card; all written before the result.
       let phases = Promise.resolve();
-      const r = await runSceneWorker({ inputPath: input, encoding: dxf.meta.encoding ?? "utf-8", outputPath: out, modelOutputPath: modelOut }, (phase) => {
-        phases = phases.then(() => setPreview(c.db, c.versionId, "scene", { status: "processing", meta: { phase } })).catch(() => undefined);
-      });
+      const r = await c.storage.withLocalCopy(dxf.storageKey ?? c.inputKey, (input) =>
+        runSceneWorker({ inputPath: input, encoding: dxf.meta.encoding ?? "utf-8", outputPath: out, modelOutputPath: modelOut }, (phase) => {
+          phases = phases.then(() => setPreview(c.db, c.versionId, "scene", { status: "processing", meta: { phase } })).catch(() => undefined);
+        }),
+      );
       await phases;
       const stored = await c.storage.put(createReadStream(out), `projects/${c.projectId}/previews`);
       const model = r.model ? await c.storage.put(createReadStream(modelOut), `projects/${c.projectId}/previews`) : null;

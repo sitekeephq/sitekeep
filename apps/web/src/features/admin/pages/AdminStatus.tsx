@@ -335,6 +335,34 @@ function StatusCards({
                 )}
               </td>
             </tr>
+            {data.storage && (
+              <tr>
+                <td className="pc-title">{t("systemStatus.resources.storage")}</td>
+                <td>
+                  <span className={`badge ${data.storage.ok ? "ok" : "danger"}`}>
+                    {t(`systemStatus.storage.driver.${data.storage.driver}`)}
+                  </span>{" "}
+                  {data.storage.ok
+                    ? t("systemStatus.storage.reachable", { ms: data.storage.latencyMs })
+                    : t("systemStatus.storage.unreachable", { error: data.storage.error ?? "" })}
+                  <div className="muted small">
+                    {data.storage.location}
+                    {data.storage.endpoint ? ` (${data.storage.endpoint})` : ""}
+                  </div>
+                  {data.storage.cache && (
+                    <div className="muted small">
+                      {t("systemStatus.storage.cache", {
+                        used: formatSize(data.storage.cache.usedBytes),
+                        max: formatSize(data.storage.cache.maxBytes),
+                        entries: data.storage.cache.entries,
+                        hits: data.storage.cache.hits,
+                        misses: data.storage.cache.misses,
+                      })}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         <p className="muted small" style={{ margin: "12px 0 8px" }}>

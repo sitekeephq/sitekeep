@@ -278,11 +278,16 @@ export class JobQueue {
    * IFC the module writes, removed by `cleanup`.
    */
   private async ifcInput(v: typeof fileVersions.$inferSelect, fileName: string, opts: { fresh?: boolean } = {}): Promise<IfcInput> {
-    const stored = this.storage.localPath(v.storageKey);
+    // Local disk: the stored file itself; object storage: a temporary copy, removed by cleanup.
     const ext = splitExtension(fileName).extension.toLowerCase();
-    if (ext === "ifc") return { path: stored, cleanup: async () => {} };
-    if (v.ifcKey && !opts.fresh && (await this.storage.size(v.ifcKey).catch(() => null)) !== null)
-      return { path: this.storage.localPath(v.ifcKey), source: v.ifcSummary?.source, cleanup: async () => {} };
+    if (ext === "ifc") {
+      const copy = await this.storage.acquireLocal(v.storageKey);
+      return { path: copy.path, cleanup: () => copy.release() };
+    }
+    if (v.ifcKey && !opts.fresh && (await this.storage.exists(v.ifcKey).catch(() => false))) {
+      const copy = await this.storage.acquireLocal(v.ifcKey);
+      return { path: copy.path, source: v.ifcSummary?.source, cleanup: () => copy.release() };
+    }
     const format = modelFormatFor(fileName);
     if (!format) throw new Error(t("jobs:queue.noModelConverter", { ext: ext || fileName }));
     const out = path.join(os.tmpdir(), `7dcde-${randomUUID()}.ifc`);
@@ -290,7 +295,9 @@ export class JobQueue {
       await rm(out, { force: true });
     };
     try {
-      const source = await format.toIfc(stored, out, { timeoutMs: this.opts.timeoutMs ?? DEFAULT_TIMEOUT_MS });
+      const source = await this.storage.withLocalCopy(v.storageKey, (stored) =>
+        format.toIfc(stored, out, { timeoutMs: this.opts.timeoutMs ?? DEFAULT_TIMEOUT_MS }),
+      );
       return { path: out, source, converted: true, cleanup };
     } catch (err) {
       await cleanup();

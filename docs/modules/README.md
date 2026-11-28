@@ -14,7 +14,7 @@ published as a versioned package and pulled into the application at a pinned ver
 |---|---|---|---|---|
 | **Cost**: contracts, progress payments (hakediş), quantity take-off (metraj), 2D take-off, 5D, Suggest Items | [sitekeep-cost](https://github.com/sitekeephq/sitekeep-cost) (private) | `@sitekeephq/sitekeep-ee-cost` | `0.8.0` | Separate repository, GitHub Packages. [Details](cost.md) |
 | **Field**: form templates, forms, approval workflow, form PDFs | [sitekeep-field](https://github.com/sitekeephq/sitekeep-field) (private) | `@sitekeephq/sitekeep-ee-field` | `0.7.0` | Separate repository, GitHub Packages. [Details](field.md) |
-| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private) | `@sitekeephq/sitekeep-ee-coordinate` | `0.5.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
+| **Coordinate**: clash tests, parameter change | [sitekeep-coordinate](https://github.com/sitekeephq/sitekeep-coordinate) (private) | `@sitekeephq/sitekeep-ee-coordinate` | `0.6.0` | Separate repository, GitHub Packages. [Details](coordinate.md) |
 | **Planning**: Schedule (P6, MS Project, Excel), CPM and authoring, time–distance view, resources, payments schedule, KPIs, versions, 4D | [sitekeep-planning](https://github.com/sitekeephq/sitekeep-planning) (private) | `@sitekeephq/sitekeep-ee-planning` | `0.6.0` | Separate repository, GitHub Packages. [Details](planning.md) |
 | **AI**: providers, Ask the project, task queue, MCP | [sitekeep-ai](https://github.com/sitekeephq/sitekeep-ai) (private) | `@sitekeephq/sitekeep-ee-ai` | `0.6.2` | Separate repository, GitHub Packages. [Details](ai.md) |
 | **Manage**: RFI, submittals, meetings, correspondence tools, Drop and save | [sitekeep-manage](https://github.com/sitekeephq/sitekeep-manage) (private) | `@sitekeephq/sitekeep-ee-manage` | `0.6.0` | Separate repository; the Works engine is in the core. [Details](manage.md) |
@@ -23,7 +23,7 @@ published as a versioned package and pulled into the application at a pinned ver
 
 | Package | Source | Version |
 |---|---|---|
-| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.20.0` |
+| `@sitekeephq/sitekeep-sdk` | this repository, `packages/sdk` | `0.21.0` |
 
 The version rows are kept in line with `apps/server/package.json` and `apps/web/package.json` (`module-boundary.test.ts` requires pinned versions).
 
@@ -148,6 +148,17 @@ the person's choice, project default applied; the actor, disabled and pending us
 `text(language)` for the title and body. A throw is logged and never breaks the workflow. A channel registered by a
 module that is off is not called. The channel makes its own outbound calls through `moduleOutboundFetch` with a
 connection declared by `registerPrivacyConnection`.
+
+### Files on object storage (SDK 0.21.0)
+
+The core's files may be on a bucket ([object storage](../onprem/object-storage.md): `CDE_STORAGE=s3` or `gcs`).
+A module never builds paths itself: it reads with `storage.get(key, range?)` and, when a worker needs a file on disk,
+`await storage.withLocalCopy(key, async (path) => …)` (or `acquireLocal(key)` + `release()`, `withLocalCopies` for
+several). On the local disk that is the stored file itself (no copy); on a bucket a temporary copy that is removed
+afterwards. `storage.localPath(key)` is deprecated: it throws `StorageNotLocalError` on object storage. SDK 0.21.0 exports
+`withLocalCopies`, `StorageNotLocalError` and the types `LocalCopy`, `ByteRange`, `StorageEntry`; the `Storage` type
+gains `get(key, range?)`, `exists`, `list`, `acquireLocal`, `withLocalCopy`, `info`, `ping`. A module that reads stored
+files from disk needs `>=0.21.0` (Coordinate 0.6.0: clash detection, parameter changes).
 
 ### Assignee resolution: approval delegation (SDK 0.20.0)
 

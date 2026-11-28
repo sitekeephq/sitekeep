@@ -120,11 +120,13 @@ async function runIdsJob(db: Db, storage: Storage, job: JobRow) {
       throw e;
     }
     const timeoutMs = envNumber("IDS_TIMEOUT_MS", 15 * 60_000);
-    const res = await runWorker<{ schema: string; elementsChecked: number; results: IdsSpecResult[] }>(
-      "ids-worker",
-      { wasmDir: wasmDir(), path: storage.localPath(ifcV.storageKey), specs: doc.specs, maxFailures: MAX_FAILURES },
-      timeoutMs,
-      tStored("coordination:jobs.idsTimeout"),
+    const res = await storage.withLocalCopy(ifcV.storageKey, (ifcPath) =>
+      runWorker<{ schema: string; elementsChecked: number; results: IdsSpecResult[] }>(
+        "ids-worker",
+        { wasmDir: wasmDir(), path: ifcPath, specs: doc.specs, maxFailures: MAX_FAILURES },
+        timeoutMs,
+        tStored("coordination:jobs.idsTimeout"),
+      ),
     );
     const totals = {
       specs: res.results.length,

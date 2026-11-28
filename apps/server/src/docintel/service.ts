@@ -63,7 +63,7 @@ export async function processVersion(db: Db, storage: Storage, versionId: string
   }
   await upsert({ status: "processing", error: null });
   try {
-    const out = await extractPdfText({ filePath: storage.localPath(v.storageKey) }, { maxPages: 1, timeoutMs: 120_000 });
+    const out = await storage.withLocalCopy(v.storageKey, (filePath) => extractPdfText({ filePath }, { maxPages: 1, timeoutMs: 120_000 }));
     const antet = analyzeAntet(out);
     const isCurrent = v.version === f.currentVersion;
     // The version's revision code (ISO 19650 codes), else the file's revision attribute.

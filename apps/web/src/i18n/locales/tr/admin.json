@@ -325,7 +325,8 @@
       "usage": "{{percent}} dolu · {{free}} boş / {{total}}",
       "process": "Süreç {{size}}",
       "unreadable": "okunamadı",
-      "last24": "Son 24 saat. Makine; proje içeriği değil."
+      "last24": "Son 24 saat. Makine; proje içeriği değil.",
+      "storage": "Dosya depolama"
     },
     "queue": {
       "title": "İş Kuyruğu",
@@ -423,6 +424,16 @@
     },
     "external": {
       "title": "Dış Bağlantılar"
+    },
+    "storage": {
+      "driver": {
+        "local": "Yerel disk",
+        "s3": "S3 nesne depolama",
+        "gcs": "Google Cloud Storage"
+      },
+      "reachable": "erişilebilir ({{ms}} ms)",
+      "unreachable": "erişilemiyor: {{error}}",
+      "cache": "Okuma önbelleği: {{used}} / {{max}}, {{entries}} dosya ({{hits}} isabet, {{misses}} ıska)"
     }
   },
   "privacy": {

@@ -5,10 +5,12 @@
 #   sitekeep logs [app|db|proxy]     logs (follows; Ctrl+C to quit)
 #   sitekeep start | stop | restart
 #   sitekeep backup                  database + files + settings -> <data>/backups/<time>/
+#                                    (object storage: the bucket's objects too, unless CDE_BACKUP_OBJECTS=0)
 #   sitekeep backups                 list backups
 #   sitekeep restore <backup>        restores a backup (the current state is backed up first)
 #   sitekeep upgrade <bundle dir>    new version: backup -> load -> start -> health; rolls back on failure
 #   sitekeep uninstall [--purge]     removes the services; --purge also deletes the data
+#   sitekeep storage <command>       file storage tool: check, migrate, prune-local (docs/onprem/object-storage.md)
 set -euo pipefail
 
 SELF="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -44,6 +46,16 @@ wait_healthy() {
   done
   return 1
 }
+
+# The file storage driver of the application (config/app.env): local, s3 or gcs.
+storage_driver() {
+  local d
+  d="$(sed -n 's/^[[:space:]]*CDE_STORAGE[[:space:]]*=[[:space:]]*["'"'"']\{0,1\}\([a-z0-9]*\).*/\1/p' "$CDE_HOME/config/app.env" 2>/dev/null | tail -1)"
+  echo "${d:-local}"
+}
+
+# The storage tool in a one-off app container (same image and settings as the app), as root so it can write a backup.
+storage_tool() { dc run --rm --no-deps -T --user 0 "$@"; }
 
 latest_backup() { find "$CDE_DATA/backups" -mindepth 1 -maxdepth 1 -type d -name '20*' 2>/dev/null | sort | tail -1; }
 
@@ -84,14 +96,27 @@ cmd_backup() {
   dc exec -T db pg_dump -U cde -d cde -Fc > "$dir.partial/db.dump" || { rm -rf "$dir.partial"; die "Database backup failed."; }
   dc exec -T db pg_restore --list < "$dir.partial/db.dump" > /dev/null || { rm -rf "$dir.partial"; die "Database backup could not be verified."; }
 
+  # The read cache and temporary work files of object storage are not data.
   if command -v rsync >/dev/null 2>&1; then
     if [ -n "$prev" ] && [ -d "$prev/app" ]; then
-      rsync -a --delete --link-dest="$prev/app" "$CDE_DATA/app/" "$dir.partial/app/"
+      rsync -a --delete --exclude /cache/ --exclude /tmp/ --link-dest="$prev/app" "$CDE_DATA/app/" "$dir.partial/app/"
     else
-      rsync -a "$CDE_DATA/app/" "$dir.partial/app/"
+      rsync -a --exclude /cache/ --exclude /tmp/ "$CDE_DATA/app/" "$dir.partial/app/"
     fi
   else
     cp -a "$CDE_DATA/app" "$dir.partial/app"
+    rm -rf "$dir.partial/app/cache" "$dir.partial/app/tmp"
+  fi
+
+  # Files on object storage: the bucket's objects, hard-linked to the previous backup when unchanged (keys
+  # are never rewritten). CDE_BACKUP_OBJECTS=0 leaves them to the bucket's own versioning / backup.
+  local driver
+  driver="$(storage_driver)"
+  if [ "$driver" != local ] && [ "${CDE_BACKUP_OBJECTS:-1}" != 0 ]; then
+    local link=()
+    [ -n "$prev" ] && [ -d "$prev/objects" ] && link=(-v "$prev/objects:/prev:ro")
+    storage_tool -v "$dir.partial:/backup" "${link[@]}" app node apps/server/dist/scripts/storage.js pull /backup/objects ${link:+--link-dest=/prev} \
+      || { rm -rf "$dir.partial"; die "Backup of the $driver bucket failed (sitekeep storage check)."; }
   fi
   mkdir -p "$dir.partial/config"
   cp -a "$CDE_HOME/config/." "$dir.partial/config/"
@@ -142,8 +167,12 @@ cmd_restore() {
   cmd_backup
   dc stop app proxy > /dev/null
   restore_db "$b/db.dump"
-  if command -v rsync >/dev/null 2>&1; then rsync -a --delete "$b/app/" "$CDE_DATA/app/"
+  if command -v rsync >/dev/null 2>&1; then rsync -a --delete --exclude /cache/ --exclude /tmp/ "$b/app/" "$CDE_DATA/app/"
   else rm -rf "$CDE_DATA/app" && cp -a "$b/app" "$CDE_DATA/app"; fi
+  # Objects the bucket no longer has (deleted since the backup) are uploaded again.
+  if [ -d "$b/objects" ] && [ "$(storage_driver)" != local ]; then
+    storage_tool -v "$b:/backup:ro" app node apps/server/dist/scripts/storage.js push /backup/objects || die "Restoring the bucket's objects failed."
+  fi
   dc up -d > /dev/null
   wait_healthy || die "The application is not healthy after the restore: sitekeep logs app"
   ok "Restored: $(basename "$b")"
@@ -216,6 +245,7 @@ case "${1:-status}" in
   restore) shift; cmd_restore "$@" ;;
   upgrade) shift; cmd_upgrade "$@" ;;
   uninstall) shift; cmd_uninstall "$@" ;;
-  -h|--help|help) sed -n '2,13p' "$SELF" ;;
+  storage) shift; need_root storage; storage_tool app node apps/server/dist/scripts/storage.js "$@" ;;
+  -h|--help|help) sed -n '2,15p' "$SELF" ;;
   *) die "Unknown command: $1 (sitekeep help)" ;;
 esac

@@ -167,6 +167,13 @@ No `docker compose down -v` in production.
 
 ---
 
+## Files on object storage
+
+With `CDE_STORAGE=s3|gcs` the files are in a bucket ([object storage](object-storage.md#backups)). `sitekeep
+backup` copies the bucket's objects into the backup (`objects/`, incremental with hard links) unless
+`CDE_BACKUP_OBJECTS=0`, in which case the bucket's versioning / soft delete / replication is the file backup and
+must keep deleted objects at least as long as the database backups.
+
 ## Encryption of disks and backups (operator's responsibility)
 
 SiteKeep does not encrypt the database, the stored files or the backups today; only secrets are

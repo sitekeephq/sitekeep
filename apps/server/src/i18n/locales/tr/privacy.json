@@ -21,6 +21,7 @@
   "data": {
     "localDisk": "Yerel disk: {{root}}",
     "configuredStorage": "Yapılandırılmış depolama",
+    "objectStorage": "Nesne depolama (operatörün kovası): {{location}}",
     "pglite": "PGlite (gömülü veritabanı)"
   },
   "connections": {

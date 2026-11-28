@@ -177,7 +177,9 @@ export async function docIntelRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     const { file, version, tree } = await loadVersion(db, req.params.pid, body.versionId, req.user!);
     requireView(tree, a, file);
     if (!isPdf(file.name)) throw badRequest(msg("docintel:errors.specPdfOnly"));
-    const out = await extractPdfText({ filePath: storage.localPath(version.storageKey) }, { maxPages: SPEC_MAX_PAGES, timeoutMs: 300_000 });
+    const out = await storage.withLocalCopy(version.storageKey, (filePath) =>
+      extractPdfText({ filePath }, { maxPages: SPEC_MAX_PAGES, timeoutMs: 300_000 }),
+    );
     const lang = requestLanguage(req);
     let { items, sectionCount } = buildRegister(out, lang);
     let usedAi = false;

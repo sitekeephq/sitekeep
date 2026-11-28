@@ -7,7 +7,6 @@ import os from "node:os";
 import { and, count, countDistinct, eq, gt, sql } from "drizzle-orm";
 import type { CapacityCounts, CapacityHardware } from "@sitekeep/shared";
 import type { AppDeps } from "../../app/deps.js";
-import { LocalStorage } from "../../core/platform/storage.js";
 import { tokens, users } from "../../db/schema.js";
 import { diskOf, statusDemoOn } from "../status.js";
 
@@ -28,7 +27,8 @@ async function cgroupLimits(): Promise<{ cpus: number | null; memoryBytes: numbe
 export async function readHardware(deps: AppDeps): Promise<CapacityHardware> {
   const limits = await cgroupLimits();
   const hostCpus = os.availableParallelism?.() ?? os.cpus().length;
-  const storageRoot = deps.storage instanceof LocalStorage ? deps.storage.root : process.cwd();
+  // Object storage: the data disk (database, cache, temporary copies) is the one that fills.
+  const storageRoot = deps.storage.scratchDir;
   const disk = await diskOf(storageRoot);
   return {
     cpuCount: limits.cpus ? Math.min(limits.cpus, hostCpus) : hostCpus,

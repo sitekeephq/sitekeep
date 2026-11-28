@@ -4,7 +4,6 @@
  * holds up IFC conversions). Results are cached per (from, to) version pair in doc_comparisons.
  * A run that was cut by a restart is detected (status "running" but not running here) and redone.
  */
-import { readFile } from "node:fs/promises";
 import { and, eq, inArray } from "drizzle-orm";
 import {
   docCompareKind,
@@ -20,6 +19,8 @@ import { analyzeAntet } from "../docintel/antet.js";
 import { extractPdfText } from "../docintel/extract.js";
 import { detectRevision } from "../docintel/revision.js";
 import type { Storage } from "../core/platform/storage.js";
+import { readAllStored } from "../core/platform/object-storage.js";
+import { withLocalCopies } from "../core/platform/storage.js";
 import { HttpError } from "../core/platform/http.js";
 import { currentLanguage, DEFAULT_LANGUAGE, msg, render, type Msg } from "../i18n/index.js";
 
@@ -252,7 +253,7 @@ async function bytesOf(storage: Storage, v: VersionRow): Promise<Buffer> {
     throw new Error(
       render(DEFAULT_LANGUAGE, msg("doccompare:errors.fileTooLarge", { mb: Math.round(v.size / 1024 / 1024), limit: MAX_OFFICE_BYTES / 1024 / 1024 })),
     );
-  return readFile(storage.localPath(v.storageKey));
+  return readAllStored(storage, v.storageKey);
 }
 
 /** The text side of a comparison (no database access). */
@@ -281,10 +282,9 @@ export async function computeComparison(storage: Storage, from: Side, to: Side):
 
   if (kind === "pdf") {
     const opts = { maxPages: MAX_PDF_PAGES, timeoutMs: 300_000 };
-    const [outA, outB] = await Promise.all([
-      extractPdfText({ filePath: storage.localPath(from.version.storageKey) }, opts),
-      extractPdfText({ filePath: storage.localPath(to.version.storageKey) }, opts),
-    ]);
+    const [outA, outB] = await withLocalCopies(storage, [from.version.storageKey, to.version.storageKey], ([a, b]) =>
+      Promise.all([extractPdfText({ filePath: a! }, opts), extractPdfText({ filePath: b! }, opts)]),
+    );
     const antetA = analyzeAntet(outA);
     const antetB = analyzeAntet(outB);
     const ua = pdfUnits(outA);

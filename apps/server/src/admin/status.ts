@@ -11,8 +11,8 @@ import { count, sql } from "drizzle-orm";
 import type { AdminStatusDto, StatusLevel } from "@sitekeep/shared";
 import type { AppDeps } from "../app/deps.js";
 import { jobs } from "../db/schema.js";
-import { LocalStorage } from "../core/platform/storage.js";
 import { appVersion } from "../app/about.js";
+import type { Storage, StoragePing } from "../core/platform/storage.js";
 import { killSwitchOn } from "../privacy/settings.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -66,6 +66,22 @@ export async function diskOf(dir: string): Promise<AdminStatusDto["disk"]> {
   }
 }
 
+/** Driver, where, reachability (one cheap request, at most every 30 s) and read cache; never credentials. */
+let lastPing: { at: number; ping: StoragePing } | null = null;
+export async function storageStatus(storage: Storage): Promise<AdminStatusDto["storage"]> {
+  if (!lastPing || Date.now() - lastPing.at > 30_000) lastPing = { at: Date.now(), ping: await storage.ping() };
+  const info = storage.info();
+  return {
+    driver: info.driver,
+    location: info.location,
+    endpoint: info.endpoint ?? null,
+    ok: lastPing.ping.ok,
+    latencyMs: lastPing.ping.ms,
+    error: lastPing.ping.error ?? null,
+    cache: info.cache ? { maxBytes: info.cache.maxBytes, usedBytes: info.cache.usedBytes, entries: info.cache.entries, hits: info.cache.hits, misses: info.cache.misses } : null,
+  };
+}
+
 export async function adminStatus(deps: AppDeps): Promise<AdminStatusDto> {
   let databaseOk = true;
   try {
@@ -82,13 +98,15 @@ export async function adminStatus(deps: AppDeps): Promise<AdminStatusDto> {
   for (const r of rows) {
     if (r.status in tallies) tallies[r.status as keyof typeof tallies] = Number(r.n);
   }
-  const storageRoot = deps.storage instanceof LocalStorage ? deps.storage.root : process.cwd();
+  // Object storage: the data disk (database, cache, temporary copies) is the one that fills.
+  const storageRoot = deps.storage.scratchDir;
   const disk = await diskOf(storageRoot);
+  const storage = await storageStatus(deps.storage);
   const backup = { scheduled: false, lastSuccessAt: null, lastError: null, nextAt: null };
   // No backup schedule on a fresh install is not a warning: the backup job is not wired to the queue yet.
   const kill = killSwitchOn();
   let level: StatusLevel = "ok";
-  if (!databaseOk || (disk && disk.usedRatio >= 0.95)) level = "danger";
+  if (!databaseOk || !storage.ok || (disk && disk.usedRatio >= 0.95)) level = "danger";
   else if ((disk && disk.usedRatio >= 0.8) || kill || tallies.failed > 0) level = "warn";
 
   const live: AdminStatusDto = {
@@ -109,6 +127,7 @@ export async function adminStatus(deps: AppDeps): Promise<AdminStatusDto> {
       processBytes: process.memoryUsage().rss,
     },
     jobs: tallies,
+    storage,
     backup,
     privacy: { killSwitch: kill },
   };

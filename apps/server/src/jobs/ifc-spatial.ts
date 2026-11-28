@@ -68,7 +68,7 @@ export async function runIfcLocationsJob(db: Db, storage: Storage, job: typeof j
     .innerJoin(files, eq(files.id, fileVersions.fileId))
     .where(eq(fileVersions.id, p.versionId));
   if (!row || row.projectId !== p.projectId) throw new Error(t("jobs:spatial.versionNotFound"));
-  const nodes = await runSpatialWorker(storage.localPath(row.v.storageKey));
+  const nodes = await storage.withLocalCopy(row.v.storageKey, (file) => runSpatialWorker(file));
 
   const existing = await db
     .select()

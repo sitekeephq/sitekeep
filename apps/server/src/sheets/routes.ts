@@ -281,7 +281,9 @@ export async function sheetRoutes(api: FastifyInstance, deps: ResolvedDeps) {
     const settings = await loadSheetSettings(db, a.project.id);
     const titleBlock = normalizeTitleBlockTemplate(body.titleBlock);
     const ctx = await sheetFileContext(db, tree, row.f);
-    const [s] = await readPdfSheets(db, storage.localPath(row.v.storageKey), ctx, { titleBlock, ocr: settings.ocr }, { page: row.s.page });
+    const [s] = await storage.withLocalCopy(row.v.storageKey, (pdf) =>
+      readPdfSheets(db, pdf, ctx, { titleBlock, ocr: settings.ocr }, { page: row.s.page }),
+    );
     if (!s) throw notFound(msg("sheets:entities.sheet"));
     const { page: _p, pageCount: _c, ...values } = s;
     return values;

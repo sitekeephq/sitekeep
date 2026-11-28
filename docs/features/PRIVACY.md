@@ -28,6 +28,13 @@ In the default installation, the server makes no connections outside the network
 | Update check (`updates`) | **Off until an administrator turns it on** (System Status, one click). Then once a day, and whenever an administrator presses "Check for updates" (that button works while the daily check is off, but never past the connection switch or the kill switch) | One plain `GET` to `api.github.com/repos/sitekeephq/sitekeep/releases/latest` (`SITEKEEP_UPDATE_URL` replaces the address, e.g. a mirror in a closed network). The only identifying text is `User-Agent: SiteKeep/<version>`. Nothing else: no installation id, no counts, no account data, no cookies. SiteKeep reads the release number, link and date; drafts and pre-releases are ignored. Enterprise installations with online licensing also learn the latest version from the licence reply, without this call | `guncelleme` |
 | Autodesk APS / ACC (`autodesk`; Connect module) | When a project administrator sets up the connection and when sync runs | OAuth code and read-only project API requests to `developer.api.autodesk.com`; file content is downloaded from the short-lived signed addresses Autodesk gives. ACC records are brought into the CDE | `entegrasyon:autodesk` |
 
+**File storage on a bucket** ([object storage](../onprem/object-storage.md): `CDE_STORAGE=s3` or `gcs`) is not in
+this table: a bucket the operator configures as the primary store is where SiteKeep keeps its files, like the
+database server. It is not an external connection in this sense, is not in the External Connections list, is not
+logged per request, and **Turn Off All External Connections** does not stop it. The provider (or the operator's own
+MinIO) is a processor to name in the privacy statement; the Privacy Centre summary shows the bucket as the place
+where files are kept. Files reach the browser only through SiteKeep's permission checks, never by a bucket link.
+
 Switching **Email server (SMTP)** off in External Connections (or the kill switch, for a server outside
 the network) stops invitation e-mails too: the invitation is still created and the inviter gets the
 link to hand over; nothing is sent. Only the hash of an invitation token is stored, and the link

@@ -21,6 +21,7 @@
   "data": {
     "localDisk": "Local disk: {{root}}",
     "configuredStorage": "Configured storage",
+    "objectStorage": "Object storage (the operator's bucket): {{location}}",
     "pglite": "PGlite (embedded database)"
   },
   "connections": {

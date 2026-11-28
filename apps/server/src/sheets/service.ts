@@ -93,7 +93,9 @@ export async function processSheets(
   const ctx = await sheetFileContext(db, tree, f);
   const ext = splitExtension(f.name).extension.toLowerCase();
   const extracted =
-    ext === "pdf" ? await readPdfSheets(db, storage.localPath(v.storageKey), ctx, settings, { log: opts.log }) : [sheetFromCad(ctx)];
+    ext === "pdf"
+      ? await storage.withLocalCopy(v.storageKey, (pdf) => readPdfSheets(db, pdf, ctx, settings, { log: opts.log }))
+      : [sheetFromCad(ctx)];
   await saveSheets(db, f, v, extracted);
   return extracted.length;
 }

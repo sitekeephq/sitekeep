@@ -7,7 +7,7 @@
 import { hasAi } from "../../helpers/modules.js"; // AI steps run when the AI module is installed
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -22,7 +22,9 @@ import { auditLog, fileVersions, files, notifications, users } from "../../../sr
 import { paramChangeChecks } from "@sitekeephq/sitekeep-ee-coordinate/internal/schema-tables.js";
 import { JobQueue } from "../../../src/jobs/queue.js";
 import { applyParamChanges } from "../../../src/jobs/param-change-worker.js";
-import { LocalStorage } from "../../../src/core/platform/storage.js";
+import type { Storage } from "../../../src/core/platform/storage.js";
+import { readAllStored } from "../../../src/core/platform/object-storage.js";
+import { testStorage } from "../../helpers/test-storage.js";
 import { D1, W1, W2, W3, ifcApi, paramIfc, readModel } from "../../coordination/param-change-fixtures.js";
 
 const PW = "Sifre-1234567";
@@ -31,7 +33,7 @@ const IFC = paramIfc("IFC4");
 let handle: DbHandle;
 let app: FastifyInstance;
 let jobs: JobQueue;
-let storage: LocalStorage;
+let storage: Storage;
 let dataDir: string;
 let ifc: WebIFC.IfcAPI;
 let stub: Server;
@@ -40,7 +42,7 @@ let stubUrl: string;
 beforeAll(async () => {
   dataDir = mkdtempSync(path.join(os.tmpdir(), "7dcde-param-"));
   handle = await openDb("memory://");
-  storage = new LocalStorage(path.join(dataDir, "storage"));
+  storage = await testStorage(dataDir);
   jobs = new JobQueue(handle.db, storage);
   app = await buildApp({ db: handle.db, storage, jobs, secretKey: Buffer.alloc(32, 9), devTools: false });
   await handle.db.insert(users).values({ email: "admin@7d.test", name: "Admin", passwordHash: await hashPassword(PW), isAdmin: true });
@@ -146,7 +148,7 @@ describe("Değişiklik Talebi (parameter change requests)", () => {
   };
   const bytesOf = async (versionId: string) => {
     const [v] = await handle.db.select().from(fileVersions).where(eq(fileVersions.id, versionId));
-    return new Uint8Array(readFileSync(storage.localPath(v!.storageKey)));
+    return new Uint8Array(await readAllStored(storage, v!.storageKey));
   };
   const spec = (globalIds: string[], set: Record<string, unknown>) => ({ source: "selection", globalIds, set });
   const wallsEi30 = { source: "query", query: { classes: ["IfcWall"], filters: [{ field: "FireRating", op: "=", value: "EI30" }] }, set: { property: "FireRating", value: "EI60" } };

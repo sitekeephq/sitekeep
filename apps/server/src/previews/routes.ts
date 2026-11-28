@@ -9,7 +9,6 @@
  *   GET  /admin/converters                             office → PDF converter and LibreDWG status (administrators)
  * All need view permission on the file only (like /content); nothing here is a download.
  */
-import { createReadStream } from "node:fs";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { and, eq } from "drizzle-orm";
 import {
@@ -254,7 +253,7 @@ export async function previewRoutes(api: FastifyInstance, deps: ResolvedDeps) {
       reply.status(206);
       reply.header("Content-Range", `bytes ${start}-${end}/${size}`);
       reply.header("Content-Length", String(end - start + 1));
-      return reply.send(createReadStream(storage.localPath(version.storageKey), { start, end }));
+      return reply.send(storage.get(version.storageKey, { start, end }));
     }
     reply.header("Content-Length", String(size));
     return reply.send(storage.get(version.storageKey));

@@ -30,7 +30,7 @@ import type { Db } from "../db/index.js";
 import { docComparisons, fileVersions, files, jobs as jobsTable, versionIndexes, versionPreviews } from "../db/schema.js";
 import type { JobQueue, JobRow } from "../jobs/queue.js";
 import { loadIndexFile } from "../jobs/version-index.js";
-import type { Storage } from "../core/platform/storage.js";
+import { withLocalCopies, type Storage } from "../core/platform/storage.js";
 import { ModelIndex } from "../model/model-index.js";
 import { ensureIndexJob, ensureUpgradeJob } from "../model/service.js";
 import { PREVIEW_JOB, queuePreview } from "../previews/service.js";
@@ -219,12 +219,12 @@ export class VersionCompareRunner {
   }
 
   /** The DXF of a drawing version (the CAD viewer's preview), or WAIT while it is being made. */
-  private async dxfOf(v: VersionRow): Promise<{ path: string; encoding?: string } | typeof WAIT> {
+  private async dxfOf(v: VersionRow): Promise<{ key: string; encoding?: string } | typeof WAIT> {
     const [p] = await this.db
       .select()
       .from(versionPreviews)
       .where(and(eq(versionPreviews.versionId, v.id), eq(versionPreviews.kind, "dxf")));
-    if (p?.status === "ready") return { path: this.storage.localPath(p.storageKey ?? v.storageKey), encoding: p.meta?.encoding };
+    if (p?.status === "ready") return { key: p.storageKey ?? v.storageKey, encoding: p.meta?.encoding };
     if (p?.status === "unavailable") throw new Error(p.error || DWG2DXF_HINT);
     if (p?.status === "failed") throw new Error(t("doccompare:versionDiff.errors.dxfFailed", { error: p.error ?? "" }));
     if (!p) await queuePreview(this.db, this.jobs, v.id, "dxf");
@@ -253,7 +253,10 @@ export class VersionCompareRunner {
     if (da === WAIT || db === WAIT) return WAIT;
     const out = path.join(os.tmpdir(), `7dcde-cmp-${randomUUID()}.json.gz`);
     try {
-      const cad = await runCadCompare({ a: da, b: db, outputPath: out });
+      // Local copies of the two DXFs (the stored files themselves on the local disk).
+      const cad = await withLocalCopies(this.storage, [da.key, db.key], ([pa, pb]) =>
+        runCadCompare({ a: { path: pa!, encoding: da.encoding }, b: { path: pb!, encoding: db.encoding }, outputPath: out }),
+      );
       const rows = JSON.parse(gunzipSync(await readFile(out)).toString("utf8")) as VersionDiffRow[];
       return { cad, rows };
     } finally {

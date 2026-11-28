@@ -83,7 +83,10 @@ export async function privacyRoutes(api: FastifyInstance, deps: ResolvedDeps) {
         : Promise.resolve([] as { name: string }[]),
     ]);
     const storage =
-      deps.dataLocation?.storage ?? (deps.storage instanceof LocalStorage ? t("privacy:data.localDisk", { root: deps.storage.root }) : t("privacy:data.configuredStorage"));
+      deps.dataLocation?.storage ??
+      (deps.storage instanceof LocalStorage
+        ? t("privacy:data.localDisk", { root: deps.storage.root })
+        : t("privacy:data.objectStorage", { location: deps.storage.info().location }));
     const database = deps.dataLocation?.database ?? (deps.dbKind === "postgres" ? "PostgreSQL" : t("privacy:data.pglite"));
     return {
       statement: privacyStatement(lang),

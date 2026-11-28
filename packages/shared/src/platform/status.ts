@@ -11,6 +11,16 @@ export interface AdminStatusDto {
   disk: { path: string; totalBytes: number; freeBytes: number; usedRatio: number } | null;
   memory: { totalBytes: number; freeBytes: number; processBytes: number };
   jobs: { queued: number; running: number; failed: number; done: number };
+  /** File storage (docs/onprem/object-storage.md): local disk or a bucket, its reachability and read cache. */
+  storage: {
+    driver: "local" | "s3" | "gcs";
+    location: string;
+    endpoint: string | null;
+    ok: boolean;
+    latencyMs: number;
+    error: string | null;
+    cache: { maxBytes: number; usedBytes: number; entries: number; hits: number; misses: number } | null;
+  };
   backup: {
     scheduled: boolean;
     lastSuccessAt: string | null;

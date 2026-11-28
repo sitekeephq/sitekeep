@@ -134,11 +134,12 @@ from the proxy.
 | `status` | services, health, version, installation ID, last backup, disk |
 | `logs [app\|db\|proxy]` | logs |
 | `start` / `stop` / `restart` | |
-| `backup` | `pg_dump -Fc` (+ verification with `pg_restore --list`), files (incremental with hard links to the previous backup if rsync is available, otherwise a full copy), settings; retention `CDE_BACKUP_KEEP` |
+| `backup` | `pg_dump -Fc` (+ verification with `pg_restore --list`), files (incremental with hard links to the previous backup if rsync is available, otherwise a full copy; with object storage the bucket's objects, [§6](#6-s3--minio)), settings; retention `CDE_BACKUP_KEEP` |
 | `backups` | list |
 | `restore <backup>` | first backs up the current state, then restores the database and files |
 | `upgrade <bundle directory>` | backup → load image → start (migrations at startup) → health; if not healthy within 3 min, returns to the old version and the pre-update database |
 | `uninstall [--purge]` | removes the services; data and settings remain, `--purge` deletes them |
+| `storage <command>` | file storage tool: `check`, `migrate`, `prune-local`, `pull`, `push` ([object storage](object-storage.md)) |
 
 The backup stays on the same disk; the README tells the customer to copy it off the server. Remote targets
 (SFTP / S3 / NAS) will come with the engine in [backups.md](backups.md).
@@ -182,10 +183,16 @@ startup check (health, login, `dwg2dxf`) for the amd64 image.
 
 ## 6. S3 / MinIO
 
-Not needed for an on-premises installation: files are under `CDE_DATA/app`, and a separate disk or NAS can be
-mounted if desired. An object storage driver can be added if the customer asks; the code reads the file as a local path in 14 places
-(IFC, preview, clash, document comparison workers), which would need a temporary download layer
-(KALANLAR.md §1).
+Files are under `CDE_DATA/app` by default; a separate disk or NAS can be mounted there. When the customer wants
+the files in object storage (their MinIO, AWS S3, Cloudflare R2, Google Cloud Storage), set `CDE_STORAGE=s3` (or
+`gcs`) and the bucket's variables in `config/app.env`: [Object storage](object-storage.md) (settings, MinIO and
+GCS setup, migration, cache, backups). The database stays on the server.
+
+- `sudo sitekeep storage check` tests the bucket; `sudo sitekeep storage --to=s3 migrate` copies the existing
+  files (resumable, verified; local files stay until `prune-local --yes`).
+- The app does not start when the configured bucket is unreachable or misconfigured (no silent fallback).
+- `sitekeep backup` also copies the bucket's objects into the backup (`objects/`, hard links to the previous
+  backup); `CDE_BACKUP_OBJECTS=0` in `/opt/sitekeep/.env` leaves the files to the bucket's own versioning.
 
 ## 7. To do
 

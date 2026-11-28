@@ -10,7 +10,7 @@ import { hashPassword } from "../../src/core/security/auth.js";
 import { openDb, type DbHandle } from "../../src/db/index.js";
 import { users } from "../../src/db/schema.js";
 import { JobQueue } from "../../src/jobs/queue.js";
-import { LocalStorage } from "../../src/core/platform/storage.js";
+import { testStorage } from "../helpers/test-storage.js";
 import { parseIds } from "../../src/coordination/ids.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -86,7 +86,7 @@ const PW = "Sifre-1234567";
 beforeAll(async () => {
   dataDir = mkdtempSync(path.join(os.tmpdir(), "7dcde-coord-"));
   handle = await openDb("memory://");
-  const storage = new LocalStorage(path.join(dataDir, "storage"));
+  const storage = await testStorage(dataDir);
   jobs = new JobQueue(handle.db, storage);
   app = await buildApp({ db: handle.db, storage, jobs });
   await handle.db

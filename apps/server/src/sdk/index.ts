@@ -22,6 +22,8 @@ export {
 export type { AppDeps, ReportLlm, ReportLlmMessage, ResolvedDeps } from "../app/deps.js";
 export type { Db } from "../db/index.js";
 export type { Storage } from "../core/platform/storage.js";
+// Object storage (SDK 0.21.0): local copies for workers, ranged reads; localPath only works on the local disk.
+export { StorageNotLocalError, withLocalCopies, type ByteRange, type LocalCopy, type StorageEntry } from "../core/platform/storage.js";
 export * from "./schema.js";
 
 // HTTP errors, audit, access

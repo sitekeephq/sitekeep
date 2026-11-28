@@ -120,7 +120,15 @@ docker run --rm -v sitekeep_cdedata:/data -v "$PWD":/yedek alpine tar -czf /yede
 ```
 
 The volume name starts with the Compose project name (the folder name; `docker volume ls`). The database and the files are only meaningful
-together. The installation bundle handles the nightly backup and restore itself ([backups.md](backups.md)).
+together. With files on object storage (below) copy the bucket as well:
+`docker compose run --rm --no-deps -u 0 -v "$PWD/objects":/backup app node apps/server/dist/scripts/storage.js pull /backup`. The installation bundle handles the nightly backup and restore itself ([backups.md](backups.md)).
+
+## Object storage (optional)
+
+Files can live in a bucket instead of the `cdedata` volume: MinIO, AWS S3, Cloudflare R2 (`CDE_STORAGE=s3`) or
+Google Cloud Storage (`CDE_STORAGE=gcs`). Settings, a MinIO service example, migration of existing files and
+backups: [Object storage](object-storage.md). The `cdedata` volume stays (read cache, temporary files; the
+embedded database when `DATABASE_URL` is not set).
 
 ## Encryption at rest
 

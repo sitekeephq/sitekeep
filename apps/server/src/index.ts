@@ -15,7 +15,7 @@ import { loadSecretKey } from "./core/platform/secrets.js";
 import { upgradeSeededLabels } from "./projects/seeded-labels.js";
 import { seedTaskTeamsOnce } from "./cde/teams.js";
 import { startDueReminders } from "./workflow/reminders.js";
-import { LocalStorage } from "./core/platform/storage.js";
+import { describeStorage, openStorage } from "./core/platform/storage-config.js";
 import { mailerFromEnv } from "./works/letter.js";
 import { startRetention } from "./privacy/retention.js";
 import { startLicenseRefresh } from "./license/online.js";
@@ -76,13 +76,26 @@ import { queueModelBackfill, queueModelReconversion } from "./files/model-backfi
  *                      downloadable (default 14), free disk space to keep (default 2)
  *   CDE_IFC_CIRCLE_SEGMENTS
  *                      straight pieces per circle in viewer models (12–128, default 48)
+ *   File storage (docs/onprem/object-storage.md; core/platform/storage-config.ts lists every variable):
+ *   CDE_STORAGE        local (default, DATA_DIR/storage) | s3 (AWS S3, MinIO, R2) | gcs (Google Cloud Storage)
+ *   CDE_S3_BUCKET / CDE_S3_ENDPOINT / CDE_S3_REGION / CDE_S3_ACCESS_KEY_ID / CDE_S3_SECRET_ACCESS_KEY /
+ *   CDE_S3_FORCE_PATH_STYLE / CDE_S3_PREFIX      CDE_GCS_BUCKET / CDE_GCS_PREFIX (credentials: ADC)
+ *   CDE_STORAGE_CACHE_GB  local read cache of object storage (default 2, 0 = off)
  */
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.resolve(process.env.DATA_DIR ?? "./data");
 const dbUrl = process.env.DATABASE_URL || path.join(dataDir, "db");
 
 const { db, kind, close } = await openDb(dbUrl);
-const storage = new LocalStorage(path.join(dataDir, "storage"));
+// Object storage that is configured but does not answer stops the start: no silent fallback to the disk.
+let storage: Awaited<ReturnType<typeof openStorage>>;
+try {
+  storage = await openStorage(dataDir, process.env, { server: true });
+} catch (err) {
+  console.error(`File storage: ${(err as Error).message}`);
+  process.exit(1);
+}
+console.log(`File storage: ${describeStorage(storage)}`);
 const circleSegments = Number(process.env.CDE_IFC_CIRCLE_SEGMENTS);
 const jobs = new JobQueue(db, storage, {
   ...(Number.isInteger(circleSegments) && circleSegments >= 12 && circleSegments <= 128 ? { circleSegments } : {}),
@@ -122,7 +135,7 @@ const app = await buildApp({
   logger: true,
   mailer,
   dbKind: kind,
-  dataLocation: { database: databaseLocation(), storage: `Yerel disk: ${path.join(dataDir, "storage")}` },
+  dataLocation: { database: databaseLocation(), ...(storage.driver === "local" && { storage: `Yerel disk: ${path.join(dataDir, "storage")}` }) },
   googleAuth: googleAuthFromEnv(),
   autodeskAuth: autodeskAuthFromEnv(),
 });
