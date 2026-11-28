@@ -57,9 +57,12 @@ RUN npm run build -w @sitekeephq/bim-viewer \
       rm -rf node_modules/@sitekeephq/sitekeep-ee-* \
       && node tools/third-party-notices.mjs --ee-only | xargs -r rm -rf \
       && find node_modules -mindepth 1 -maxdepth 1 -name '@*' -type d -empty -delete; \
+    else \
+      node -e 'const fs=require("fs");const d=Object.keys(require("./apps/server/package.json").optionalDependencies).filter(n=>n.startsWith("@sitekeephq/sitekeep-ee-"));const m=d.filter(n=>!fs.existsSync("node_modules/"+n+"/package.json"));if(m.length){console.error("Enterprise modules missing from node_modules (nested in a workspace? check package-lock.json):",m.join(", "));process.exit(1)}'; \
     fi
 # (again after prune: npm restores missing optional packages from its cache; the packages only the Enterprise
-# modules need, such as @cursor/sdk, go too)
+# modules need, such as @cursor/sdk, go too). Enterprise: every module the server depends on must be in the root
+# node_modules, the only one copied into the image; a module npm nested under apps/* would silently be missing.
 # OCR of scanned sheets (docs/features/SHEETS.md): tesseract.js runs a WebAssembly build of Tesseract in Node
 # with the English and Turkish "best_int" models, all installed by npm ci (nothing is downloaded at run time).
 # The legacy models and the browser builds (WebAssembly inlined in JavaScript) are removed, about 45 MB; the

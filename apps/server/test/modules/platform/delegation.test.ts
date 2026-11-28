@@ -232,21 +232,26 @@ describe.skipIf(!hasDelegation)("approval delegation (Platform)", () => {
     expect((await bora.get(`${P()}/reviews/${open}`)).body.canAct).toBe(true);
   });
 
-  it("period boundaries: 1–15 December covers the 1st and the 15th, not the 30th of November or the 16th", async () => {
-    const r = await ayse.post("/delegations", { delegateId: ids.bora, startsOn: "2026-12-01", endsOn: "2026-12-15", projectIds: [pid] });
+  it("period boundaries: a 15-day period covers its first and last day, not the day before or after", async () => {
+    // Relative to today (a fixed December period went stale once the calendar passed it): starts in 10 days,
+    // so Bora's step from the earlier test (due in 5) is overdue by then.
+    const from = addDaysIso(today, 10);
+    const to = addDaysIso(today, 24);
+    const r = await ayse.post("/delegations", { delegateId: ids.bora, startsOn: from, endsOn: to, projectIds: [pid] });
     expect(r.status, JSON.stringify(r.body)).toBe(200);
-    expect(r.body.delegation.status).toBe(today < "2026-12-01" ? "planned" : "active");
-    const ask = (at: string, projectId = pid) => mod!.assigneeResolver.delegates({ db: handle.db, projectId, userIds: [ids.ayse!], at: new Date(at) });
-    expect(await ask("2026-11-30T23:30:00")).toEqual([]);
-    expect(await ask("2026-12-01T00:00:01")).toEqual([{ forUserId: ids.ayse, userId: ids.bora, delegationId: r.body.delegation.id }]);
-    expect((await ask("2026-12-15T23:59:00")).length).toBe(1);
-    expect(await ask("2026-12-16T00:00:01")).toEqual([]);
-    expect(await ask("2026-12-05T10:00:00", pid2)).toEqual([]); // other project: out of scope
+    expect(r.body.delegation.status).toBe("planned");
+    const at = (day: string, time: string) => new Date(`${day}T${time}`);
+    const ask = (when: Date, projectId = pid) => mod!.assigneeResolver.delegates({ db: handle.db, projectId, userIds: [ids.ayse!], at: when });
+    expect(await ask(at(addDaysIso(from, -1), "23:30:00"))).toEqual([]);
+    expect(await ask(at(from, "00:00:01"))).toEqual([{ forUserId: ids.ayse, userId: ids.bora, delegationId: r.body.delegation.id }]);
+    expect((await ask(at(to, "23:59:00"))).length).toBe(1);
+    expect(await ask(at(addDaysIso(to, 1), "00:00:01"))).toEqual([]);
+    expect(await ask(at(addDaysIso(from, 4), "10:00:00"), pid2)).toEqual([]); // other project: out of scope
     // The reminder round tells both when it starts (once).
     const starts = async () => (await bora.get("/notifications")).body.filter((n: { kind: string }) => n.kind === "delegation.started").length;
     const before = await starts();
-    await runDueReminders(handle.db, new Date("2026-12-01T08:00:00"));
-    await runDueReminders(handle.db, new Date("2026-12-01T09:00:00"));
+    await runDueReminders(handle.db, at(from, "08:00:00"));
+    await runDueReminders(handle.db, at(from, "09:00:00"));
     expect(await starts()).toBe(before + 1);
     // The step from Bora's earlier period is overdue by then: the reminder reaches the delegate too.
     expect((await bora.get("/notifications")).body.some((n: { kind: string; title: string }) => n.kind === "review.overdue" && n.title.includes("Ayşe adına"))).toBe(true);
